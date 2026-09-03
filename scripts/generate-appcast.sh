@@ -9,7 +9,7 @@ BUILD_NUMBER=$(grep CURRENT_PROJECT_VERSION "$ROOT_DIR/Config.xcconfig" | cut -d
 DMG_NAME="Reframed-${VERSION}.dmg"
 DMG_PATH="$DIST_DIR/$DMG_NAME"
 APPCAST_PATH="$DIST_DIR/appcast.xml"
-DOWNLOAD_URL="https://github.com/jkuri/Reframed/releases/download/v${VERSION}/${DMG_NAME}"
+DOWNLOAD_URL="https://github.com/mattwebhub/Reframed/releases/download/v${VERSION}/${DMG_NAME}"
 
 if [ ! -f "$DMG_PATH" ]; then
   echo "Error: DMG not found at $DMG_PATH"
@@ -103,7 +103,7 @@ cat > "$APPCAST_PATH" << EOF
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>Reframed</title>
-    <link>https://github.com/jkuri/Reframed</link>
+    <link>https://github.com/mattwebhub/Reframed</link>
     <description>Reframed Updates</description>
     <language>en</language>
     <item>

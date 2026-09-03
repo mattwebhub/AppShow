@@ -46,7 +46,7 @@ The codebase is organized by concern:
 - `UI/` -- reusable components, toolbar, settings
 - `Utilities/` -- extensions and helpers
 
-See `CLAUDE.md` for a more detailed breakdown.
+See `AGENTS.md` for a more detailed breakdown.
 
 ## Concurrency
 

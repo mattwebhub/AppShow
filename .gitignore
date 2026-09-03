@@ -67,3 +67,6 @@ fastlane/test_output
 .DS_Store
 
 .claude/worktrees
+
+# Per-developer signing overrides (see Local.xcconfig.example)
+Local.xcconfig

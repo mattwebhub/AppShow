@@ -8,7 +8,7 @@ VERSION=$(grep MARKETING_VERSION "$ROOT_DIR/Config.xcconfig" | cut -d'=' -f2 | t
 TAG="v${VERSION}"
 DMG_PATH="$DIST_DIR/Reframed-${VERSION}.dmg"
 APPCAST_PATH="$DIST_DIR/appcast.xml"
-REPO="jkuri/Reframed"
+REPO="mattwebhub/Reframed"
 
 if ! command -v gh &>/dev/null; then
   echo "Error: gh CLI not found. Install it: brew install gh"

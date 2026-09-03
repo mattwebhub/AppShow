@@ -27,7 +27,7 @@ enum UpdateChecker {
   }
 
   nonisolated static func fetchLatestChangelog() async -> (version: String, changelog: String)? {
-    let urlString = "https://api.github.com/repos/jkuri/Reframed/releases/latest"
+    let urlString = "https://api.github.com/repos/mattwebhub/Reframed/releases/latest"
     guard let url = URL(string: urlString) else { return nil }
 
     var request = URLRequest(url: url)
