@@ -13,6 +13,10 @@ Last updated: 2026-09-03
 
 - `make build`, `make lint`, `make test` exit 0; 21 tests in 4 suites.
 
+## Scheduled
+
+- Execution kickoff timer set for 2026-09-03 23:11 local (milestone 00 leftovers, then 01, 02, 03 in order with TDD).
+
 ## Next
 
 1. Owner answers the questions in `docs/features/00-overall-plan.md` (27, each with a stated assumption) and decides ADRs 0005 (identity), 0008 (gifski licence), 0009 (Toone code provenance).
@@ -22,5 +26,5 @@ Last updated: 2026-09-03
 
 ## Open questions for the owner
 
-- Product identity (ADR 0005), gifski licence before distribution (ADR 0008), Toone provenance (ADR 0009).
+- Product identity (ADR 0005), Toone provenance (ADR 0009). ADR 0008 accepted: fully open source, gifski kept under AGPL.
 - The 27 feature questions in `docs/features/00-overall-plan.md`.

@@ -19,6 +19,7 @@ Depends on: none.
 - [ ] T11. GitHub Actions workflow running build, lint, and test on a macOS runner on every PR. Workflow written at `.github/workflows/ci.yml`; unproven until a PR runs it. Proof: green check on a PR to `main`.
 - [x] T12. `AGENTS.md` fork section: TDD workflow, planning folder, upstream sync, and the test/lint commands. Proof: file mentions `planning/STATE.md`, `make test`, and `upstream-sync.md`.
 - [ ] T13. Owner decides product identity (ADR 0005). Proof: ADR status is `accepted` or `rejected`.
+- [x] T15. gifski licence bookkeeping (ADR 0008 accepted, fully open source): AGPL text at `Reframed/Libraries/gifski/LICENSE`, attribution in Credits and README. Proof: file exists, `grep -i gifski Reframed/Credits.html` matches.
 - [ ] T14. Commit the milestone on a branch and open a PR to `main` of the fork. Proof: PR URL recorded in `VERIFY.md`.
 
 ## Out of scope
