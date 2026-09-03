@@ -1,2 +1,10 @@
 MARKETING_VERSION = 0.14.7
 CURRENT_PROJECT_VERSION = 26
+
+// Signing defaults to ad-hoc so a fresh clone builds and runs locally.
+// Put your own team in Local.xcconfig (git-ignored, see Local.xcconfig.example).
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY = -
+DEVELOPMENT_TEAM =
+
+#include? "Local.xcconfig"

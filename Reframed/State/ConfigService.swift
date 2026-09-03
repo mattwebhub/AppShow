@@ -107,7 +107,7 @@ final class ConfigService {
   }
 
   private init() {
-    let dir = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".reframed", isDirectory: true)
+    let dir = ReframedPaths.home
     try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
     fileURL = dir.appendingPathComponent("reframed.json")
     data = ConfigData()
