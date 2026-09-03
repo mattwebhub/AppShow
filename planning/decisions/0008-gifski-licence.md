@@ -1,22 +1,19 @@
 # 0008. Licence of the vendored gifski library
 
-Status: proposed
+Status: accepted
 Date: 2026-09-03
 
 ## Context
 
-`Reframed/Libraries/gifski/libgifski.a` is a prebuilt static library linked into the app for GIF export (`Reframed/Compositor/VideoCompositor+GIFExport.swift`). gifski upstream (`ImageOptim/gifski`) is licensed AGPL-3.0; the folder contains only `gifski.h`, `libgifski.a`, and `module.modulemap`, no licence text and no source. The app itself is MIT. AGPL obligations attach to distribution of a combined work, not to private development, so this does not block local work or testing.
+`Reframed/Libraries/gifski/libgifski.a` is a prebuilt static library linked into the app for GIF export (`Reframed/Compositor/VideoCompositor+GIFExport.swift`). gifski (`ImageOptim/gifski`) is licensed AGPL-3.0-or-later; its author offers commercial licences for closed-source use. Upstream ships only `gifski.h`, `libgifski.a`, and `module.modulemap`, no licence text. The app itself is MIT. AGPL obligations attach to distribution, not to private development.
 
 ## Decision
 
-Pending. Options when we distribute:
-
-1. Keep gifski and publish the fork's complete source under AGPL-compatible terms, adding the gifski licence text to `Reframed/Credits.html` and the repo.
-2. Replace gifski with an MIT/Apache GIF encoder (ImageIO `CGImageDestination` with `kCGImagePropertyGIFDictionary`, lower quality; or a permissively licensed quantizer) and delete `Libraries/gifski`.
-3. Drop GIF export.
-
-Recommendation: decide before the first external release; keep gifski until then so upstream merges stay simple.
+The product stays fully open source. We keep gifski, ship the AGPL-3.0 text next to the library (`Reframed/Libraries/gifski/LICENSE`), credit gifski in `Reframed/Credits.html` and the README, and offer the combined distributed app under AGPL-compatible terms (source always published). No commercial gifski licence is needed.
 
 ## Consequences
 
-To be filled when accepted. Whatever is chosen, the test bundle must not link `libgifski.a` directly (see `docs/architecture/07-testability.md`).
+- GIF export stays as upstream built it; merges stay simple.
+- Any future move to closed-source or paid distribution reopens this decision: replace gifski or buy a commercial licence first.
+- The test bundle must not link `libgifski.a` directly (see `docs/architecture/07-testability.md`).
+- Owner decided on 2026-09-03: "we will keep fully open source".

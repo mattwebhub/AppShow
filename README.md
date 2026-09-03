@@ -95,4 +95,4 @@ Or grab the `.dmg` from [Releases](https://github.com/jkuri/reframed/releases).
 
 ## License
 
-MIT
+MIT. GIF export links [gifski](https://gif.ski), which is licensed AGPL-3.0-or-later (text in `Reframed/Libraries/gifski/LICENSE`); distributed builds of this app are therefore offered with full source under AGPL-compatible terms.
