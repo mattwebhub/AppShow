@@ -82,7 +82,7 @@ struct ReframedProject: Sendable {
     let fm = FileManager.default
     let prefix = projectPrefix(captureMode: captureMode, sourceName: sourceName)
     let ts = timestamp()
-    let bundleName = "\(prefix)-\(ts).frm"
+    let bundleName = "\(prefix)-\(ts).\(AppShowIdentity.projectExtension)"
     let bundleURL = directory.appendingPathComponent(bundleName)
     try fm.createDirectory(at: bundleURL, withIntermediateDirectories: true)
 
@@ -169,7 +169,11 @@ struct ReframedProject: Sendable {
       .components(separatedBy: CharacterSet.alphanumerics.union(CharacterSet(charactersIn: " -_")).inverted)
       .joined()
     let dirName = sanitized.isEmpty ? newName : sanitized
-    let newBundleURL = bundleURL.deletingLastPathComponent().appendingPathComponent("\(dirName).frm")
+    let currentExtension = bundleURL.pathExtension.lowercased()
+    let projectExtension =
+      currentExtension == AppShowIdentity.legacyProjectExtension
+      ? AppShowIdentity.legacyProjectExtension : AppShowIdentity.projectExtension
+    let newBundleURL = bundleURL.deletingLastPathComponent().appendingPathComponent("\(dirName).\(projectExtension)")
 
     if newBundleURL != bundleURL && !FileManager.default.fileExists(atPath: newBundleURL.path) {
       try FileManager.default.moveItem(at: bundleURL, to: newBundleURL)

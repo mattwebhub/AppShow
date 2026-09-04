@@ -42,8 +42,8 @@ struct ReframedProjectTests {
     let fm = FileManager.default
     let bundleName = project.bundleURL.lastPathComponent
     #expect(bundleName.hasPrefix("Screen-"))
-    #expect(bundleName.hasSuffix(".frm"))
-    #expect(bundleName == "\(project.name).frm")
+    #expect(bundleName.hasSuffix(".appshow"))
+    #expect(bundleName == "\(project.name).appshow")
     #expect(project.bundleURL.deletingLastPathComponent().lastPathComponent == "projects")
     let expected = ["screen.mov", "webcam.mp4", "system-audio.m4a", "mic-audio.m4a", "cursor-metadata.json", "project.json"]
     let contents = try fm.contentsOfDirectory(atPath: project.bundleURL.path).sorted()
@@ -179,7 +179,7 @@ struct ReframedProjectTests {
     var (project, _) = try await makeProject(in: dir, webcam: false, cursor: false)
     let oldURL = project.bundleURL
     try project.rename(to: "My Clip: v2/final_cut!")
-    #expect(project.bundleURL.lastPathComponent == "My Clip v2final_cut.frm")
+    #expect(project.bundleURL.lastPathComponent == "My Clip v2final_cut.appshow")
     #expect(project.bundleURL.deletingLastPathComponent() == oldURL.deletingLastPathComponent())
     #expect(project.metadata.name == "My Clip: v2/final_cut!")
     #expect(project.name == "My Clip: v2/final_cut!")
@@ -196,7 +196,7 @@ struct ReframedProjectTests {
     defer { TestPaths.remove(dir) }
     var (project, _) = try await makeProject(in: dir, webcam: false, cursor: false)
     let oldURL = project.bundleURL
-    let occupied = oldURL.deletingLastPathComponent().appendingPathComponent("Taken.frm")
+    let occupied = oldURL.deletingLastPathComponent().appendingPathComponent("Taken.appshow")
     try FileManager.default.createDirectory(at: occupied, withIntermediateDirectories: true)
     try project.rename(to: "Taken")
     #expect(project.bundleURL == oldURL)
@@ -209,7 +209,7 @@ struct ReframedProjectTests {
     defer { TestPaths.remove(dir) }
     var (project, _) = try await makeProject(in: dir, webcam: false, cursor: false)
     try project.rename(to: "***")
-    #expect(project.bundleURL.lastPathComponent == "***.frm")
+    #expect(project.bundleURL.lastPathComponent == "***.appshow")
     #expect(FileManager.default.fileExists(atPath: project.bundleURL.appendingPathComponent("project.json").path))
   }
 
@@ -237,6 +237,20 @@ struct ReframedProjectTests {
     #expect(throws: (any Error).self) {
       try ReframedProject.open(at: bundle)
     }
+  }
+
+  @Test func legacyFrmProjectOpensAndKeepsItsExtensionWhenRenamed() async throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let (created, _) = try await makeProject(in: dir, webcam: false, cursor: false)
+    let legacyURL = created.bundleURL.deletingPathExtension().appendingPathExtension("frm")
+    try FileManager.default.moveItem(at: created.bundleURL, to: legacyURL)
+
+    var legacy = try ReframedProject.open(at: legacyURL)
+    try legacy.rename(to: "Legacy Renamed")
+
+    #expect(legacy.bundleURL.lastPathComponent == "Legacy Renamed.frm")
+    #expect(try ReframedProject.open(at: legacy.bundleURL).metadata.name == "Legacy Renamed")
   }
 
   @Test func deleteRemovesTheBundle() async throws {

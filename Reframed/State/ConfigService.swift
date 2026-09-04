@@ -112,7 +112,7 @@ final class ConfigService {
   }
 
   private convenience init() {
-    self.init(fileURL: ReframedPaths.home.appendingPathComponent("reframed.json"))
+    self.init(fileURL: AppShowPaths.home.appendingPathComponent("config.json"))
   }
 
   init(fileURL: URL) {
@@ -174,7 +174,7 @@ final class ConfigService {
 }
 
 private struct ConfigData: Codable {
-  var outputFolder: String = "~/Movies/Reframed"
+  var outputFolder: String = "~/Movies/AppShow"
   var timerDelay: Int = 3
   var audioDeviceId: String? = nil
   var rememberLastSelection: Bool = true
@@ -183,7 +183,7 @@ private struct ConfigData: Codable {
   var captureSystemAudio: Bool = false
   var cameraDeviceId: String? = nil
   var cameraMaximumResolution: String = "1080p"
-  var projectFolder: String = "~/Reframed"
+  var projectFolder: String = "~/AppShow"
   var retinaCapture: Bool = false
   var dimOuterArea: Bool = true
   var hideCameraPreviewWhileRecording: Bool = false
