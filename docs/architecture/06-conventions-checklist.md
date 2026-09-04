@@ -1,15 +1,15 @@
 # 06 — Conventions Checklist (pre-PR)
 
-Derived from `05-coding-patterns.md`. Run through the matching list before opening a PR. Paths are relative to `Reframed/`.
+Derived from `05-coding-patterns.md`. Run through the matching list before opening a PR. Paths are relative to `AppShow/`.
 
 ## Always
 
 1. `make format` then `make build`; zero warnings.
 2. No comments (`//`, `///`, `/* */`, `// MARK:`). Rename instead.
 3. No stock button styles; use `PlainCustomButtonStyle`/`OutlineButtonStyle`/`PrimaryButtonStyle`/`SecondaryButtonStyle` from `UI/PrimaryButton.swift`.
-4. Colours/sizes/radii only via `ReframedColors`, `FontSize`, `Radius`, `Layout` (`UI/Colors.swift`, `UI/Constants.swift`).
+4. Colours/sizes/radii only via `AppShowColors`, `FontSize`, `Radius`, `Layout` (`UI/Colors.swift`, `UI/Constants.swift`).
 5. New view: `@Environment(\.colorScheme)` + `let _ = colorScheme` at top of `body`; split at ~200 lines into `View+Section.swift`.
-6. New logger: `Logger(label: "eu.jankuri.reframed.<kebab-name>")`, levels `info`/`warning`/`error` only, never `print`.
+6. New logger: `Logger(label: "com.mattwebhub.appshow.<kebab-name>")`, levels `info`/`warning`/`error` only, never `print`.
 7. Errors: throw `CaptureError` (`State/CaptureState.swift`); surface with `SessionState.showError` (recording) or an inline `phase`/`errorMessage` (editor).
 8. Concurrency: `@MainActor @Observable final class` for UI models, `actor` for pipeline owners, `@unchecked Sendable` only with a serial queue + `dispatchPrecondition` or all-`let` members; `MainActor.assumeIsolated` in AppKit callbacks.
 9. Codable: new fields optional or `decodeOrDefault(...)` in an `extension X { init(from:) }`; string-backed enums; `CodableColor`/`CodableSize` for CG types.
@@ -36,7 +36,7 @@ Derived from `05-coding-patterns.md`. Run through the matching list before openi
 3. Thread the value: `State/SessionState+Recording.swift` (`options.x`) → `Recording/RecordingCoordinator+Screen.swift` / `+Device.swift` parameter → `Recording/ScreenCaptureSession.swift` / `Recording/VideoTrackWriter.swift` / `Utilities/EncodingSettings.swift`.
 4. UI: `UI/Settings<General|Recording|Devices>Tab.swift` via `settingsToggle(_:isOn:)` or `settingsRow(label:) { SegmentPicker(...) }` bound with `Binding(get: { options?.x ?? default }, set: { options?.x = $0 })`; or a `CheckmarkRow` group in `UI/OptionsPopover.swift` for toolbar-level options.
 5. Session-layout state (positions, last selection) goes to `State/StateService.swift`, not `ConfigService`.
-6. Persisting per-project: add to `ProjectMetadata` in `Project/ReframedProject.create(...)` and read back in `ReframedProject.recordingResult` / `RecordingResult`.
+6. Persisting per-project: add to `ProjectMetadata` in `Project/AppShowProject.create(...)` and read back in `AppShowProject.recordingResult` / `RecordingResult`.
 
 ## Adding a new capture mode
 
@@ -47,7 +47,7 @@ Derived from `05-coding-patterns.md`. Run through the matching list before openi
 5. Overlay/selection UI: new `CaptureModes/Capture<Mode>/` folder with a `@MainActor final class <Mode>SelectionCoordinator` and NSWindow/NSView overlay, following `CaptureModes/Common/SelectionCoordinator.swift`.
 6. Toolbar: `UI/CaptureToolbar+ModeSelection.swift` — a `ModeButton(icon:label:isSelected:)` calling `session.selectMode(.x)` with `.hoverEffect(id: "mode.x")`.
 7. `Utilities/KeyboardShortcut.swift` — optional `ShortcutAction.switchTo<Mode>` with `label`, `isSessionAction`, `isGlobal`, `defaultShortcut`; dispatch in `State/KeyboardShortcutManager.swift`.
-8. `Project/ReframedProject.projectPrefix(captureMode:sourceName:)` — bundle-name prefix; `State/SessionState+Project.projectSourceName()` — source label.
+8. `Project/AppShowProject.projectPrefix(captureMode:sourceName:)` — bundle-name prefix; `State/SessionState+Project.projectSourceName()` — source label.
 9. `Utilities/MenuBarIcon.swift` / `SessionState.updateStatusIcon()` if the mode needs a distinct menu-bar state.
 
 ## Adding a new export option
@@ -58,5 +58,5 @@ Derived from `05-coding-patterns.md`. Run through the matching list before openi
 4. `Compositor/VideoCompositor.swift` — read `config.exportSettings.x` in `export(...)` and route to `+ManualExport`, `+ParallelExport`, or `+GIFExport`; update `checkNeedsCompositor` in `+InstructionBuilder.swift` if the option can bypass rendering.
 5. `Utilities/EncodingSettings.exportVideoSettings(...)` for codec/bitrate/colour changes; `Compositor/VideoCompositor+Audio.swift` for audio mix changes.
 6. Sidecar outputs follow `Utilities/SubtitleExporter.swift` and are written next to the URL returned from `export` in `Editor/EditorState+Export.swift`.
-7. Output naming/location goes through `FileManager.default.defaultSaveURL(for:extension:)` (`Recording/FileManager+Reframed.swift`) via `MainActor.run`.
+7. Output naming/location goes through `FileManager.default.defaultSaveURL(for:extension:)` (`Recording/FileManager+AppShow.swift`) via `MainActor.run`.
 8. Test one passthrough export (no effects) and one composited export in both `.parallel` and `.normal` modes.

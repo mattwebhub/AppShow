@@ -1,11 +1,11 @@
-# .frm project format
+# AppShow project format
 
-Reframed saves recordings as `.frm` bundles -- directories that macOS treats as opaque files. The UTI is `eu.jkuri.reframed.project`.
+AppShow saves new recordings as `.appshow` bundles -- directories that macOS treats as opaque files. The UTI is `com.mattwebhub.appshow.project`. Legacy `.frm` bundles with UTI `eu.jankuri.reframed.project` open without conversion and retain their extension when renamed.
 
 ## Bundle structure
 
 ```
-recording-2024-12-06-143022.frm/
+recording-2024-12-06-143022.appshow/
 ├── project.json
 ├── screen.mp4            (or screen.mov for ProRes)
 ├── webcam.mp4            (optional)
@@ -76,11 +76,11 @@ Array of editor state snapshots for undo/redo, up to 50 entries. Each entry has 
 
 ## Storage location
 
-Projects are saved to the configured project folder (default: `~/Reframed`). The folder is set in ConfigService and can be changed in settings.
+Projects are saved to the configured project folder (default: `~/AppShow`). The folder is set in ConfigService and can be changed in settings.
 
 ## Reopening projects
 
-Double-clicking a .frm bundle (or opening from the menu bar's recent projects list) loads the project metadata, reconstructs EditorState from the saved snapshot, loads cursor metadata if present, and opens the editor window. The recording files are read directly from the bundle during preview and export.
+Double-clicking an `.appshow` or legacy `.frm` bundle (or opening from the menu bar's recent projects list) loads the project metadata, reconstructs EditorState from the saved snapshot, loads cursor metadata if present, and opens the editor window. The recording files are read directly from the bundle during preview and export.
 
 ## Fork additions
 

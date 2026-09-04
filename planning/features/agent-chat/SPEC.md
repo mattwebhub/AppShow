@@ -23,7 +23,7 @@ Editing a recording into a presentation is many small manual steps. The user wan
 
 ## Touch points
 
-New module `Reframed/Agent/` (`AgentProvider` protocol, `ClaudeCodeProvider`, `CodexProvider`, `AgentProcessRunner`, `AgentSession`, and `AgentProbe` actors, `AgentTranscript` model, `AgentConversationStore`, `AgentReadiness`, `AgentToolchain`, panel views, and markdown renderer). Upstream edits per the attack plan: `EditorView.swift` (panel insertion), `StateService.swift` (panel state), `ConfigService.swift` (provider preference), `ReframedProject.swift` (`agent/` folder), and `EditorState.swift` (transcript ownership and export gate).
+New module `AppShow/Agent/` (`AgentProvider` protocol, `ClaudeCodeProvider`, `CodexProvider`, `AgentProcessRunner`, `AgentSession`, and `AgentProbe` actors, `AgentTranscript` model, `AgentConversationStore`, `AgentReadiness`, `AgentToolchain`, panel views, and markdown renderer). Upstream edits per the attack plan: `EditorView.swift` (panel insertion), `StateService.swift` (panel state), `ConfigService.swift` (provider preference), `AppShowProject.swift` (`agent/` folder), and `EditorState.swift` (transcript ownership and export gate).
 
 ## Owner assumptions in force
 

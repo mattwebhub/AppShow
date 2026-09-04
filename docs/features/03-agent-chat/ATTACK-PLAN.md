@@ -10,21 +10,21 @@ Toone paths below are relative to `/Users/matheusparanhos/Projects/toone/apps/to
 
 | # | Toone file (lines) | Lands as | What to strip while copying |
 | --- | --- | --- | --- |
-| 1 | `Toone/Core/Services/AIService/Claude/ClaudeCommandBuilder.swift:15-122` | `Reframed/Agent/ClaudeCodeProvider.swift` (arguments half) | `AISessionOptions`, MCP lockdown branches (45-72), budget flags |
-| 2 | `Toone/Core/Services/AIService/Codex/CodexCommandBuilder.swift:11-111` | `Reframed/Agent/CodexProvider.swift` (arguments half) | `AIModel`, image attachments |
+| 1 | `Toone/Core/Services/AIService/Claude/ClaudeCommandBuilder.swift:15-122` | `AppShow/Agent/ClaudeCodeProvider.swift` (arguments half) | `AISessionOptions`, MCP lockdown branches (45-72), budget flags |
+| 2 | `Toone/Core/Services/AIService/Codex/CodexCommandBuilder.swift:11-111` | `AppShow/Agent/CodexProvider.swift` (arguments half) | `AIModel`, image attachments |
 | 3 | `Toone/Core/Services/AIService/Claude/ClaudeMessageParser.swift:35-147` | `ClaudeCodeProvider.swift` (parser half), rewritten on `Codable` structs | `Log.ai`, plan/task/MCP projections (205-667) |
 | 4 | `Toone/Core/Services/AIService/Codex/CodexMessageParser.swift:29-44, 181-227, 420-476, 904-965, 1009-1063` | `CodexProvider.swift` (parser half) | app-server adapter (46-285), `Log.ai`, plan snapshots |
-| 5 | `TooneTests/Services/CodexCommandBuilderTests.swift:129-142`, `TooneTests/Services/ThreadTitleServiceTests.swift:114-115`, `TooneTests/Services/ChatProgressSafetyTests.swift:112-163` | `ReframedTests/Fixtures/agent/*.ndjson` | Convert inline literals to one file per scenario; add lines recorded from the installed CLIs |
-| 6 | `Toone/Features/Setup/Models/AIProviderReadiness.swift:8-62` + `TooneTests/Features/AIProviderReadinessTests.swift` | `Reframed/Agent/AgentReadiness.swift`, `ReframedTests/Agent/AgentReadinessTests.swift` | add `.notLoggedIn` |
-| 7 | `Toone/Features/Setup/Services/AIProviderDiscoveryService.swift:111-178`, `Toone/Core/Services/CLIManager/ToolchainResolver.swift:151-162, 210-246`, `Toone/Core/Services/CLIManager/AIProviderCandidateSelector.swift:14-20` | `Reframed/Agent/AgentToolchain.swift` | `@unchecked Sendable` → actor; login-shell fallback |
-| 8 | `Toone/Core/Services/AIService/Base/BaseAIService.swift:244-391, 494-581, 623-727` | `Reframed/Agent/AgentProcessRunner.swift` (as a reference, not a copy) | everything; only the sequence of operations survives |
-| 9 | `Toone/Features/Chat/Views/MarkdownTextView.swift:35-53, 59-610, 614-833, 877-1074` | `Reframed/Agent/AgentMarkdownView.swift` (+ `AgentMarkdownParser.swift` for the pure block parser) | `Colors.`, `layoutStyle`, `appEnvironment`, Mermaid |
+| 5 | `TooneTests/Services/CodexCommandBuilderTests.swift:129-142`, `TooneTests/Services/ThreadTitleServiceTests.swift:114-115`, `TooneTests/Services/ChatProgressSafetyTests.swift:112-163` | `AppShowTests/Fixtures/agent/*.ndjson` | Convert inline literals to one file per scenario; add lines recorded from the installed CLIs |
+| 6 | `Toone/Features/Setup/Models/AIProviderReadiness.swift:8-62` + `TooneTests/Features/AIProviderReadinessTests.swift` | `AppShow/Agent/AgentReadiness.swift`, `AppShowTests/Agent/AgentReadinessTests.swift` | add `.notLoggedIn` |
+| 7 | `Toone/Features/Setup/Services/AIProviderDiscoveryService.swift:111-178`, `Toone/Core/Services/CLIManager/ToolchainResolver.swift:151-162, 210-246`, `Toone/Core/Services/CLIManager/AIProviderCandidateSelector.swift:14-20` | `AppShow/Agent/AgentToolchain.swift` | `@unchecked Sendable` → actor; login-shell fallback |
+| 8 | `Toone/Core/Services/AIService/Base/BaseAIService.swift:244-391, 494-581, 623-727` | `AppShow/Agent/AgentProcessRunner.swift` (as a reference, not a copy) | everything; only the sequence of operations survives |
+| 9 | `Toone/Features/Chat/Views/MarkdownTextView.swift:35-53, 59-610, 614-833, 877-1074` | `AppShow/Agent/AgentMarkdownView.swift` (+ `AgentMarkdownParser.swift` for the pure block parser) | `Colors.`, `layoutStyle`, `appEnvironment`, Mermaid |
 | 10 | `Toone/Features/Chat/Views/RichMessageBubble.swift:852-867, 880-1004, 1040-1062` | `AgentStreamingCursor.swift`, `AgentToolCallRow.swift` | file-viewer links, `DesignTokens` |
-| 11 | `Toone/Features/Chat/Views/ChatPanelView.swift:136-186` | `Reframed/Agent/AgentTranscriptLayoutPolicy.swift` | nothing |
+| 11 | `Toone/Features/Chat/Views/ChatPanelView.swift:136-186` | `AppShow/Agent/AgentTranscriptLayoutPolicy.swift` | nothing |
 
 ## Phase 1 — provider protocol and stream parsers (pure) · size M · T1
 
-Failing tests first, all in `ReframedTests/Agent/`:
+Failing tests first, all in `AppShowTests/Agent/`:
 
 | Test | File | Assertion |
 | --- | --- | --- |
@@ -48,9 +48,9 @@ Failing tests first, all in `ReframedTests/Agent/`:
 | `codexTurnCompletedWithNullErrorIsNotAFailure` | same | pins the `NSNull` trap; decoded with `Codable` so `"error": null` is `nil` |
 | `codexTurnFailedYieldsFailedTurn` | same | `.turnCompleted(isError:true, …)` |
 | `codexReusedItemIdsDoNotCollide` | `AgentEventTests.swift` | two `item_0` messages produce distinct transcript ids (see phase 3) |
-| `fixtureFilesParseWithoutUnknownEvents` | `AgentFixtureTests.swift` | `@Test(arguments:)` over every `ReframedTests/Fixtures/agent/*.ndjson`: no `.system(raw)` from a known line |
+| `fixtureFilesParseWithoutUnknownEvents` | `AgentFixtureTests.swift` | `@Test(arguments:)` over every `AppShowTests/Fixtures/agent/*.ndjson`: no `.system(raw)` from a known line |
 
-Production: `Reframed/Agent/AgentProvider.swift`, `AgentEvent.swift`, `ClaudeCodeProvider.swift`, `CodexProvider.swift`; fixtures under `ReframedTests/Fixtures/agent/` (`claude-2.1-turn.ndjson`, `claude-2.1-tool-error.ndjson`, `codex-0.14-turn.ndjson`, `codex-0.14-failed.ndjson`), each ≤ 20 KB, plus `ReframedTests/Support/Fixtures.swift` with the `FixtureAnchor` class that `planning/tdd-strategy.md` already specifies.
+Production: `AppShow/Agent/AgentProvider.swift`, `AgentEvent.swift`, `ClaudeCodeProvider.swift`, `CodexProvider.swift`; fixtures under `AppShowTests/Fixtures/agent/` (`claude-2.1-turn.ndjson`, `claude-2.1-tool-error.ndjson`, `codex-0.14-turn.ndjson`, `codex-0.14-failed.ndjson`), each ≤ 20 KB, plus `AppShowTests/Support/Fixtures.swift` with the `FixtureAnchor` class that `planning/tdd-strategy.md` already specifies.
 
 Manual check: none (pure).
 
@@ -66,13 +66,13 @@ Manual check: none (pure).
 | `runnerTerminatesProcessOnTaskCancellation` | same | `/bin/sleep 30`; cancel the consuming task; `isRunning == false` within 1 s |
 | `runnerWatchdogFailsSilentProcess` | same | `/bin/sleep 30` with watchdog 0.2 s → `AgentError.inactivity` |
 | `runnerCapsLineAtOneMegabyte` | same | `/bin/sh -c 'head -c 2000000 /dev/zero | tr "\0" x; echo'` → `AgentError.lineTooLong`, process terminated |
-| `runnerUsesOnlyTheGivenEnvironment` | same | `/usr/bin/env` output contains `PATH` and `HOME` and not `REFRAMED_HOME` |
+| `runnerUsesOnlyTheGivenEnvironment` | same | `/usr/bin/env` output contains `PATH` and `HOME` and not `APPSHOW_HOME` |
 | `runnerRunsInTheGivenWorkingDirectory` | same | `/bin/pwd` prints the temp directory |
 | `sessionMapsLinesToEventsAndRecordsSessionId` | `AgentSessionTests.swift` | `/bin/cat` fed the Claude fixture → events equal phase 1 expectations, `sessionID == "…"` |
 | `sessionSecondTurnPassesResumeId` | same | a `RecordingProvider` test double captures `resume:` on the second `send` |
 | `sessionCancelTerminatesAndLeavesThreadResumable` | same | after `cancel()`, `sessionID` is retained |
 
-Production: `Reframed/Agent/AgentProcessRunner.swift` (actor), `AgentSession.swift` (actor), `AgentError.swift` (`LocalizedError`, own type; do not extend `CaptureError`). Tests use `@Suite(.serialized)` and `FileManager.default.temporaryDirectory/<UUID>` per `tdd-strategy.md` rule 4.
+Production: `AppShow/Agent/AgentProcessRunner.swift` (actor), `AgentSession.swift` (actor), `AgentError.swift` (`LocalizedError`, own type; do not extend `CaptureError`). Tests use `@Suite(.serialized)` and `FileManager.default.temporaryDirectory/<UUID>` per `tdd-strategy.md` rule 4.
 
 Manual check: Activity Monitor shows no `claude`/`codex` process after closing the editor window (T3, record in `VERIFY.md`).
 
@@ -94,7 +94,7 @@ Manual check: Activity Monitor shows no `claude`/`codex` process after closing t
 | `conversationSavesInsideTheBundle` | `AgentConversationStoreTests.swift` | temp `.frm` dir; `agent/conversation.json` exists |
 | `conversationLoadsWhenTheProjectReopens` | same | round trip through a temp bundle |
 | `clearRemovesMessagesAndResumeIds` | `AgentTranscriptTests.swift` | provider stays selected; transcript and ids reset |
-| `renamedProjectKeepsAgentDirectory` | `ReframedProjectTests.swift` | `ReframedProject.rename(to:)` on a temp bundle with `agent/` moves it |
+| `renamedProjectKeepsAgentDirectory` | `AppShowProjectTests.swift` | `AppShowProject.rename(to:)` on a temp bundle with `agent/` moves it |
 
 Production: `AgentConversationData.swift`, `AgentConversationStore.swift`, `AgentTranscript.swift`. `AgentTranscript` consumes an `AgentSession` created for each turn; reducer behavior is tested without a process and process integration uses fake executables.
 
@@ -104,12 +104,12 @@ Manual check: none.
 
 | Test | File | Assertion |
 | --- | --- | --- |
-| `stateServiceDefaultsToExpandedPanelWithDefaultWidth` | `ReframedTests/State/StateServiceTests.swift` | seam S2 `init(fileURL:)` on a temp file: `agentPanelCollapsed == false`, `agentPanelWidth == nil` |
+| `stateServiceDefaultsToExpandedPanelWithDefaultWidth` | `AppShowTests/State/StateServiceTests.swift` | seam S2 `init(fileURL:)` on a temp file: `agentPanelCollapsed == false`, `agentPanelWidth == nil` |
 | `stateServicePersistsPanelCollapsedAndWidth` | same | set, reload from file, equal |
 | `panelWidthIsClampedToLayoutBounds` | `AgentPanelLayoutTests.swift` | `AgentPanelLayout.clamp(250) == 260`, `clamp(900) == 480` |
-| `configServiceDefaultsAgentProviderToClaude` | `ReframedTests/State/ConfigServiceTests.swift` | merged-defaults load |
+| `configServiceDefaultsAgentProviderToClaude` | `AppShowTests/State/ConfigServiceTests.swift` | merged-defaults load |
 
-Production: `Layout` constants (`Reframed/UI/Constants.swift`), `StateService`/`ConfigService` fields, `Reframed/Agent/AgentPanelLayout.swift` (pure clamp), `AgentChatPanel.swift` + `+Header.swift` with a placeholder transcript area, the one-line insertion in `EditorView.swift:43`, the `EditorState.agentTranscript` property. Card chrome copied from `EditorView.swift:44-55`; toggle via `IconButton`; drag handle on the trailing edge; hidden in preview mode.
+Production: `Layout` constants (`AppShow/UI/Constants.swift`), `StateService`/`ConfigService` fields, `AppShow/Agent/AgentPanelLayout.swift` (pure clamp), `AgentChatPanel.swift` + `+Header.swift` with a placeholder transcript area, the one-line insertion in `EditorView.swift:43`, the `EditorState.agentTranscript` property. Card chrome copied from `EditorView.swift:44-55`; toggle via `IconButton`; drag handle on the trailing edge; hidden in preview mode.
 
 Manual check (T3): expand/collapse animates with `.easeInOut(duration: 0.2)` like the timeline signature animation (`EditorView.swift:77`); width survives quit and relaunch; window at 1400×900 still shows the full properties panel; light and dark appearance both use `backgroundCard` and `border`.
 
@@ -142,7 +142,7 @@ Manual check (T3): a 300-line assistant reply scrolls without jank; streaming cu
 | `probeReportsReadyFromCodexLoginStatusExitZero` | same | fixture script printing `Logged in using ChatGPT` |
 | `singleReadyProviderIsPreselected` | same | `AgentReadinessSnapshot.selection(remembered:)` |
 
-Production: `AgentReadiness.swift`, `AgentToolchain.swift` (actor `AgentProbe` with injectable search directories and executable overrides), `AgentChatPanel+Setup.swift` (setup card per state from `SPIKE.md` §6), provider `SegmentPicker` popover in the header. Fixture scripts live in `ReframedTests/Fixtures/agent/bin/` and are marked executable by `scripts/make-fixtures.swift`.
+Production: `AgentReadiness.swift`, `AgentToolchain.swift` (actor `AgentProbe` with injectable search directories and executable overrides), `AgentChatPanel+Setup.swift` (setup card per state from `SPIKE.md` §6), provider `SegmentPicker` popover in the header. Fixture scripts live in `AppShowTests/Fixtures/agent/bin/` and are marked executable by `scripts/make-fixtures.swift`.
 
 Manual check (T3): on a machine with neither CLI the panel shows the `.missing` card and the searched directories; after `brew install`/`npm i -g` "Check again" flips to ready without restarting; logged-out state shows the Terminal instruction.
 
@@ -175,12 +175,12 @@ Two people: one takes 1 → 2 → 3 → 6 (runtime), the other 4 → 5 → 7 (UI
 
 ## Definition of done
 
-- [ ] Every table row above exists as a test with that name; `make test` green locally and in CI; suites under `ReframedTests/Agent/` and the two `State/` suites.
-- [ ] No test launches `claude` or `codex`; fixtures under `ReframedTests/Fixtures/agent/` are ≤ 20 KB each, named with the CLI version they were recorded from.
-- [ ] `make format`, `make lint`, `make build` clean, zero warnings; no comments in new Swift files; every colour, size, and radius comes from `ReframedColors`/`FontSize`/`Radius`/`Layout`; only the four allowed button styles.
-- [ ] No `[String: Any]` crosses an actor boundary; no `@unchecked Sendable` in `Reframed/Agent/`; no `NSLock`.
+- [ ] Every table row above exists as a test with that name; `make test` green locally and in CI; suites under `AppShowTests/Agent/` and the two `State/` suites.
+- [ ] No test launches `claude` or `codex`; fixtures under `AppShowTests/Fixtures/agent/` are ≤ 20 KB each, named with the CLI version they were recorded from.
+- [ ] `make format`, `make lint`, `make build` clean, zero warnings; no comments in new Swift files; every colour, size, and radius comes from `AppShowColors`/`FontSize`/`Radius`/`Layout`; only the four allowed button styles.
+- [ ] No `[String: Any]` crosses an actor boundary; no `@unchecked Sendable` in `AppShow/Agent/`; no `NSLock`.
 - [ ] The only upstream files edited are those in `SPIKE.md` §5.6, each additive, each listed in `planning/upstream-sync.md`.
-- [ ] `--dangerously-skip-permissions` and `--dangerously-bypass-approvals-and-sandbox` appear nowhere under `Reframed/` (a grep test, `AgentSafetyTests.swift`, enforces it).
+- [ ] `--dangerously-skip-permissions` and `--dangerously-bypass-approvals-and-sandbox` appear nowhere under `AppShow/` (a grep test, `AgentSafetyTests.swift`, enforces it).
 - [ ] T3 checklist run on a machine with both CLIs, with one, and with none; results in the milestone `VERIFY.md`; no orphan process after closing the editor.
 - [ ] ADR in `planning/decisions/` covering the module boundary, the one-process-per-turn decision, the transcript location, and the provenance of copied Toone code.
 - [ ] `docs/architecture/01-module-map.md` gains an `Agent/` section and `02-concurrency.md` lists the two new actors.

@@ -1,6 +1,6 @@
 # 02 — Concurrency and Isolation Map
 
-The project compiles with `SWIFT_VERSION = 6.0` (strict concurrency is the default language mode; no `SWIFT_STRICT_CONCURRENCY` override and no `SWIFT_DEFAULT_ACTOR_ISOLATION` setting exist in `Reframed.xcodeproj/project.pbxproj`, so the default is **nonisolated**, not main-actor-by-default).
+The project compiles with `SWIFT_VERSION = 6.0` (strict concurrency is the default language mode; no `SWIFT_STRICT_CONCURRENCY` override and no `SWIFT_DEFAULT_ACTOR_ISOLATION` setting exist in `AppShow.xcodeproj/project.pbxproj`, so the default is **nonisolated**, not main-actor-by-default).
 
 The mental model in `AGENTS.md` ("everything is actor-isolated; writers are actors") is wrong in detail. The real model is:
 
@@ -12,20 +12,20 @@ The mental model in `AGENTS.md` ("everything is actor-isolated; writers are acto
 
 | Type | File | Also `@Observable`? |
 | --- | --- | --- |
-| `AppDelegate` | `Reframed/App/AppDelegate.swift` | |
-| `WindowController` | `Reframed/App/WindowController.swift` | `ObservableObject` |
-| `SessionState` (+ every extension file re-declares `@MainActor extension`) | `Reframed/State/SessionState*.swift` | yes |
-| `RecordingOptions` | `Reframed/State/RecordingOptions.swift` | yes |
-| `ConfigService`, `StateService` | `Reframed/State/ConfigService.swift`, `StateService.swift` | |
-| `KeyboardShortcutManager` | `Reframed/State/KeyboardShortcutManager.swift` | |
-| `SelectionCoordinator`, `WindowSelectionCoordinator`, `WindowPositionObserver` (+ private `DisplayLinkTarget`), `SelectionOverlayWindow`, `SelectionOverlayView`, `WindowSelectionOverlay`, `RecordingBorderWindow`, `StartRecordingWindow` | `Reframed/CaptureModes/**` | |
-| `CaptureToolbarWindow`, `ReframedColors` (enum; reads `NSApp.effectiveAppearance`), `SoundEffect` | `Reframed/UI/CaptureToolbarWindow.swift`, `Colors.swift`; `Reframed/Utilities/SoundEffect.swift` | |
-| `MouseClickMonitor`, `WebcamPreviewWindow`, `RecordingPreviewWindow`, `DevicePreviewWindow`, `MouseClickWindow`, `DeviceDiscovery` | `Reframed/Recording/*.swift` | `DeviceDiscovery` yes |
-| `EditorWindow`, `EditorState`, `SyncedPlayerController`, `History`, `ClickSoundPlayer`, `AudioWaveformGenerator` | `Reframed/Editor/*.swift` | `EditorState`, `SyncedPlayerController`, `History`, `AudioWaveformGenerator` yes |
-| `AgentTranscript`, `AgentChatPanel`, `AgentConversationView` | `Reframed/Agent/*.swift` | `AgentTranscript` yes |
-| `SparkleUpdater`, `UpdateChecker` (enum), `WhisperModelManager` | `Reframed/Utilities/*.swift` | `WhisperModelManager` yes |
-| `FileManager.projectSaveDirectory()`, `defaultSaveDirectory()`, `defaultSaveURL(for:extension:)` (method-level) | `Reframed/Recording/FileManager+Reframed.swift` | because they read `ConfigService` |
-| Static previews: `CursorRenderer.previewImage`, `SystemCursorRenderer.previewImage`; `Track.background/borderColor/regionTextColor` | `Reframed/Editor/CursorRenderer.swift`, `SystemCursorRenderer.swift`; `Reframed/UI/Constants.swift` | |
+| `AppDelegate` | `AppShow/App/AppDelegate.swift` | |
+| `WindowController` | `AppShow/App/WindowController.swift` | `ObservableObject` |
+| `SessionState` (+ every extension file re-declares `@MainActor extension`) | `AppShow/State/SessionState*.swift` | yes |
+| `RecordingOptions` | `AppShow/State/RecordingOptions.swift` | yes |
+| `ConfigService`, `StateService` | `AppShow/State/ConfigService.swift`, `StateService.swift` | |
+| `KeyboardShortcutManager` | `AppShow/State/KeyboardShortcutManager.swift` | |
+| `SelectionCoordinator`, `WindowSelectionCoordinator`, `WindowPositionObserver` (+ private `DisplayLinkTarget`), `SelectionOverlayWindow`, `SelectionOverlayView`, `WindowSelectionOverlay`, `RecordingBorderWindow`, `StartRecordingWindow` | `AppShow/CaptureModes/**` | |
+| `CaptureToolbarWindow`, `AppShowColors` (enum; reads `NSApp.effectiveAppearance`), `SoundEffect` | `AppShow/UI/CaptureToolbarWindow.swift`, `Colors.swift`; `AppShow/Utilities/SoundEffect.swift` | |
+| `MouseClickMonitor`, `WebcamPreviewWindow`, `RecordingPreviewWindow`, `DevicePreviewWindow`, `MouseClickWindow`, `DeviceDiscovery` | `AppShow/Recording/*.swift` | `DeviceDiscovery` yes |
+| `EditorWindow`, `EditorState`, `SyncedPlayerController`, `History`, `ClickSoundPlayer`, `AudioWaveformGenerator` | `AppShow/Editor/*.swift` | `EditorState`, `SyncedPlayerController`, `History`, `AudioWaveformGenerator` yes |
+| `AgentTranscript`, `AgentChatPanel`, `AgentConversationView` | `AppShow/Agent/*.swift` | `AgentTranscript` yes |
+| `SparkleUpdater`, `UpdateChecker` (enum), `WhisperModelManager` | `AppShow/Utilities/*.swift` | `WhisperModelManager` yes |
+| `FileManager.projectSaveDirectory()`, `defaultSaveDirectory()`, `defaultSaveURL(for:extension:)` (method-level) | `AppShow/Recording/FileManager+AppShow.swift` | because they read `ConfigService` |
+| Static previews: `CursorRenderer.previewImage`, `SystemCursorRenderer.previewImage`; `Track.background/borderColor/regionTextColor` | `AppShow/Editor/CursorRenderer.swift`, `SystemCursorRenderer.swift`; `AppShow/UI/Constants.swift` | |
 
 SwiftUI `View` structs are implicitly main-actor. All AppKit `NSWindow`/`NSView` subclasses are main-actor by inheritance.
 
@@ -33,36 +33,36 @@ SwiftUI `View` structs are implicitly main-actor. All AppKit `NSWindow`/`NSView`
 
 | Actor | File | Role |
 | --- | --- | --- |
-| `RecordingCoordinator` | `Reframed/Recording/RecordingCoordinator.swift` | The only application-level actor. Its state is the set of optional sources/writers plus `pauseStartTime`, `totalPauseOffset`, pixel dimensions. Its methods mostly *dispatch* to queue-confined objects (`videoWriter?.pause()` → `queue.async`), so the actor is a coordination point, not a data path. Sample buffers never pass through it. |
-| `RNNoiseProgressTracker` (private) | `Reframed/Utilities/RNNoiseProcessor.swift` | Aggregates progress from parallel denoise chunks and forwards to a `@MainActor` closure. |
-| `AgentProcessRunner` | `Reframed/Agent/AgentProcessRunner.swift` | Owns a single child `Process`, incrementally streams stdout, bounds line length, and terminates on cancellation. |
-| `AgentSession` | `Reframed/Agent/AgentSession.swift` | Composes a provider and runner for one turn and converts output lines to `AgentEvent` values. |
-| `AgentToolchain` | `Reframed/Agent/AgentToolchain.swift` | Resolves provider executables from controlled directories and an optional bounded login-shell lookup. |
-| `AgentProbe` | `Reframed/Agent/AgentReadiness.swift` | Runs bounded version and authentication checks and kills a timed-out probe. |
+| `RecordingCoordinator` | `AppShow/Recording/RecordingCoordinator.swift` | The only application-level actor. Its state is the set of optional sources/writers plus `pauseStartTime`, `totalPauseOffset`, pixel dimensions. Its methods mostly *dispatch* to queue-confined objects (`videoWriter?.pause()` → `queue.async`), so the actor is a coordination point, not a data path. Sample buffers never pass through it. |
+| `RNNoiseProgressTracker` (private) | `AppShow/Utilities/RNNoiseProcessor.swift` | Aggregates progress from parallel denoise chunks and forwards to a `@MainActor` closure. |
+| `AgentProcessRunner` | `AppShow/Agent/AgentProcessRunner.swift` | Owns a single child `Process`, incrementally streams stdout, bounds line length, and terminates on cancellation. |
+| `AgentSession` | `AppShow/Agent/AgentSession.swift` | Composes a provider and runner for one turn and converts output lines to `AgentEvent` values. |
+| `AgentToolchain` | `AppShow/Agent/AgentToolchain.swift` | Resolves provider executables from controlled directories and an optional bounded login-shell lookup. |
+| `AgentProbe` | `AppShow/Agent/AgentReadiness.swift` | Runs bounded version and authentication checks and kills a timed-out probe. |
 
 ### 1.3 `@unchecked Sendable` types and how each one actually achieves safety
 
 | Type | File | Real synchronisation | Comment |
 | --- | --- | --- | --- |
-| `ScreenCaptureSession` | `Reframed/Recording/ScreenCaptureSession.swift` | All mutable fields touched only on `videoWriter.queue` (SCStream delivers there; `pause()`/`resume()` hop there); `stop()` awaited from the actor | Safe by convention. `onStreamError`/`onPreviewFrame` are set from the actor before `start`. |
-| `SystemAudioCapture` | `Reframed/Recording/SystemAudioCapture.swift` | audio samples on `audioWriter.queue`; dummy video on `discardQueue` | `isPaused` written on `audioWriter.queue`, read in the delegate on the same queue. |
-| `WebcamCapture`, `MicrophoneCapture`, `DeviceCapture` | `Reframed/Recording/*.swift` | `verifyQueue` for verification; after `attachWriter` the `AVCapture*DataOutput` delegate queue is re-pointed to `writer.queue` | `captureSession` is read from `@MainActor` (`SessionState+Camera`) after `startAndVerify` returns — a benign read of an `AVCaptureSession` reference. |
-| `VideoTrackWriter`, `AudioTrackWriter` | `Reframed/Recording/VideoTrackWriter.swift`, `AudioTrackWriter.swift` | Private serial `DispatchQueue` (`eu.jankuri.reframed.video-track-writer.queue`, `…audio-track-writer.<label>.queue`, both `qos: .userInteractive`); `appendSampleBuffer`/`appendSample` assert `dispatchPrecondition(condition: .onQueue(queue))` | `writtenFrames`/`droppedFrames`/`currentPeakLevel`/`lastWrittenPTS` are read off-queue (see hazards). |
-| `SharedRecordingClock` | `Reframed/Recording/SharedRecordingClock.swift` | `NSLock` around `_referenceTime` and `firstPTSValues` | Correct. |
-| `CursorMetadataRecorder` | `Reframed/Recording/CursorMetadataRecorder.swift` | `NSLock` around all sample arrays and timing state; 8 ms timer on its own queue; 16 ms cursor-type timer on `.main` | Correct; note the two `nonisolated(unsafe) static var` caches for cursor-type detection are only touched on `.main`. |
-| `CaptureTarget` (enum) | `Reframed/Recording/CaptureTarget.swift` | none — wraps a non-Sendable `SCWindow` | Passed from `SessionState` into the actor; `SCWindow` is effectively immutable once fetched. |
-| `SendableBox<T>` | `Reframed/Utilities/SendableBox.swift` | none | Carries `AVCaptureSession` actor → main. |
-| `KeyboardShortcutManager.TapContext` | `Reframed/State/KeyboardShortcutManager.swift` | main run loop | Bridges `CGEventTap` `userInfo` back to the main-actor manager. |
-| `CompositionInstruction` | `Reframed/Compositor/CompositionInstruction.swift` | all `let`; contains `CGImage`, `CGColor`, `ZoomTimeline`, `CursorMetadataSnapshot` | Immutable → safe to share among render workers. |
-| `FrameRenderer` | `Reframed/Compositor/FrameRenderer.swift` | instance holds one `PersonSegmentationProcessor`; static rendering is stateless | Instances are never actually created by export code (static API only). |
-| `PersonSegmentationProcessor`, `SegmentationProcessorPool` | `Reframed/Compositor/PersonSegmentationProcessor.swift` | pool hands out one processor per worker | Vision requests are not thread-safe, hence the pool. |
-| `VideoCompositor` private helpers: `CancelToken`, `SafeContinuation`, `DoneCondition`, `CountingCondition`, `FrameJobQueue`, `Metrics`, `OrderedFrameWriter`, `FrameJob` (struct), `AudioState` | `Reframed/Compositor/VideoCompositor+ParallelExport.swift` | `NSLock` / `NSCondition` | Hand-rolled primitives for the GCD-based render farm (see §3.3). |
-| `ExportProgressPoller` | `Reframed/Compositor/VideoCompositor+ManualExport.swift` | wraps `AVAssetExportSession.progress` reads | Used from a `Task.detached` polling loop. |
-| `ZoomTimeline` | `Reframed/Editor/ZoomTimeline.swift` | `NSLock` around `keyframes` (which is never mutated after `init`) | Immutable in practice; `EditorState` replaces the whole instance on every edit, which is also what makes `@Observable` notice the change. |
-| `CursorMetadataProvider`, `CursorMetadataSnapshot` | `Reframed/Editor/CursorMetadataProvider.swift` | all `let` | Provider is used on main; snapshot is the export-time copy. |
-| `ChunkParams` (struct) | `Reframed/Utilities/RNNoiseProcessor.swift` | raw pointers into disjoint buffer ranges | Each task group child owns a disjoint slice. |
+| `ScreenCaptureSession` | `AppShow/Recording/ScreenCaptureSession.swift` | All mutable fields touched only on `videoWriter.queue` (SCStream delivers there; `pause()`/`resume()` hop there); `stop()` awaited from the actor | Safe by convention. `onStreamError`/`onPreviewFrame` are set from the actor before `start`. |
+| `SystemAudioCapture` | `AppShow/Recording/SystemAudioCapture.swift` | audio samples on `audioWriter.queue`; dummy video on `discardQueue` | `isPaused` written on `audioWriter.queue`, read in the delegate on the same queue. |
+| `WebcamCapture`, `MicrophoneCapture`, `DeviceCapture` | `AppShow/Recording/*.swift` | `verifyQueue` for verification; after `attachWriter` the `AVCapture*DataOutput` delegate queue is re-pointed to `writer.queue` | `captureSession` is read from `@MainActor` (`SessionState+Camera`) after `startAndVerify` returns — a benign read of an `AVCaptureSession` reference. |
+| `VideoTrackWriter`, `AudioTrackWriter` | `AppShow/Recording/VideoTrackWriter.swift`, `AudioTrackWriter.swift` | Private serial `DispatchQueue` (`com.mattwebhub.appshow.video-track-writer.queue`, `…audio-track-writer.<label>.queue`, both `qos: .userInteractive`); `appendSampleBuffer`/`appendSample` assert `dispatchPrecondition(condition: .onQueue(queue))` | `writtenFrames`/`droppedFrames`/`currentPeakLevel`/`lastWrittenPTS` are read off-queue (see hazards). |
+| `SharedRecordingClock` | `AppShow/Recording/SharedRecordingClock.swift` | `NSLock` around `_referenceTime` and `firstPTSValues` | Correct. |
+| `CursorMetadataRecorder` | `AppShow/Recording/CursorMetadataRecorder.swift` | `NSLock` around all sample arrays and timing state; 8 ms timer on its own queue; 16 ms cursor-type timer on `.main` | Correct; note the two `nonisolated(unsafe) static var` caches for cursor-type detection are only touched on `.main`. |
+| `CaptureTarget` (enum) | `AppShow/Recording/CaptureTarget.swift` | none — wraps a non-Sendable `SCWindow` | Passed from `SessionState` into the actor; `SCWindow` is effectively immutable once fetched. |
+| `SendableBox<T>` | `AppShow/Utilities/SendableBox.swift` | none | Carries `AVCaptureSession` actor → main. |
+| `KeyboardShortcutManager.TapContext` | `AppShow/State/KeyboardShortcutManager.swift` | main run loop | Bridges `CGEventTap` `userInfo` back to the main-actor manager. |
+| `CompositionInstruction` | `AppShow/Compositor/CompositionInstruction.swift` | all `let`; contains `CGImage`, `CGColor`, `ZoomTimeline`, `CursorMetadataSnapshot` | Immutable → safe to share among render workers. |
+| `FrameRenderer` | `AppShow/Compositor/FrameRenderer.swift` | instance holds one `PersonSegmentationProcessor`; static rendering is stateless | Instances are never actually created by export code (static API only). |
+| `PersonSegmentationProcessor`, `SegmentationProcessorPool` | `AppShow/Compositor/PersonSegmentationProcessor.swift` | pool hands out one processor per worker | Vision requests are not thread-safe, hence the pool. |
+| `VideoCompositor` private helpers: `CancelToken`, `SafeContinuation`, `DoneCondition`, `CountingCondition`, `FrameJobQueue`, `Metrics`, `OrderedFrameWriter`, `FrameJob` (struct), `AudioState` | `AppShow/Compositor/VideoCompositor+ParallelExport.swift` | `NSLock` / `NSCondition` | Hand-rolled primitives for the GCD-based render farm (see §3.3). |
+| `ExportProgressPoller` | `AppShow/Compositor/VideoCompositor+ManualExport.swift` | wraps `AVAssetExportSession.progress` reads | Used from a `Task.detached` polling loop. |
+| `ZoomTimeline` | `AppShow/Editor/ZoomTimeline.swift` | `NSLock` around `keyframes` (which is never mutated after `init`) | Immutable in practice; `EditorState` replaces the whole instance on every edit, which is also what makes `@Observable` notice the change. |
+| `CursorMetadataProvider`, `CursorMetadataSnapshot` | `AppShow/Editor/CursorMetadataProvider.swift` | all `let` | Provider is used on main; snapshot is the export-time copy. |
+| `ChunkParams` (struct) | `AppShow/Utilities/RNNoiseProcessor.swift` | raw pointers into disjoint buffer ranges | Each task group child owns a disjoint slice. |
 
-Plain `Sendable` value types (structs/enums) are used for every cross-subsystem handoff: `RecordingResult`, `ReframedProject`, `ProjectMetadata`/`EditorStateData` and friends, `ExportConfiguration`, `ExportSettings`, `SelectionRect`, `CaptureState`, `CaptureMode`, `CaptureQuality`, `CodableColor`, `KeyboardShortcut`, `MediaFileInfo`, `GitHubRelease`, `VerifiedCamera`/`VerifiedDevice`, `MicrophoneFormat`, `ExternalDevice`, `AudioDevice`, `CaptureDevice`.
+Plain `Sendable` value types (structs/enums) are used for every cross-subsystem handoff: `RecordingResult`, `AppShowProject`, `ProjectMetadata`/`EditorStateData` and friends, `ExportConfiguration`, `ExportSettings`, `SelectionRect`, `CaptureState`, `CaptureMode`, `CaptureQuality`, `CodableColor`, `KeyboardShortcut`, `MediaFileInfo`, `GitHubRelease`, `VerifiedCamera`/`VerifiedDevice`, `MicrophoneFormat`, `ExternalDevice`, `AudioDevice`, `CaptureDevice`.
 
 ### 1.4 `nonisolated` and `nonisolated(unsafe)`
 
@@ -81,17 +81,17 @@ Plain `Sendable` value types (structs/enums) are used for every cross-subsystem 
 
 | Label | Owner | QoS | Purpose |
 | --- | --- | --- | --- |
-| `eu.jankuri.reframed.video-track-writer.queue` | `VideoTrackWriter.queue` | userInteractive | SCStream screen output + webcam `AVCaptureVideoDataOutput` deliver here; all writer state |
-| `eu.jankuri.reframed.audio-track-writer.<label>.queue` (`mic`, `sysaudio`, `device-audio`) | `AudioTrackWriter.queue` | userInteractive | SCStream audio / mic / device audio deliver here |
-| `eu.jankuri.reframed.system-audio-capture.discard` | `SystemAudioCapture` | background | swallow the 2×2 dummy video frames |
-| `eu.jankuri.reframed.cursor-metadata` | `CursorMetadataRecorder` | userInteractive | 8 ms sampling timer |
-| `eu.jankuri.reframed.webcam-verify`, `mic-verify`, `device-verify`, `device-audio` | capture sources | userInteractive | first-sample verification before a writer is attached |
-| `eu.jankuri.reframed.webcam-start`, `device-start` | capture sources | default | `AVCaptureSession.startRunning()` off the caller's thread |
-| `eu.jankuri.reframed.render-workers` (concurrent) | `parallelRenderExport` | userInitiated | N render workers |
-| `eu.jankuri.reframed.video-writer` | `OrderedFrameWriter` | userInitiated | `requestMediaDataWhenReady` drain |
-| `eu.jankuri.reframed.audio`, `eu.jankuri.reframed.manual-audio` | export audio pass-through | userInitiated | |
-| `eu.jkuri.reframed.segmentation` | `VideoPreviewContainer` | userInteractive | live person-segmentation in the editor preview |
-| `eu.jankuri.reframed.log-writer` | `RotatingFileLogHandler` | default | file appends |
+| `com.mattwebhub.appshow.video-track-writer.queue` | `VideoTrackWriter.queue` | userInteractive | SCStream screen output + webcam `AVCaptureVideoDataOutput` deliver here; all writer state |
+| `com.mattwebhub.appshow.audio-track-writer.<label>.queue` (`mic`, `sysaudio`, `device-audio`) | `AudioTrackWriter.queue` | userInteractive | SCStream audio / mic / device audio deliver here |
+| `com.mattwebhub.appshow.system-audio-capture.discard` | `SystemAudioCapture` | background | swallow the 2×2 dummy video frames |
+| `com.mattwebhub.appshow.cursor-metadata` | `CursorMetadataRecorder` | userInteractive | 8 ms sampling timer |
+| `com.mattwebhub.appshow.webcam-verify`, `mic-verify`, `device-verify`, `device-audio` | capture sources | userInteractive | first-sample verification before a writer is attached |
+| `com.mattwebhub.appshow.webcam-start`, `device-start` | capture sources | default | `AVCaptureSession.startRunning()` off the caller's thread |
+| `com.mattwebhub.appshow.render-workers` (concurrent) | `parallelRenderExport` | userInitiated | N render workers |
+| `com.mattwebhub.appshow.video-writer` | `OrderedFrameWriter` | userInitiated | `requestMediaDataWhenReady` drain |
+| `com.mattwebhub.appshow.audio`, `com.mattwebhub.appshow.manual-audio` | export audio pass-through | userInitiated | |
+| `com.mattwebhub.appshow.segmentation` | `VideoPreviewContainer` | userInteractive | live person-segmentation in the editor preview |
+| `com.mattwebhub.appshow.log-writer` | `RotatingFileLogHandler` | default | file appends |
 | `DispatchQueue.global(qos: .userInitiated)` | manual/parallel/GIF export | | the export driver thread that owns the `AVAssetReader` loop |
 
 ### 1.6 Isolation domains at a glance
@@ -148,7 +148,7 @@ flowchart LR
 
 | From → To | Mechanism | Example |
 | --- | --- | --- |
-| `@MainActor` → actor | `await coordinator.method(...)` with `Sendable` arguments (`CaptureTarget`, `Int`, `String?`, `CaptureQuality`, `CursorMetadataRecorder`) | `SessionState.startRecording()` → `RecordingCoordinator.startRecording(target:fps:…)` (`Reframed/State/SessionState+Recording.swift:51`) |
+| `@MainActor` → actor | `await coordinator.method(...)` with `Sendable` arguments (`CaptureTarget`, `Int`, `String?`, `CaptureQuality`, `CursorMetadataRecorder`) | `SessionState.startRecording()` → `RecordingCoordinator.startRecording(target:fps:…)` (`AppShow/State/SessionState+Recording.swift:51`) |
 | actor → `@MainActor` | `@Sendable` closure handlers set once, which then spawn `Task { @MainActor in … }` | `coordinator.setStreamErrorHandler { … Task { @MainActor in await self.handleStreamError() } }` |
 | actor → `@MainActor` (data) | return value of an `async` actor method | `let box = await coordinator.getWebcamCaptureSessionBox()` → `SendableBox<AVCaptureSession>` |
 | `@MainActor` polling actor | `Task` loop with `Task.sleep(.milliseconds(100))` | `SessionState.startAudioLevelPolling()` reads `coordinator.getAudioLevels()` |
@@ -166,7 +166,7 @@ flowchart LR
 
 ## 3. Timestamp model
 
-### 3.1 `SharedRecordingClock` (`Reframed/Recording/SharedRecordingClock.swift`)
+### 3.1 `SharedRecordingClock` (`AppShow/Recording/SharedRecordingClock.swift`)
 
 All capture sources emit `CMSampleBuffer`s whose PTS is in the **host time clock** (`CMClockGetHostTimeClock()`): ScreenCaptureKit, `AVCaptureSession` outputs, and `CursorMetadataRecorder.startHostTime` all use it. The clock's job is to pick a common zero.
 

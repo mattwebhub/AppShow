@@ -15,9 +15,9 @@ Mirror of `planning/features/lossless-cut/TASKS.md`; tick both.
 - [x] T5. P2 persistence + history (T2 rows green). Proof: `ProjectMetadataTests`, `HistoryChangeRulesTests`, `EditorStateVideoRegionsTests`.
 - [x] T6. P7 unit rows + seam S3. Proof: `EditorStateExportTests`.
 - [x] T7. P6 compressed timeline. Proof: `TimelineGeometryTests`, manual alignment check.
-- [x] T8. P7 gated export run. Proof: `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests`.
+- [x] T8. P7 gated export run. Proof: `TEST_RUNNER_APPSHOW_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests`.
 - [x] T9. Docs and divergences: `docs/editor.md`, `AGENTS.md`, `planning/upstream-sync.md`, `docs/architecture/07-testability.md` seams. Proof: grep.
-- [x] T10. VERIFY.md automated rows run, branch pushed, PR opened (https://github.com/mattwebhub/Reframed/pull/3); manual rows pending a human.
+- [x] T10. VERIFY.md automated rows run, branch pushed, PR opened (https://github.com/mattwebhub/AppShow/pull/3); manual rows pending a human.
 
 ## Out of scope
 

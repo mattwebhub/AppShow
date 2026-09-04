@@ -12,6 +12,7 @@ Last updated: 2026-09-04
 - Milestone 06 is code-complete on PR #8; it integrates milestones 03–05 and milestone 07's completed primitives. Labeled history, rollback, exact cuts, grouped transactions, single-use confirmations, provider-scoped MCP configuration, the signed stdio shim, bridge lifecycle, live activity UI, presentation settings, timed captions, workspace-only draft export, confirmed exact-path full export, silence removal, external music, transitions, text/image/blur tools, and five dual-provider skills are implemented test-first. Both providers pass the live MCP read/mutate/undo path and discover and invoke the bundled title skill; manual UI checks remain.
 - Milestone 07 PR #4 contains silence removal, text overlays, image overlays, source-space blur regions, and entry/exit transitions on overlays and kept slices. T1 to T9 are code-complete; its manual checks remain.
 - Milestone 08 is complete as a verified no-op: the freshly fetched `upstream/main` and the fork base are both `b6a1709` (v0.14.7), so there was nothing to merge before the identity migration.
+- Milestone 09 AppShow identity is in final verification: the build graph, bundle identifiers, runtime contracts, new `.appshow` project type, safe legacy migration, release metadata, living documentation, and GitHub repository are renamed. Legacy `.frm`, `~/.reframed`, selected `REFRAMED_*` ingress values, upstream attribution, and recorded fixtures remain deliberately compatible.
 
 ## Verified on this machine
 
@@ -23,7 +24,7 @@ Last updated: 2026-09-04
 - Skill E2E: Codex expanded `$add-title-cards`; Claude listed and invoked `/add-title-cards`; both called the signed AppShow bridge and left exactly one requested title overlay in a fresh project. The gated command is `make test-agent-skills CLAUDE_MODEL=sonnet`.
 - Presentation scenario: `make test-scenario` replays a checked-in multi-tool batch, proves persistence and one-step Undo, and exports a private 640 px/15 fps draft with the 12-second kept duration.
 - Blur-region format, lint, build, 379 tests in 39 suites, and 3 gated export tests pass on `milestone-07-primitives`.
-- `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` is green on `milestone-02-lossless-cut`.
+- `TEST_RUNNER_APPSHOW_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` is green on `milestone-02-lossless-cut`.
 
 ## Accepted product decisions
 
@@ -44,4 +45,4 @@ Last updated: 2026-09-04
 1. Run the remaining human UI rows for milestone 06 and review its stacked PR.
 2. Human runs the manual rows for milestones 02, 03, 04, and 07.
 3. Run the full checked-in presentation scenario and its draft export.
-4. Perform the AppShow identity migration before the first public release.
+4. Finish the milestone 09 clean verification and review its stacked PR.

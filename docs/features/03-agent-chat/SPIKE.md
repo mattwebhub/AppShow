@@ -2,7 +2,7 @@
 
 Status: spike, no code written. Date: 2026-09-03. Companion: `ATTACK-PLAN.md`.
 
-Paths: `Reframed/...` and `ReframedTests/...` are relative to `/Users/matheusparanhos/Projects/appshow/reframed`. `Toone/...` and `TooneTests/...` are relative to `/Users/matheusparanhos/Projects/toone/apps/toone-desktop/Toone`. Every path and line below was read on the date above.
+Paths: `AppShow/...` and `AppShowTests/...` are relative to `/Users/matheusparanhos/Projects/appshow/reframed`. `Toone/...` and `TooneTests/...` are relative to `/Users/matheusparanhos/Projects/toone/apps/toone-desktop/Toone`. Every path and line below was read on the date above.
 
 ## 1. Goal
 
@@ -18,43 +18,43 @@ Out of scope for v1: MCP servers, slash commands beyond `/clear` and `/new`, bac
 
 | Token | Value | Source |
 | --- | --- | --- |
-| `Layout.sectionSpacing / itemSpacing / compactSpacing` | 32 / 16 / 8 | `Reframed/UI/Constants.swift:9-11` |
-| `Layout.panelPadding` | 16 | `Reframed/UI/Constants.swift:13` |
-| `Layout.toolbarHeight` | 52 | `Reframed/UI/Constants.swift:23` |
-| `Layout.propertiesPanelWidth` | 390 | `Reframed/UI/Constants.swift:27` |
-| `Layout.editorWindowMinWidth / MinHeight` | 1400 / 900 | `Reframed/UI/Constants.swift:28-29` |
-| `FontSize.xxs / xs / sm / base / lg` | 10 / 12 / 14 / 16 / 18 | `Reframed/UI/Constants.swift:44-48` |
-| `Radius.sm / md / lg / xl / xxl` | 4 / 6 / 8 / 12 / 16 | `Reframed/UI/Constants.swift:56-60` |
-| `ReframedColors.backgroundCard` | `#0d0d0d` dark / `#ffffff` light | `Reframed/UI/Colors.swift:90-92` |
-| `ReframedColors.background` | black / white | `Reframed/UI/Colors.swift:78-80` |
-| `ReframedColors.fieldBackground` | `#000000` / `#ffffff` | `Reframed/UI/Colors.swift:110-112` |
-| `ReframedColors.border` | `#313131` / `#d9d9d9` | `Reframed/UI/Colors.swift:138-140` |
-| `ReframedColors.divider` | white 12 % / black 12 % | `Reframed/UI/Colors.swift:134-136` |
-| `ReframedColors.primaryText / secondaryText / tertiaryText` | white / 70 % / 50 % (dark) | `Reframed/UI/Colors.swift:118-128` |
-| `ReframedColors.muted` (selected tab, hover pill) | white 8 % / `Color(white: 0.96)` | `Reframed/UI/Colors.swift:190-192` |
-| `ReframedColors.accent` (outline-button hover) | white 12 % / black 6 % | `Reframed/UI/Colors.swift:186-188` |
-| `ReframedColors.isDark` reads `NSApp.effectiveAppearance`, so the enum is `@MainActor` | | `Reframed/UI/Colors.swift:61-66` |
+| `Layout.sectionSpacing / itemSpacing / compactSpacing` | 32 / 16 / 8 | `AppShow/UI/Constants.swift:9-11` |
+| `Layout.panelPadding` | 16 | `AppShow/UI/Constants.swift:13` |
+| `Layout.toolbarHeight` | 52 | `AppShow/UI/Constants.swift:23` |
+| `Layout.propertiesPanelWidth` | 390 | `AppShow/UI/Constants.swift:27` |
+| `Layout.editorWindowMinWidth / MinHeight` | 1400 / 900 | `AppShow/UI/Constants.swift:28-29` |
+| `FontSize.xxs / xs / sm / base / lg` | 10 / 12 / 14 / 16 / 18 | `AppShow/UI/Constants.swift:44-48` |
+| `Radius.sm / md / lg / xl / xxl` | 4 / 6 / 8 / 12 / 16 | `AppShow/UI/Constants.swift:56-60` |
+| `AppShowColors.backgroundCard` | `#0d0d0d` dark / `#ffffff` light | `AppShow/UI/Colors.swift:90-92` |
+| `AppShowColors.background` | black / white | `AppShow/UI/Colors.swift:78-80` |
+| `AppShowColors.fieldBackground` | `#000000` / `#ffffff` | `AppShow/UI/Colors.swift:110-112` |
+| `AppShowColors.border` | `#313131` / `#d9d9d9` | `AppShow/UI/Colors.swift:138-140` |
+| `AppShowColors.divider` | white 12 % / black 12 % | `AppShow/UI/Colors.swift:134-136` |
+| `AppShowColors.primaryText / secondaryText / tertiaryText` | white / 70 % / 50 % (dark) | `AppShow/UI/Colors.swift:118-128` |
+| `AppShowColors.muted` (selected tab, hover pill) | white 8 % / `Color(white: 0.96)` | `AppShow/UI/Colors.swift:190-192` |
+| `AppShowColors.accent` (outline-button hover) | white 12 % / black 6 % | `AppShow/UI/Colors.swift:186-188` |
+| `AppShowColors.isDark` reads `NSApp.effectiveAppearance`, so the enum is `@MainActor` | | `AppShow/UI/Colors.swift:61-66` |
 
-There is no monospace token and no per-role bubble colour; the app is monochrome with opacity steps. A chat bubble should therefore be `ReframedColors.muted` for the user and no fill for the assistant, not an accent tint.
+There is no monospace token and no per-role bubble colour; the app is monochrome with opacity steps. A chat bubble should therefore be `AppShowColors.muted` for the user and no fill for the assistant, not an accent tint.
 
 ### 2.2 Buttons, headers, popovers
 
-- Only four button styles exist and are allowed (`docs/architecture/06-conventions-checklist.md` item 3): `PrimaryButtonStyle` (filled, `Reframed/UI/PrimaryButton.swift:49-72`), `SecondaryButtonStyle` (74-97), `OutlineButtonStyle` (99-123), `PlainCustomButtonStyle` (125-129). `ButtonSize.small` is 30 pt high, `Radius.md`, `FontSize.xs` semibold (`PrimaryButton.swift:8-46`). The top-bar "Export" is `PrimaryButtonStyle(size: .small)` (`Reframed/Editor/EditorTopBar.swift:24-26`); the send button of the composer should match it.
-- `IconButton` is a 28×28 `PlainCustomButtonStyle` image button at `FontSize.xs` (`Reframed/UI/IconButton.swift:3-20`); this is the collapse/expand control.
-- `SectionHeader(icon:title:)` is `FontSize.sm` icon + `FontSize.xs` semibold title (`Reframed/UI/SectionHeader.swift:11-19`); the bare-title variant is `FontSize.xxs` secondary text with 12 pt horizontal padding (21-27), which is what a thread list header looks like.
-- Sidebar tabs are 56×48 pills, `Radius.lg`, `ReframedColors.muted` when selected, wrapped in `HoverEffectScope` with `.hoverEffect(id:)` (`Reframed/Editor/EditorView+Sidebar.swift:15-36`, `Reframed/UI/HoverEffect.swift:3-24`).
-- Popover content is `VStack(alignment: .leading, spacing: 0)` + `SectionHeader(title:)` + `.popoverContainerStyle()` (`Reframed/UI/PopoverContainerStyle.swift:3-23`, `Radius.lg`, 0.5 pt border). A provider picker is a `SegmentPicker` or `CheckmarkRow` list in such a popover (`docs/architecture/05-coding-patterns.md` §9.4).
+- Only four button styles exist and are allowed (`docs/architecture/06-conventions-checklist.md` item 3): `PrimaryButtonStyle` (filled, `AppShow/UI/PrimaryButton.swift:49-72`), `SecondaryButtonStyle` (74-97), `OutlineButtonStyle` (99-123), `PlainCustomButtonStyle` (125-129). `ButtonSize.small` is 30 pt high, `Radius.md`, `FontSize.xs` semibold (`PrimaryButton.swift:8-46`). The top-bar "Export" is `PrimaryButtonStyle(size: .small)` (`AppShow/Editor/EditorTopBar.swift:24-26`); the send button of the composer should match it.
+- `IconButton` is a 28×28 `PlainCustomButtonStyle` image button at `FontSize.xs` (`AppShow/UI/IconButton.swift:3-20`); this is the collapse/expand control.
+- `SectionHeader(icon:title:)` is `FontSize.sm` icon + `FontSize.xs` semibold title (`AppShow/UI/SectionHeader.swift:11-19`); the bare-title variant is `FontSize.xxs` secondary text with 12 pt horizontal padding (21-27), which is what a thread list header looks like.
+- Sidebar tabs are 56×48 pills, `Radius.lg`, `AppShowColors.muted` when selected, wrapped in `HoverEffectScope` with `.hoverEffect(id:)` (`AppShow/Editor/EditorView+Sidebar.swift:15-36`, `AppShow/UI/HoverEffect.swift:3-24`).
+- Popover content is `VStack(alignment: .leading, spacing: 0)` + `SectionHeader(title:)` + `.popoverContainerStyle()` (`AppShow/UI/PopoverContainerStyle.swift:3-23`, `Radius.lg`, 0.5 pt border). A provider picker is a `SegmentPicker` or `CheckmarkRow` list in such a popover (`docs/architecture/05-coding-patterns.md` §9.4).
 - Every view starts `body` with `let _ = colorScheme` after declaring `@Environment(\.colorScheme) private var colorScheme` (`05-coding-patterns.md` §2.5). No comments, no literal sizes, no stock `.buttonStyle(.plain)`.
 
 ### 2.3 How the editor is laid out today
 
-`EditorView.body` (`Reframed/Editor/EditorView.swift:28-127`) is a `VStack(spacing: 0)`:
+`EditorView.body` (`AppShow/Editor/EditorView.swift:28-127`) is a `VStack(spacing: 0)`:
 
 1. `EditorTopBar` (44 pt, `EditorTopBar.swift:30`), horizontal padding 12.
-2. `HStack(spacing: 8)` at lines 43-56 containing three cards, each `.background(ReframedColors.backgroundCard)`, `.clipShape(RoundedRectangle(cornerRadius: Radius.xxl))`, `.overlay(... strokeBorder(ReframedColors.border, lineWidth: 1))`: `mainContent` (video preview, flexible), `editorSidebar` (fixed 64 pt: 56 + 2×4 padding, `EditorView+Sidebar.swift:42-43`), `PropertiesPanel` (fixed `Layout.propertiesPanelWidth` = 390, `PropertiesPanel.swift:96`).
+2. `HStack(spacing: 8)` at lines 43-56 containing three cards, each `.background(AppShowColors.backgroundCard)`, `.clipShape(RoundedRectangle(cornerRadius: Radius.xxl))`, `.overlay(... strokeBorder(AppShowColors.border, lineWidth: 1))`: `mainContent` (video preview, flexible), `editorSidebar` (fixed 64 pt: 56 + 2×4 padding, `EditorView+Sidebar.swift:42-43`), `PropertiesPanel` (fixed `Layout.propertiesPanelWidth` = 390, `PropertiesPanel.swift:96`).
 3. `transportBar`, then the `timeline` card with 12 pt padding.
 
-Preview mode (`editorState.isPreviewMode`) collapses everything to `mainContent` (lines 31-33). The window is an `NSWindow` hosting `NSHostingView(rootView: EditorView)` with `contentMinSize` 1400×900 and its frame persisted through `StateService.shared.editorWindowFrame` (`Reframed/Editor/EditorWindow.swift:40-60, 173-181`). There is no collapsible sidebar anywhere in the app today; the closest precedent is `RecordingPreviewWindow` persisting its height in `StateService.recordingPreviewHeight` (`Reframed/State/StateService.swift:92-95`).
+Preview mode (`editorState.isPreviewMode`) collapses everything to `mainContent` (lines 31-33). The window is an `NSWindow` hosting `NSHostingView(rootView: EditorView)` with `contentMinSize` 1400×900 and its frame persisted through `StateService.shared.editorWindowFrame` (`AppShow/Editor/EditorWindow.swift:40-60, 173-181`). There is no collapsible sidebar anywhere in the app today; the closest precedent is `RecordingPreviewWindow` persisting its height in `StateService.recordingPreviewHeight` (`AppShow/State/StateService.swift:92-95`).
 
 ### 2.4 Where the panel slots in
 
@@ -113,7 +113,7 @@ Toone is a Swift 5 (`SWIFT_VERSION = 5.0`, `Toone.xcodeproj/project.pbxproj:505,
 | Version parsing | `CLIVersionParser.semanticVersion` | `Toone/Core/Services/CLIManager/AIProviderCandidateSelector.swift:14-91` | as-is | One regex |
 | Login detection | `CLIAuthService.checkClaudeAuth/checkCodexAuth` | `Toone/Core/Services/CLIManager/CLIAuthService.swift:90-137` | adapt | The two commands are all we need; the PTY login flow (141-195) is out of scope |
 | Auto-update | `CLIAutoUpdateService`, `CLIDownloadService` | `Toone/Core/Services/CLIManager/CLIAutoUpdateService.swift:16-208`, `CLIDownloadService.swift:258-265` | no | Downloads binaries into `~/.toone/bin`; we point at the user's install and never download |
-| Markdown renderer | `MarkdownTextView`, `MarkdownRenderSegment`, `FormattedTextView`, `MarkdownTableView` | `Toone/Features/Chat/Views/MarkdownTextView.swift:35-53, 59-610, 614-833, 987-1074` | adapt | Bespoke parser, `import SwiftUI` only (line 8), NSCache-backed, streaming-aware (`cachedSegments(_:cacheResult:)` line 196); replace 22 `Colors.` and 6 `layoutStyle` references with `ReframedColors`, delete `appEnvironment` |
+| Markdown renderer | `MarkdownTextView`, `MarkdownRenderSegment`, `FormattedTextView`, `MarkdownTableView` | `Toone/Features/Chat/Views/MarkdownTextView.swift:35-53, 59-610, 614-833, 987-1074` | adapt | Bespoke parser, `import SwiftUI` only (line 8), NSCache-backed, streaming-aware (`cachedSegments(_:cacheResult:)` line 196); replace 22 `Colors.` and 6 `layoutStyle` references with `AppShowColors`, delete `appEnvironment` |
 | Code block | `CodeBlockView` | `Toone/Features/Chat/Views/CodeBlockView.swift:12-206` | adapt | Depends on Highlightr; v1 uses `.system(design: .monospaced)` and a copy button only |
 | Streaming cursor | `StreamingCursor` | `Toone/Features/Chat/Views/RichMessageBubble.swift:852-867` | as-is | 15 lines |
 | Tool-call rows | `CollapsibleToolCalls`, `DetailedToolCallRow`, `ToolCallBadge` | `RichMessageBubble.swift:880-1004, 1040-1192, 1196` | adapt | Grouping logic and SF Symbol map (1049-1062) are good; restyle with tokens, drop file-viewer links |
@@ -233,21 +233,21 @@ Two traps the Codex parser guards: `JSONSerialization` maps JSON `null` to `NSNu
 
 ### 3.4 License of the source repo
 
-`/Users/matheusparanhos/Projects/toone` has no root `LICENSE`; `apps/toone-desktop` has none either. `apps/toone-desktop/README.md:72-74` says `[MIT](LICENSE)` with a dangling link, and its disclaimer (line 68) names Hexagonal.io as the developer. Root `package.json` has no `license` field and is `"private": true`. No Swift file carries a license header. Sibling packages (`apps/toone-oss/LICENSE`, `apps/toone-edge-relay/LICENSE`, `packages/toone-edge-*/LICENSE`) are MIT, copyright `io-hexagonal`. Both repositories live under the same GitHub account (`mattwebhub/toone`, `mattwebhub/Reframed`). Conclusion: copying is a decision for the owner, not a legal blocker, but the first commit that copies code should be accompanied by either a `LICENSE` added to `apps/toone-desktop` or an ADR in `planning/decisions/` recording provenance and the owner's authorisation (the target app is MIT, ADR 0008 already tracks a licence question for gifski).
+`/Users/matheusparanhos/Projects/toone` has no root `LICENSE`; `apps/toone-desktop` has none either. `apps/toone-desktop/README.md:72-74` says `[MIT](LICENSE)` with a dangling link, and its disclaimer (line 68) names Hexagonal.io as the developer. Root `package.json` has no `license` field and is `"private": true`. No Swift file carries a license header. Sibling packages (`apps/toone-oss/LICENSE`, `apps/toone-edge-relay/LICENSE`, `packages/toone-edge-*/LICENSE`) are MIT, copyright `io-hexagonal`. Both repositories live under the same GitHub account (`mattwebhub/toone`, `mattwebhub/AppShow`). Conclusion: copying is a decision for the owner, not a legal blocker, but the first commit that copies code should be accompanied by either a `LICENSE` added to `apps/toone-desktop` or an ADR in `planning/decisions/` recording provenance and the owner's authorisation (the target app is MIT, ADR 0008 already tracks a licence question for gifski).
 
 ## 4. What the target app lacks
 
-- No `Process` usage anywhere under `Reframed/` (grep `Process()` → 0 hits) and no NDJSON or JSON-RPC client.
-- No markdown rendering and no SPM markdown package (`Reframed.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved` lists Sparkle, WhisperKit, swift-log, MenuBarExtraAccess, rnnoise and their transitive deps only).
+- No `Process` usage anywhere under `AppShow/` (grep `Process()` → 0 hits) and no NDJSON or JSON-RPC client.
+- No markdown rendering and no SPM markdown package (`AppShow.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved` lists Sparkle, WhisperKit, swift-log, MenuBarExtraAccess, rnnoise and their transitive deps only).
 - No `AsyncStream` anywhere (`docs/architecture/02-concurrency.md` §2: every stream is a delegate callback on a GCD queue).
 - No collapsible or resizable side panel; the three editor cards are fixed or flexible (§2.3).
-- No multi-line text input component; `InlineEditableText` (`Reframed/UI/InlineEditableText.swift`) is single-line.
-- No per-project auxiliary data beyond `project.json`, `history.json` and the media files (`Reframed/Project/ReframedProject.swift:13-45, 122, 179`); adding an `agent/` directory to the bundle is new territory for `rename(to:)` (line 161) and `delete()`.
-- No test fixtures directory yet; `planning/tdd-strategy.md` §Fixtures describes `ReframedTests/Fixtures/` and `FixtureAnchor`, but `ReframedTests/` currently holds four suites and no `Support/` folder.
+- No multi-line text input component; `InlineEditableText` (`AppShow/UI/InlineEditableText.swift`) is single-line.
+- No per-project auxiliary data beyond `project.json`, `history.json` and the media files (`AppShow/Project/AppShowProject.swift:13-45, 122, 179`); adding an `agent/` directory to the bundle is new territory for `rename(to:)` (line 161) and `delete()`.
+- No test fixtures directory yet; `planning/tdd-strategy.md` §Fixtures describes `AppShowTests/Fixtures/` and `FixtureAnchor`, but `AppShowTests/` currently holds four suites and no `Support/` folder.
 
 ## 5. Recommended architecture for the port
 
-### 5.1 Module boundary: `Reframed/Agent/`
+### 5.1 Module boundary: `AppShow/Agent/`
 
 One folder, one concern per file, no upstream file touched except at the seams listed in §5.6.
 
@@ -260,21 +260,21 @@ One folder, one concern per file, no upstream file touched except at the seams l
 | `AgentProcessRunner.swift` | `actor` | actor | Owns `Process`, `Pipe`s, the line buffer and the inactivity watchdog; exposes `func run(executable:arguments:cwd:environment:stdin:) -> AsyncThrowingStream<String, Error>` and `func terminate()` |
 | `AgentSession.swift` | `actor` | actor | One thread's live run: composes runner + provider, turns lines into `AgentEvent`s, tracks `sessionID`, exposes `func send(_ prompt: String) -> AsyncStream<AgentEvent>` and `func cancel()` |
 | `AgentTranscript.swift` | `@MainActor @Observable final class` | main | Per-project UI model: one `AgentConversationData`, messages, provider-scoped resume ids, `isRunning`, `streamingMessageID`; applies `AgentEvent`s; owns the `Task` that drains the session |
-| `AgentTranscript+Persistence.swift` | extension | main | `load(from:)`, `save()`; JSON with the `ReframedProject` encoder settings (`.iso8601`, `[.prettyPrinted, .sortedKeys]`) |
+| `AgentTranscript+Persistence.swift` | extension | main | `load(from:)`, `save()`; JSON with the `AppShowProject` encoder settings (`.iso8601`, `[.prettyPrinted, .sortedKeys]`) |
 | `AgentConversationData.swift` | `struct … Codable, Sendable, Equatable` + `AgentMessageData`, `AgentContentData` (enum with string `type` discriminator, unknown → `.text`) | none | The single-conversation on-disk schema; custom decoding migrates the abandoned legacy session id field |
 | `AgentToolchain.swift` | `enum` + `actor AgentProbe` | none / actor | Filesystem-only binary lookup (port of `ToolchainResolver.searchDirectories`), `--version` probe, login-status probe → `AgentReadiness` |
 | `AgentReadiness.swift` | `enum AgentReadiness: Sendable, Equatable` | none | `.ready(path:version:)`, `.missing`, `.unhealthy(reason:)`, `.notLoggedIn(path:)`; `label`, `detail`, `isReady` |
 | `AgentChatPanel.swift` (+ `+Header`, `+Transcript`, `+Composer`, `+Setup`) | SwiftUI views | main | The card; each extension file stays under ~200 lines |
-| `AgentMarkdownView.swift`, `AgentCodeBlockView.swift`, `AgentToolCallRow.swift`, `AgentStreamingCursor.swift` | SwiftUI views | main | Ported from Toone, restyled with `ReframedColors`/`FontSize`/`Radius` |
+| `AgentMarkdownView.swift`, `AgentCodeBlockView.swift`, `AgentToolCallRow.swift`, `AgentStreamingCursor.swift` | SwiftUI views | main | Ported from Toone, restyled with `AppShowColors`/`FontSize`/`Radius` |
 
-Dependency direction: `Agent/` depends on `Project/` (`ReframedProject.bundleURL`), `State/` (`StateService`, `ConfigService`), `UI/` (tokens, buttons), `Utilities/` (`LenientCodable`, `ReframedPaths`), `Logging`. Nothing else depends on `Agent/` except `Editor/EditorView.swift` (one line) and `Editor/EditorState.swift` (one stored property, see §5.6).
+Dependency direction: `Agent/` depends on `Project/` (`AppShowProject.bundleURL`), `State/` (`StateService`, `ConfigService`), `UI/` (tokens, buttons), `Utilities/` (`LenientCodable`, `AppShowPaths`), `Logging`. Nothing else depends on `Agent/` except `Editor/EditorView.swift` (one line) and `Editor/EditorState.swift` (one stored property, see §5.6).
 
 ### 5.2 Concurrency placement (per `docs/architecture/02-concurrency.md` §5)
 
 - `Process`, `Pipe`, `FileHandle` are non-Sendable and callback-driven; they live inside `AgentProcessRunner` (actor). The `readabilityHandler` closure is `@Sendable` and runs on a GCD thread; it copies the `Data` and hops with `Task { await self.append(data) }`. This replaces Toone's `NSLock` + non-isolated `@Observable` class, which does not compile under strict concurrency. The `terminationHandler` is installed before `run()` (as `BaseAIService.swift:331-380` insists) and also hops into the actor.
 - `AsyncThrowingStream` is new to the codebase but is the idiomatic Swift 6 replacement for Toone's `messageContinuation`; it is confined to `Agent/` and finished on termination, cancellation, or watchdog.
 - `AgentSession` (actor) is the equivalent of `RecordingCoordinator`: a coordination point, not a data path. It returns `Sendable` enums only.
-- `AgentTranscript` is `@MainActor @Observable`, owned by `EditorState` the way `History` is (`Reframed/Editor/EditorState.swift`), and torn down in `EditorState.teardown()` (`Reframed/Editor/EditorState+Persistence.swift:437`), which cancels the drain task and terminates the process so no CLI outlives the window.
+- `AgentTranscript` is `@MainActor @Observable`, owned by `EditorState` the way `History` is (`AppShow/Editor/EditorState.swift`), and torn down in `EditorState.teardown()` (`AppShow/Editor/EditorState+Persistence.swift:437`), which cancels the drain task and terminates the process so no CLI outlives the window.
 - The transcript's streaming update is whole-text replace per event, exactly Toone's `updateStreamingMessage` (`ChatViewModel.swift:1382-1387`); no partial-message deltas in v1.
 - Cancellation follows the app's existing pattern (`05-coding-patterns.md` §6.5): the drain task is stored as `Task<Void, Never>?`, cancelled in `teardown()`, and the runner's stream uses `withTaskCancellationHandler { … } onCancel: { terminate }`.
 
@@ -301,25 +301,25 @@ recording-…​.frm/
     └── conversation.json         provider, resumeIds, timestamps, messages
 ```
 
-Reasons: a conversation is about one project and should move, rename, and delete with it; `ReframedProject.rename(to:)` already moves the whole directory (`ReframedProject.swift:161`). Resume ids are keyed by provider because a Claude session id is meaningless to Codex. Saves occur at user-message append, turn completion/cancellation, provider change, and clear. Provider session data itself stays where the CLIs keep it (`~/.claude/projects/...`, `~/.codex/sessions/...`); AppShow stores only the ids.
+Reasons: a conversation is about one project and should move, rename, and delete with it; `AppShowProject.rename(to:)` already moves the whole directory (`AppShowProject.swift:161`). Resume ids are keyed by provider because a Claude session id is meaningless to Codex. Saves occur at user-message append, turn completion/cancellation, provider change, and clear. Provider session data itself stays where the CLIs keep it (`~/.claude/projects/...`, `~/.codex/sessions/...`); AppShow stores only the ids.
 
 The CLI working directory is a sibling path, `.agent/<project-name>/`, containing ephemeral socket, token, and preview-frame files. It is intentionally separate from the portable conversation record inside the bundle.
 
 ### 5.5 Panel state and preferences
 
-- `StateService` gains `agentPanelCollapsed: Bool` and `agentPanelWidth: CGFloat?` in `StateData` (`Reframed/State/StateService.swift:150-159`), with get/set + `save()` properties in the `recordingPreviewHeight` style (lines 92-95). Session-layout state belongs there, not in `ConfigService` (`06-conventions-checklist.md` "Adding a new setting" item 5).
+- `StateService` gains `agentPanelCollapsed: Bool` and `agentPanelWidth: CGFloat?` in `StateData` (`AppShow/State/StateService.swift:150-159`), with get/set + `save()` properties in the `recordingPreviewHeight` style (lines 92-95). Session-layout state belongs there, not in `ConfigService` (`06-conventions-checklist.md` "Adding a new setting" item 5).
 - `ConfigService` gains `agentProvider: String = "claude"` in `ConfigData` plus a get/set property; the picker in the panel header writes it directly, like `appearance` in `SettingsView` (`05-coding-patterns.md` §5.2).
-- Default width 320, clamp 260…480, collapsed rail 40; constants go into `Layout` as `agentPanelWidth`, `agentPanelMinWidth`, `agentPanelMaxWidth`, `agentPanelRailWidth` (`Reframed/UI/Constants.swift:8-30`).
+- Default width 320, clamp 260…480, collapsed rail 40; constants go into `Layout` as `agentPanelWidth`, `agentPanelMinWidth`, `agentPanelMaxWidth`, `agentPanelRailWidth` (`AppShow/UI/Constants.swift:8-30`).
 
 ### 5.6 Upstream files touched (seams)
 
 | File | Change | Why it is a seam |
 | --- | --- | --- |
-| `Reframed/Editor/EditorView.swift:43` | insert `AgentChatPanel(transcript: editorState.agentTranscript)` as the first child of the `HStack` | one additive line |
-| `Reframed/Editor/EditorState.swift` | one stored property `let agentTranscript: AgentTranscript` initialised from `project` | additive; `History` precedent |
-| `Reframed/Editor/EditorState+Persistence.swift:437` | `agentTranscript.teardown()` inside `teardown()` | additive line |
-| `Reframed/State/StateService.swift`, `Reframed/State/ConfigService.swift` | new optional/defaulted fields | listed pattern |
-| `Reframed/UI/Constants.swift` | four `Layout` constants | additive |
+| `AppShow/Editor/EditorView.swift:43` | insert `AgentChatPanel(transcript: editorState.agentTranscript)` as the first child of the `HStack` | one additive line |
+| `AppShow/Editor/EditorState.swift` | one stored property `let agentTranscript: AgentTranscript` initialised from `project` | additive; `History` precedent |
+| `AppShow/Editor/EditorState+Persistence.swift:437` | `agentTranscript.teardown()` inside `teardown()` | additive line |
+| `AppShow/State/StateService.swift`, `AppShow/State/ConfigService.swift` | new optional/defaulted fields | listed pattern |
+| `AppShow/UI/Constants.swift` | four `Layout` constants | additive |
 | `planning/upstream-sync.md` | list the above under "Intentional divergences" | required by `planning/tdd-strategy.md` |
 
 ## 6. Provider detection and setup UX
@@ -338,9 +338,9 @@ Provider switch is a `SegmentPicker` in the header; switching while a turn runs 
 ## 7. Security and permissions
 
 - Working directory: the `.frm` bundle directory of the open project, never `~`, never the project folder root. Both CLIs treat cwd as the project root for their own session storage and rule files, so a user's `~/.claude/CLAUDE.md` still applies but no `CLAUDE.md`/`AGENTS.md` from unrelated folders does.
-- Tool policy v1: read-only. Claude Code launched with `--permission-mode default --allowedTools Read Glob Grep` (anything else prompts, and a prompt in `-p` mode is denied, which the transcript shows as a failed tool call); Codex with `--sandbox read-only` and no bypass flag. `--dangerously-skip-permissions` and `--dangerously-bypass-approvals-and-sandbox` are never passed, and there is no setting to enable them. Write access, when it comes, goes through a Reframed-owned MCP server exposing editor operations (Toone's `--mcp-config` / `codex mcp add` shapes), so the agent edits the project through validated operations, never by rewriting `project.json` or media.
-- Environment: a fresh dictionary with `PATH` = the fixed search list, `HOME`, `LANG`, `TERM`; nothing else from the app's environment is forwarded. `REFRAMED_HOME`/`REFRAMED_TMP` are never forwarded.
-- Never exposed: `~/.reframed/reframed.json`, `~/.reframed/state.json`, the Whisper model folders, `~/Movies/Reframed`, recordings of other projects, the app's log file. Media files inside the bundle are readable by the agent (it is in the bundle); if that is unwanted, cwd becomes `<bundle>/agent/` with a symlink to `project.json` only (question in §9).
+- Tool policy v1: read-only. Claude Code launched with `--permission-mode default --allowedTools Read Glob Grep` (anything else prompts, and a prompt in `-p` mode is denied, which the transcript shows as a failed tool call); Codex with `--sandbox read-only` and no bypass flag. `--dangerously-skip-permissions` and `--dangerously-bypass-approvals-and-sandbox` are never passed, and there is no setting to enable them. Write access, when it comes, goes through a AppShow-owned MCP server exposing editor operations (Toone's `--mcp-config` / `codex mcp add` shapes), so the agent edits the project through validated operations, never by rewriting `project.json` or media.
+- Environment: a fresh dictionary with `PATH` = the fixed search list, `HOME`, `LANG`, `TERM`; nothing else from the app's environment is forwarded. `APPSHOW_HOME`/`APPSHOW_TMP` are never forwarded.
+- Never exposed: `~/.reframed/reframed.json`, `~/.reframed/state.json`, the Whisper model folders, `~/Movies/AppShow`, recordings of other projects, the app's log file. Media files inside the bundle are readable by the agent (it is in the bundle); if that is unwanted, cwd becomes `<bundle>/agent/` with a symlink to `project.json` only (question in §9).
 - Prompt content is written to the CLI and to `agent/conversation.json`; nothing leaves the machine except through the CLI the user installed and logged into.
 - Test host: `AgentProbe` and `AgentProcessRunner` take the executable URL and environment as parameters, so tests run `/bin/echo`, `/bin/cat`, `/usr/bin/false` and a fixture script instead of any real CLI, and never touch `~/.claude` or `~/.codex`.
 
@@ -365,6 +365,6 @@ Provider switch is a `SegmentPicker` in the header; switching while a turn runs 
 3. Transcripts inside the bundle travel with a shared project. Acceptable, or should they be stripped on export/share?
 4. Resolved by ADR 0010: one fresh process per turn is acceptable; the logical provider session resumes through its stored id.
 5. Provider preference: global (`ConfigService`, proposed) or per project?
-6. Which shortcut toggles the panel? Adding a `ShortcutAction` case edits `Reframed/Utilities/KeyboardShortcut.swift` (upstream); the alternative is no shortcut in v1.
+6. Which shortcut toggles the panel? Adding a `ShortcutAction` case edits `AppShow/Utilities/KeyboardShortcut.swift` (upstream); the alternative is no shortcut in v1.
 7. Provenance of copied Toone code: add a `LICENSE` to `apps/toone-desktop`, or record authorisation in an ADR here?
 8. Should the app refuse to run the agent while an export is in progress (`editorState.isExporting`) to keep CPU for the encoder?
