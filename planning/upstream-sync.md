@@ -66,3 +66,7 @@ Keep this list current. Each entry links the ADR that justifies it.
 ## Cadence
 
 Sync at the start of every milestone and before any release. Never sync in the middle of a feature branch; rebase the feature on `main` after the sync lands.
+
+## Sync log
+
+- 2026-09-04: fetched `upstream/main`; it remained at the fork base `b6a1709` (v0.14.7). Milestone 08 required no merge or conflict resolution.
