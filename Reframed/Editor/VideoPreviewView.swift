@@ -69,6 +69,7 @@ struct VideoPreviewView: NSViewRepresentable {
       exitTransition: RegionTransitionType, exitDuration: Double
     )] = []
   var isPreviewMode: Bool = false
+  var hasCuts: Bool = false
   var isPlaying: Bool = false
   var clickSoundEnabled: Bool = false
   var clickSoundVolume: Float = 0.5
