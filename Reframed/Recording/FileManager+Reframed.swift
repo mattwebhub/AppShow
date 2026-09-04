@@ -2,7 +2,7 @@ import Foundation
 
 extension FileManager {
   private func reframedTempDir() -> URL {
-    let tempDir = URL(fileURLWithPath: "/tmp/Reframed", isDirectory: true)
+    let tempDir = ReframedPaths.temp
     try? createDirectory(at: tempDir, withIntermediateDirectories: true)
     return tempDir
   }
@@ -67,7 +67,7 @@ extension FileManager {
   }
 
   func cleanupTempDir() {
-    let tempDir = URL(fileURLWithPath: "/tmp/Reframed", isDirectory: true)
+    let tempDir = ReframedPaths.temp
     guard let contents = try? contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil) else { return }
     for file in contents {
       try? removeItem(at: file)
