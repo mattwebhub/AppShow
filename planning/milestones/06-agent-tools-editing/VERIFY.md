@@ -19,5 +19,5 @@
 | Confirmation deny | external import/export does not start and no state changes | |
 | Confirmation allow | exactly the shown operation runs once | |
 | Provider E2E | Claude Code and Codex each read timeline and apply a reversible edit | pass: Codex 0.149.1 default model and Claude Code 2.1.260 with `sonnet`; configured Fable quota was exhausted (2026-09-04) |
-| Stacked PR | PR targets milestone 05 and CI passes on its final head | PR #8; CI pending |
+| Stacked PR | PR targets milestone 05 and CI passes on its final head | PR #8; pass (2026-09-04) |
 | Export | user selects a destination; existing file is not overwritten without a second decision | |
