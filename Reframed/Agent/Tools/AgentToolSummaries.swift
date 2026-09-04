@@ -127,7 +127,7 @@ enum AgentToolSummaries {
       items.append([
         "index": JSONValue(index),
         "timestamp": .string(formatter.string(from: entry.timestamp)),
-        "label": .string(changes.first ?? "Editor settings updated"),
+        "label": .string(entry.label ?? changes.first ?? "Editor settings updated"),
         "changes": .array(changes.map { .string($0) }),
         "isCurrent": .bool(index == currentIndex),
       ])

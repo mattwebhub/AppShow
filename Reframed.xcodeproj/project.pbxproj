@@ -82,6 +82,7 @@
 		7E57000000000000000000C6 /* AgentBridgeServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000C5 /* AgentBridgeServer.swift */; };
 		7E57000000000000000000C4 /* AgentRPCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000C3 /* AgentRPCSession.swift */; };
 		7E57000000000000000000C2 /* AgentToolDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000C1 /* AgentToolDispatcher.swift */; };
+		7E5900000000000000000002 /* AgentEditingTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5900000000000000000001 /* AgentEditingTools.swift */; };
 		7E57000000000000000000C0 /* AgentToolPreviewFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BF /* AgentToolPreviewFrame.swift */; };
 		7E57000000000000000000BE /* AgentToolHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BD /* AgentToolHandlers.swift */; };
 		7E57000000000000000000BC /* AgentToolCursorActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BB /* AgentToolCursorActivity.swift */; };
@@ -387,6 +388,7 @@
 		7E57000000000000000000C5 /* AgentBridgeServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBridgeServer.swift; sourceTree = "<group>"; };
 		7E57000000000000000000C3 /* AgentRPCSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRPCSession.swift; sourceTree = "<group>"; };
 		7E57000000000000000000C1 /* AgentToolDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolDispatcher.swift; sourceTree = "<group>"; };
+		7E5900000000000000000001 /* AgentEditingTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentEditingTools.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BF /* AgentToolPreviewFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolPreviewFrame.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BD /* AgentToolHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolHandlers.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BB /* AgentToolCursorActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolCursorActivity.swift; sourceTree = "<group>"; };
@@ -1043,6 +1045,7 @@
 				7E57000000000000000000BD /* AgentToolHandlers.swift */,
 				7E57000000000000000000BF /* AgentToolPreviewFrame.swift */,
 				7E57000000000000000000C1 /* AgentToolDispatcher.swift */,
+				7E5900000000000000000001 /* AgentEditingTools.swift */,
 				7E57000000000000000000C3 /* AgentRPCSession.swift */,
 				7E57000000000000000000C5 /* AgentBridgeServer.swift */,
 				7E57000000000000000000C7 /* AgentWorkspace.swift */,
@@ -1424,6 +1427,7 @@
 				7E57000000000000000000C6 /* AgentBridgeServer.swift in Sources */,
 				7E57000000000000000000C4 /* AgentRPCSession.swift in Sources */,
 				7E57000000000000000000C2 /* AgentToolDispatcher.swift in Sources */,
+				7E5900000000000000000002 /* AgentEditingTools.swift in Sources */,
 				7E57000000000000000000C0 /* AgentToolPreviewFrame.swift in Sources */,
 				7E57000000000000000000BE /* AgentToolHandlers.swift in Sources */,
 				7E57000000000000000000BC /* AgentToolCursorActivity.swift in Sources */,
