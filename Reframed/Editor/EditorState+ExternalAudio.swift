@@ -108,6 +108,11 @@ extension EditorState {
   }
 
   func syncExternalAudioToPlayer() {
+    var urls: [UUID: URL] = [:]
+    for track in externalAudioTracks {
+      urls[track.id] = externalAudioURL(for: track)
+    }
+    playerController.setExternalAudioTracks(externalAudioTracks, urls: urls)
   }
 
   private func updateExternalAudioTrack(id: UUID, _ transform: (ExternalAudioTrackData) -> ExternalAudioTrackData) {

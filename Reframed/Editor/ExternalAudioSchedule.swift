@@ -1,6 +1,8 @@
 import Foundation
 
 enum ExternalAudioSchedule {
+  static let driftTolerance: Double = 0.04
+
   struct Segment: Equatable, Sendable {
     let startFrame: Int64
     let frameCount: Int64
@@ -56,6 +58,10 @@ enum ExternalAudioSchedule {
       return time
     }
     return videoRegions.first(where: { $0.start > time })?.start
+  }
+
+  static func exceedsDriftTolerance(anchorTime: Double, playedSeconds: Double, timelineTime: Double) -> Bool {
+    abs(anchorTime + playedSeconds - timelineTime) > driftTolerance
   }
 
   private static func frames(_ seconds: Double, _ sampleRate: Double) -> Int64 {
