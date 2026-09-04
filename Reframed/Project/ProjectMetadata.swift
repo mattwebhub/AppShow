@@ -494,6 +494,7 @@ struct EditorStateData: Codable, Sendable {
   var spotlightRegions: [SpotlightRegionData]?
   var textOverlays: [TextOverlayData]?
   var imageOverlays: [ImageOverlayData]?
+  var blurRegions: [BlurRegionData]? = nil
 }
 
 struct CodableSize: Codable, Sendable {

@@ -9,11 +9,12 @@ Last updated: 2026-09-04
 - Milestone 03 music tracks is code-complete on PR #5; its manual checks remain.
 - Milestone 04 agent chat is code-complete on PR #6 with one persisted, clearable conversation per project and provider-specific session resumption; its manual checks remain.
 - Milestone 05 read-only agent bridge is code-complete on PR #7.
-- Milestone 07 PR #4 contains silence removal, text overlays and image overlays. T1 to T6 are code-complete; blur regions and broader transition work remain. Its manual checks remain.
+- Milestone 06 is code-complete on green PR #8, including live Claude Code and Codex MCP verification; its manual UI checks remain.
+- Milestone 07 PR #4 contains silence removal, text overlays, image overlays, and source-space blur regions. T1 to T7 are code-complete; broader transition work remains. Its manual checks remain.
 
 ## Verified on this machine
 
-- `make format`, `make lint`, `make build`, and `make test` green after image overlays (366 tests, 37 suites).
+- Blur-region format, lint, build, 379 tests in 39 suites, and 3 gated export tests are green.
 - `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` green on `milestone-02-lossless-cut`.
 
 ## Notes for the next session
@@ -25,8 +26,8 @@ Last updated: 2026-09-04
 
 ## Next
 
-1. Advance PR #4 to the image-overlay head and verify CI.
+1. Commit and push blur regions, then verify PR #4 CI.
 2. Human runs the manual rows for milestones 02, 03, 04 and 07.
-3. Continue milestone 06 editing tools after the agent-chat stack lands.
-4. Implement blur regions and the remaining transition work in milestone 07.
+3. Forward-integrate blur into milestone 06 and add its agent tool.
+4. Implement the remaining transition work in milestone 07.
 5. Add the dedicated AppShow identity migration before the first public release.

@@ -34,7 +34,11 @@ extension FrameRenderer {
       result = shadow.composited(over: result)
     }
 
-    let screenCI = CIImage(cvPixelBuffer: screenBuffer)
+    let screenCI = applyingBlurRegions(
+      to: CIImage(cvPixelBuffer: screenBuffer),
+      instruction: instruction,
+      compositionTime: compositionTime
+    )
     var screenLayer = hdrPositionScreen(
       screenCI,
       in: state.videoRect,
