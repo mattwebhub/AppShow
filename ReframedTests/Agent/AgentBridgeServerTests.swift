@@ -333,10 +333,11 @@ struct AgentBridgeServerTests {
     )
     #expect(badArguments.error?.code == -32602)
     #expect(badArguments.error?.data?["code"] == "TOOL_ARGUMENTS_INVALID")
-    let pending = try await client.request(
+    let silences = try await client.request(
       JSONRPCRequest(id: .number(7), method: "tools/call", params: ["name": "get_silences", "arguments": [:]])
     )
-    #expect(pending.error?.code == -32004)
+    #expect(silences.error == nil)
+    #expect(silences.result?["structuredContent"]?["count"] == 0)
     let unknownMethod = try await client.request(JSONRPCRequest(id: .number(8), method: "resources/list", params: nil))
     #expect(unknownMethod.error?.code == -32601)
     #expect(harness.state.history.entries.count == 1)

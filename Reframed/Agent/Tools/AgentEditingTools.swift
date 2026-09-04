@@ -208,6 +208,69 @@ enum AgentEditingToolCatalog {
     slow: true
   )
 
+  static let removeSilences = AgentToolDefinition(
+    name: "remove_silences",
+    description: "Detect silent audio gaps and remove them from the kept video, preserving speech padding.",
+    inputSchema: AgentToolSchema.object([
+      "thresholdDb": AgentToolSchema.number("Silence threshold in dBFS, default -40", minimum: -120, maximum: 0),
+      "minGapSeconds": AgentToolSchema.number("Shortest gap to remove, default 0.8", minimum: 0),
+      "padding": AgentToolSchema.number("Speech padding on each side, default 0.15", minimum: 0, maximum: 2),
+      "source": AgentToolSchema.string("Audio track to analyse", enum: ["mic", "system"]),
+      "confirmationId": AgentToolSchema.string("Single-use confirmation required when more than 40% would be removed"),
+      "label": AgentToolSchema.string("Short undo-history label"),
+    ]),
+    mutating: true,
+    slow: true
+  )
+
+  static let addText = AgentToolDefinition(
+    name: "add_text",
+    description: "Add a styled text overlay over an exact source-time range.",
+    inputSchema: textOverlaySchema(requireIdentity: false),
+    mutating: true
+  )
+
+  static let updateText = AgentToolDefinition(
+    name: "update_text",
+    description: "Update an existing text overlay by id.",
+    inputSchema: textOverlaySchema(requireIdentity: true, requireContent: false),
+    mutating: true
+  )
+
+  static let removeText = AgentToolDefinition(
+    name: "remove_text",
+    description: "Remove a text overlay by id.",
+    inputSchema: AgentToolSchema.object(
+      ["id": AgentToolSchema.string("Text overlay UUID"), "label": AgentToolSchema.string("Short undo-history label")],
+      required: ["id"]
+    ),
+    mutating: true
+  )
+
+  static let addImage = AgentToolDefinition(
+    name: "add_image",
+    description: "Import an image from an exact path after in-app confirmation and add it as an overlay.",
+    inputSchema: imageOverlaySchema(requirePath: true),
+    mutating: true
+  )
+
+  static let updateImage = AgentToolDefinition(
+    name: "update_image",
+    description: "Update an existing image overlay by id.",
+    inputSchema: imageOverlaySchema(requireIdentity: true),
+    mutating: true
+  )
+
+  static let removeImage = AgentToolDefinition(
+    name: "remove_image",
+    description: "Remove an image overlay by id while retaining its bundled asset for undo.",
+    inputSchema: AgentToolSchema.object(
+      ["id": AgentToolSchema.string("Image overlay UUID"), "label": AgentToolSchema.string("Short undo-history label")],
+      required: ["id"]
+    ),
+    mutating: true
+  )
+
   static let beginBatch = AgentToolDefinition(
     name: "begin_batch",
     description: "Begin a labeled edit transaction whose mutations become one undo step.",
@@ -240,8 +303,62 @@ enum AgentEditingToolCatalog {
       AgentSetCameraTool(),
       AgentSetAudioTool(),
       AgentExportVideoTool(),
+      AgentRemoveSilencesTool(),
+      AgentAddTextTool(),
+      AgentUpdateTextTool(),
+      AgentRemoveTextTool(),
+      AgentAddImageTool(),
+      AgentUpdateImageTool(),
+      AgentRemoveImageTool(),
       AgentBatchBoundaryTool(definition: beginBatch),
       AgentBatchBoundaryTool(definition: endBatch),
+    ]
+  }
+
+  private static func textOverlaySchema(
+    requireIdentity: Bool,
+    requireContent: Bool = true
+  ) -> JSONValue {
+    var properties = overlayProperties()
+    properties["id"] = AgentToolSchema.string("Text overlay UUID")
+    properties["text"] = AgentToolSchema.string("Displayed text")
+    properties["fontSize"] = AgentToolSchema.number("Font size as a canvas-height fraction", minimum: 0.01, maximum: 0.3)
+    properties["weight"] = AgentToolSchema.string("Font weight", enum: CaptionFontWeight.allCases.map(\.rawValue))
+    properties["showBackground"] = AgentToolSchema.boolean("Whether to draw a background pill")
+    properties["backgroundOpacity"] = AgentToolSchema.number("Background opacity", minimum: 0, maximum: 1)
+    var required: [String] = []
+    if requireIdentity { required.append("id") }
+    if requireContent { required.append(contentsOf: ["text", "start", "end"]) }
+    return AgentToolSchema.object(properties, required: required)
+  }
+
+  private static func imageOverlaySchema(requirePath: Bool = false, requireIdentity: Bool = false) -> JSONValue {
+    var properties = overlayProperties()
+    properties["id"] = AgentToolSchema.string("Image overlay UUID")
+    properties["path"] = AgentToolSchema.string("Absolute source image path")
+    properties["confirmationId"] = AgentToolSchema.string("Single-use confirmation identifier")
+    properties["width"] = AgentToolSchema.number("Width as a canvas fraction", minimum: 0.01, maximum: 1)
+    properties["cornerRadius"] = AgentToolSchema.number("Corner radius relative to image size", minimum: 0, maximum: 1)
+    properties["opacity"] = AgentToolSchema.number("Image opacity", minimum: 0, maximum: 1)
+    properties["shadow"] = AgentToolSchema.number("Shadow strength", minimum: 0, maximum: 1)
+    var required: [String] = []
+    if requirePath { required.append(contentsOf: ["path", "start", "end"]) }
+    if requireIdentity { required.append("id") }
+    return AgentToolSchema.object(properties, required: required)
+  }
+
+  private static func overlayProperties() -> [String: JSONValue] {
+    [
+      "start": AgentToolSchema.number("Start in source seconds", minimum: 0),
+      "end": AgentToolSchema.number("End in source seconds", minimum: 0),
+      "position": AgentToolSchema.string("Position preset", enum: TextOverlayPosition.allCases.map(\.rawValue)),
+      "offsetX": AgentToolSchema.number("Horizontal canvas offset", minimum: -1, maximum: 1),
+      "offsetY": AgentToolSchema.number("Vertical canvas offset", minimum: -1, maximum: 1),
+      "entryTransition": AgentToolSchema.string("Entry transition", enum: RegionTransitionType.allCases.map(\.rawValue)),
+      "entryDuration": AgentToolSchema.number("Entry transition duration", minimum: 0, maximum: 5),
+      "exitTransition": AgentToolSchema.string("Exit transition", enum: RegionTransitionType.allCases.map(\.rawValue)),
+      "exitDuration": AgentToolSchema.number("Exit transition duration", minimum: 0, maximum: 5),
+      "label": AgentToolSchema.string("Short undo-history label"),
     ]
   }
 }
@@ -567,6 +684,258 @@ private struct AgentExportVideoTool: AgentToolHandler {
     default: nil
     }
   }
+}
+
+@MainActor
+private struct AgentRemoveSilencesTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.removeSilences
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let sourceName = arguments["source"]?.stringValue ?? "mic"
+    let source: SilenceSource = sourceName == "system" ? .system : .microphone
+    let config = SilenceDetectorConfig(
+      thresholdDb: arguments["thresholdDb"]?.doubleValue ?? -40,
+      minimumSilence: arguments["minGapSeconds"]?.doubleValue ?? 0.8,
+      padding: arguments["padding"]?.doubleValue ?? 0.15
+    )
+    let preview = await context.editorState.previewSilenceRemoval(config: config, source: source)
+    if let error = preview.errorDescription { throw AgentToolError.failed(error) }
+    guard preview.canApply else { return context.timelineResult() }
+    let keptDuration = context.editorState.cutTimeline.totalDuration
+    if keptDuration > 0, preview.totalRemoved / keptDuration > 0.4 {
+      let operation = AgentConfirmationOperation(
+        kind: definition.name,
+        arguments: [
+          "source": .string(sourceName),
+          "thresholdDb": .number(config.thresholdDb),
+          "minGapSeconds": .number(config.minimumSilence),
+          "padding": .number(config.padding),
+        ]
+      )
+      try context.editorState.agentConfirmations.authorize(
+        operation: operation,
+        confirmationID: try agentConfirmationID(arguments),
+        title: "Remove extensive silence",
+        detail: "Remove (Int((preview.totalRemoved / keptDuration * 100).rounded()))% of the kept video"
+      )
+    }
+    context.editorState.videoRegions = preview.slices
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentAddTextTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.addText
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let text = arguments["text"]?.stringValue?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    guard !text.isEmpty else { throw AgentToolError.invalidArguments("text must not be empty") }
+    let range = try agentOverlayRange(arguments, duration: CMTimeGetSeconds(context.editorState.duration))
+    guard let overlay = context.editorState.addTextOverlay(atTime: range.lowerBound) else {
+      throw AgentToolError.failed("The recording is too short for a text overlay")
+    }
+    try updateTextOverlay(overlay.id, arguments: arguments, range: range, state: context.editorState)
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentUpdateTextTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.updateText
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let id = try agentOverlayID(arguments)
+    guard let overlay = context.editorState.textOverlays.first(where: { $0.id == id }) else {
+      throw AgentToolError.invalidArguments("text overlay does not exist")
+    }
+    let range = try agentOverlayRange(
+      arguments,
+      duration: CMTimeGetSeconds(context.editorState.duration),
+      fallback: overlay.startSeconds...overlay.endSeconds
+    )
+    try updateTextOverlay(id, arguments: arguments, range: range, state: context.editorState)
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentRemoveTextTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.removeText
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let id = try agentOverlayID(arguments)
+    guard context.editorState.textOverlays.contains(where: { $0.id == id }) else {
+      throw AgentToolError.invalidArguments("text overlay does not exist")
+    }
+    context.editorState.removeTextOverlay(id: id)
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentAddImageTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.addImage
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    guard let path = arguments["path"]?.stringValue, path.hasPrefix("/") else {
+      throw AgentToolError.invalidArguments("path must be absolute")
+    }
+    let source = URL(fileURLWithPath: path).standardizedFileURL
+    try context.editorState.agentConfirmations.authorize(
+      operation: .externalFile(kind: definition.name, url: source),
+      confirmationID: try agentConfirmationID(arguments),
+      title: "Import image",
+      detail: "Copy (source.lastPathComponent) into this project"
+    )
+    let range = try agentOverlayRange(arguments, duration: CMTimeGetSeconds(context.editorState.duration))
+    guard let overlay = context.editorState.addImageOverlay(from: source, atTime: range.lowerBound) else {
+      throw AgentToolError.failed("The image could not be imported")
+    }
+    try updateImageOverlay(overlay.id, arguments: arguments, range: range, state: context.editorState)
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentUpdateImageTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.updateImage
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let id = try agentOverlayID(arguments)
+    guard let overlay = context.editorState.imageOverlays.first(where: { $0.id == id }) else {
+      throw AgentToolError.invalidArguments("image overlay does not exist")
+    }
+    let range = try agentOverlayRange(
+      arguments,
+      duration: CMTimeGetSeconds(context.editorState.duration),
+      fallback: overlay.startSeconds...overlay.endSeconds
+    )
+    try updateImageOverlay(id, arguments: arguments, range: range, state: context.editorState)
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentRemoveImageTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.removeImage
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let id = try agentOverlayID(arguments)
+    guard context.editorState.imageOverlays.contains(where: { $0.id == id }) else {
+      throw AgentToolError.invalidArguments("image overlay does not exist")
+    }
+    context.editorState.removeImageOverlay(id: id)
+    return context.timelineResult()
+  }
+}
+
+private func agentOverlayID(_ arguments: JSONValue) throws -> UUID {
+  guard let value = arguments["id"]?.stringValue, let id = UUID(uuidString: value) else {
+    throw AgentToolError.invalidArguments("id must be a UUID")
+  }
+  return id
+}
+
+private func agentConfirmationID(_ arguments: JSONValue) throws -> UUID? {
+  guard let value = arguments["confirmationId"]?.stringValue else { return nil }
+  guard let id = UUID(uuidString: value) else {
+    throw AgentToolError.invalidArguments("confirmationId must be a UUID")
+  }
+  return id
+}
+
+private func agentOverlayRange(
+  _ arguments: JSONValue,
+  duration: Double,
+  fallback: ClosedRange<Double>? = nil
+) throws -> ClosedRange<Double> {
+  let start = arguments["start"]?.doubleValue ?? fallback?.lowerBound ?? 0
+  let end = arguments["end"]?.doubleValue ?? fallback?.upperBound ?? duration
+  guard end - start >= TextOverlayData.minimumLength else {
+    throw AgentToolError.invalidArguments("overlay end must be at least (TextOverlayData.minimumLength) seconds after start")
+  }
+  guard start >= 0, end <= duration else {
+    throw AgentToolError.invalidArguments("overlay range must fit inside the recording")
+  }
+  return start...end
+}
+
+@MainActor
+private func updateTextOverlay(
+  _ id: UUID,
+  arguments: JSONValue,
+  range: ClosedRange<Double>,
+  state: EditorState
+) throws {
+  guard let index = state.textOverlays.firstIndex(where: { $0.id == id }) else {
+    throw AgentToolError.invalidArguments("text overlay does not exist")
+  }
+  var overlay = state.textOverlays[index]
+  if let value = arguments["text"]?.stringValue {
+    let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { throw AgentToolError.invalidArguments("text must not be empty") }
+    overlay.text = trimmed
+  }
+  if let value = arguments["fontSize"]?.doubleValue { overlay.fontSize = value }
+  if let value = arguments["weight"]?.stringValue, let weight = CaptionFontWeight(rawValue: value) { overlay.fontWeight = weight }
+  if let value = arguments["showBackground"]?.boolValue { overlay.showBackground = value }
+  if let value = arguments["backgroundOpacity"]?.doubleValue { overlay.backgroundOpacity = value }
+  applyOverlayValues(arguments, to: &overlay)
+  overlay.startSeconds = range.lowerBound
+  overlay.endSeconds = range.upperBound
+  state.textOverlays[index] = overlay
+  state.textOverlays.sort { $0.startSeconds < $1.startSeconds }
+}
+
+@MainActor
+private func updateImageOverlay(
+  _ id: UUID,
+  arguments: JSONValue,
+  range: ClosedRange<Double>,
+  state: EditorState
+) throws {
+  guard let index = state.imageOverlays.firstIndex(where: { $0.id == id }) else {
+    throw AgentToolError.invalidArguments("image overlay does not exist")
+  }
+  var overlay = state.imageOverlays[index]
+  if let value = arguments["width"]?.doubleValue { overlay.width = value }
+  if let value = arguments["cornerRadius"]?.doubleValue { overlay.cornerRadius = value }
+  if let value = arguments["opacity"]?.doubleValue { overlay.opacity = value }
+  if let value = arguments["shadow"]?.doubleValue { overlay.shadow = value }
+  applyOverlayValues(arguments, to: &overlay)
+  overlay.startSeconds = range.lowerBound
+  overlay.endSeconds = range.upperBound
+  state.imageOverlays[index] = overlay
+  state.imageOverlays.sort { $0.startSeconds < $1.startSeconds }
+}
+
+private func applyOverlayValues(_ arguments: JSONValue, to overlay: inout TextOverlayData) {
+  if let value = arguments["position"]?.stringValue, let position = TextOverlayPosition(rawValue: value) { overlay.position = position }
+  if let value = arguments["offsetX"]?.doubleValue { overlay.offsetX = value }
+  if let value = arguments["offsetY"]?.doubleValue { overlay.offsetY = value }
+  if let value = arguments["entryTransition"]?.stringValue, let transition = RegionTransitionType(rawValue: value) {
+    overlay.entryTransition = transition
+  }
+  if let value = arguments["entryDuration"]?.doubleValue { overlay.entryTransitionDuration = value }
+  if let value = arguments["exitTransition"]?.stringValue, let transition = RegionTransitionType(rawValue: value) {
+    overlay.exitTransition = transition
+  }
+  if let value = arguments["exitDuration"]?.doubleValue { overlay.exitTransitionDuration = value }
+}
+
+private func applyOverlayValues(_ arguments: JSONValue, to overlay: inout ImageOverlayData) {
+  if let value = arguments["position"]?.stringValue, let position = TextOverlayPosition(rawValue: value) { overlay.position = position }
+  if let value = arguments["offsetX"]?.doubleValue { overlay.offsetX = value }
+  if let value = arguments["offsetY"]?.doubleValue { overlay.offsetY = value }
+  if let value = arguments["entryTransition"]?.stringValue, let transition = RegionTransitionType(rawValue: value) {
+    overlay.entryTransition = transition
+  }
+  if let value = arguments["entryDuration"]?.doubleValue { overlay.entryTransitionDuration = value }
+  if let value = arguments["exitTransition"]?.stringValue, let transition = RegionTransitionType(rawValue: value) {
+    overlay.exitTransition = transition
+  }
+  if let value = arguments["exitDuration"]?.doubleValue { overlay.exitTransitionDuration = value }
 }
 
 @MainActor

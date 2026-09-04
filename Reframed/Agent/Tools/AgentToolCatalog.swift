@@ -82,7 +82,7 @@ enum AgentToolCatalog {
       "source": AgentToolSchema.string("Audio track to analyse", enum: ["mic", "system"]),
     ]),
     mutating: false,
-    availability: .pendingMerge(branch: "milestone-07-primitives")
+    slow: true
   )
 
   static let all: [AgentToolDefinition] = [
@@ -110,7 +110,7 @@ enum AgentToolCatalog {
       AgentToolCursorActivityHandler(),
       AgentToolHistoryHandler(),
       AgentToolPreviewFrameHandler(),
-      AgentToolUnavailableHandler(definition: getSilences),
+      AgentToolSilencesHandler(),
     ]
   }
 }

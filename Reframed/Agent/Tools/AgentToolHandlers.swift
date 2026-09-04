@@ -105,6 +105,28 @@ struct AgentToolHistoryHandler: AgentToolHandler {
 }
 
 @MainActor
+struct AgentToolSilencesHandler: AgentToolHandler {
+  var definition: AgentToolDefinition { AgentToolCatalog.getSilences }
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let sourceName = arguments["source"]?.stringValue ?? "mic"
+    let source: SilenceSource = sourceName == "system" ? .system : .microphone
+    let config = SilenceDetectorConfig(
+      thresholdDb: arguments["thresholdDb"]?.doubleValue ?? -40,
+      minimumSilence: arguments["minGapSeconds"]?.doubleValue ?? 0.8
+    )
+    let preview = await context.editorState.previewSilenceRemoval(config: config, source: source)
+    if let error = preview.errorDescription { throw AgentToolError.failed(error) }
+    return [
+      "source": .string(sourceName),
+      "count": JSONValue(preview.count),
+      "totalSeconds": AgentToolSummaries.seconds(preview.silences.reduce(0) { $0 + $1.upperBound - $1.lowerBound }),
+      "silences": .array(preview.silences.map { AgentToolSummaries.range($0.lowerBound, $0.upperBound) }),
+    ]
+  }
+}
+
+@MainActor
 struct AgentToolUnavailableHandler: AgentToolHandler {
   let definition: AgentToolDefinition
 

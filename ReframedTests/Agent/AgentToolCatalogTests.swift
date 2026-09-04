@@ -6,6 +6,7 @@ import Testing
 struct AgentToolCatalogTests {
   private static let expectedNames: Set<String> = [
     "get_project_summary", "get_timeline", "get_transcript", "get_cursor_activity", "get_history", "render_preview_frame",
+    "get_silences",
   ]
 
   @Test func everyToolHasUniqueSnakeCaseNameAndObjectSchema() throws {
@@ -29,9 +30,10 @@ struct AgentToolCatalogTests {
     }
   }
 
-  @Test func noToolIsMutatingInThisMilestone() {
+  @Test func readOnlyCatalogMarksOnlyExpensiveMediaWorkAsSlow() {
     #expect(AgentToolCatalog.all.allSatisfy { !$0.mutating })
-    #expect(AgentToolCatalog.all.filter { $0.name.hasPrefix("get_") }.allSatisfy { !$0.mutating && !$0.slow })
+    #expect(AgentToolCatalog.all.filter { $0.name.hasPrefix("get_") }.allSatisfy { !$0.mutating })
+    #expect(AgentToolCatalog.definition(named: "get_silences")?.slow == true)
     #expect(AgentToolCatalog.definition(named: "render_preview_frame")?.slow == true)
   }
 
@@ -51,11 +53,11 @@ struct AgentToolCatalogTests {
     #expect(roundTrip == list)
   }
 
-  @Test func pendingMergeToolIsListedInAllButNotAvailable() throws {
+  @Test func silenceToolIsAvailableAfterPrimitiveIntegration() throws {
     let silences = try #require(AgentToolCatalog.definition(named: "get_silences"))
-    #expect(silences.availability == .pendingMerge(branch: "milestone-07-primitives"))
-    #expect(silences.isAvailable == false)
-    #expect(AgentToolCatalog.available.contains { $0.name == "get_silences" } == false)
+    #expect(silences.availability == .available)
+    #expect(silences.isAvailable)
+    #expect(AgentToolCatalog.available.contains { $0.name == "get_silences" })
     #expect(AgentToolCatalog.all.contains { $0.name == "get_silences" })
     #expect(Set(AgentToolCatalog.available.map(\.name)) == Self.expectedNames)
   }

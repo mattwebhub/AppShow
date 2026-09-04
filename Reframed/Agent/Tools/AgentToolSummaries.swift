@@ -64,6 +64,10 @@ enum AgentToolSummaries {
         "count": JSONValue(snapshot.captionSegments?.count ?? 0),
         "segments": .array((snapshot.captionSegments ?? []).map { caption($0, withWords: false) }),
       ],
+      "overlays": [
+        "text": .array((snapshot.textOverlays ?? []).map(textOverlay)),
+        "images": .array((snapshot.imageOverlays ?? []).map(imageOverlay)),
+      ],
       "audio": [
         "system": audioTrack(
           present: media.hasSystemAudio,
@@ -223,6 +227,30 @@ enum AgentToolSummaries {
       "muted": .bool(track.muted),
       "fadeIn": seconds(track.fadeInSeconds),
       "fadeOut": seconds(track.fadeOutSeconds),
+    ]
+  }
+
+  private static func textOverlay(_ overlay: TextOverlayData) -> JSONValue {
+    [
+      "id": .string(overlay.id.uuidString),
+      "start": seconds(overlay.startSeconds),
+      "end": seconds(overlay.endSeconds),
+      "text": .string(overlay.text),
+      "position": .string(overlay.position.rawValue),
+      "offsetX": .number(Double(overlay.offsetX)),
+      "offsetY": .number(Double(overlay.offsetY)),
+    ]
+  }
+
+  private static func imageOverlay(_ overlay: ImageOverlayData) -> JSONValue {
+    [
+      "id": .string(overlay.id.uuidString),
+      "start": seconds(overlay.startSeconds),
+      "end": seconds(overlay.endSeconds),
+      "name": .string(overlay.displayName),
+      "position": .string(overlay.position.rawValue),
+      "width": .number(Double(overlay.width)),
+      "opacity": .number(Double(overlay.opacity)),
     ]
   }
 
