@@ -26,8 +26,8 @@ The default private data directory moves from `~/.reframed` to `~/.appshow`. On 
 
 ## Consequences
 
-- Feature branches continue using the current Reframed symbols and paths, avoiding a rename mixed into behavioral work.
+- Feature branches used the inherited Reframed symbols and paths until milestone 09, avoiding a rename mixed into behavioral work.
 - No externally distributed build may ship under the inherited upstream identity.
-- A dedicated pre-release milestone will rename the product to AppShow and assign identifiers owned by this project.
+- Milestone 09 renames the Xcode project, source roots, products, symbols, paths, release metadata, and repository to AppShow.
 - Tests must cover opening projects created before and after the identity migration.
 - Existing project metadata stays schema-compatible; changing the filename extension does not rewrite project contents.

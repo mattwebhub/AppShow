@@ -1,4 +1,4 @@
-# Contributing to Reframed
+# Contributing to AppShow
 
 Thanks for wanting to help out. Here's what you need to know.
 
@@ -29,8 +29,8 @@ make dev
 ## Code style
 
 - No code comments. No inline comments, no doc comments. The code should speak for itself.
-- Reuse existing UI components from `Reframed/UI/` before creating new ones. The project has its own button styles (`OutlineButtonStyle`, `PrimaryButtonStyle`, `SecondaryButtonStyle`) -- never use `.borderless`, `.plain`, or other stock SwiftUI button styles.
-- Reuse utility functions from `Reframed/Utilities/` when they exist.
+- Reuse existing UI components from `AppShow/UI/` before creating new ones. The project has its own button styles (`OutlineButtonStyle`, `PrimaryButtonStyle`, `SecondaryButtonStyle`) -- never use `.borderless`, `.plain`, or other stock SwiftUI button styles.
+- Reuse utility functions from `AppShow/Utilities/` when they exist.
 - If a view goes past 200 lines, split it into separate files using Swift extensions.
 - Fix root causes. No band-aid fixes or temporary workarounds.
 

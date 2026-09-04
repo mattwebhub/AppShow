@@ -6,16 +6,16 @@ Automated result: all rows are green on 2026-09-04. The `red` values in the tabl
 
 | Spec # | Test name | Layer | File | Fixture | Status |
 |--------|-----------|-------|------|---------|--------|
-| 10 | `defaultsFillEveryOptionalField` (JSON with start, end and filename decodes with the declared defaults) | unit T1 | `ReframedTests/Project/ImageOverlayDataTests.swift` | none | red |
+| 10 | `defaultsFillEveryOptionalField` (JSON with start, end and filename decodes with the declared defaults) | unit T1 | `AppShowTests/Project/ImageOverlayDataTests.swift` | none | red |
 | 10 | `roundTripPreservesEveryField` | unit T1 | same | none | red |
 | 10 | `unknownPositionAndTransitionFallBackToDefaults` | unit T1 | same | none | red |
 | 10 | `editorStateWithoutImageOverlaysDecodesToNil` | unit T1 | same | `legacyV1ProjectJSON` | red |
-| 2 | `importCopiesTheFileUnderItsHashName` (generated PNG, name matches `image-<hash8>.png`, pixel size reported) | integration T2 | `ReframedTests/Project/ImageOverlayImporterTests.swift` | PNG drawn with `CGContext` | red |
+| 2 | `importCopiesTheFileUnderItsHashName` (generated PNG, name matches `image-<hash8>.png`, pixel size reported) | integration T2 | `AppShowTests/Project/ImageOverlayImporterTests.swift` | PNG drawn with `CGContext` | red |
 | 2 | `importingTheSameBytesTwiceReusesTheFile` | integration T2 | same | same | red |
 | 2 | `importRejectsAFileThatIsNotAnImage` | integration T2 | same | text file named `.png` | red |
 | 2 | `importRejectsAnUnsupportedExtension` | integration T2 | same | none | red |
 | 4 | `loadImageDecodesTheFirstFrame` | integration T2 | same | same PNG | red |
-| 6 | `addOverlayFromFileCreatesThreeSecondRegionWithTheFileInTheBundle` | EditorState T2 | `ReframedTests/Editor/EditorStateImageOverlaysTests.swift` | `ReframedProject.create(..., cleanupTemp: false)` | red |
+| 6 | `addOverlayFromFileCreatesThreeSecondRegionWithTheFileInTheBundle` | EditorState T2 | `AppShowTests/Editor/EditorStateImageOverlaysTests.swift` | `AppShowProject.create(..., cleanupTemp: false)` | red |
 | 6 | `addOverlayNearEndIsPulledBackAndClamped` | EditorState T2 | same | same | red |
 | 6 | `addOverlayFromAnUnreadableFileAddsNothing` | EditorState T2 | same | same | red |
 | 7 | `updateOverlayChangesFields` | EditorState T2 | same | same | red |
@@ -24,17 +24,17 @@ Automated result: all rows are green on 2026-09-04. The `red` values in the tabl
 | 10 | `snapshotRoundTripRestoresOverlays` | EditorState T2 | same | same | red |
 | 10 | `reopeningDropsOverlaysWhoseFileIsMissing` | EditorState T2 | same | same | red |
 | 7 | `overlayTrackShowsForImageOverlaysAlone` | EditorState T2 | same | same | red |
-| 10 | `imageOverlayChangesAreDescribedAsAddedRemovedAdjusted` | unit T1 | `ReframedTests/Editor/HistoryChangeRulesTests.swift` | none | red |
-| 3 | `widthFractionAndAspectGiveThePixelSize` (1920×1080) | unit T1 | `ReframedTests/Compositor/ImageOverlayLayoutTests.swift` | none | red |
+| 10 | `imageOverlayChangesAreDescribedAsAddedRemovedAdjusted` | unit T1 | `AppShowTests/Editor/HistoryChangeRulesTests.swift` | none | red |
+| 3 | `widthFractionAndAspectGiveThePixelSize` (1920×1080) | unit T1 | `AppShowTests/Compositor/ImageOverlayLayoutTests.swift` | none | red |
 | 3 | `tallImageIsScaledDownToFitTheCanvas` | unit T1 | same | none | red |
 | 3 | `centerPresetCentresTheImage` | unit T1 | same | none | red |
 | 3 | `cornerPresetsSitAtTheMargin` (`@Test(arguments:)` over the six edge presets) | unit T1 | same | none | red |
 | 3 | `offsetMovesAndClampsTheImage` | unit T1 | same | none | red |
 | 3 | `resolvedInstructionCarriesPixelLayout` | unit T1 | same | none | red |
-| 8 | `imageOverlayIsClippedAndShiftedByTrimStart` | unit T1 | `ReframedTests/Compositor/RegionRemappingTests.swift` | none | red |
+| 8 | `imageOverlayIsClippedAndShiftedByTrimStart` | unit T1 | `AppShowTests/Compositor/RegionRemappingTests.swift` | none | red |
 | 8 | `imageOverlaySpanningTwoSegmentsIsSplitWithFreshIds` | unit T1 | same | none | red |
-| 8 | `imageOverlayNeedsCompositor` | unit T1 | `ReframedTests/Compositor/InstructionBuilderTests.swift` | none | red |
-| 4 | `imageOverlayCoversTheCentre` (64×36, solid 8×8 generated image at the centre, centre pixel dominated by it, pixel (1,1) unchanged) | golden T2 | `ReframedTests/Compositor/FrameRendererGoldenTests.swift` | none | red |
+| 8 | `imageOverlayNeedsCompositor` | unit T1 | `AppShowTests/Compositor/InstructionBuilderTests.swift` | none | red |
+| 4 | `imageOverlayCoversTheCentre` (64×36, solid 8×8 generated image at the centre, centre pixel dominated by it, pixel (1,1) unchanged) | golden T2 | `AppShowTests/Compositor/FrameRendererGoldenTests.swift` | none | red |
 | 4 | `imageOverlayIsAbsentAtTransitionProgressZero` | golden T2 | same | none | red |
 | 4 | `imageOverlayIsAbsentOutsideItsRange` | golden T2 | same | none | red |
 

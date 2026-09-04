@@ -5,7 +5,7 @@ Date: 2026-09-03
 
 ## Context
 
-`Reframed/Info.plist` set `SUFeedURL` to upstream's GitHub appcast and `SUEnableAutomaticChecks` to true. `Reframed/Utilities/SparkleUpdater.swift` additionally forces `automaticallyChecksForUpdates = true` in code, so the plist flag alone would not stop checks. `AppDelegate.applicationDidFinishLaunching` initializes `SparkleUpdater.shared` on every launch, including when a test bundle launches the app as its host. A fork build would offer to replace itself with upstream's release, signed with a key we do not own.
+`AppShow/Info.plist` set `SUFeedURL` to upstream's GitHub appcast and `SUEnableAutomaticChecks` to true. `AppShow/Utilities/SparkleUpdater.swift` additionally forces `automaticallyChecksForUpdates = true` in code, so the plist flag alone would not stop checks. `AppDelegate.applicationDidFinishLaunching` initializes `SparkleUpdater.shared` on every launch, including when a test bundle launches the app as its host. A fork build would offer to replace itself with upstream's release, signed with a key we do not own.
 
 Sparkle 2 (`SPUStandardUpdaterController.m`) does not crash when the updater fails to start, but it can show an updater error when launched without a valid key. AppShow therefore must not start Sparkle until its own key is configured.
 

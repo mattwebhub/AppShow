@@ -3,7 +3,7 @@
 Status: accepted
 Date: 2026-09-03
 
-Accepted 2026-09-04 under the owner's instruction to proceed; both repositories are owned by the same account. Reversible by deleting Reframed/Agent/.
+Accepted 2026-09-04 under the owner's instruction to proceed; both repositories are owned by the same account. Reversible by deleting AppShow/Agent/.
 
 ## Context
 

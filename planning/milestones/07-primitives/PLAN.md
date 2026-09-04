@@ -8,9 +8,9 @@ Depends on: milestone 02 (keep-slices and the Cuts track) for silence removal; m
 
 Silence removal mirrors `planning/features/silence-removal/TASKS.md`, text overlays mirror `planning/features/text-overlays/TASKS.md`, and image overlays mirror `planning/features/image-overlays/TASKS.md`; tick all three.
 
-- [x] T1. Silence removal, pure detector. Proof: `ReframedTests/Editor/SilenceDetectorTests.swift` green.
-- [x] T2. Silence removal, PCM analysis of a real file. Proof: `ReframedTests/Editor/SilenceAnalysisTests.swift` green on generated tones.
-- [x] T3. Silence removal, editor wiring and labelled history entry. Proof: `ReframedTests/Editor/EditorStateSilenceRemovalTests.swift` and the `HistoryTests` label round trip green.
+- [x] T1. Silence removal, pure detector. Proof: `AppShowTests/Editor/SilenceDetectorTests.swift` green.
+- [x] T2. Silence removal, PCM analysis of a real file. Proof: `AppShowTests/Editor/SilenceAnalysisTests.swift` green on generated tones.
+- [x] T3. Silence removal, editor wiring and labelled history entry. Proof: `AppShowTests/Editor/EditorStateSilenceRemovalTests.swift` and the `HistoryTests` label round trip green.
 - [x] T4. Silence removal, Silences section in the Video tab. Proof: `make build` warning-free, manual rows in `VERIFY.md`.
 - [x] T5. Text overlay primitive (`docs/features/04-agent-tools/ATTACK-PLAN.md` phase 6; `planning/features/text-overlays/`). Proof: `TextOverlayLayoutTests`, the overlay rows in `RegionRemappingTests`, `InstructionBuilderTests` and `FrameRendererGoldenTests`, `TextOverlayDataTests` (`project.json` decode), `EditorStateTextOverlaysTests`, and the overlay rule in `HistoryChangeRulesTests` green; Overlays track, popover and Effects-tab section built warning-free, manual rows in `VERIFY.md`.
 - [x] T6. Image overlay primitive (phase 7, after T5; `planning/features/image-overlays/`). Proof: `ImageOverlayDataTests` (`project.json` decode), `ImageOverlayImporterTests` (bundle copy under the hash name, dedupe, rejection), `EditorStateImageOverlaysTests`, the image rule in `HistoryChangeRulesTests`, `ImageOverlayLayoutTests`, the image rows in `RegionRemappingTests`, `InstructionBuilderTests` and `FrameRendererGoldenTests` green; image chips on the Overlays track, popover and Add Image button built warning-free, manual rows in `VERIFY.md`.

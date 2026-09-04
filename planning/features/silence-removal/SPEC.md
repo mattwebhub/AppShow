@@ -26,9 +26,9 @@ A narrated recording is full of pauses: thinking time, tab switches, waiting for
 
 ## Touch points
 
-Ours, new: `Reframed/Editor/SilenceDetector.swift` (pure), `Reframed/Editor/SilenceAnalysis.swift` (PCM decode), `Reframed/Editor/EditorState+SilenceRemoval.swift`, `Reframed/Editor/PropertiesPanel+SilencesSection.swift`.
+Ours, new: `AppShow/Editor/SilenceDetector.swift` (pure), `AppShow/Editor/SilenceAnalysis.swift` (PCM decode), `AppShow/Editor/EditorState+SilenceRemoval.swift`, `AppShow/Editor/PropertiesPanel+SilencesSection.swift`.
 
-Upstream, minimal edits: `Reframed/Editor/History.swift` (`HistoryEntry.label`, `pushSnapshot(_:label:)`), `Reframed/Editor/HistoryPopover.swift` (prefers the label), `Reframed/Editor/PropertiesPanel.swift` (one section in the Video tab), `Reframed.xcodeproj/project.pbxproj` (four file entries). `CutTimeline`, `EditorState+VideoRegions.swift`, and the Cuts track are reused unchanged.
+Upstream, minimal edits: `AppShow/Editor/History.swift` (`HistoryEntry.label`, `pushSnapshot(_:label:)`), `AppShow/Editor/HistoryPopover.swift` (prefers the label), `AppShow/Editor/PropertiesPanel.swift` (one section in the Video tab), `AppShow.xcodeproj/project.pbxproj` (four file entries). `CutTimeline`, `EditorState+VideoRegions.swift`, and the Cuts track are reused unchanged.
 
 ## Owner assumptions in force
 

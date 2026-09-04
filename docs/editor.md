@@ -1,6 +1,6 @@
 # Video editor
 
-After recording, Reframed opens a built-in editor. Everything lives in `EditorState` (`@MainActor`, `@Observable`), which owns the player, all editing parameters, and the undo history.
+After recording, AppShow opens a built-in editor. Everything lives in `EditorState` (`@MainActor`, `@Observable`), which owns the player, all editing parameters, and the undo history.
 
 ## Timeline trimming
 
@@ -45,7 +45,7 @@ All three feed into the same `ZoomTimeline`, which the compositor queries per-fr
 
 ## Cursor overlay
 
-Instead of baking the system cursor into the screen recording, Reframed hides it during capture and renders it from metadata at export time. This means you can change cursor appearance after recording.
+Instead of baking the system cursor into the screen recording, AppShow hides it during capture and renders it from metadata at export time. This means you can change cursor appearance after recording.
 
 **Styles** -- multiple SVG-based designs (center default, crosshair, outline, etc.) with configurable primary fill and outline stroke colors, plus size scaling.
 
@@ -111,11 +111,11 @@ Export options: burned into the video, or as SRT/VTT sidecar files.
 
 50-snapshot system. Each snapshot captures the full `EditorStateData` -- every setting, every region, every keyframe. Snapshots are diffed to generate human-readable change descriptions like "Trim range 0:00-1:23 to 0:05-1:20" or "Camera region added".
 
-Operations: push (truncates redo stack), undo, redo, jump to specific entry. History persists in the .frm project bundle as `history.json`, so reopening a project restores the full edit history.
+Operations: push (truncates redo stack), undo, redo, jump to specific entry. History persists in the .appshow project bundle as `history.json`, so reopening a project restores the full edit history.
 
 ## Auto-save
 
-EditorState debounces saves with a 1-second delay. Every change schedules a save, but only the last one within any 1-second window actually writes to disk. The full editor state (including history) goes into `project.json` inside the .frm bundle.
+EditorState debounces saves with a 1-second delay. Every change schedules a save, but only the last one within any 1-second window actually writes to disk. The full editor state (including history) goes into `project.json` inside the .appshow bundle.
 
 ## Music tracks (fork)
 
@@ -125,7 +125,7 @@ External audio files can be added from the Audio tab or by dropping them on the 
 
 The editor's left edge contains a collapsible, resizable assistant panel. It supports Claude Code and Codex, discovers their executables through PATH, common install locations, and a login shell, and checks version and authentication before enabling the composer.
 
-Each project owns exactly one conversation at `agent/conversation.json` inside its `.frm` bundle. Messages and provider-specific resume identifiers survive reopening the project. Clear Conversation removes both after confirmation. Switching providers keeps the conversation and uses that provider's own resume identifier.
+Each project owns exactly one conversation at `agent/conversation.json` inside its `.appshow` bundle. Messages and provider-specific resume identifiers survive reopening the project. Clear Conversation removes both after confirmation. Switching providers keeps the conversation and uses that provider's own resume identifier.
 
 Each submitted turn launches a fresh provider process, streams Markdown and tool events into the transcript, and exits at completion or cancellation. The process runs in `.agent/<project-name>/` beside the bundle. That sibling directory is ephemeral workspace for sockets, tokens, and generated preview frames; it is not the portable conversation record.
 

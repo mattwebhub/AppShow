@@ -4,7 +4,7 @@ Written before the production code. Layers from `planning/tdd-strategy.md`.
 
 | Spec # | Test name | Layer | File | Fixture | Status |
 |--------|-----------|-------|------|---------|--------|
-| 3 | `rmsWindowsAverageEachWindow` | unit T1 | `ReframedTests/Editor/SilenceDetectorTests.swift` | none | green |
+| 3 | `rmsWindowsAverageEachWindow` | unit T1 | `AppShowTests/Editor/SilenceDetectorTests.swift` | none | green |
 | 3 | `silentSpansFindGapsBelowRelativeThreshold` (10 s signal, silence at 3–5 and 8–10) | unit T1 | same | none | green |
 | 3 | `silentSpansIgnoreGapsShorterThanMinimum` | unit T1 | same | none | green |
 | 3 | `thresholdIsRelativeToPeakNotAbsolute` (same shape 20 dB quieter gives the same spans) | unit T1 | same | none | green |
@@ -15,15 +15,15 @@ Written before the production code. Layers from `planning/tdd-strategy.md`.
 | 4 | `keepSlicesFromNoSilencesIsOneFullSlice`, `keepSlicesFromAllSilentIsEmpty` | unit T1 | same | none | green |
 | 5 | `intersectKeepsExistingCutsAndSplitsAroundSilences` | unit T1 | same | none | green |
 | 5 | `intersectPreservesTransitionsOnOuterPieces` | unit T1 | same | none | green |
-| 2, 3 | `analyzeFindsGapInGeneratedTone` | T2 | `ReframedTests/Editor/SilenceAnalysisTests.swift` | `AudioFixtures.toneWithGap` (wav) | green |
+| 2, 3 | `analyzeFindsGapInGeneratedTone` | T2 | `AppShowTests/Editor/SilenceAnalysisTests.swift` | `AudioFixtures.toneWithGap` (wav) | green |
 | 3 | `analyzeMixesTwoSourcesByLouderWindow` | T2 | same | two `toneWithGap` files | green |
 | 2 | `analyzeThrowsForMissingFile` | T2 | same | none | green |
-| 2 | `previewReportsCountAndTotalWithoutMutating` | EditorState T2 | `ReframedTests/Editor/EditorStateSilenceRemovalTests.swift` | `recordingResult` + mic `toneWithGap` | green |
+| 2 | `previewReportsCountAndTotalWithoutMutating` | EditorState T2 | `AppShowTests/Editor/EditorStateSilenceRemovalTests.swift` | `recordingResult` + mic `toneWithGap` | green |
 | 5, 6 | `applyWritesSlicesAndPushesOneLabelledSnapshot` | EditorState T2 | same | same | green |
 | 6 | `undoAfterApplyRestoresPreviousSlices` | EditorState T2 | same | same | green |
 | 5 | `applyIntersectsWithExistingCuts` | EditorState T2 | same | same | green |
 | 7 | `previewWithNoAudioSourceIsEmpty` | EditorState T2 | same | `recordingResult` without audio | green |
-| 6 | `historyEntryLabelSurvivesRoundTrip` | unit T1 | `ReframedTests/Editor/HistoryTests.swift` | none | green |
+| 6 | `historyEntryLabelSurvivesRoundTrip` | unit T1 | `AppShowTests/Editor/HistoryTests.swift` | none | green |
 
 ## Manual checks
 

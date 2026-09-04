@@ -20,15 +20,15 @@ make changelog  # Generate CHANGELOG.md
 ## Testing
 
 ```bash
-make test                                   # Build and run the ReframedTests unit-test bundle (Debug, hosted by Reframed.app)
+make test                                   # Build and run the AppShowTests unit-test bundle (Debug, hosted by AppShow.app)
 make test T=ZoomTimelineTests               # One suite; T='ZoomTimelineTests/emptyTimelineReturnsUnitRect()' for one test
-make lint                                   # swift format lint over Reframed/ and ReframedTests/
+make lint                                   # swift format lint over AppShow/ and AppShowTests/
 ```
 
-- Tests use Swift Testing (`import Testing`, `@Test`, `#expect`) with `@testable import Reframed`, and live in `ReframedTests/` mirroring the `Reframed/` folder layout (e.g. `ReframedTests/Editor/ZoomTimelineTests.swift`).
-- The raw xcodebuild form of a filter is `-only-testing:ReframedTests/ZoomTimelineTests`.
-- The test host is the real app. The scheme's TestAction sets `REFRAMED_TEST_HOST=1` (skips Sparkle, the keyboard event tap, and the permissions window in `AppDelegate`), `REFRAMED_HOME` and `REFRAMED_TMP` (redirect `~/.reframed` and `/tmp/Reframed` to `/tmp/reframed-tests/home` and `/tmp/reframed-tests/tmp` via `ReframedPaths`; xcodebuild does not expand `$(...)` in scheme environment values, so these are literal). To pass extra variables to the host, prefix them with `TEST_RUNNER_` on the `make test` command line.
-- Tests must never touch `~/.reframed`, `~/Movies`, `/tmp/Reframed`, `UserDefaults`, permissions, or the network. Whether written by a developer or a coding assistant, add the failing test first, then the code.
+- Tests use Swift Testing (`import Testing`, `@Test`, `#expect`) with `@testable import AppShow`, and live in `AppShowTests/` mirroring the `AppShow/` folder layout (e.g. `AppShowTests/Editor/ZoomTimelineTests.swift`).
+- The raw xcodebuild form of a filter is `-only-testing:AppShowTests/ZoomTimelineTests`.
+- The test host is the real app. The scheme's TestAction sets `APPSHOW_TEST_HOST=1` (skips Sparkle, the keyboard event tap, and the permissions window in `AppDelegate`), `APPSHOW_HOME` and `APPSHOW_TMP` (redirect `~/.appshow` and `/tmp/AppShow` to `/tmp/appshow-tests/home` and `/tmp/appshow-tests/tmp` via `AppShowPaths`; xcodebuild does not expand `$(...)` in scheme environment values, so these are literal). To pass extra variables to the host, prefix them with `TEST_RUNNER_` on the `make test` command line.
+- Tests must never touch `~/.appshow`, `~/.reframed`, `~/Movies`, `/tmp/AppShow`, `UserDefaults`, permissions, or the network. Whether written by a developer or a coding assistant, add the failing test first, then the code.
 
 ## Working in this fork
 
@@ -36,20 +36,20 @@ This repository is a fork of `jkuri/Reframed` (remote `upstream`). Development i
 
 - Start every session by reading `planning/STATE.md`, then the active milestone under `planning/milestones/`.
 - Engineering documentation of the inherited code is in `docs/architecture/00` to `07` (overview, module map, concurrency, data flow, dependencies, coding patterns, conventions checklist, testability). Upstream's feature docs stay in `docs/*.md`.
-- Loop: write the failing test in `ReframedTests/`, `make test` (red), minimal change, `make test` (green), `make format`, `make lint`, tick the task in the plan. Rules and layers are in `planning/tdd-strategy.md`.
+- Loop: write the failing test in `AppShowTests/`, `make test` (red), minimal change, `make test` (green), `make format`, `make lint`, tick the task in the plan. Rules and layers are in `planning/tdd-strategy.md`.
 - Decisions that change structure, tooling, or a contract get an ADR in `planning/decisions/`.
-- Pulling upstream changes follows `planning/upstream-sync.md`; keep our additions in `planning/`, `docs/architecture/`, `ReframedTests/`, and the seams listed there.
+- Pulling upstream changes follows `planning/upstream-sync.md`; keep our additions in `planning/`, `docs/architecture/`, `AppShowTests/`, and the seams listed there.
 - Signing is per developer through `Local.xcconfig` (see `Local.xcconfig.example`); a fresh clone builds ad-hoc with no setup.
 - This file is the canonical guidance for any developer or coding assistant; `CLAUDE.md` is a symlink to it. Do not add vendor-specific instructions here.
 
 ## Architecture
 
-Reframed is a macOS screen recording app with a menu bar interface, floating capture toolbar, built-in video editor, and `.frm` project management (macOS 15+, Swift 6 strict concurrency).
+AppShow is a macOS screen recording app with a menu bar interface, floating capture toolbar, built-in video editor, and `.appshow` project management (macOS 15+, Swift 6 strict concurrency). Legacy `.frm` projects remain supported.
 
 ### Source layout
 
 ```
-Reframed/
+AppShow/
 ├── Agent/            Claude Code/Codex chat, protocol models, editor tools, preview rendering, and local socket bridge
 ├── App/              AppDelegate, Permissions, WindowController
 ├── CaptureModes/     Area/Screen/Window/Device selection + Common overlay components
@@ -57,12 +57,12 @@ Reframed/
 ├── Editor/           Video editor (timeline, properties panels, preview, cursor, zoom, camera regions, history)
 ├── Libraries/        Native C/C++ dependencies (gifski static library for GIF encoding)
 ├── Logging/          LogBootstrap, RotatingFileLogHandler
-├── Project/          .frm bundle management (ReframedProject, ProjectMetadata)
+├── Project/          .appshow bundle management (AppShowProject, ProjectMetadata)
 ├── Recording/        Capture pipeline (coordinators, writers, device/webcam/mic/audio, cursor metadata)
 ├── State/            SessionState, CaptureState, CaptureMode, ConfigService, StateService, RecordingOptions, KeyboardShortcutManager
 ├── UI/               Toolbar, menu bar, popovers, settings, countdown overlay, reusable components
 ├── Utilities/        CGRect/NSScreen extensions, CodableColor, SendableBox, SoundEffect, TimeFormatting, UpdateChecker, MediaFileInfo, RNNoiseProcessor, CIImageExtensions, KeyboardShortcut
-├── ReframedApp.swift Entry point (@main)
+├── AppShowApp.swift Entry point (@main)
 └── Info.plist        App configuration
 ```
 
@@ -88,7 +88,7 @@ idle → selecting → countdown(remaining) → recording(startedAt) ⇄ paused(
 
 ### Recording flow
 
-Reframed offers four recording modes:
+AppShow offers four recording modes:
 
 - **Entire screen** — captures the full display
 - **Selected window** — window highlight overlay, captures a single application window
@@ -97,14 +97,14 @@ Reframed offers four recording modes:
 
 Optional features: webcam PiP overlay (with hide-while-recording option), microphone audio, system audio capture, configurable countdown timer (3/5/10s), cursor metadata recording with mouse click monitoring.
 
-After selection, ScreenCaptureKit captures the chosen target. CVPixelBuffers flow through `SharedRecordingClock` for timestamp synchronization, then to track writers. On stop, a `.frm` project bundle is created and the editor opens automatically.
+After selection, ScreenCaptureKit captures the chosen target. CVPixelBuffers flow through `SharedRecordingClock` for timestamp synchronization, then to track writers. On stop, an `.appshow` project bundle is created and the editor opens automatically.
 
 ### Video editor
 
 Built-in editor with:
 - Timeline trimming (independent trim ranges for video, system audio, mic audio)
 - Keep-slices (`CutTimeline`): the transport-bar cut button splits at the playhead, a Cuts track appears under Screen, playback jumps over gaps, export concatenates kept slices
-- Assistant panel: collapsible project chat using Claude Code or Codex, one persisted conversation per `.frm`, fresh process per turn with provider-specific session resumption
+- Assistant panel: collapsible project chat using Claude Code or Codex, one persisted conversation per project, fresh process per turn with provider-specific session resumption
 - Audio regions (per-track independent audio trimming with volume and mute controls)
 - Background styles (none, solid color, gradient presets, background image with fill modes)
 - Canvas aspect ratios (original, 16:9, 1:1, 4:3, 9:16)
@@ -134,14 +134,14 @@ The `Compositor/` module handles all video composition and export:
 
 ### Agent tool bridge
 
-`Reframed/Agent/Tools/` exposes editor inspection and opt-in editing over newline-framed JSON-RPC on an authenticated Unix socket. The catalog and results use MCP-compatible `tools/list` and `tools/call` shapes. Calls enter the main-actor `AgentToolDispatcher`; read-only sessions refuse mutations, while editing sessions create one labeled undo step per call or explicit batch. Ephemeral socket, token, and frame files live in a sibling `.agent/` workspace; portable conversation history belongs inside the `.frm` project (ADR 0010).
+`AppShow/Agent/Tools/` exposes editor inspection and opt-in editing over newline-framed JSON-RPC on an authenticated Unix socket. The catalog and results use MCP-compatible `tools/list` and `tools/call` shapes. Calls enter the main-actor `AgentToolDispatcher`; read-only sessions refuse mutations, while editing sessions create one labeled undo step per call or explicit batch. Ephemeral socket, token, and frame files live in a sibling `.agent/` workspace; portable conversation history belongs inside the project bundle (ADR 0010).
 
 ### Project management
 
-Recordings are saved as `.frm` bundles (UTI: `eu.jankuri.reframed.project`) containing:
+Recordings are saved as `.appshow` bundles (UTI: `com.mattwebhub.appshow.project`) containing:
 
 ```
-recording-YYYY-MM-DD-HHmmss.frm/
+recording-YYYY-MM-DD-HHmmss.appshow/
 ├── project.json          ProjectMetadata (JSON) with full EditorStateData
 ├── screen.mp4            Main screen recording
 ├── webcam.mp4            Optional webcam overlay
@@ -164,8 +164,8 @@ Uses `MenuBarExtra(.window)` + MenuBarExtraAccess (1.2.x) for the `isPresented` 
 
 ### Persistence
 
-- **`ConfigService`** (@MainActor, singleton) — user preferences stored at `~/.reframed/config.json`
-- **`StateService`** (@MainActor, singleton) — session state (last selection rect, window positions) stored at `~/.reframed/state.json`
+- **`ConfigService`** (@MainActor, singleton) — user preferences stored at `~/.appshow/config.json`
+- **`StateService`** (@MainActor, singleton) — session state (last selection rect, window positions) stored at `~/.appshow/state.json`
 
 ## Swift 6 patterns used throughout
 
@@ -185,7 +185,7 @@ Uses `MenuBarExtra(.window)` + MenuBarExtraAccess (1.2.x) for the `isPresented` 
 
 - Do not add code comments. Generate only code, no inline comments or doc comments.
 - Always create reusable views if possible and put them in the `UI/` folder.
-- Always reuse existing UI components and styles from `Reframed/UI/` before creating new ones. Check for existing buttons, popovers, sliders, color pickers, section headers, and other shared components first. Never use `.borderless`, `.plain`, or other generic SwiftUI button styles — always use the project's custom styles (`OutlineButtonStyle`, `PrimaryButtonStyle`, `SecondaryButtonStyle`) from `PrimaryButton.swift`.
+- Always reuse existing UI components and styles from `AppShow/UI/` before creating new ones. Check for existing buttons, popovers, sliders, color pickers, section headers, and other shared components first. Never use `.borderless`, `.plain`, or other generic SwiftUI button styles — always use the project's custom styles (`OutlineButtonStyle`, `PrimaryButtonStyle`, `SecondaryButtonStyle`) from `PrimaryButton.swift`.
 - Always reuse functions if possible (e.g. time formatting) and put them in the `Utilities/` folder.
 - If a view exceeds 200 lines, break it into separate files using Swift extensions.
 - Always run `make format` after changes.
@@ -194,7 +194,7 @@ Uses `MenuBarExtra(.window)` + MenuBarExtraAccess (1.2.x) for the `isPresented` 
 
 ## Key constraints
 
-- Bundle ID: `eu.jkuri.reframed`
+- Bundle ID: `com.mattwebhub.appshow`
 - `LSUIElement = false` (app shows in Dock with icon)
 - App sandbox disabled (required for ScreenCaptureKit)
 - Version is managed in `Config.xcconfig` (`MARKETING_VERSION` + `CURRENT_PROJECT_VERSION`)

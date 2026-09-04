@@ -4,7 +4,7 @@
 |-------|------------------|----------|--------|
 | Builds | `make build` | exit 0, no new warnings | pass |
 | Tests | `make test` | all green | pass, 332 tests in 39 suites |
-| Gated | `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 TEST_RUNNER_REFRAMED_RUN_AUDIO_ENGINE_TESTS=1 make test` | green | pass (3 export, 2 engine) |
+| Gated | `TEST_RUNNER_APPSHOW_RUN_EXPORT_TESTS=1 TEST_RUNNER_APPSHOW_RUN_AUDIO_ENGINE_TESTS=1 make test` | green | pass (3 export, 2 engine) |
 | Lint, format | `make lint && make format && git diff --exit-code` | clean | pass |
 | Pre-feature project | open a `.frm` made before this milestone | no Audio rows, no history entry | |
 | Import | add an mp3 and a wav | rows appear at the playhead, waveform drawn, bundle holds `audio-*` copies | |
@@ -14,4 +14,4 @@
 
 Manual rows need a human with the app; steps in `planning/features/music-tracks/TASKS.md`.
 
-Closed on: pending manual checks; PR https://github.com/mattwebhub/Reframed/pull/5
+Closed on: pending manual checks; PR https://github.com/mattwebhub/AppShow/pull/5

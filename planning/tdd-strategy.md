@@ -4,14 +4,14 @@ How this fork tests a codebase that arrived with zero tests. Companion to `docs/
 
 ## Red, green, refactor — rules for this codebase
 
-1. **Test first, in `ReframedTests/` only.** Write the failing test, run `make test T=<Suite>`, see red, then write the minimum production code. If the test cannot be written without a seam, the seam must be one listed in `07-testability.md` §2 (S1–S12) or get an ADR first.
+1. **Test first, in `AppShowTests/` only.** Write the failing test, run `make test T=<Suite>`, see red, then write the minimum production code. If the test cannot be written without a seam, the seam must be one listed in `07-testability.md` §2 (S1–S12) or get an ADR first.
 2. **One behavior per test, named as a sentence.** `@Test func trimmedRegionIsShiftedByTrimStart()`, not `testRemap1`. The name is the regression message.
 3. **Pin before you change.** Before touching any upstream function, write the characterization test that captures its current output (even if the output looks wrong). Then change behavior in a second commit with the test updated. This is how we keep upstream merges reviewable.
-4. **No test touches the real machine.** Forbidden inside tests: `~/.reframed`, `~/Movies`, `~/Reframed`, `/tmp/Reframed`, `UserDefaults`, the network, `LogBootstrap.configure()`, `Permissions.*`, `AVCaptureDevice.requestAccess`. Every disk write goes to `FileManager.default.temporaryDirectory/<UUID>` created and removed by the test. The host itself is redirected by the scheme to `/tmp/reframed-tests/home` and `/tmp/reframed-tests/tmp` through `ReframedPaths`, so even `ConfigService.shared` cannot reach the real config.
+4. **No test touches the real machine.** Forbidden inside tests: `~/.appshow`, legacy `~/.reframed`, `~/Movies`, `~/AppShow`, `/tmp/AppShow`, `UserDefaults`, the network, `LogBootstrap.configure()`, `Permissions.*`, `AVCaptureDevice.requestAccess`. Every disk write goes to `FileManager.default.temporaryDirectory/<UUID>` created and removed by the test. The host itself is redirected by the scheme to `/tmp/appshow-tests/home` and `/tmp/appshow-tests/tmp` through `AppShowPaths`, so even `ConfigService.shared` cannot reach the real config.
 5. **Isolation is explicit.** Tests of `@MainActor` types are `@MainActor`. Suites that share a directory use `@Suite(.serialized)`. Fixtures shared across tests are `Sendable` value types.
 6. **Deterministic or gated.** No sleeps to "let things settle"; await the real completion. Tests that take more than ~2 s (export, RNNoise, waveform on a real file) live behind `.enabled(if:)` on an env var and never run in the default `make test`.
-7. **Refactor step includes `make format` and `make lint`.** Both already cover `ReframedTests/`.
-8. **Swift Testing by default.** XCTest only for `measure {}` baselines. Both live in the same `ReframedTests` target.
+7. **Refactor step includes `make format` and `make lint`.** Both already cover `AppShowTests/`.
+8. **Swift Testing by default.** XCTest only for `measure {}` baselines. Both live in the same `AppShowTests` target.
 
 ## Which layer tests which change
 
@@ -19,16 +19,16 @@ How this fork tests a codebase that arrived with zero tests. Companion to `docs/
 | --- | --- | --- | --- |
 | Pure logic (math, Codable, tables, remapping, formatting) | Unit, T1 | Construct values from literals; `#expect` on results; `@Test(arguments:)` for tables | `ZoomTimeline`, `remapAllRegions`, `ProjectMetadata`, `ExportPreset`, `TimeFormatting`, `SharedRecordingClock` |
 | Editor state mutation | Unit on `@MainActor`, T2 | `EditorState(result: fixture)` + `await setup()`; mutate; assert on state and on `createSnapshot()`; `teardown()` in `defer` | `addVideoRegion`, `updateCameraRegionEnd`, `undo/redo`, `restoreFromSnapshot` |
-| Project bundle I/O | Integration, T2 | Temp dir with dummy media; `ReframedProject.create/open/save*/rename` | Bundle layout, `project.json`, `history.json` |
+| Project bundle I/O | Integration, T2 | Temp dir with dummy media; `AppShowProject.create/open/save*/rename` | Bundle layout, `project.json`, `history.json` |
 | Compositing / rendering | Golden frame, T2 | Build `CompositionInstruction` in memory; allocate BGRA `CVPixelBuffer`s (`CVPixelBufferCreate`, 64×36 or 128×72); fill the screen buffer with a known color; call `FrameRenderer.renderFrame(screenBuffer:webcamBuffer:outputBuffer:compositionTime:instruction:)`; lock the output buffer and read bytes (order `B,G,R,A`) | Background color, padding, corner radius, transitions, webcam PiP position, caption presence |
-| Golden comparison policy | | Prefer **property assertions** (this pixel is background, this region is non-black, left/right halves symmetric) with tolerance ±3/255. Full-frame hashes only for the HDR path, stored as SHA-256 of the output bytes under `ReframedTests/Golden/<name>.sha256`, regenerated deliberately with `TEST_RUNNER_REFRAMED_UPDATE_GOLDEN=1` | Keeps tests stable across macOS CoreGraphics revisions |
-| Export | End-to-end, T2, gated | `ExportPipelineTests` runs `VideoCompositor.export` on `Fixtures/screen-2s.mov` (+ optional webcam/audio) into a temp `outputDirectory` (seam S3) with `.enabled(if: env["REFRAMED_RUN_EXPORT_TESTS"] == "1")`; asserts the file exists, `AVURLAsset` duration ≈ trim length, `naturalSize` = expected render size, track count | `make test-export`; run before every PR that touches `Compositor/` |
+| Golden comparison policy | | Prefer **property assertions** (this pixel is background, this region is non-black, left/right halves symmetric) with tolerance ±3/255. Full-frame hashes only for the HDR path, stored as SHA-256 of the output bytes under `AppShowTests/Golden/<name>.sha256`, regenerated deliberately with `TEST_RUNNER_APPSHOW_UPDATE_GOLDEN=1` | Keeps tests stable across macOS CoreGraphics revisions |
+| Export | End-to-end, T2, gated | `ExportPipelineTests` runs `VideoCompositor.export` on `Fixtures/screen-2s.mov` (+ optional webcam/audio) into a temp `outputDirectory` (seam S3) with `.enabled(if: env["APPSHOW_RUN_EXPORT_TESTS"] == "1")`; asserts the file exists, `AVURLAsset` duration ≈ trim length, `naturalSize` = expected render size, track count | `make test-export`; run before every PR that touches `Compositor/` |
 | Recording writers | Integration, T2 | Synthetic `CMSampleBuffer`s into `VideoTrackWriter`/`AudioTrackWriter` with a `SharedRecordingClock`; `finish()`; reopen with `AVURLAsset` | Pause offsets, first-frame PTS, buffering fix from `8c67fff` |
 | Capture, permissions, windows, Sparkle, Whisper | Manual checklist, T3 | See below | Everything in `07-testability.md` T3 |
 
 ### Manual capture checklist (T3)
 
-Run before a release and after any change under `Reframed/Recording/`, `Reframed/State/`, `Reframed/CaptureModes/`. Record results in the milestone's `VERIFY.md`.
+Run before a release and after any change under `AppShow/Recording/`, `AppShow/State/`, `AppShow/CaptureModes/`. Record results in the milestone's `VERIFY.md`.
 
 - [ ] Entire screen, 10 s, mic on, system audio on → `.frm` opens, audio in sync at the end.
 - [ ] Selected area with webcam PiP, pause/resume once → no gap or freeze at the resume point.
@@ -39,9 +39,9 @@ Run before a release and after any change under `Reframed/Recording/`, `Reframed
 
 ## Fixtures
 
-As landed in milestone 01: nothing binary is committed except, from milestone 03, `ReframedTests/Fixtures/sine-1s.mp3` (8 KB, provenance in `ReframedTests/Fixtures/README.md`, loaded through `BundledFixtures`), because AVFoundation cannot encode MP3. `ReframedTests/Support/VideoFixtures.swift` generates the movies at test time with `AVAssetWriter` (grey-ramp frame index, about 10 KB for 2 s), `AudioFixtures` generates tones with `AVAudioFile`, and `ProjectFixtures` builds the legacy document, cursor metadata, and a `RecordingResult` in a temp directory. The table below is the original spec.
+As landed in milestone 01: nothing binary is committed except, from milestone 03, `AppShowTests/Fixtures/sine-1s.mp3` (8 KB, provenance in `AppShowTests/Fixtures/README.md`, loaded through `BundledFixtures`), because AVFoundation cannot encode MP3. `AppShowTests/Support/VideoFixtures.swift` generates the movies at test time with `AVAssetWriter` (grey-ramp frame index, about 10 KB for 2 s), `AudioFixtures` generates tones with `AVAudioFile`, and `ProjectFixtures` builds the legacy document, cursor metadata, and a `RecordingResult` in a temp directory. The table below is the original spec.
 
-Location `ReframedTests/Fixtures/`, loaded with `Bundle(for: FixtureAnchor.self).url(forResource:withExtension:subdirectory: "Fixtures")` (`FixtureAnchor` is an empty `final class` in `ReframedTests/Support/Fixtures.swift`).
+Location `AppShowTests/Fixtures/`, loaded with `Bundle(for: FixtureAnchor.self).url(forResource:withExtension:subdirectory: "Fixtures")` (`FixtureAnchor` is an empty `final class` in `AppShowTests/Support/Fixtures.swift`).
 
 | File | Content | Budget |
 | --- | --- | --- |
@@ -58,7 +58,7 @@ Rules: hard limit 300 KB per file, 1 MB total for the folder; binaries are gener
 
 - [ ] Tests written before the code; each `planning/features/<name>/TEST-PLAN.md` bullet maps to a test name.
 - [ ] `make test` green locally and in CI (`.github/workflows/ci.yml`).
-- [ ] `make test-export` green if anything under `Reframed/Compositor/` or `Reframed/Utilities/{EncodingSettings,RNNoiseProcessor,ClickSoundGenerator}.swift` changed.
+- [ ] `make test-export` green if anything under `AppShow/Compositor/` or `AppShow/Utilities/{EncodingSettings,RNNoiseProcessor,ClickSoundGenerator}.swift` changed.
 - [ ] `make format` and `make lint` clean; `make build` has no new warnings.
 - [ ] Any new seam in an upstream file is listed in `docs/architecture/07-testability.md` §2 and `planning/upstream-sync.md` "Intentional divergences".
 - [ ] Manual checklist run if T3 code changed; results in `VERIFY.md`.
@@ -66,11 +66,11 @@ Rules: hard limit 300 KB per file, 1 MB total for the folder; binaries are gener
 
 ## Upstream merges (upstream has no tests)
 
-- Tests are ours. They live only in `ReframedTests/` and `scripts/make-fixtures.swift`; upstream never creates those paths, so merges never conflict there.
+- Tests are ours. They live only in `AppShowTests/` and `scripts/make-fixtures.swift`; upstream never creates those paths, so merges never conflict there.
 - Touch upstream files only at seams (S1–S12) or via access-level widening (S7). Keep each such edit to the smallest diff and list it in `upstream-sync.md`.
 - On a sync branch: `git merge upstream/main`, then `make build && make test`. A red test after a merge means upstream changed behavior; read `CHANGELOG.md`, decide whether to accept the new behavior (update the test, note it in the sync PR) or keep ours (fix the code, note the divergence).
 - New upstream features arrive untested. Before building on one, add characterization tests for its pure parts (its `+Extension.swift` files are usually T1/T2) in the sync PR or the first feature PR that uses it.
-- Never move or rename upstream files for testability; that is what makes `ReframedCore` extraction a future decision, not a default.
+- Never move or rename upstream files for testability; that is what makes `AppShowCore` extraction a future decision, not a default.
 
 ## Coverage targets
 
@@ -78,7 +78,7 @@ Measure with `make coverage` (`xcrun xccov view --report`). Targets are per area
 
 | Area | Target | Rationale |
 | --- | --- | --- |
-| `Project/` (`ProjectMetadata`, `ReframedProject`) | 90 % lines | On-disk contract |
+| `Project/` (`ProjectMetadata`, `AppShowProject`) | 90 % lines | On-disk contract |
 | `Compositor/` logic files (`+RegionRemapping`, `+InstructionBuilder`, `CompositionInstruction`, `FrameRenderer+Helpers`, `+Captions`, `ExportSettings`) | 80 % | Export correctness |
 | `Compositor/` drawing (`FrameRenderer*.swift` drawing paths) | 50 % via golden frames | Diminishing returns past the main branches |
 | `Editor/` pure math (`CursorSmoothing`, `ZoomTimeline`, `ZoomDetector`, `ZoomRegion`, `CursorEffects`, `CursorLoopTelemetry`, `CursorMetadataProvider`, `History*`) | 85 % | Cheap and high-value |

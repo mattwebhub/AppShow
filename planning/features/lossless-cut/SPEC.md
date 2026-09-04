@@ -25,7 +25,7 @@ A recording contains dead time and detours. The user wants to keep only the good
 
 ## Touch points
 
-Upstream code, listed per phase in `docs/features/01-lossless-cut/ATTACK-PLAN.md`: `Reframed/Editor/EditorState.swift`, `EditorState+VideoRegions.swift`, `EditorState+Persistence.swift`, `EditorState+Playback.swift`, `History+ChangeRules.swift`, `SyncedPlayerController.swift`, `TimelineView.swift`, `TimelineView+ScreenTrack.swift`, `EditorView.swift`, `EditorView+TransportBar.swift`, `VideoPreviewView+Update.swift`, `EditorView+Preview.swift`, `EditorState+Export.swift`, `ExportConfiguration.swift`. New files: `Reframed/Editor/CutTimeline.swift`, `TimelineView+CutTrack.swift`, `TimelineGeometry.swift`.
+Upstream code, listed per phase in `docs/features/01-lossless-cut/ATTACK-PLAN.md`: `AppShow/Editor/EditorState.swift`, `EditorState+VideoRegions.swift`, `EditorState+Persistence.swift`, `EditorState+Playback.swift`, `History+ChangeRules.swift`, `SyncedPlayerController.swift`, `TimelineView.swift`, `TimelineView+ScreenTrack.swift`, `EditorView.swift`, `EditorView+TransportBar.swift`, `VideoPreviewView+Update.swift`, `EditorView+Preview.swift`, `EditorState+Export.swift`, `ExportConfiguration.swift`. New files: `AppShow/Editor/CutTimeline.swift`, `TimelineView+CutTrack.swift`, `TimelineGeometry.swift`.
 
 ## Owner assumptions in force
 

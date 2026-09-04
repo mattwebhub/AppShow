@@ -13,7 +13,7 @@
 | 08 | upstream-sync-1 | First upstream comparison after divergence, exercising `upstream-sync.md` | complete; upstream still at fork base |
 | 09 | appshow-identity | Rename the app, identifiers, paths, release metadata, and user-facing copy to AppShow before public release (ADR 0005) | in progress |
 
-The overall feature plan is `docs/features/00-overall-plan.md`. The product name is AppShow; inherited Reframed identity remains until the pre-release rename (ADR 0005).
+The overall feature plan is `docs/features/00-overall-plan.md`. The AppShow identity migration is tracked in milestone 09 and ADR 0005.
 
 ## Milestone rules
 

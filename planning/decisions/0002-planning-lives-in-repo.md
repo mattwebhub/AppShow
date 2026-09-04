@@ -5,11 +5,11 @@ Date: 2026-09-03
 
 ## Context
 
-Planning could live in a sibling folder outside the git repo, in a wiki, or inside the repo. Upstream merges add and modify files under `Reframed/`, `docs/*.md`, `AGENTS.md`, and the pbxproj, but never create `planning/` or `docs/architecture/`.
+Planning could live in a sibling folder outside the git repo, in a wiki, or inside the repo. Upstream merges add and modify files under `AppShow/`, `docs/*.md`, `AGENTS.md`, and the pbxproj, but never create `planning/` or `docs/architecture/`.
 
 ## Decision
 
-Keep `planning/` and `docs/architecture/` inside the repository. Test code lives in `ReframedTests/`.
+Keep `planning/` and `docs/architecture/` inside the repository. Test code lives in `AppShowTests/`.
 
 ## Consequences
 

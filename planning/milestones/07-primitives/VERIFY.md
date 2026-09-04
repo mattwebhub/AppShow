@@ -8,7 +8,7 @@ Run on a clean clone before closing the milestone. Record the date and commit.
 | Tests | `make test` | all green | pass, 379 tests in 39 suites (2026-09-04) |
 | Format | `make format && git diff --exit-code` | no diff | pass (2026-09-04) |
 | Lint | `make lint` | clean | pass (2026-09-04) |
-| Blur export gate | `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` | blur configuration exports through the compositor | pass, 3 tests (2026-09-04) |
+| Blur export gate | `TEST_RUNNER_APPSHOW_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` | blur configuration exports through the compositor | pass, 3 tests (2026-09-04) |
 | Transition automation | focused mutation, remapping, and golden-render suites | tool updates text/image/slice targets; cut remapping preserves settings; midpoint fades render | pass (2026-09-04) |
 | Silences, no audio | open a screen-only `.frm`, Video tab | Silences section greyed out | |
 | Silences, preview | record 20 s with two long pauses, Video tab, Preview | line reads "2 silences, N s removed", timeline unchanged | |
