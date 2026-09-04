@@ -1,30 +1,26 @@
 # State
 
-Last updated: 2026-09-03
+Last updated: 2026-09-04
 
 ## Position
 
-- Milestone `00-fork-setup`: 11 of 14 tasks done, committed on branch `fork-setup` (commit `ad8f460`). Remaining: T11 (CI proven on a PR), T13 (product identity), T14 (PR).
-- Feature planning complete for the four product features: `docs/features/00-overall-plan.md` plus `SPIKE.md` and `ATTACK-PLAN.md` for `01-lossless-cut`, `02-music-tracks`, `03-agent-chat`, `04-agent-tools` (about 1,800 lines, all cited paths verified).
-- Roadmap milestones 02 to 08 map the features; see `planning/ROADMAP.md`.
-- Fork: https://github.com/mattwebhub/Reframed, cloned to `~/Projects/appshow/reframed`; upstream `jkuri/Reframed` v0.14.7, remote `upstream`. Nothing pushed yet.
+- Milestone 00 closed except the product-identity decision: PR #1 https://github.com/mattwebhub/Reframed/pull/1 (CI green).
+- Milestone 01 test-foundation complete: 218 tests, PR #2 https://github.com/mattwebhub/Reframed/pull/2 (stacked on fork-setup).
+- Milestone 02 lossless-cut on branch `milestone-02-lossless-cut`: phases P1, P2, P3, P4, P5, P7 landed with tests (257 tests, plus 2 gated export tests). P6 compressed timeline in progress by a delegated worktree. Remaining after P6: VERIFY.md manual checks, push, PR.
+- Milestone 03 music-tracks: not started; attack plan in `docs/features/02-music-tracks/ATTACK-PLAN.md`.
 
 ## Verified on this machine
 
-- `make build`, `make lint`, `make test` exit 0; 21 tests in 4 suites.
+- `make build`, `make lint`, `make test` green on `milestone-02-lossless-cut` after merging milestone 01.
+- `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` green.
 
-## Scheduled
+## Notes for the next session
 
-- Execution kickoff timer set for 2026-09-03 23:11 local (milestone 00 leftovers, then 01, 02, 03 in order with TDD).
+- Disk filled up once during parallel worktree builds (each worktree build is about 1 GB); regenerable caches were cleared (Xcode DerivedData, npm/pnpm caches, an Electron updater cache). Keep an eye on `df -h /` before spawning parallel builds.
+- Upstream quirks pinned by characterization tests, candidates for fixes: audio-mix index pairing with click sounds, custom camera region border unscaled on the trim path, colour-matched solid backgrounds in the 8-bit render path, unclamped zoom hold keyframe, `FrameRenderer.visibleText` crash/loop edge cases.
 
 ## Next
 
-1. Owner answers the questions in `docs/features/00-overall-plan.md` (27, each with a stated assumption) and decides ADRs 0005 (identity), 0008 (gifski licence), 0009 (Toone code provenance).
-2. Push `fork-setup`, open the PR, confirm CI (milestone 00 T11, T14).
-3. Milestone 01 `test-foundation`: first-15-tests table in `docs/architecture/07-testability.md`, plus the characterization test for the audio-mix index pairing bug found in `docs/features/02-music-tracks/SPIKE.md`, plus `ReframedTests/Fixtures` and `Support/Fixtures.swift` which the attack plans depend on.
-4. Milestone 02 `lossless-cut`: start from `docs/features/01-lossless-cut/ATTACK-PLAN.md` phase P1 (`CutTimeline` pure model, split at playhead).
-
-## Open questions for the owner
-
-- Product identity (ADR 0005), Toone provenance (ADR 0009). ADR 0008 accepted: fully open source, gifski kept under AGPL.
-- The 27 feature questions in `docs/features/00-overall-plan.md`.
+1. Land P6, run `planning/milestones/02-lossless-cut/VERIFY.md` (manual checks need a human with the app), push, open PR #3 stacked on milestone 01.
+2. Milestone 03 music tracks from phase 0 of its attack plan.
+3. Owner decisions still open: ADR 0005 identity, ADR 0009 Toone provenance, the 27 feature questions (assumptions in force).
