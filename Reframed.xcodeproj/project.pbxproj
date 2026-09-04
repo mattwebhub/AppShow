@@ -61,6 +61,9 @@
 		7E5700000000000000000045 /* ExternalAudioWaveformWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000044 /* ExternalAudioWaveformWindow.swift */; };
 		7E5700000000000000000043 /* PropertiesPanel+MusicSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000042 /* PropertiesPanel+MusicSection.swift */; };
 		7E5700000000000000000041 /* ExternalAudioSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000040 /* ExternalAudioSchedule.swift */; };
+		7E57000000000000000000C8 /* AgentWorkspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000C7 /* AgentWorkspace.swift */; };
+		7E57000000000000000000C6 /* AgentBridgeServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000C5 /* AgentBridgeServer.swift */; };
+		7E57000000000000000000C4 /* AgentRPCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000C3 /* AgentRPCSession.swift */; };
 		7E57000000000000000000C2 /* AgentToolDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000C1 /* AgentToolDispatcher.swift */; };
 		7E57000000000000000000C0 /* AgentToolPreviewFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BF /* AgentToolPreviewFrame.swift */; };
 		7E57000000000000000000BE /* AgentToolHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BD /* AgentToolHandlers.swift */; };
@@ -346,6 +349,9 @@
 		7E5700000000000000000044 /* ExternalAudioWaveformWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioWaveformWindow.swift; sourceTree = "<group>"; };
 		7E5700000000000000000042 /* PropertiesPanel+MusicSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+MusicSection.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000040 /* ExternalAudioSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioSchedule.swift; sourceTree = "<group>"; };
+		7E57000000000000000000C7 /* AgentWorkspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentWorkspace.swift; sourceTree = "<group>"; };
+		7E57000000000000000000C5 /* AgentBridgeServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBridgeServer.swift; sourceTree = "<group>"; };
+		7E57000000000000000000C3 /* AgentRPCSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRPCSession.swift; sourceTree = "<group>"; };
 		7E57000000000000000000C1 /* AgentToolDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolDispatcher.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BF /* AgentToolPreviewFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolPreviewFrame.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BD /* AgentToolHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolHandlers.swift; sourceTree = "<group>"; };
@@ -978,6 +984,9 @@
 				7E57000000000000000000BD /* AgentToolHandlers.swift */,
 				7E57000000000000000000BF /* AgentToolPreviewFrame.swift */,
 				7E57000000000000000000C1 /* AgentToolDispatcher.swift */,
+				7E57000000000000000000C3 /* AgentRPCSession.swift */,
+				7E57000000000000000000C5 /* AgentBridgeServer.swift */,
+				7E57000000000000000000C7 /* AgentWorkspace.swift */,
 			);
 			name = Tools;
 			path = Agent/Tools;
@@ -1335,6 +1344,9 @@
 				7E5700000000000000000045 /* ExternalAudioWaveformWindow.swift in Sources */,
 				7E5700000000000000000043 /* PropertiesPanel+MusicSection.swift in Sources */,
 				7E5700000000000000000041 /* ExternalAudioSchedule.swift in Sources */,
+				7E57000000000000000000C8 /* AgentWorkspace.swift in Sources */,
+				7E57000000000000000000C6 /* AgentBridgeServer.swift in Sources */,
+				7E57000000000000000000C4 /* AgentRPCSession.swift in Sources */,
 				7E57000000000000000000C2 /* AgentToolDispatcher.swift in Sources */,
 				7E57000000000000000000C0 /* AgentToolPreviewFrame.swift in Sources */,
 				7E57000000000000000000BE /* AgentToolHandlers.swift in Sources */,
