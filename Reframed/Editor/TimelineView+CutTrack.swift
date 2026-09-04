@@ -4,20 +4,22 @@ import SwiftUI
 extension TimelineView {
   func cutTrackContent(width: CGFloat) -> some View {
     let h = trackHeight
-    let timeline = editorState.cutTimeline
+    let geometry = geometry(width: width)
 
     return ZStack(alignment: .leading) {
-      ForEach(Array(timeline.gaps.enumerated()), id: \.offset) { _, gap in
-        let startX = max(0, CGFloat(gap.lowerBound / totalSeconds) * width)
-        let endX = min(width, CGFloat(gap.upperBound / totalSeconds) * width)
-        RoundedRectangle(cornerRadius: Track.borderRadius)
-          .fill(Track.background.opacity(0.35))
-          .frame(width: max(0, endX - startX), height: h)
-          .position(x: startX + (endX - startX) / 2, y: h / 2)
-          .allowsHitTesting(false)
+      if geometry.mode == .source {
+        ForEach(Array(geometry.timeline.gaps.enumerated()), id: \.offset) { _, gap in
+          let startX = max(0, geometry.x(forSource: gap.lowerBound))
+          let endX = min(width, geometry.x(forSource: gap.upperBound))
+          RoundedRectangle(cornerRadius: Track.borderRadius)
+            .fill(Track.background.opacity(0.35))
+            .frame(width: max(0, endX - startX), height: h)
+            .position(x: startX + (endX - startX) / 2, y: h / 2)
+            .allowsHitTesting(false)
+        }
       }
 
-      ForEach(timeline.slices) { region in
+      ForEach(editorState.cutTimeline.slices) { region in
         videoRegionView(
           region: region,
           width: width,
@@ -30,7 +32,7 @@ extension TimelineView {
     .coordinateSpace(name: "videoRegion")
     .contentShape(Rectangle())
     .onTapGesture(count: 2) { location in
-      let time = (location.x / width) * totalSeconds
+      let time = sourceTime(forX: location.x, width: width)
       editorState.addVideoRegion(atTime: time)
     }
   }
@@ -42,8 +44,8 @@ extension TimelineView {
     height: CGFloat
   ) -> some View {
     let effective = effectiveVideoRegion(region, width: width)
-    let startX = max(0, CGFloat(effective.start / totalSeconds) * width)
-    let endX = min(width, CGFloat(effective.end / totalSeconds) * width)
+    let startX = max(0, xPosition(forSource: effective.start, width: width))
+    let endX = min(width, xPosition(forSource: effective.end, width: width))
     let regionWidth = max(4, endX - startX)
     let edgeThreshold = min(8.0, regionWidth * 0.2)
     let isPopoverShown = popoverVideoRegionId == region.id
@@ -104,8 +106,8 @@ extension TimelineView {
       DragGesture(minimumDistance: 3, coordinateSpace: .named("videoRegion"))
         .onChanged { value in
           if videoDragType == nil {
-            let origStartX = CGFloat(region.startSeconds / totalSeconds) * width
-            let origEndX = CGFloat(region.endSeconds / totalSeconds) * width
+            let origStartX = xPosition(forSource: region.startSeconds, width: width)
+            let origEndX = xPosition(forSource: region.endSeconds, width: width)
             let origWidth = origEndX - origStartX
             let relX = value.startLocation.x - origStartX
             let effectiveEdge = min(8.0, origWidth * 0.2)
@@ -113,8 +115,10 @@ extension TimelineView {
               videoDragType = .resizeLeft
             } else if relX >= origWidth - effectiveEdge {
               videoDragType = .resizeRight
-            } else {
+            } else if isTrackEditable {
               videoDragType = .move
+            } else {
+              return
             }
             videoDragRegionId = region.id
           }
@@ -133,8 +137,10 @@ extension TimelineView {
       case .active(let location):
         if location.x <= edgeThreshold || location.x >= regionWidth - edgeThreshold {
           NSCursor.resizeLeftRight.set()
-        } else {
+        } else if isTrackEditable {
           NSCursor.openHand.set()
+        } else {
+          NSCursor.arrow.set()
         }
       case .ended:
         NSCursor.arrow.set()
@@ -149,7 +155,7 @@ extension TimelineView {
     guard videoDragRegionId == region.id, let dt = videoDragType else {
       return (region.startSeconds, region.endSeconds)
     }
-    let timeDelta = (videoDragOffset / width) * totalSeconds
+    let timeDelta = (videoDragOffset / width) * visibleSeconds
     let regions = editorState.videoRegions
     guard let idx = regions.firstIndex(where: { $0.id == region.id }) else {
       return (region.startSeconds, region.endSeconds)
@@ -157,7 +163,7 @@ extension TimelineView {
     let prevEnd: Double = idx > 0 ? regions[idx - 1].endSeconds : 0
     let nextStart: Double = idx < regions.count - 1 ? regions[idx + 1].startSeconds : totalSeconds
 
-    let minDuration = max(0.1, (24.0 / width) * totalSeconds)
+    let minDuration = max(0.1, (24.0 / width) * visibleSeconds)
 
     switch dt {
     case .move:
@@ -174,7 +180,7 @@ extension TimelineView {
   }
 
   func commitVideoDrag(region: VideoRegionData, width: CGFloat) {
-    let timeDelta = (videoDragOffset / width) * totalSeconds
+    let timeDelta = (videoDragOffset / width) * visibleSeconds
 
     switch videoDragType {
     case .move:

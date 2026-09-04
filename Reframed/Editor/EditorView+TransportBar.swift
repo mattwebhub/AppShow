@@ -49,6 +49,15 @@ extension EditorView {
           }
           .disabled(!canCut)
 
+          if editorState.showCutTrack {
+            IconButton(
+              systemName: "arrow.left.and.right.square",
+              color: timelineDisplayMode == .compressed ? ReframedColors.primaryText : ReframedColors.secondaryText
+            ) {
+              timelineDisplayMode = timelineDisplayMode == .compressed ? .source : .compressed
+            }
+          }
+
           IconButton(
             systemName: "minus.magnifyingglass",
             color: timelineZoom > 1.0 ? ReframedColors.primaryText : ReframedColors.disabledText
