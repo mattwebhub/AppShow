@@ -9,7 +9,7 @@ Last updated: 2026-09-04
 - Milestone 03 music tracks is code-complete on green PR #5; its manual checks remain.
 - Milestone 04 agent chat is code-complete on green PR #6: one persisted conversation per project, fresh provider process per turn with resume ids, collapsible streamed UI, Markdown/code/tool rendering, and readiness guidance. Its manual checks remain.
 - Milestone 05 read-only agent tools is code-complete on green PR #7: JSON-RPC codec, MCP-shaped catalog and results, dispatcher, preview frames, authenticated Unix socket, and sibling `.agent/` workspace.
-- Milestone 06 integrates milestones 03–05 on `milestone-06-agent-tools-editing`; labeled history, rollback, exact cuts, grouped transactions, single-use confirmations, provider-scoped MCP configuration, the signed stdio shim, bridge lifecycle, and live activity UI are implemented test-first. Broader editing tools remain.
+- Milestone 06 integrates milestones 03–05 on `milestone-06-agent-tools-editing`; labeled history, rollback, exact cuts, grouped transactions, single-use confirmations, provider-scoped MCP configuration, the signed stdio shim, bridge lifecycle, live activity UI, presentation settings, timed captions, and exact-path export are implemented test-first. Primitive-backed tools and provider E2E remain.
 - Milestone 07 PR #4 contains silence removal, text overlays and image overlays with green CI. T1 to T6 are code-complete; blur regions and broader transition work remain. Its manual checks remain.
 
 ## Verified on this machine
@@ -17,7 +17,7 @@ Last updated: 2026-09-04
 - Agent chat: format, lint, build, and 403 tests in 40 suites pass on `milestone-04-agent-chat`; PR #6 is green.
 - Read-only agent tools: build, lint, and 385 tests in 46 suites pass on `milestone-05-agent-tools`; PR #7 is green.
 - Image overlays: format, lint, build, and 366 tests in 37 suites pass on `milestone-07-primitives`; PR #4 is green.
-- Milestone 06 bridge and editing foundation: format, lint, build, and 543 tests in 61 suites pass; the gated real-process shim test passes.
+- Milestone 06 editing surface: format, lint, build, and 546 tests in 61 suites pass; 4 gated export tests and the gated real-process shim test pass.
 - `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` is green on `milestone-02-lossless-cut`.
 
 ## Accepted product decisions
@@ -36,7 +36,7 @@ Last updated: 2026-09-04
 
 ## Next
 
-1. Continue milestone 06 with broader mutating tools and confirmed export.
+1. Continue milestone 06 by integrating the silence/text/image primitives, exposing their tools, and exercising both providers end to end.
 2. Human runs the manual rows for milestones 02, 03, 04, and 07.
 3. Implement blur regions and remaining transition work in milestone 07.
 4. Add skills and the end-to-end presentation flow after the editing tool surface is stable.

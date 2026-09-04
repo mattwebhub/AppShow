@@ -87,6 +87,127 @@ enum AgentEditingToolCatalog {
     mutating: true
   )
 
+  static let setCanvas = AgentToolDefinition(
+    name: "set_canvas",
+    description: "Set canvas aspect, spacing, video styling, and background.",
+    inputSchema: AgentToolSchema.object([
+      "aspect": AgentToolSchema.string("Canvas aspect", enum: CanvasAspect.allCases.map(\.rawValue)),
+      "padding": AgentToolSchema.number("Canvas padding from 0 to 0.4", minimum: 0, maximum: 0.4),
+      "cornerRadius": AgentToolSchema.number("Video corner radius", minimum: 0, maximum: 100),
+      "shadow": AgentToolSchema.number("Video shadow from 0 to 1", minimum: 0, maximum: 1),
+      "background": AgentToolSchema.string("Background type", enum: ["none", "solid", "gradient"]),
+      "gradient": AgentToolSchema.integer("Gradient preset index", minimum: 0, maximum: 32),
+      "red": AgentToolSchema.number("Solid background red channel", minimum: 0, maximum: 1),
+      "green": AgentToolSchema.number("Solid background green channel", minimum: 0, maximum: 1),
+      "blue": AgentToolSchema.number("Solid background blue channel", minimum: 0, maximum: 1),
+      "label": AgentToolSchema.string("Short undo-history label"),
+    ]),
+    mutating: true
+  )
+
+  static let setCaptions = AgentToolDefinition(
+    name: "set_captions",
+    description: "Configure caption visibility, typography, position, and line length.",
+    inputSchema: AgentToolSchema.object([
+      "enabled": AgentToolSchema.boolean("Whether captions are visible"),
+      "fontSize": AgentToolSchema.number("Caption font size", minimum: 12, maximum: 200),
+      "weight": AgentToolSchema.string("Caption weight", enum: CaptionFontWeight.allCases.map(\.rawValue)),
+      "positionX": AgentToolSchema.number("Horizontal position from 0 to 1", minimum: 0, maximum: 1),
+      "positionY": AgentToolSchema.number("Vertical position from 0 to 1", minimum: 0, maximum: 1),
+      "maxWordsPerLine": AgentToolSchema.integer("Maximum words per line", minimum: 1, maximum: 20),
+      "showBackground": AgentToolSchema.boolean("Whether captions have a background"),
+      "backgroundOpacity": AgentToolSchema.number("Caption background opacity", minimum: 0, maximum: 1),
+      "label": AgentToolSchema.string("Short undo-history label"),
+    ]),
+    mutating: true
+  )
+
+  static let replaceCaptions = AgentToolDefinition(
+    name: "replace_captions",
+    description: "Replace all timed caption segments in source time.",
+    inputSchema: AgentToolSchema.object(
+      [
+        "segments": AgentToolSchema.array(
+          "Timed caption segments",
+          items: AgentToolSchema.object(
+            [
+              "start": AgentToolSchema.number("Segment start in source seconds", minimum: 0),
+              "end": AgentToolSchema.number("Segment end in source seconds", minimum: 0),
+              "text": AgentToolSchema.string("Caption text"),
+            ],
+            required: ["start", "end", "text"]
+          )
+        ),
+        "label": AgentToolSchema.string("Short undo-history label"),
+      ],
+      required: ["segments"]
+    ),
+    mutating: true
+  )
+
+  static let setCursor = AgentToolDefinition(
+    name: "set_cursor",
+    description: "Configure cursor visibility, style, size, and click effects.",
+    inputSchema: AgentToolSchema.object([
+      "visible": AgentToolSchema.boolean("Whether the cursor is visible"),
+      "style": AgentToolSchema.integer("Cursor style index from 0 to 21", minimum: 0, maximum: 21),
+      "size": AgentToolSchema.number("Cursor size in pixels", minimum: 8, maximum: 128),
+      "clickHighlights": AgentToolSchema.boolean("Whether clicks show a highlight"),
+      "clickHighlightSize": AgentToolSchema.number("Click highlight size", minimum: 8, maximum: 160),
+      "clickSound": AgentToolSchema.boolean("Whether clicks play a sound"),
+      "clickSoundVolume": AgentToolSchema.number("Click sound volume", minimum: 0, maximum: 1),
+      "label": AgentToolSchema.string("Short undo-history label"),
+    ]),
+    mutating: true
+  )
+
+  static let setCamera = AgentToolDefinition(
+    name: "set_camera",
+    description: "Configure camera visibility, layout, aspect, and styling.",
+    inputSchema: AgentToolSchema.object([
+      "enabled": AgentToolSchema.boolean("Whether the camera is visible"),
+      "x": AgentToolSchema.number("Horizontal position from 0 to 1", minimum: 0, maximum: 1),
+      "y": AgentToolSchema.number("Vertical position from 0 to 1", minimum: 0, maximum: 1),
+      "width": AgentToolSchema.number("Relative width from 0.05 to 1", minimum: 0.05, maximum: 1),
+      "aspect": AgentToolSchema.string("Camera aspect", enum: CameraAspect.allCases.map(\.rawValue)),
+      "cornerRadius": AgentToolSchema.number("Camera corner radius", minimum: 0, maximum: 100),
+      "borderWidth": AgentToolSchema.number("Camera border width", minimum: 0, maximum: 20),
+      "shadow": AgentToolSchema.number("Camera shadow from 0 to 1", minimum: 0, maximum: 1),
+      "mirrored": AgentToolSchema.boolean("Whether the camera is mirrored"),
+      "label": AgentToolSchema.string("Short undo-history label"),
+    ]),
+    mutating: true
+  )
+
+  static let setAudio = AgentToolDefinition(
+    name: "set_audio",
+    description: "Configure captured system and microphone audio levels.",
+    inputSchema: AgentToolSchema.object([
+      "systemVolume": AgentToolSchema.number("System audio volume", minimum: 0, maximum: 2),
+      "microphoneVolume": AgentToolSchema.number("Microphone volume", minimum: 0, maximum: 2),
+      "systemMuted": AgentToolSchema.boolean("Whether system audio is muted"),
+      "microphoneMuted": AgentToolSchema.boolean("Whether microphone audio is muted"),
+      "label": AgentToolSchema.string("Short undo-history label"),
+    ]),
+    mutating: true
+  )
+
+  static let exportVideo = AgentToolDefinition(
+    name: "export_video",
+    description: "Export to an exact new file after one in-app confirmation. Existing files are never overwritten.",
+    inputSchema: AgentToolSchema.object(
+      [
+        "destination": AgentToolSchema.string("Absolute destination file path"),
+        "format": AgentToolSchema.string("Export format", enum: ["mp4", "mov", "gif"]),
+        "confirmationId": AgentToolSchema.string("Single-use confirmation identifier"),
+        "label": AgentToolSchema.string("Activity label"),
+      ],
+      required: ["destination", "format"]
+    ),
+    mutating: true,
+    slow: true
+  )
+
   static let beginBatch = AgentToolDefinition(
     name: "begin_batch",
     description: "Begin a labeled edit transaction whose mutations become one undo step.",
@@ -112,6 +233,13 @@ enum AgentEditingToolCatalog {
       AgentAddSpotlightTool(),
       AgentSetKeptSlicesTool(),
       AgentRemoveTimeRangeTool(),
+      AgentSetCanvasTool(),
+      AgentSetCaptionsTool(),
+      AgentReplaceCaptionsTool(),
+      AgentSetCursorTool(),
+      AgentSetCameraTool(),
+      AgentSetAudioTool(),
+      AgentExportVideoTool(),
       AgentBatchBoundaryTool(definition: beginBatch),
       AgentBatchBoundaryTool(definition: endBatch),
     ]
@@ -121,13 +249,16 @@ enum AgentEditingToolCatalog {
 extension AgentToolContext {
   @MainActor
   func timelineResult() -> JSONValue {
-    AgentToolSummaries.timeline(
+    let result = AgentToolSummaries.timeline(
       snapshot: editorState.createSnapshot(),
       duration: CMTimeGetSeconds(editorState.duration),
       media: editorState.agentMediaInfo,
       historyIndex: editorState.history.currentIndex,
       historyCount: editorState.history.entries.count
     )
+    guard let url = editorState.lastExportedURL, case .object(var object) = result else { return result }
+    object["lastExportedPath"] = .string(url.path)
+    return .object(object)
   }
 }
 
@@ -240,6 +371,201 @@ private struct AgentRemoveTimeRangeTool: AgentToolHandler {
     }
     context.editorState.videoRegions = timeline.slices
     return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentSetCanvasTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.setCanvas
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let state = context.editorState
+    if let value = arguments["aspect"]?.stringValue, let aspect = CanvasAspect(rawValue: value) {
+      state.canvasAspect = aspect
+    }
+    if let value = arguments["padding"]?.doubleValue { state.padding = value }
+    if let value = arguments["cornerRadius"]?.doubleValue { state.videoCornerRadius = value }
+    if let value = arguments["shadow"]?.doubleValue { state.videoShadow = value }
+    if let background = arguments["background"]?.stringValue {
+      switch background {
+      case "none":
+        state.backgroundStyle = .none
+      case "gradient":
+        let identifier = arguments["gradient"]?.intValue ?? 0
+        guard GradientPresets.all.contains(where: { $0.id == identifier }) else {
+          throw AgentToolError.invalidArguments("gradient does not identify a preset")
+        }
+        state.backgroundStyle = .gradient(identifier)
+      case "solid":
+        state.backgroundStyle = .solidColor(
+          CodableColor(
+            r: arguments["red"]?.doubleValue ?? 0,
+            g: arguments["green"]?.doubleValue ?? 0,
+            b: arguments["blue"]?.doubleValue ?? 0
+          )
+        )
+      default:
+        break
+      }
+    }
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentSetCaptionsTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.setCaptions
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let state = context.editorState
+    if let value = arguments["enabled"]?.boolValue { state.captionsEnabled = value }
+    if let value = arguments["fontSize"]?.doubleValue { state.captionFontSize = value }
+    if let value = arguments["weight"]?.stringValue, let weight = CaptionFontWeight(rawValue: value) {
+      state.captionFontWeight = weight
+    }
+    let x = arguments["positionX"]?.doubleValue ?? Double(state.captionPosition.relativeX)
+    let y = arguments["positionY"]?.doubleValue ?? Double(state.captionPosition.relativeY)
+    state.captionPosition = CaptionPosition(relativeX: x, relativeY: y)
+    if let value = arguments["maxWordsPerLine"]?.intValue { state.captionMaxWordsPerLine = value }
+    if let value = arguments["showBackground"]?.boolValue { state.captionShowBackground = value }
+    if let value = arguments["backgroundOpacity"]?.doubleValue { state.captionBackgroundOpacity = value }
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentReplaceCaptionsTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.replaceCaptions
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let duration = CMTimeGetSeconds(context.editorState.duration)
+    let segments = try (arguments["segments"]?.arrayValue ?? []).map { value -> CaptionSegment in
+      let start = min(value["start"]?.doubleValue ?? 0, duration)
+      let end = min(value["end"]?.doubleValue ?? duration, duration)
+      let text = value["text"]?.stringValue?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+      guard end > start else { throw AgentToolError.invalidArguments("caption end must be greater than start") }
+      guard !text.isEmpty else { throw AgentToolError.invalidArguments("caption text must not be empty") }
+      return CaptionSegment(startSeconds: start, endSeconds: end, text: text)
+    }
+    context.editorState.captionSegments = segments.sorted { $0.startSeconds < $1.startSeconds }
+    context.editorState.captionsEnabled = !segments.isEmpty
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentSetCursorTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.setCursor
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let state = context.editorState
+    if let value = arguments["visible"]?.boolValue { state.showCursor = value }
+    if let value = arguments["style"]?.intValue, let style = CursorStyle(rawValue: value) { state.cursorStyle = style }
+    if let value = arguments["size"]?.doubleValue { state.cursorSize = value }
+    if let value = arguments["clickHighlights"]?.boolValue { state.showClickHighlights = value }
+    if let value = arguments["clickHighlightSize"]?.doubleValue { state.clickHighlightSize = value }
+    if let value = arguments["clickSound"]?.boolValue { state.clickSoundEnabled = value }
+    if let value = arguments["clickSoundVolume"]?.doubleValue { state.clickSoundVolume = Float(value) }
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentSetCameraTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.setCamera
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let state = context.editorState
+    if let value = arguments["enabled"]?.boolValue { state.webcamEnabled = value }
+    let width = arguments["width"]?.doubleValue ?? Double(state.cameraLayout.relativeWidth)
+    state.cameraLayout = CameraLayout(
+      relativeX: min(arguments["x"]?.doubleValue ?? Double(state.cameraLayout.relativeX), 1 - width),
+      relativeY: arguments["y"]?.doubleValue ?? Double(state.cameraLayout.relativeY),
+      relativeWidth: width
+    )
+    if let value = arguments["aspect"]?.stringValue, let aspect = CameraAspect(rawValue: value) {
+      state.cameraAspect = aspect
+    }
+    if let value = arguments["cornerRadius"]?.doubleValue { state.cameraCornerRadius = value }
+    if let value = arguments["borderWidth"]?.doubleValue { state.cameraBorderWidth = value }
+    if let value = arguments["shadow"]?.doubleValue { state.cameraShadow = value }
+    if let value = arguments["mirrored"]?.boolValue { state.cameraMirrored = value }
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentSetAudioTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.setAudio
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let state = context.editorState
+    if let value = arguments["systemVolume"]?.doubleValue { state.systemAudioVolume = Float(value) }
+    if let value = arguments["microphoneVolume"]?.doubleValue { state.micAudioVolume = Float(value) }
+    if let value = arguments["systemMuted"]?.boolValue { state.systemAudioMuted = value }
+    if let value = arguments["microphoneMuted"]?.boolValue { state.micAudioMuted = value }
+    state.syncAudioVolumes()
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentExportVideoTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.exportVideo
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    guard let rawDestination = arguments["destination"]?.stringValue, rawDestination.hasPrefix("/") else {
+      throw AgentToolError.invalidArguments("destination must be an absolute path")
+    }
+    guard let rawFormat = arguments["format"]?.stringValue, let format = exportFormat(rawFormat) else {
+      throw AgentToolError.invalidArguments("unsupported export format")
+    }
+    let destination = URL(fileURLWithPath: rawDestination).standardizedFileURL
+    guard destination.pathExtension.lowercased() == format.fileExtension else {
+      throw AgentToolError.invalidArguments("destination extension must be .\(format.fileExtension)")
+    }
+    guard !FileManager.default.fileExists(atPath: destination.path) else {
+      throw AgentToolError.invalidArguments("destination already exists")
+    }
+    var isDirectory: ObjCBool = false
+    guard
+      FileManager.default.fileExists(atPath: destination.deletingLastPathComponent().path, isDirectory: &isDirectory),
+      isDirectory.boolValue
+    else {
+      throw AgentToolError.invalidArguments("destination directory does not exist")
+    }
+    let operation = AgentConfirmationOperation(
+      kind: definition.name,
+      arguments: ["destination": .string(destination.path), "format": .string(rawFormat)]
+    )
+    let confirmationID: UUID?
+    if let value = arguments["confirmationId"]?.stringValue {
+      guard let parsed = UUID(uuidString: value) else {
+        throw AgentToolError.invalidArguments("confirmationId must be a UUID")
+      }
+      confirmationID = parsed
+    } else {
+      confirmationID = nil
+    }
+    try context.editorState.agentConfirmations.authorize(
+      operation: operation,
+      confirmationID: confirmationID,
+      title: "Export video",
+      detail: "Write a new \(rawFormat.uppercased()) file to \(destination.path)"
+    )
+    var settings = ExportSettings()
+    settings.format = format
+    let url = try await context.editorState.export(settings: settings, outputURL: destination)
+    return ["path": .string(url.path), "format": .string(rawFormat)]
+  }
+
+  private func exportFormat(_ value: String) -> ExportFormat? {
+    switch value {
+    case "mp4": .mp4
+    case "mov": .mov
+    case "gif": .gif
+    default: nil
+    }
   }
 }
 
