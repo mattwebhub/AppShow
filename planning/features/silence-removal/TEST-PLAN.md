@@ -18,12 +18,12 @@ Written before the production code. Layers from `planning/tdd-strategy.md`.
 | 2, 3 | `analyzeFindsGapInGeneratedTone` | T2 | `ReframedTests/Editor/SilenceAnalysisTests.swift` | `AudioFixtures.toneWithGap` (wav) | green |
 | 3 | `analyzeMixesTwoSourcesByLouderWindow` | T2 | same | two `toneWithGap` files | green |
 | 2 | `analyzeThrowsForMissingFile` | T2 | same | none | green |
-| 2 | `previewReportsCountAndTotalWithoutMutating` | EditorState T2 | `ReframedTests/Editor/EditorStateSilenceRemovalTests.swift` | `recordingResult` + mic `toneWithGap` | red |
+| 2 | `previewReportsCountAndTotalWithoutMutating` | EditorState T2 | `ReframedTests/Editor/EditorStateSilenceRemovalTests.swift` | `recordingResult` + mic `toneWithGap` | green |
 | 5, 6 | `applyWritesSlicesAndPushesOneLabelledSnapshot` | EditorState T2 | same | same | green |
 | 6 | `undoAfterApplyRestoresPreviousSlices` | EditorState T2 | same | same | green |
 | 5 | `applyIntersectsWithExistingCuts` | EditorState T2 | same | same | green |
 | 7 | `previewWithNoAudioSourceIsEmpty` | EditorState T2 | same | `recordingResult` without audio | green |
-| 6 | `historyEntryLabelSurvivesRoundTrip` | unit T1 | `ReframedTests/Editor/HistoryTests.swift` | none | red |
+| 6 | `historyEntryLabelSurvivesRoundTrip` | unit T1 | `ReframedTests/Editor/HistoryTests.swift` | none | green |
 
 ## Manual checks
 

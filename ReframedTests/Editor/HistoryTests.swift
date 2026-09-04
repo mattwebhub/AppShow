@@ -151,4 +151,16 @@ struct HistoryTests {
     #expect(snapshot.spotlightRegions == original.spotlightRegions)
     #expect(snapshot.backgroundStyle == original.backgroundStyle)
   }
+
+  @Test func historyEntryLabelSurvivesRoundTrip() throws {
+    let history = History()
+    history.pushSnapshot(ProjectFixtures.editorState(marker: 0))
+    history.pushSnapshot(ProjectFixtures.editorState(marker: 1), label: "Silences removed")
+    #expect(history.entries[0].label == nil)
+    #expect(history.entries[1].label == "Silences removed")
+    let json = try JSONEncoder().encode(history.toData())
+    let decoded = try JSONDecoder().decode(HistoryData.self, from: json)
+    #expect(decoded.entries.map(\.label) == [nil, "Silences removed"])
+  }
+
 }
