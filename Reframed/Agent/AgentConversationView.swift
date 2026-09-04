@@ -8,7 +8,7 @@ struct AgentConversationView: View {
   let isExporting: Bool
 
   @State private var prompt = ""
-  @State private var executable: URL?
+  @State private var readiness: [AgentProviderKind: AgentReadiness] = [:]
   @State private var isResolving = false
   @State private var toolchain = AgentToolchain.standard()
   @FocusState private var composerFocused: Bool
@@ -20,8 +20,8 @@ struct AgentConversationView: View {
         .overlay(ReframedColors.divider)
       composer
     }
-    .task(id: transcript.provider) {
-      await resolveExecutable()
+    .task {
+      await refreshReadiness()
     }
   }
 
@@ -65,16 +65,11 @@ struct AgentConversationView: View {
 
   private var composer: some View {
     VStack(alignment: .leading, spacing: Layout.compactSpacing) {
-      if executable == nil {
-        HStack(spacing: 6) {
-          Image(systemName: isResolving ? "ellipsis" : "exclamationmark.triangle")
-          Text(
-            isResolving
-              ? "Finding \(transcript.provider.displayName)…" : "Install and sign in to \(transcript.provider.displayName) to continue."
-          )
-        }
-        .font(.system(size: FontSize.xxs))
-        .foregroundStyle(ReframedColors.secondaryText)
+      readinessView
+      if project == nil {
+        Text("Open a project to start a conversation.")
+          .font(.system(size: FontSize.xxs))
+          .foregroundStyle(ReframedColors.secondaryText)
       }
       if isExporting {
         Text("Wait for the export to finish before sending a message.")
@@ -111,22 +106,113 @@ struct AgentConversationView: View {
   }
 
   private var canSend: Bool {
-    executable != nil
+    selectedReadiness?.isReady == true
       && project != nil
       && !isExporting
       && !transcript.isRunning
       && !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
   }
 
-  private func resolveExecutable() async {
+  @ViewBuilder
+  private var readinessView: some View {
+    if isResolving, selectedReadiness == nil {
+      statusRow(icon: "ellipsis", text: "Checking \(transcript.provider.displayName)…")
+    } else {
+      switch selectedReadiness {
+      case .ready(_, let version):
+        statusRow(icon: "checkmark.circle.fill", text: "Ready · \(version)", color: Color.green)
+      case .missing:
+        setupCard(
+          message: "\(transcript.provider.displayName) was not found in PATH or common install locations."
+        )
+      case .notLoggedIn:
+        setupCard(message: "Sign in from Terminal with `\(loginCommand)`.")
+      case .unhealthy(_, let reason):
+        setupCard(message: reason)
+      case nil:
+        setupCard(message: "\(transcript.provider.displayName) has not been checked yet.")
+      }
+    }
+  }
+
+  private var selectedReadiness: AgentReadiness? {
+    readiness[transcript.provider]
+  }
+
+  private var loginCommand: String {
+    switch transcript.provider {
+    case .claudeCode: "claude auth login"
+    case .codex: "codex login"
+    }
+  }
+
+  private func statusRow(icon: String, text: String, color: Color = ReframedColors.secondaryText) -> some View {
+    HStack(spacing: 6) {
+      Image(systemName: icon)
+      Text(text)
+    }
+    .font(.system(size: FontSize.xxs))
+    .foregroundStyle(color)
+  }
+
+  private func setupCard(message: String) -> some View {
+    VStack(alignment: .leading, spacing: Layout.compactSpacing) {
+      statusRow(icon: "exclamationmark.triangle", text: selectedReadiness?.statusLabel ?? "Not checked")
+      Text(message)
+        .font(.system(size: FontSize.xxs))
+        .foregroundStyle(ReframedColors.secondaryText)
+      Button("Check Again") {
+        Task { await refreshReadiness() }
+      }
+      .buttonStyle(SecondaryButtonStyle(size: .small))
+      .disabled(isResolving)
+    }
+    .padding(8)
+    .background(ReframedColors.muted)
+    .clipShape(RoundedRectangle(cornerRadius: Radius.md))
+  }
+
+  private func refreshReadiness() async {
     isResolving = true
-    executable = await toolchain.resolve(transcript.provider.makeProvider().executableNames)
+    await toolchain.invalidate()
+    let searchPath = await toolchain.searchPath()
+    let home = FileManager.default.homeDirectoryForCurrentUser.path
+    let searchedPaths = searchPath.split(separator: ":").map(String.init)
+    var statuses: [AgentProviderKind: AgentReadiness] = [:]
+    for kind in AgentProviderKind.allCases {
+      let provider = kind.makeProvider()
+      guard let executable = await toolchain.resolve(provider.executableNames) else {
+        statuses[kind] = .missing(searchedPaths: searchedPaths)
+        continue
+      }
+      let environment = AgentEnvironment.scrubbed(
+        path: await toolchain.searchPath(),
+        home: home,
+        forwarding: provider.environmentKeys
+      )
+      statuses[kind] = await AgentProbe().check(
+        provider: kind,
+        executable: executable,
+        environment: environment
+      )
+    }
+    readiness = statuses
+    let selected = AgentReadinessSnapshot(statuses: statuses).selection(remembered: transcript.provider)
+    if selected != transcript.provider {
+      transcript.setProvider(selected)
+      ConfigService.shared.agentProvider = selected
+    }
     isResolving = false
   }
 
   private func send() {
     let text = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard canSend, !text.isEmpty, let executable, let project else { return }
+    guard
+      canSend,
+      !text.isEmpty,
+      let executable = selectedReadiness?.executableURL,
+      let project
+    else { return }
     let provider = transcript.provider.makeProvider()
     let workspace = AgentProjectWorkspace.directory(for: project.bundleURL)
     do {
