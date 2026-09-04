@@ -130,6 +130,6 @@ struct AgentConversationStoreTests {
     #expect(!FileManager.default.fileExists(atPath: oldFile.path))
     let movedStore = AgentConversationStore(project: project)
     #expect(try movedStore.load()?.messages.first?.text == "hello")
-    #expect(movedStore.fileURL.path.hasSuffix("Renamed Project.frm/agent/conversation.json"))
+    #expect(movedStore.fileURL.path.hasSuffix("Renamed Project.appshow/agent/conversation.json"))
   }
 }
