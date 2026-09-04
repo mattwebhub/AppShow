@@ -1,6 +1,7 @@
 import AVFoundation
 import CryptoKit
 import Foundation
+import UniformTypeIdentifiers
 
 struct ImportedExternalAudio: Sendable, Equatable {
   let fileName: String
@@ -9,6 +10,13 @@ struct ImportedExternalAudio: Sendable, Equatable {
 }
 
 enum ExternalAudioImporter {
+  nonisolated static let contentTypes: [UTType] = [
+    .mp3, .mpeg4Audio, .wav, .aiff,
+    UTType("public.aac-audio"),
+    UTType("com.apple.coreaudio-format"),
+    UTType("org.xiph.flac"),
+  ].compactMap { $0 }
+
   nonisolated static func `import`(sourceURL: URL, into bundleURL: URL) async throws -> ImportedExternalAudio {
     let asset = AVURLAsset(url: sourceURL)
     let audioTracks = (try? await asset.loadTracks(withMediaType: .audio)) ?? []
