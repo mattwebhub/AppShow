@@ -39,6 +39,9 @@ extension VideoCompositor {
       || hasVideoRegions
       || (config.captionsEnabled && !config.captionSegments.isEmpty)
       || (!config.spotlightRegions.isEmpty && config.cursorSnapshot != nil)
+      || !config.textOverlays.isEmpty
+      || !config.imageOverlays.isEmpty
+      || !config.blurRegions.isEmpty
       || clickSoundURL != nil
   }
 
@@ -145,6 +148,7 @@ extension VideoCompositor {
       effectiveTrim: effectiveTrim,
       scaleX: scaleX
     )
+    let images = ImageOverlayImporter.loadImages(for: regions.imageOverlays, in: config.imageOverlayDirectory)
 
     return CompositionInstruction(
       timeRange: CMTimeRange(start: .zero, duration: compositionDuration),
@@ -228,6 +232,20 @@ extension VideoCompositor {
       spotlightRadius: config.spotlightRadius,
       spotlightDimOpacity: config.spotlightDimOpacity,
       spotlightEdgeSoftness: config.spotlightEdgeSoftness,
+      textOverlays: regions.textOverlays.map { TextOverlayLayout.resolve($0, canvasSize: renderSize) },
+      imageOverlays: regions.imageOverlays.compactMap { overlay in
+        images[overlay.filename].map { ImageOverlayLayout.resolve(overlay, image: $0, canvasSize: renderSize) }
+      },
+      blurRegions: regions.blurRegions.map {
+        BlurRegionInstruction(
+          timeRange: CMTimeRange(
+            start: CMTime(seconds: $0.startSeconds, preferredTimescale: 600),
+            end: CMTime(seconds: $0.endSeconds, preferredTimescale: 600)
+          ),
+          rect: $0.rect,
+          radius: $0.radius
+        )
+      },
       isHDR: result.isHDR
     )
   }

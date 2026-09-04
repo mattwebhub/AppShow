@@ -34,7 +34,11 @@ extension FrameRenderer {
       result = shadow.composited(over: result)
     }
 
-    let screenCI = CIImage(cvPixelBuffer: screenBuffer)
+    let screenCI = applyingBlurRegions(
+      to: CIImage(cvPixelBuffer: screenBuffer),
+      instruction: instruction,
+      compositionTime: compositionTime
+    )
     var screenLayer = hdrPositionScreen(
       screenCI,
       in: state.videoRect,
@@ -582,7 +586,8 @@ extension FrameRenderer {
     outputWidth: Int,
     outputHeight: Int
   ) -> CIImage {
-    guard instruction.captionsEnabled, !instruction.captionSegments.isEmpty else { return background }
+    let hasCaptions = instruction.captionsEnabled && !instruction.captionSegments.isEmpty
+    guard hasCaptions || !instruction.textOverlays.isEmpty || !instruction.imageOverlays.isEmpty else { return background }
 
     guard
       let ctx = CGContext(
@@ -598,6 +603,8 @@ extension FrameRenderer {
 
     ctx.clear(CGRect(x: 0, y: 0, width: outputWidth, height: outputHeight))
     let canvasRect = CGRect(x: 0, y: 0, width: outputWidth, height: outputHeight)
+    drawTextOverlays(in: ctx, canvasRect: canvasRect, instruction: instruction, compositionTime: compositionTime)
+    drawImageOverlays(in: ctx, instruction: instruction, compositionTime: compositionTime)
     drawCaptions(in: ctx, videoRect: videoRect, canvasRect: canvasRect, instruction: instruction, compositionTime: compositionTime)
 
     guard let overlayImage = ctx.makeImage() else { return background }

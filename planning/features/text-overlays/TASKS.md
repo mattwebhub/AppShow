@@ -1,0 +1,9 @@
+# Tasks: Text overlays
+
+Ordered red-green-refactor steps. One commit per step is the default.
+
+- [x] 1. Planning docs: this folder and the T5 row in `planning/milestones/07-primitives/PLAN.md`.
+- [x] 2. Red: `ReframedTests/Project/TextOverlayDataTests.swift`, `ReframedTests/Editor/EditorStateTextOverlaysTests.swift`, the overlay rule in `HistoryChangeRulesTests.swift`; `make test T=...` fails to compile. Green: `Reframed/Project/TextOverlayData.swift` (`TextOverlayPosition`, `TextOverlayData`, lenient decoder), `EditorStateData.textOverlays`, `EditorState.textOverlays` with load, snapshot, restore and observation, `Reframed/Editor/EditorState+TextOverlays.swift` (add, update, move, resize, remove), the `regions` change rule. `make format`, `make lint`.
+- [x] 3. Red: `ReframedTests/Compositor/TextOverlayLayoutTests.swift`, the two remap tests, the `needsCompositor` row, the three golden tests. Green: `Reframed/Compositor/TextOverlayLayout.swift`, `TextOverlayInstruction` on `CompositionInstruction`, `ExportConfiguration.textOverlays` passed from `EditorState+Export.swift`, `remapTextOverlay` in `VideoCompositor+RegionRemapping.swift`, the builder and `checkNeedsCompositor`, `Reframed/Compositor/FrameRenderer+TextOverlays.swift` called from `FrameRenderer.swift` and `FrameRenderer+HDR.swift` before captions.
+- [x] 4. Preview: `Reframed/Editor/VideoPreviewContainer+TextOverlays.swift` (`CATextLayer` per overlay inside a canvas-sized layer), `VideoPreviewView.textOverlays`, `updateTextOverlays` in `VideoPreviewView+Update.swift`, wired from `EditorView+Preview.swift`; `make build` warning-free.
+- [x] 5. Timeline and properties: `Reframed/Editor/TimelineView+OverlayTrack.swift`, `TextOverlayEditPopover.swift` (+ `+Style.swift`), `PropertiesPanel+OverlaysSection.swift` in the Effects tab, `visibleTrackCount` and `timelineTrackSignature`; `make build` warning-free; manual rows in the milestone `VERIFY.md`.

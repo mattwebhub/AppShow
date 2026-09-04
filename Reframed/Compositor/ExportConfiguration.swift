@@ -64,6 +64,10 @@ struct ExportConfiguration: Sendable {
   var spotlightRadius: CGFloat = 200
   var spotlightDimOpacity: CGFloat = 0.6
   var spotlightEdgeSoftness: CGFloat = 50
+  var textOverlays: [TextOverlayData] = []
+  var imageOverlays: [ImageOverlayData] = []
+  var blurRegions: [BlurRegionData] = []
+  var imageOverlayDirectory: URL? = nil
   var clickSoundEnabled: Bool = false
   var clickSoundVolume: Float = 0.5
   var clickSoundStyle: ClickSoundStyle = .click001

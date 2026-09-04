@@ -73,6 +73,11 @@ struct TimelineView: View {
   @State var spotlightDragRegionId: UUID?
   @State var popoverSpotlightRegionId: UUID?
 
+  @State var overlayDragOffset: CGFloat = 0
+  @State var overlayDragType: RegionDragType?
+  @State var overlayDragRegionId: UUID?
+  @State var popoverOverlayId: UUID?
+
   private var showSystemAudioTrack: Bool {
     !editorState.systemAudioMuted
       && (!systemAudioSamples.isEmpty || editorState.hasSystemAudio)
@@ -95,6 +100,7 @@ struct TimelineView: View {
     if showMicAudioTrack { count += 1 }
     if editorState.zoomEnabled { count += 1 }
     if showSpotlightTrack { count += 1 }
+    if editorState.showOverlayTrack { count += 1 }
     return count
   }
 
@@ -144,6 +150,12 @@ struct TimelineView: View {
 
           if showSpotlightTrack {
             trackSidebar(label: "Spotlight", icon: "light.max")
+              .frame(height: trackHeight)
+              .transition(.trackTransition)
+          }
+
+          if editorState.showOverlayTrack {
+            trackSidebar(label: "Overlays", icon: "square.on.square")
               .frame(height: trackHeight)
               .transition(.trackTransition)
           }
@@ -218,6 +230,11 @@ struct TimelineView: View {
 
                 if showSpotlightTrack {
                   spotlightTrackContent(width: cw)
+                    .transition(.trackTransition)
+                }
+
+                if editorState.showOverlayTrack {
+                  overlayTrackContent(width: cw)
                     .transition(.trackTransition)
                 }
               }

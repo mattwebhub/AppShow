@@ -3,6 +3,7 @@ import Foundation
 struct HistoryEntry: Codable, Sendable {
   var snapshot: EditorStateData
   var timestamp: Date
+  var label: String? = nil
 }
 
 struct HistoryData: Codable, Sendable {
@@ -21,11 +22,11 @@ final class History {
   var canUndo: Bool { currentIndex > 0 }
   var canRedo: Bool { currentIndex < entries.count - 1 }
 
-  func pushSnapshot(_ snapshot: EditorStateData) {
+  func pushSnapshot(_ snapshot: EditorStateData, label: String? = nil) {
     if currentIndex < entries.count - 1 {
       entries.removeSubrange((currentIndex + 1)...)
     }
-    entries.append(HistoryEntry(snapshot: snapshot, timestamp: Date()))
+    entries.append(HistoryEntry(snapshot: snapshot, timestamp: Date(), label: label))
     currentIndex = entries.count - 1
     if entries.count > maxSnapshots {
       let excess = entries.count - maxSnapshots
