@@ -61,6 +61,12 @@
 		7E5700000000000000000045 /* ExternalAudioWaveformWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000044 /* ExternalAudioWaveformWindow.swift */; };
 		7E5700000000000000000043 /* PropertiesPanel+MusicSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000042 /* PropertiesPanel+MusicSection.swift */; };
 		7E5700000000000000000041 /* ExternalAudioSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000040 /* ExternalAudioSchedule.swift */; };
+		7E57000000000000000000C0 /* AgentToolPreviewFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BF /* AgentToolPreviewFrame.swift */; };
+		7E57000000000000000000BE /* AgentToolHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BD /* AgentToolHandlers.swift */; };
+		7E57000000000000000000BC /* AgentToolCursorActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BB /* AgentToolCursorActivity.swift */; };
+		7E57000000000000000000BA /* AgentToolSummaries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000B9 /* AgentToolSummaries.swift */; };
+		7E57000000000000000000B8 /* AgentToolCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000B7 /* AgentToolCatalog.swift */; };
+		7E57000000000000000000B6 /* AgentTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000B5 /* AgentTool.swift */; };
 		7E57000000000000000000B4 /* JSONRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000B3 /* JSONRPC.swift */; };
 		7E57000000000000000000B2 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000B1 /* JSONValue.swift */; };
 		828909551C8795EF72269706 /* PropertiesPanel+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C03E11186EDDA74B1B6958 /* PropertiesPanel+Background.swift */; };
@@ -339,6 +345,12 @@
 		7E5700000000000000000044 /* ExternalAudioWaveformWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioWaveformWindow.swift; sourceTree = "<group>"; };
 		7E5700000000000000000042 /* PropertiesPanel+MusicSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+MusicSection.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000040 /* ExternalAudioSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioSchedule.swift; sourceTree = "<group>"; };
+		7E57000000000000000000BF /* AgentToolPreviewFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolPreviewFrame.swift; sourceTree = "<group>"; };
+		7E57000000000000000000BD /* AgentToolHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolHandlers.swift; sourceTree = "<group>"; };
+		7E57000000000000000000BB /* AgentToolCursorActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolCursorActivity.swift; sourceTree = "<group>"; };
+		7E57000000000000000000B9 /* AgentToolSummaries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolSummaries.swift; sourceTree = "<group>"; };
+		7E57000000000000000000B7 /* AgentToolCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolCatalog.swift; sourceTree = "<group>"; };
+		7E57000000000000000000B5 /* AgentTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentTool.swift; sourceTree = "<group>"; };
 		7E57000000000000000000B3 /* JSONRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONRPC.swift; sourceTree = "<group>"; };
 		7E57000000000000000000B1 /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		815C681612F3844727C988EF /* CaptureToolbar+ModeSelection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CaptureToolbar+ModeSelection.swift"; sourceTree = "<group>"; };
@@ -957,6 +969,12 @@
 			children = (
 				7E57000000000000000000B1 /* JSONValue.swift */,
 				7E57000000000000000000B3 /* JSONRPC.swift */,
+				7E57000000000000000000B5 /* AgentTool.swift */,
+				7E57000000000000000000B7 /* AgentToolCatalog.swift */,
+				7E57000000000000000000B9 /* AgentToolSummaries.swift */,
+				7E57000000000000000000BB /* AgentToolCursorActivity.swift */,
+				7E57000000000000000000BD /* AgentToolHandlers.swift */,
+				7E57000000000000000000BF /* AgentToolPreviewFrame.swift */,
 			);
 			name = Tools;
 			path = Agent/Tools;
@@ -1314,6 +1332,12 @@
 				7E5700000000000000000045 /* ExternalAudioWaveformWindow.swift in Sources */,
 				7E5700000000000000000043 /* PropertiesPanel+MusicSection.swift in Sources */,
 				7E5700000000000000000041 /* ExternalAudioSchedule.swift in Sources */,
+				7E57000000000000000000C0 /* AgentToolPreviewFrame.swift in Sources */,
+				7E57000000000000000000BE /* AgentToolHandlers.swift in Sources */,
+				7E57000000000000000000BC /* AgentToolCursorActivity.swift in Sources */,
+				7E57000000000000000000BA /* AgentToolSummaries.swift in Sources */,
+				7E57000000000000000000B8 /* AgentToolCatalog.swift in Sources */,
+				7E57000000000000000000B6 /* AgentTool.swift in Sources */,
 				7E57000000000000000000B4 /* JSONRPC.swift in Sources */,
 				7E57000000000000000000B2 /* JSONValue.swift in Sources */,
 				77030A22115111C9D1325490 /* EditorState+CameraLayout.swift in Sources */,
