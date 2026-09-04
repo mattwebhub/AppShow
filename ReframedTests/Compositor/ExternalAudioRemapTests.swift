@@ -114,4 +114,27 @@ struct ExternalAudioRemapTests {
     #expect(near(ramp.startVolume, 0.5))
     #expect(near(ramp.endVolume, 1))
   }
+
+  @Test func trackBeforeTrimStartIsDroppedEvenWithFades() {
+    let t = track(1, 4, fadeIn: 1, fadeOut: 1)
+    let insertions = VideoCompositor.insertions(for: t, trim: range(5, 10), segments: nil)
+    #expect(insertions.isEmpty)
+    #expect(VideoCompositor.volumeRamps(for: t, insertions: insertions).isEmpty)
+    let segments = [segment(5, 7, at: 0), segment(8, 10, at: 2)]
+    #expect(VideoCompositor.insertions(for: t, trim: range(0, 10), segments: segments).isEmpty)
+  }
+
+  @Test func fadeOutSurvivesWhenLastSegmentCutsTheTrackEnd() throws {
+    let t = track(0, 10, fadeOut: 2)
+    let segments = [segment(0, 4, at: 0), segment(7, 9, at: 4)]
+    let insertions = VideoCompositor.insertions(for: t, trim: range(0, 10), segments: segments)
+    #expect(insertions.count == 2)
+    let ramps = VideoCompositor.volumeRamps(for: t, insertions: insertions)
+    let ramp = try #require(ramps.first)
+    #expect(ramps.count == 1)
+    #expect(near(ramp.timeRange.start.seconds, 5))
+    #expect(near(ramp.timeRange.end.seconds, 6))
+    #expect(near(ramp.startVolume, 1))
+    #expect(near(ramp.endVolume, 0.5))
+  }
 }
