@@ -27,6 +27,7 @@ struct TimelineView: View {
   let onScrub: (CMTime) -> Void
   @Binding var timelineZoom: CGFloat
   @Binding var baseZoom: CGFloat
+  @Binding var displayMode: TimelineDisplayMode
   @Environment(\.colorScheme) private var colorScheme
 
   let sidebarWidth: CGFloat = 70

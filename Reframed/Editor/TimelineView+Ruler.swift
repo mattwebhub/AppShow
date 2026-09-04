@@ -3,14 +3,15 @@ import SwiftUI
 
 extension TimelineView {
   func timeRuler(width: CGFloat) -> some View {
-    Canvas { context, size in
-      let duration = totalSeconds
-      let interval = rulerInterval(for: duration)
-      let minorInterval = interval / 5
+    let geometry = geometry(width: width)
+    let duration = geometry.visibleDuration
+    let interval = geometry.rulerInterval(zoom: timelineZoom)
+    let minorInterval = interval / 5
 
+    return Canvas { context, size in
       var t: Double = 0
       while t <= duration {
-        let x = CGFloat(t / duration) * size.width
+        let x = geometry.x(forDisplay: t)
         let isMajor = isApproximatelyMultiple(t, of: interval)
 
         if isMajor {
@@ -20,7 +21,7 @@ extension TimelineView {
           }
           context.stroke(tickPath, with: .color(ReframedColors.primaryText), lineWidth: 1)
 
-          let label = formatRulerTime(t)
+          let label = formatRulerTime(t, totalDuration: duration)
           let text = Text(label)
             .font(.system(size: FontSize.xs, design: .monospaced))
             .foregroundStyle(ReframedColors.primaryText)
@@ -41,26 +42,15 @@ extension TimelineView {
     .gesture(rulerScrubGesture(width: width))
   }
 
-  private func rulerInterval(for duration: Double) -> Double {
-    let effectiveDuration = duration / timelineZoom
-    if effectiveDuration <= 5 { return 1 }
-    if effectiveDuration <= 15 { return 2 }
-    if effectiveDuration <= 30 { return 5 }
-    if effectiveDuration <= 60 { return 10 }
-    if effectiveDuration <= 180 { return 30 }
-    if effectiveDuration <= 600 { return 60 }
-    return 120
-  }
-
   private func isApproximatelyMultiple(_ value: Double, of interval: Double) -> Bool {
     let remainder = value.truncatingRemainder(dividingBy: interval)
     return remainder < 0.001 || (interval - remainder) < 0.001
   }
 
-  private func formatRulerTime(_ seconds: Double) -> String {
+  private func formatRulerTime(_ seconds: Double, totalDuration: Double) -> String {
     let mins = Int(seconds) / 60
     let secs = Int(seconds) % 60
-    if totalSeconds >= 60 {
+    if totalDuration >= 60 {
       return String(format: "%d:%02d", mins, secs)
     }
     return String(format: "0:%02d", secs)
@@ -69,8 +59,7 @@ extension TimelineView {
   private func rulerScrubGesture(width: CGFloat) -> some Gesture {
     DragGesture(minimumDistance: 0)
       .onChanged { value in
-        let fraction = max(0, min(1, value.location.x / width))
-        let time = CMTime(seconds: fraction * totalSeconds, preferredTimescale: 600)
+        let time = CMTime(seconds: sourceTime(forX: value.location.x, width: width), preferredTimescale: 600)
         onScrub(time)
       }
   }
