@@ -1,0 +1,7 @@
+{"type":"thread.started","thread_id":"01a06baf-c0ef-7b83-99c7-59e3392f5575"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"I’ll run that command now."}}
+{"type":"item.started","item":{"id":"item_1","type":"command_execution","command":"/bin/zsh -lc 'ls /nonexistent-reframed-dir'","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_1","type":"command_execution","command":"/bin/zsh -lc 'ls /nonexistent-reframed-dir'","aggregated_output":"ls: /nonexistent-reframed-dir: No such file or directory\n","exit_code":1,"status":"failed"}}
+{"type":"item.completed","item":{"id":"item_2","type":"agent_message","text":"command failed"}}
+{"type":"turn.completed","usage":{"input_tokens":27014,"cached_input_tokens":24576,"cache_write_input_tokens":0,"output_tokens":67,"reasoning_output_tokens":0}}

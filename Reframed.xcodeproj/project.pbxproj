@@ -42,6 +42,11 @@
 		7E570000000000000000000D /* LaunchEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000000C /* LaunchEnvironment.swift */; };
 		7E570000000000000000000F /* ReframedPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000000E /* ReframedPaths.swift */; };
 		7E570000000000000000001B /* CutTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000001A /* CutTimeline.swift */; };
+		7E5700000000000000000062 /* AgentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000061 /* AgentProvider.swift */; };
+		7E5700000000000000000064 /* AgentEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000063 /* AgentEvent.swift */; };
+		7E5700000000000000000066 /* AgentJSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000065 /* AgentJSONValue.swift */; };
+		7E5700000000000000000068 /* ClaudeCodeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000067 /* ClaudeCodeProvider.swift */; };
+		7E570000000000000000006A /* CodexProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000069 /* CodexProvider.swift */; };
 		7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000001C /* TimelineView+CutTrack.swift */; };
 		7E5700000000000000000021 /* TimelineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000020 /* TimelineGeometry.swift */; };
 		7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000022 /* TimelineView+Geometry.swift */; };
@@ -303,6 +308,11 @@
 		7E570000000000000000000C /* LaunchEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchEnvironment.swift; sourceTree = "<group>"; };
 		7E570000000000000000000E /* ReframedPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReframedPaths.swift; sourceTree = "<group>"; };
 		7E570000000000000000001A /* CutTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CutTimeline.swift; sourceTree = "<group>"; };
+		7E5700000000000000000061 /* AgentProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentProvider.swift; sourceTree = "<group>"; };
+		7E5700000000000000000063 /* AgentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentEvent.swift; sourceTree = "<group>"; };
+		7E5700000000000000000065 /* AgentJSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentJSONValue.swift; sourceTree = "<group>"; };
+		7E5700000000000000000067 /* ClaudeCodeProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeCodeProvider.swift; sourceTree = "<group>"; };
+		7E5700000000000000000069 /* CodexProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexProvider.swift; sourceTree = "<group>"; };
 		7E570000000000000000001C /* TimelineView+CutTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CutTrack.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000020 /* TimelineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineGeometry.swift; sourceTree = "<group>"; };
 		7E5700000000000000000022 /* TimelineView+Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+Geometry.swift"; sourceTree = "<group>"; };
@@ -579,6 +589,7 @@
 				D1000000000000000000000D /* CaptureModes */,
 				D10000000000000000000008 /* Recording */,
 				D20000000000000000000001 /* Editor */,
+				7E5700000000000000000060 /* Agent */,
 				D40000000000000000000001 /* Compositor */,
 				D30000000000000000000001 /* Project */,
 				D10000000000000000000009 /* Utilities */,
@@ -814,6 +825,18 @@
 				B2000000000000000000002B /* ResizePopover.swift */,
 			);
 			path = CaptureWindow;
+			sourceTree = "<group>";
+		};
+		7E5700000000000000000060 /* Agent */ = {
+			isa = PBXGroup;
+			children = (
+				7E5700000000000000000061 /* AgentProvider.swift */,
+				7E5700000000000000000063 /* AgentEvent.swift */,
+				7E5700000000000000000065 /* AgentJSONValue.swift */,
+				7E5700000000000000000067 /* ClaudeCodeProvider.swift */,
+				7E5700000000000000000069 /* CodexProvider.swift */,
+			);
+			path = Agent;
 			sourceTree = "<group>";
 		};
 		D20000000000000000000001 /* Editor */ = {
@@ -1235,6 +1258,11 @@
 				099C5B4AFE46AC44C6636A86 /* EditorState+CameraRegions.swift in Sources */,
 				E351B15E58A9971DB73296AD /* EditorState+VideoRegions.swift in Sources */,
 				7E570000000000000000001B /* CutTimeline.swift in Sources */,
+				7E5700000000000000000062 /* AgentProvider.swift in Sources */,
+				7E5700000000000000000064 /* AgentEvent.swift in Sources */,
+				7E5700000000000000000066 /* AgentJSONValue.swift in Sources */,
+				7E5700000000000000000068 /* ClaudeCodeProvider.swift in Sources */,
+				7E570000000000000000006A /* CodexProvider.swift in Sources */,
 				7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */,
 				7E5700000000000000000021 /* TimelineGeometry.swift in Sources */,
 				7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */,
