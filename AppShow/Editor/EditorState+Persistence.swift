@@ -208,12 +208,14 @@ extension EditorState {
       micAudioRegions = savedMicRegions
     }
     externalAudioTracks = data.externalAudioTracks ?? []
-    if let savedCameraRegions = data.cameraRegions, !savedCameraRegions.isEmpty {
+    if let savedCameraRegions = data.cameraRegions {
       cameraRegions = savedCameraRegions
     } else if let legacyRegions = data.cameraFullscreenRegions, !legacyRegions.isEmpty {
       cameraRegions = legacyRegions.map {
         CameraRegionData(id: $0.id, startSeconds: $0.startSeconds, endSeconds: $0.endSeconds, type: .fullscreen)
       }
+    } else {
+      cameraRegions = []
     }
     if let savedVideoRegions = data.videoRegions, !savedVideoRegions.isEmpty {
       videoRegions = CutTimeline(slices: savedVideoRegions, duration: CMTimeGetSeconds(duration)).normalized().slices

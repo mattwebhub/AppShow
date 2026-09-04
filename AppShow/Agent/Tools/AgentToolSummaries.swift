@@ -57,6 +57,13 @@ enum AgentToolSummaries {
       "camera": [
         "present": .bool(media.hasWebcam),
         "enabled": .bool(snapshot.webcamEnabled ?? true),
+        "x": .number(Double(snapshot.cameraLayout.relativeX)),
+        "y": .number(Double(snapshot.cameraLayout.relativeY)),
+        "width": .number(Double(snapshot.cameraLayout.relativeWidth)),
+        "aspect": .string((snapshot.cameraAspect ?? .original).rawValue),
+        "cornerRadius": .number(Double(snapshot.cameraCornerRadius)),
+        "fullscreenFillMode": .string((snapshot.cameraFullscreenFillMode ?? .fit).rawValue),
+        "fullscreenAspect": .string((snapshot.cameraFullscreenAspect ?? .original).rawValue),
         "regions": .array((snapshot.cameraRegions ?? []).map(cameraRegion)),
       ],
       "captions": [
@@ -190,6 +197,8 @@ enum AgentToolSummaries {
       "type": .string(region.type.rawValue),
     ]
     if let entry = region.entryTransition { object["entryTransition"] = .string(entry.rawValue) }
+    object["entryDuration"] = seconds(region.entryTransitionDuration ?? 0.3)
+    object["exitDuration"] = seconds(region.exitTransitionDuration ?? 0.3)
     if let exit = region.exitTransition { object["exitTransition"] = .string(exit.rawValue) }
     return .object(object)
   }

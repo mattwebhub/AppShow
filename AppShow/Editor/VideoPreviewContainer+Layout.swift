@@ -169,12 +169,7 @@ extension VideoPreviewContainer {
         }
 
         let p = cameraTransitionProgress
-        let interpFrame = CGRect(
-          x: pipFrame.origin.x + (fsTargetRect.origin.x - pipFrame.origin.x) * p,
-          y: pipFrame.origin.y + (fsTargetRect.origin.y - pipFrame.origin.y) * p,
-          width: pipFrame.width + (fsTargetRect.width - pipFrame.width) * p,
-          height: pipFrame.height + (fsTargetRect.height - pipFrame.height) * p
-        )
+        let interpFrame = CameraLayout.interpolatedRect(from: pipFrame, to: fsTargetRect, progress: p)
 
         let pipMinDim = min(pipW, pipH)
         let pipRadius = pipMinDim * (currentCameraCornerRadius / 100.0)

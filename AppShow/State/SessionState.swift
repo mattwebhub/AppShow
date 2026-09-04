@@ -20,6 +20,7 @@ final class SessionState {
   var errorMessage: String?
   var cameraPreviewState: CameraPreviewState = .off
   var isCameraOn = false
+  var recordingWebcamPresentation: WebcamPresentation?
   var isMicrophoneOn = false
   var micAudioLevel: Float = 0
   var systemAudioLevel: Float = 0
@@ -29,6 +30,12 @@ final class SessionState {
   var menuBarIconState: MenuBarIcon.State = .idle
 
   init() {
+    options.onWebcamPresentationChange = { [weak self] value in
+      self?.webcamPreviewWindow?.updatePresentation(value)
+    }
+    options.onCameraDeviceChange = { [weak self] in
+      self?.refreshCameraPreview()
+    }
     if ConfigService.shared.isMicrophoneOn, options.selectedMicrophone != nil {
       isMicrophoneOn = true
     }

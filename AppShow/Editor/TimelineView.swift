@@ -44,6 +44,7 @@ struct TimelineView: View {
   @State var audioDragRegionId: UUID?
 
   @State var cameraDragOffset: CGFloat = 0
+  @State var cameraDragAnchorTime: Double = 0
   @State var cameraDragType: RegionDragType?
   @State var cameraDragRegionId: UUID?
   @State var popoverCameraRegionId: UUID?

@@ -2,6 +2,8 @@ import SwiftUI
 
 struct CameraRegionEditPopover: View {
   let region: CameraRegionData
+  let onUpdateStart: (Double) -> Void
+  let onUpdateEnd: (Double) -> Void
   let maxCameraRelativeWidth: CGFloat
   let onChangeType: (CameraRegionType) -> Void
   let onUpdateLayout: (CameraLayout) -> Void
@@ -13,24 +15,29 @@ struct CameraRegionEditPopover: View {
   let onUpdateTransition: (RegionTransitionType?, Double?, RegionTransitionType?, Double?) -> Void
   let onRemove: () -> Void
 
-  @State private var localLayout: CameraLayout = CameraLayout()
-  @State private var localAspect: CameraAspect = .original
-  @State private var localCornerRadius: CGFloat = 8
-  @State private var localShadow: CGFloat = 0
-  @State private var localBorderWidth: CGFloat = 0
-  @State private var localBorderColor: CodableColor = CodableColor(r: 0, g: 0, b: 0, a: 1)
-  @State private var localMirrored: Bool = false
-  @State private var localEntryTransition: RegionTransitionType = .none
-  @State private var localEntryDuration: Double = 0.3
-  @State private var localExitTransition: RegionTransitionType = .none
-  @State private var localExitDuration: Double = 0.3
-  @State private var didInit = false
+  @State var localLayout: CameraLayout = CameraLayout()
+  @State var localAspect: CameraAspect = .original
+  @State var localCornerRadius: CGFloat = 8
+  @State var localShadow: CGFloat = 0
+  @State var localBorderWidth: CGFloat = 0
+  @State var localBorderColor: CodableColor = CodableColor(r: 0, g: 0, b: 0, a: 1)
+  @State var localMirrored: Bool = false
+  @State var localEntryTransition: RegionTransitionType = .none
+  @State var localEntryDuration: Double = 0.3
+  @State var localExitTransition: RegionTransitionType = .none
+  @State var localExitDuration: Double = 0.3
+  @State var didInit = false
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     let _ = colorScheme
     VStack(alignment: .leading, spacing: Layout.regionPopoverSpacing) {
-      SectionHeader(title: "Camera Region")
+      SectionHeader(title: "Webcam section")
+      TimeRangeControls(
+        start: Binding(get: { region.startSeconds }, set: { onUpdateStart($0) }),
+        end: Binding(get: { region.endSeconds }, set: { onUpdateEnd($0) })
+      )
+      .padding(.horizontal, 12)
 
       SegmentPicker(
         items: CameraRegionType.allCases,
@@ -121,95 +128,4 @@ struct CameraRegionEditPopover: View {
     }
   }
 
-  private var customControls: some View {
-    VStack(alignment: .leading, spacing: Layout.itemSpacing) {
-      SectionHeader(icon: "arrow.up.and.down.and.arrow.left.and.right", title: "Position")
-
-      HStack(spacing: 4) {
-        ForEach(
-          Array(
-            zip(
-              [CameraCorner.topLeft, .topRight, .bottomLeft, .bottomRight],
-              ["arrow.up.left", "arrow.up.right", "arrow.down.left", "arrow.down.right"]
-            )
-          ),
-          id: \.1
-        ) { corner, icon in
-          Button {
-            onSetCorner(corner)
-          } label: {
-            Image(systemName: icon)
-              .font(.system(size: FontSize.xs))
-              .frame(width: 28, height: 28)
-              .background(AppShowColors.fieldBackground)
-              .clipShape(RoundedRectangle(cornerRadius: Radius.sm))
-              .overlay(RoundedRectangle(cornerRadius: Radius.sm).strokeBorder(AppShowColors.border))
-          }
-          .buttonStyle(PlainCustomButtonStyle())
-          .foregroundStyle(AppShowColors.primaryText)
-        }
-      }
-
-      SectionHeader(icon: "aspectratio", title: "Aspect Ratio")
-
-      SegmentPicker(
-        items: CameraAspect.allCases,
-        label: { $0.label },
-        selection: $localAspect
-      )
-
-      SectionHeader(icon: "paintbrush", title: "Style")
-
-      SliderRow(
-        label: "Size",
-        value: $localLayout.relativeWidth,
-        range: 0.1...maxCameraRelativeWidth,
-        step: 0.01
-      )
-
-      SliderRow(
-        label: "Radius",
-        value: $localCornerRadius,
-        range: 0...50,
-        formattedValue: "\(Int(localCornerRadius))%"
-      )
-
-      SliderRow(
-        label: "Shadow",
-        value: $localShadow,
-        range: 0...100,
-        formattedValue: "\(Int(localShadow))"
-      )
-
-      SliderRow(
-        label: "Border",
-        value: $localBorderWidth,
-        range: 0...30,
-        step: 0.5,
-        formattedValue: String(format: "%.1f", localBorderWidth)
-      )
-
-      borderColorPickerButton
-
-      ToggleRow(label: "Mirror", isOn: $localMirrored)
-    }
-    .padding(.horizontal, 12)
-    .padding(.vertical, 4)
-  }
-
-  private var transitionControls: some View {
-    TransitionControlsSection(
-      entryTransition: $localEntryTransition,
-      entryDuration: $localEntryDuration,
-      exitTransition: $localExitTransition,
-      exitDuration: $localExitDuration
-    )
-  }
-
-  private var borderColorPickerButton: some View {
-    TailwindColorPicker(
-      color: localBorderColor,
-      onSelect: { localBorderColor = $0 }
-    )
-  }
 }

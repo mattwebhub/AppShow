@@ -537,6 +537,7 @@ struct MutatingToolsTests {
     #expect(
       names.isSuperset(
         of: [
+          "add_camera_region", "update_camera_region", "remove_camera_region",
           "set_trim", "add_zoom", "add_spotlight", "set_kept_slices", "remove_time_range", "remove_silences",
           "add_text", "update_text", "remove_text", "add_image", "update_image", "remove_image", "begin_batch", "end_batch",
           "add_blur", "update_blur", "remove_blur", "set_transition", "add_music", "set_music", "remove_music",

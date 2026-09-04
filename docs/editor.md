@@ -138,3 +138,11 @@ Click a kept slice to select it. Delete/Backspace or the transport trash button 
 Zoom regions have visible edge handles for changing duration and can be dragged to move, including while cut gaps are hidden. Editing an automatically generated zoom converts its keyframes to manual. The drag preview and final keyframes use the same clamped timing calculation.
 
 Assistant replies render separate paragraphs, headings, list rows, and code blocks. Complete provider messages are separated by paragraph breaks; incremental text chunks remain contiguous.
+
+### Webcam recording and focus
+
+Enable **Include webcam** in recording Options, then choose a camera. Options and Settings → Devices offer a corner and size for new recordings. The default is a circular webcam at bottom right, 20% of video width, constrained to fit the canvas. These preferences travel with the recording; reopening an older edit preserves its saved layout.
+
+In the editor’s Webcam properties, **Focus webcam** adds a fullscreen section from the playhead, up to five seconds or the next section/end. It expands from the bubble and returns with a 0.4-second scale animation (short sections shorten transitions). Double-clicking empty space on the Webcam track also adds a focus section. Drag the section to move it or its visible edges to resize it, in source or compressed mode. Click to edit source-second start/end, type and transitions, or remove it. Focus edits use the existing history and project persistence.
+
+The assistant can use `set_camera` with `shape`, `corner`, `width`, `fullscreenFillMode` and `fullscreenAspect`, and `add_camera_region`, `update_camera_region`, `remove_camera_region`. Region tools accept source times, stable IDs and entry/exit animation settings. Regions cannot overlap and require recorded webcam media. The timeline result reports current layout and transition durations.

@@ -39,6 +39,8 @@ extension SessionState {
       throw CaptureError.invalidTransition(from: "\(state)", to: "recording")
     }
 
+    recordingWebcamPresentation = options.webcamPresentation.normalized
+
     if captureMode == .device, let capture = deviceCapture {
       try await startDeviceRecordingInternal(capture: capture)
       return
@@ -151,7 +153,7 @@ extension SessionState {
 
     let sourceName = projectSourceName()
 
-    guard let result = try await recordingCoordinator?.stopRecordingRaw(keepWebcamAlive: false) else {
+    guard var result = try await recordingCoordinator?.stopRecordingRaw(keepWebcamAlive: false) else {
       recordingCoordinator = nil
       captureTarget = nil
       captureMode = .none
@@ -163,6 +165,8 @@ extension SessionState {
       return
     }
 
+    result.webcamPresentation = result.webcamVideoURL == nil ? nil : recordingWebcamPresentation
+    recordingWebcamPresentation = nil
     SoundEffect.stopRecording.play()
     recordingCoordinator = nil
     captureTarget = nil

@@ -2,6 +2,27 @@ import CoreMedia
 import Foundation
 
 extension EditorState {
+  @discardableResult
+  func focusWebcam(atTime time: Double) -> UUID? {
+    guard hasWebcam, webcamEnabled, !isExporting, time.isFinite else { return nil }
+    let start = max(0, time)
+    guard !cameraRegions.contains(where: { start >= $0.startSeconds && start < $0.endSeconds }) else { return nil }
+    let end = min(start + 5, cameraRegions.first(where: { $0.startSeconds > start })?.startSeconds ?? duration.seconds)
+    guard end - start >= 0.05 else { return nil }
+    var region = CameraRegionData(startSeconds: start, endSeconds: end)
+    region.entryTransition = .scale
+    region.exitTransition = .scale
+    region.entryTransitionDuration = min(0.4, (end - start) / 2)
+    region.exitTransitionDuration = min(0.4, (end - start) / 2)
+    pendingUndoTask?.cancel()
+    history.pushSnapshot(createSnapshot())
+    cameraRegions.append(region)
+    cameraRegions.sort { $0.startSeconds < $1.startSeconds }
+    history.pushSnapshot(createSnapshot(), label: "Focus webcam")
+    scheduleSave()
+    return region.id
+  }
+
   func isCameraFullscreen(at time: Double) -> Bool {
     cameraRegions.contains { $0.type == .fullscreen && time >= $0.startSeconds && time <= $0.endSeconds }
   }
@@ -110,6 +131,7 @@ extension EditorState {
     if let entryDuration { cameraRegions[idx].entryTransitionDuration = entryDuration }
     if let exitTransition { cameraRegions[idx].exitTransition = exitTransition }
     if let exitDuration { cameraRegions[idx].exitTransitionDuration = exitDuration }
+    cameraRegions[idx].clampTransitionDurations()
   }
 
   func addCameraRegion(atTime time: Double, type: CameraRegionType = .fullscreen) {
@@ -178,10 +200,11 @@ extension EditorState {
   }
 
   func updateCameraRegionStart(regionId: UUID, newStart: Double) {
-    guard let idx = cameraRegions.firstIndex(where: { $0.id == regionId }) else { return }
+    guard newStart.isFinite, let idx = cameraRegions.firstIndex(where: { $0.id == regionId }) else { return }
     let minStart: Double = idx > 0 ? cameraRegions[idx - 1].endSeconds : 0
-    let maxStart = cameraRegions[idx].endSeconds - 0.01
+    let maxStart = cameraRegions[idx].endSeconds - 0.05
     cameraRegions[idx].startSeconds = max(minStart, min(maxStart, newStart))
+    cameraRegions[idx].clampTransitionDurations()
     cameraRegions.sort { $0.startSeconds < $1.startSeconds }
   }
 
@@ -191,8 +214,9 @@ extension EditorState {
     let maxEnd: Double =
       idx < cameraRegions.count - 1
       ? cameraRegions[idx + 1].startSeconds : dur
-    let minEnd = cameraRegions[idx].startSeconds + 0.01
+    let minEnd = cameraRegions[idx].startSeconds + 0.05
     cameraRegions[idx].endSeconds = max(minEnd, min(maxEnd, newEnd))
+    cameraRegions[idx].clampTransitionDurations()
     cameraRegions.sort { $0.startSeconds < $1.startSeconds }
   }
 
@@ -208,5 +232,13 @@ extension EditorState {
     cameraRegions[idx].startSeconds = clampedStart
     cameraRegions[idx].endSeconds = clampedStart + regionDuration
     cameraRegions.sort { $0.startSeconds < $1.startSeconds }
+  }
+}
+
+extension CameraRegionData {
+  mutating func clampTransitionDurations() {
+    let half = max(0, (endSeconds - startSeconds) / 2)
+    entryTransitionDuration = min(half, max(0, entryTransitionDuration ?? 0.3))
+    exitTransitionDuration = min(half, max(0, exitTransitionDuration ?? 0.3))
   }
 }

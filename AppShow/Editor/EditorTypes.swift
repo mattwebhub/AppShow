@@ -107,6 +107,17 @@ enum AudioTrackType {
   case system, mic
 }
 
-enum CameraCorner {
+enum CameraCorner: String, Codable, Sendable, CaseIterable, Identifiable {
   case topLeft, topRight, bottomLeft, bottomRight
+
+  var id: String { rawValue }
+
+  var label: String {
+    switch self {
+    case .topLeft: "Top left"
+    case .topRight: "Top right"
+    case .bottomLeft: "Bottom left"
+    case .bottomRight: "Bottom right"
+    }
+  }
 }

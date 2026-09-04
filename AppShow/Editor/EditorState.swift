@@ -350,7 +350,14 @@ final class EditorState {
       syncNoiseReduction()
       regenerateSmoothedCursor()
     } else if hasWebcam {
-      setCameraCorner(.bottomRight)
+      if let presentation = result.webcamPresentation {
+        cameraAspect = .ratio1x1
+        cameraCornerRadius = 50
+        cameraFullscreenFillMode = .fill
+        cameraLayout = presentation.layout(canvasSize: canvasSize(for: result.screenSize))
+      } else {
+        setCameraCorner(.bottomRight)
+      }
     }
 
     if let proj = project, let historyData = proj.loadHistory() {

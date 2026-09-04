@@ -212,7 +212,14 @@ extension VideoCompositor {
             entryTransition: region.entryTransition,
             entryDuration: region.entryDuration,
             exitTransition: region.exitTransition,
-            exitDuration: region.exitDuration
+            exitDuration: region.exitDuration,
+            transitionTimeRange: CMTimeRange(
+              start: CMTimeAdd(
+                (region.transitionTimeRange ?? region.timeRange).start,
+                CMTime(seconds: compStart - segStart, preferredTimescale: 600)
+              ),
+              duration: (region.transitionTimeRange ?? region.timeRange).duration
+            )
           )
         )
       }
@@ -230,7 +237,11 @@ extension VideoCompositor {
         entryTransition: region.entryTransition,
         entryDuration: region.entryDuration,
         exitTransition: region.exitTransition,
-        exitDuration: region.exitDuration
+        exitDuration: region.exitDuration,
+        transitionTimeRange: CMTimeRange(
+          start: CMTimeSubtract((region.transitionTimeRange ?? region.timeRange).start, effectiveTrim.start),
+          duration: (region.transitionTimeRange ?? region.timeRange).duration
+        )
       )
     ]
   }

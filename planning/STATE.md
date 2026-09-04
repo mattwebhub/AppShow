@@ -38,6 +38,12 @@ Verification: `make format`, `make lint`, `make build`, 690 tests in 76 suites, 
 
 The focused review at `planning/reviews/2026-09-04-publication-review.md` patches trim/export consistency, saved trim reopening, renamed conversation persistence and bridge relocation, canceled request queues and unfinished batches, music gain after cuts, confirmation text, and export progress cleanup. The 694-test full suite, additional saved-trim regression, 8 bridge tests, 5 gated exports, format, lint and warning-free Debug build pass. Changes are committed locally, with no GitHub publication.
 
+## Webcam presentation
+
+Milestone 10 is code-complete on local branch `webcam-presentation-and-review`: Include webcam, saved corner/size defaults, circular new-recording layout, timed Focus webcam with animated expansion/return, source/compressed timeline editing, numeric timing, and MCP camera-region CRUD. Existing projects retain saved styling. Camera Undo, SDR/HDR fullscreen parity and cut-boundary transition timing were corrected with regressions.
+
+Verification: 707 tests in 78 suites, 6 gated export tests (including SDR and HDR webcam-focus cases), format, lint, warning-free Debug build and project validation pass. Real camera, drag interaction and live-provider checks remain manual in milestone 10 VERIFY.md. No changes have been pushed.
+
 ## Accepted product decisions
 
 - Final product name: AppShow. Keep inherited names and identifiers during feature development, then perform one pre-release identity migration (ADR 0005).
@@ -54,6 +60,6 @@ The focused review at `planning/reviews/2026-09-04-publication-review.md` patche
 
 ## Next
 
-1. Run the remaining human UI rows for milestone 06 and review its stacked PR.
+1. Restart the updated Debug build and run milestone 10’s real-webcam and interaction checks, then the remaining milestone 06 rows.
 2. Human runs the manual rows for milestones 02, 03, 04, and 07.
 3. Review green milestone 09 PR #10 and arrange Developer ID signing/notarization before a public release.

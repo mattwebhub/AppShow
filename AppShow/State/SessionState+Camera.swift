@@ -5,13 +5,36 @@ import ScreenCaptureKit
 @MainActor
 extension SessionState {
   func toggleCamera() {
-    guard options.selectedCamera != nil else { return }
+    guard options.selectedCamera != nil || isCameraOn else { return }
     isCameraOn.toggle()
     if isCameraOn {
       startCameraPreview()
     } else {
       stopCameraPreview()
     }
+  }
+
+  func setWebcamIncluded(_ included: Bool) {
+    if included && options.selectedCamera == nil {
+      options.selectedCamera = options.availableCameras.first
+    }
+    guard !included || options.selectedCamera != nil else { return }
+    guard included != isCameraOn else { return }
+    toggleCamera()
+  }
+
+  func refreshCameraPreview() {
+    switch state {
+    case .recording, .paused, .processing: return
+    default: break
+    }
+    guard isCameraOn else { return }
+    guard options.selectedCamera != nil else {
+      isCameraOn = false
+      stopCameraPreview()
+      return
+    }
+    startCameraPreview()
   }
 
   private func startCameraPreview() {
@@ -21,6 +44,7 @@ extension SessionState {
     cameraPreviewState = .starting
 
     let previewWindow = WebcamPreviewWindow()
+    previewWindow.updatePresentation(options.webcamPresentation)
     previewWindow.showLoading()
     webcamPreviewWindow = previewWindow
 
@@ -75,6 +99,7 @@ extension SessionState {
   func showCameraPreviewIfNeeded(from box: SendableBox<AVCaptureSession>?) {
     if let camSession = box?.session {
       let previewWindow = WebcamPreviewWindow()
+      previewWindow.updatePresentation(options.webcamPresentation)
       previewWindow.show(captureSession: camSession)
       if options.hideCameraPreviewWhileRecording {
         previewWindow.hide()

@@ -326,7 +326,7 @@ extension FrameRenderer {
 
   // MARK: - Webcam Compositing
 
-  private static func hdrComposeWebcam(
+  static func hdrComposeWebcam(
     webcamImage: CIImage,
     over background: CIImage,
     instruction: CompositionInstruction,
@@ -343,11 +343,47 @@ extension FrameRenderer {
       let webcamSize = webcamImage.extent.size
       let drawRect: CGRect
       if instruction.cameraFullscreenAspect == .original {
-        drawRect = AVMakeRect(aspectRatio: webcamSize, insideRect: fullRect)
+        drawRect = fullRect
       } else {
         let targetAspect = instruction.cameraFullscreenAspect.aspectRatio(webcamSize: webcamSize)
         let virtualSize = CGSize(width: targetAspect * 1000, height: 1000)
         drawRect = AVMakeRect(aspectRatio: virtualSize, insideRect: fullRect)
+      }
+
+      if let transition = regionTransition, transition.progress < 1,
+        transition.type == .scale || transition.type == .slide,
+        let camera = resolveCamera(
+          instruction: instruction,
+          compositionTime: compositionTime,
+          outputWidth: outputWidth,
+          outputHeight: outputHeight
+        )
+      {
+        let pip = CGRect(
+          x: camera.rect.minX,
+          y: CGFloat(outputHeight) - camera.rect.maxY,
+          width: camera.rect.width,
+          height: camera.rect.height
+        )
+        let rect = CameraLayout.interpolatedRect(from: pip, to: drawRect, progress: transition.progress)
+        let radius = camera.cornerRadius * (1 - transition.progress)
+        let border = camera.borderWidth * (1 - transition.progress)
+        var layer = hdrFitWebcam(webcamImage, in: rect, fillMode: .fill)
+        if camera.mirrored { layer = hdrMirror(layer, centerX: rect.midX) }
+        layer = hdrApplyRoundedRectMask(to: layer, rect: rect, cornerRadius: radius)
+        if border > 0 {
+          let inner = rect.insetBy(dx: border, dy: border)
+          var innerLayer = hdrFitWebcam(webcamImage, in: inner, fillMode: .fill)
+          if camera.mirrored { innerLayer = hdrMirror(innerLayer, centerX: inner.midX) }
+          innerLayer = hdrApplyRoundedRectMask(to: innerLayer, rect: inner, cornerRadius: max(0, radius - border))
+          let borderLayer = hdrApplyRoundedRectMask(
+            to: CIImage(color: CIColor(cgColor: camera.borderColor)).cropped(to: rect),
+            rect: rect,
+            cornerRadius: radius
+          )
+          layer = innerLayer.composited(over: borderLayer)
+        }
+        return layer.composited(over: result)
       }
 
       if regionTransition == nil || regionTransition!.type == .none {
