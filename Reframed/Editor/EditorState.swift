@@ -61,6 +61,7 @@ final class EditorState {
   var spotlightDimOpacity: CGFloat = 0.6
   var spotlightEdgeSoftness: CGFloat = 50
   var spotlightRegions: [SpotlightRegionData] = []
+  var textOverlays: [TextOverlayData] = []
 
   var clickSoundEnabled: Bool = false
   var clickSoundVolume: Float = 0.5
@@ -308,6 +309,9 @@ final class EditorState {
       } else if spotlightEnabled && saved.spotlightRegions == nil {
         let dur = CMTimeGetSeconds(playerController.duration)
         spotlightRegions = [SpotlightRegionData(startSeconds: 0, endSeconds: dur)]
+      }
+      if let savedTextOverlays = saved.textOverlays, !savedTextOverlays.isEmpty {
+        textOverlays = savedTextOverlays
       }
       if let audioSettings = saved.audioSettings {
         systemAudioVolume = audioSettings.systemAudioVolume
