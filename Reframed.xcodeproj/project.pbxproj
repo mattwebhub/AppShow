@@ -50,6 +50,10 @@
 		7E570000000000000000006C /* AgentError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000006B /* AgentError.swift */; };
 		7E570000000000000000006E /* AgentProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000006D /* AgentProcessRunner.swift */; };
 		7E5700000000000000000070 /* AgentToolchain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000006F /* AgentToolchain.swift */; };
+		7E5700000000000000000072 /* AgentThreadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000071 /* AgentThreadData.swift */; };
+		7E5700000000000000000074 /* AgentThreadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000073 /* AgentThreadStore.swift */; };
+		7E5700000000000000000076 /* AgentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000075 /* AgentSession.swift */; };
+		7E5700000000000000000078 /* AgentTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000077 /* AgentTranscript.swift */; };
 		7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000001C /* TimelineView+CutTrack.swift */; };
 		7E5700000000000000000021 /* TimelineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000020 /* TimelineGeometry.swift */; };
 		7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000022 /* TimelineView+Geometry.swift */; };
@@ -319,6 +323,10 @@
 		7E570000000000000000006B /* AgentError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentError.swift; sourceTree = "<group>"; };
 		7E570000000000000000006D /* AgentProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentProcessRunner.swift; sourceTree = "<group>"; };
 		7E570000000000000000006F /* AgentToolchain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolchain.swift; sourceTree = "<group>"; };
+		7E5700000000000000000071 /* AgentThreadData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentThreadData.swift; sourceTree = "<group>"; };
+		7E5700000000000000000073 /* AgentThreadStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentThreadStore.swift; sourceTree = "<group>"; };
+		7E5700000000000000000075 /* AgentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSession.swift; sourceTree = "<group>"; };
+		7E5700000000000000000077 /* AgentTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentTranscript.swift; sourceTree = "<group>"; };
 		7E570000000000000000001C /* TimelineView+CutTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CutTrack.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000020 /* TimelineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineGeometry.swift; sourceTree = "<group>"; };
 		7E5700000000000000000022 /* TimelineView+Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+Geometry.swift"; sourceTree = "<group>"; };
@@ -844,6 +852,10 @@
 				7E570000000000000000006B /* AgentError.swift */,
 				7E570000000000000000006D /* AgentProcessRunner.swift */,
 				7E570000000000000000006F /* AgentToolchain.swift */,
+				7E5700000000000000000071 /* AgentThreadData.swift */,
+				7E5700000000000000000073 /* AgentThreadStore.swift */,
+				7E5700000000000000000075 /* AgentSession.swift */,
+				7E5700000000000000000077 /* AgentTranscript.swift */,
 			);
 			path = Agent;
 			sourceTree = "<group>";
@@ -1275,6 +1287,10 @@
 				7E570000000000000000006C /* AgentError.swift in Sources */,
 				7E570000000000000000006E /* AgentProcessRunner.swift in Sources */,
 				7E5700000000000000000070 /* AgentToolchain.swift in Sources */,
+				7E5700000000000000000072 /* AgentThreadData.swift in Sources */,
+				7E5700000000000000000074 /* AgentThreadStore.swift in Sources */,
+				7E5700000000000000000076 /* AgentSession.swift in Sources */,
+				7E5700000000000000000078 /* AgentTranscript.swift in Sources */,
 				7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */,
 				7E5700000000000000000021 /* TimelineGeometry.swift in Sources */,
 				7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */,

@@ -51,6 +51,7 @@ actor AgentProcessRunner {
   private var standardOutputFinished = false
   private var standardErrorFinished = false
   private var terminated = false
+  private var cancelledBeforeLaunch = false
   private var failure: AgentError?
   private var killTask: Task<Void, Never>?
   private var forceFinishTask: Task<Void, Never>?
@@ -66,6 +67,10 @@ actor AgentProcessRunner {
     let (stream, continuation) = AsyncThrowingStream<String, Error>.makeStream()
     guard !isRunning else {
       continuation.finish(throwing: AgentError.alreadyRunning)
+      return stream
+    }
+    guard !cancelledBeforeLaunch else {
+      continuation.finish(throwing: AgentError.cancelled)
       return stream
     }
     resetState()
@@ -112,7 +117,10 @@ actor AgentProcessRunner {
   }
 
   func cancel() {
-    guard let process, isRunning else { return }
+    guard let process, isRunning else {
+      cancelledBeforeLaunch = true
+      return
+    }
     if failure == nil {
       failure = .cancelled
     }
