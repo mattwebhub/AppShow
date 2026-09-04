@@ -70,7 +70,7 @@ struct ClaudeCodeProviderTests {
         .toolCallStarted(
           id: "toolu_01GU1tRDPHffpwKnUaexW1Mw",
           name: "Read",
-          input: #"{"file_path":"/Users/example/Movies/AppShow/demo.frm/note.txt"}"#
+          input: #"{"file_path":"/Users/example/Movies/Reframed/demo.frm/note.txt"}"#
         )
       ]
     )
