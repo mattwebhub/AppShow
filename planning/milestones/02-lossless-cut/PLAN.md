@@ -12,7 +12,7 @@ Mirror of `planning/features/lossless-cut/TASKS.md`; tick both.
 - [x] T2. P4 transport button. Proof: `canCut` tests, manual check of enabled state.
 - [x] T3. P3 Cuts track. Proof: `showCutTrack`/`gaps` tests; manual animation check.
 - [x] T4. P5 playback jumping (T2 rows wait for the milestone 01 fixture). Proof: `SyncedPlayerControllerTests`, `EditorStatePlaybackTests`.
-- [ ] T5. P2 persistence + history. Proof: `ProjectMetadataTests`, `HistoryChangeRulesTests`, `EditorStateVideoRegionsTests`.
+- [x] T5. P2 persistence + history (T2 rows wait for the milestone 01 fixture). Proof: `ProjectMetadataTests`, `HistoryChangeRulesTests`, `EditorStateVideoRegionsTests`.
 - [ ] T6. P7 unit rows + seam S3. Proof: `EditorStateExportTests`.
 - [ ] T7. P6 compressed timeline. Proof: `TimelineGeometryTests`, manual alignment check.
 - [ ] T8. P7 gated export run. Proof: `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests`.

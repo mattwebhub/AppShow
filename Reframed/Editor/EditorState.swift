@@ -301,7 +301,7 @@ final class EditorState {
         }
       }
       if let savedVideoRegions = saved.videoRegions, !savedVideoRegions.isEmpty {
-        videoRegions = savedVideoRegions
+        videoRegions = CutTimeline(slices: savedVideoRegions, duration: dur).normalized().slices
       }
       if let savedSpotlightRegions = saved.spotlightRegions, !savedSpotlightRegions.isEmpty {
         spotlightRegions = savedSpotlightRegions
