@@ -40,6 +40,7 @@ extension VideoCompositor {
       || (config.captionsEnabled && !config.captionSegments.isEmpty)
       || (!config.spotlightRegions.isEmpty && config.cursorSnapshot != nil)
       || clickSoundURL != nil
+      || !config.externalAudioTracks.isEmpty
   }
 
   static func computeCanvasSize(

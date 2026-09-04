@@ -188,7 +188,8 @@ extension EditorState {
       spotlightEdgeSoftness: spotlightEdgeSoftness,
       clickSoundEnabled: clickSoundEnabled && showCursor,
       clickSoundVolume: clickSoundVolume,
-      clickSoundStyle: clickSoundStyle
+      clickSoundStyle: clickSoundStyle,
+      externalAudioTracks: Self.exportExternalAudioTracks(from: externalAudioTracks, bundleURL: project?.bundleURL)
     )
 
     let state = self

@@ -107,6 +107,27 @@ extension EditorState {
     }
   }
 
+  nonisolated static func exportExternalAudioTracks(
+    from tracks: [ExternalAudioTrackData],
+    bundleURL: URL?
+  ) -> [ExternalAudioExportTrack] {
+    guard let bundleURL else { return [] }
+    return tracks.compactMap { track in
+      guard track.effectiveVolume > 0, track.lengthSeconds > 0 else { return nil }
+      return ExternalAudioExportTrack(
+        url: bundleURL.appendingPathComponent(track.fileName),
+        timelineRange: CMTimeRange(
+          start: CMTime(seconds: track.timelineStartSeconds, preferredTimescale: 600),
+          end: CMTime(seconds: track.timelineEndSeconds, preferredTimescale: 600)
+        ),
+        fileStart: CMTime(seconds: track.fileInSeconds, preferredTimescale: 600),
+        volume: track.effectiveVolume,
+        fadeIn: CMTime(seconds: track.fadeInSeconds, preferredTimescale: 600),
+        fadeOut: CMTime(seconds: track.fadeOutSeconds, preferredTimescale: 600)
+      )
+    }
+  }
+
   func syncExternalAudioToPlayer() {
     var urls: [UUID: URL] = [:]
     for track in externalAudioTracks {
