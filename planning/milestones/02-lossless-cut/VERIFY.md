@@ -14,4 +14,6 @@
 
 Manual rows (pre-feature project, cut flow, undo, export audition, compressed alignment) need a human with the app; steps for compressed mode are in the P6 report summarized in `planning/features/lossless-cut/TASKS.md`.
 
+CI: pass on PR #3.
+
 Closed on: pending manual checks; PR https://github.com/mattwebhub/Reframed/pull/3
