@@ -4,85 +4,74 @@ import Logging
 @MainActor
 @Observable
 final class AgentTranscript {
-  private(set) var threads: [AgentThreadData] = []
-  private(set) var activeThreadID: UUID?
+  private(set) var conversation: AgentConversationData
   private(set) var isRunning = false
   private(set) var isCancelled = false
   private(set) var streamingMessageID: UUID?
   private(set) var lastError: String?
 
-  let store: AgentThreadStore?
+  let store: AgentConversationStore?
   private let logger = Logger(label: "eu.jankuri.reframed.agent-transcript")
   private var turnTask: Task<Void, Never>?
   private var session: AgentSession?
 
-  init(store: AgentThreadStore?) {
+  init(store: AgentConversationStore?, defaultProvider: AgentProviderKind = .claudeCode) {
     self.store = store
-    if let store {
-      threads = (try? store.list()) ?? []
-      activeThreadID = threads.first?.id
-    }
-  }
-
-  var activeThread: AgentThreadData? {
-    threads.first { $0.id == activeThreadID }
+    conversation = store.flatMap { try? $0.load() } ?? AgentConversationData(provider: defaultProvider)
   }
 
   var messages: [AgentMessageData] {
-    activeThread?.messages ?? []
+    conversation.messages
+  }
+
+  var provider: AgentProviderKind {
+    conversation.provider
+  }
+
+  var resumeIDs: [AgentProviderKind: String] {
+    conversation.resumeIDs
+  }
+
+  func setProvider(_ provider: AgentProviderKind) {
+    conversation.provider = provider
+    persist()
   }
 
   @discardableResult
-  func createThread(title: String, provider: AgentProviderKind) -> AgentThreadData {
-    let thread = AgentThreadData(title: title, provider: provider)
-    threads.insert(thread, at: 0)
-    activeThreadID = thread.id
-    persist(thread)
-    return thread
-  }
-
-  func selectThread(id: UUID) {
-    guard threads.contains(where: { $0.id == id }) else { return }
-    activeThreadID = id
-  }
-
-  func renameThread(id: UUID, to title: String) {
-    guard let index = threads.firstIndex(where: { $0.id == id }) else { return }
-    threads[index].title = title
-    persist(threads[index])
-  }
-
-  func deleteThread(id: UUID) {
-    guard let index = threads.firstIndex(where: { $0.id == id }) else { return }
-    threads.remove(at: index)
+  func clear() -> Bool {
+    guard !isRunning else { return false }
+    conversation = AgentConversationData(provider: conversation.provider)
+    streamingMessageID = nil
+    isCancelled = false
+    lastError = nil
     if let store {
       do {
-        try store.delete(id: id)
+        try store.clear()
       } catch {
-        logger.error("Failed to delete agent thread: \(error.localizedDescription)")
+        logger.error("Failed to clear agent conversation: \(error.localizedDescription)")
+        return false
       }
     }
-    if activeThreadID == id {
-      activeThreadID = threads.max { $0.lastActivityAt < $1.lastActivityAt }?.id
-    }
+    return true
   }
 
   @discardableResult
   func appendUserMessage(_ text: String) -> AgentMessageData {
     let message = AgentMessageData(role: .user, content: [.text(text)], status: .completed)
-    mutateActiveThread { thread in
-      thread.messages.append(message)
-      thread.lastActivityAt = message.createdAt
+    mutateConversation { conversation in
+      conversation.messages.append(message)
+      conversation.lastActivityAt = message.createdAt
     }
+    persist()
     return message
   }
 
   @discardableResult
   func beginAssistantMessage() -> UUID {
     let message = AgentMessageData(role: .assistant, content: [], status: .streaming)
-    mutateActiveThread { thread in
-      thread.messages.append(message)
-      thread.lastActivityAt = message.createdAt
+    mutateConversation { conversation in
+      conversation.messages.append(message)
+      conversation.lastActivityAt = message.createdAt
     }
     streamingMessageID = message.id
     isRunning = true
@@ -94,7 +83,7 @@ final class AgentTranscript {
   func apply(_ event: AgentEvent) {
     switch event {
     case .sessionStarted(let id):
-      mutateActiveThread { $0.sessionID = id }
+      mutateConversation { $0.resumeIDs[$0.provider] = id }
     case .textDelta(let text):
       mutateStreamingMessage { message in
         if case .text(let existing)? = message.content.last {
@@ -165,9 +154,7 @@ final class AgentTranscript {
     }
     streamingMessageID = nil
     isRunning = false
-    if let thread = activeThread {
-      persist(thread)
-    }
+    persist()
   }
 
   func markCancelled() {
@@ -177,13 +164,11 @@ final class AgentTranscript {
     streamingMessageID = nil
     isRunning = false
     isCancelled = true
-    if let thread = activeThread {
-      persist(thread)
-    }
+    persist()
   }
 
   func send(_ prompt: String, using session: AgentSession) {
-    guard !isRunning, activeThreadID != nil else { return }
+    guard !isRunning else { return }
     self.session = session
     appendUserMessage(prompt)
     beginAssistantMessage()
@@ -222,26 +207,25 @@ final class AgentTranscript {
     }
   }
 
-  private func mutateActiveThread(_ change: (inout AgentThreadData) -> Void) {
-    guard let index = threads.firstIndex(where: { $0.id == activeThreadID }) else { return }
-    change(&threads[index])
+  private func mutateConversation(_ change: (inout AgentConversationData) -> Void) {
+    change(&conversation)
   }
 
   private func mutateStreamingMessage(_ change: (inout AgentMessageData) -> Void) {
     guard let streamingMessageID else { return }
-    mutateActiveThread { thread in
-      guard let index = thread.messages.firstIndex(where: { $0.id == streamingMessageID }) else { return }
-      change(&thread.messages[index])
-      thread.lastActivityAt = AgentTimestamp.now()
+    mutateConversation { conversation in
+      guard let index = conversation.messages.firstIndex(where: { $0.id == streamingMessageID }) else { return }
+      change(&conversation.messages[index])
+      conversation.lastActivityAt = AgentTimestamp.now()
     }
   }
 
-  private func persist(_ thread: AgentThreadData) {
+  private func persist() {
     guard let store else { return }
     do {
-      try store.save(thread)
+      try store.save(conversation)
     } catch {
-      logger.error("Failed to save agent thread: \(error.localizedDescription)")
+      logger.error("Failed to save agent conversation: \(error.localizedDescription)")
     }
   }
 }
