@@ -46,6 +46,7 @@
 		7E5700000000000000000021 /* TimelineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000020 /* TimelineGeometry.swift */; };
 		7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000022 /* TimelineView+Geometry.swift */; };
 		7E5700000000000000000025 /* RegionCutMarkers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000024 /* RegionCutMarkers.swift */; };
+		7E5700000000000000000083 /* SilenceAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000082 /* SilenceAnalysis.swift */; };
 		7E5700000000000000000081 /* SilenceDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000080 /* SilenceDetector.swift */; };
 		828909551C8795EF72269706 /* PropertiesPanel+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C03E11186EDDA74B1B6958 /* PropertiesPanel+Background.swift */; };
 		86BD45F487E80051EC653B68 /* CursorRenderer+Shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC84C35E4DD49FCEA9DE6CBB /* CursorRenderer+Shapes.swift */; };
@@ -308,6 +309,7 @@
 		7E5700000000000000000020 /* TimelineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineGeometry.swift; sourceTree = "<group>"; };
 		7E5700000000000000000022 /* TimelineView+Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+Geometry.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000024 /* RegionCutMarkers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionCutMarkers.swift; sourceTree = "<group>"; };
+		7E5700000000000000000082 /* SilenceAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilenceAnalysis.swift; sourceTree = "<group>"; };
 		7E5700000000000000000080 /* SilenceDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilenceDetector.swift; sourceTree = "<group>"; };
 		815C681612F3844727C988EF /* CaptureToolbar+ModeSelection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CaptureToolbar+ModeSelection.swift"; sourceTree = "<group>"; };
 		8BF80E50CD7B9915C3047A7C /* EditorState+Playback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+Playback.swift"; sourceTree = "<group>"; };
@@ -868,6 +870,7 @@
 				7E570000000000000000001C /* TimelineView+CutTrack.swift */,
 				7E5700000000000000000020 /* TimelineGeometry.swift */,
 				7E5700000000000000000022 /* TimelineView+Geometry.swift */,
+				7E5700000000000000000082 /* SilenceAnalysis.swift */,
 				7E5700000000000000000080 /* SilenceDetector.swift */,
 				E8596CD61869ECC16EAECA92 /* EditorState+CameraLayout.swift */,
 				B2354223AAA382DB82EF31D5 /* EditorState+Zoom.swift */,
@@ -1242,6 +1245,7 @@
 				7E5700000000000000000021 /* TimelineGeometry.swift in Sources */,
 				7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */,
 				7E5700000000000000000025 /* RegionCutMarkers.swift in Sources */,
+				7E5700000000000000000083 /* SilenceAnalysis.swift in Sources */,
 				7E5700000000000000000081 /* SilenceDetector.swift in Sources */,
 				77030A22115111C9D1325490 /* EditorState+CameraLayout.swift in Sources */,
 				D231D2CA1110B032A7D42474 /* EditorState+Zoom.swift in Sources */,
