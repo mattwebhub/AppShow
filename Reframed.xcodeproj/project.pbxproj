@@ -41,6 +41,7 @@
 		7C1A78C769C856DC34BD3318 /* VideoPreviewContainer+Interaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3469C70747A78B7BDD2B5C /* VideoPreviewContainer+Interaction.swift */; };
 		7E570000000000000000000D /* LaunchEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000000C /* LaunchEnvironment.swift */; };
 		7E570000000000000000000F /* ReframedPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000000E /* ReframedPaths.swift */; };
+		7E570000000000000000001B /* CutTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000001A /* CutTimeline.swift */; };
 		828909551C8795EF72269706 /* PropertiesPanel+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C03E11186EDDA74B1B6958 /* PropertiesPanel+Background.swift */; };
 		86BD45F487E80051EC653B68 /* CursorRenderer+Shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC84C35E4DD49FCEA9DE6CBB /* CursorRenderer+Shapes.swift */; };
 		922F814E886E4D2B242E4541 /* VideoPreviewContainer+Cursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17A303B9C60827322EAE0A9 /* VideoPreviewContainer+Cursor.swift */; };
@@ -297,6 +298,7 @@
 		7E5700000000000000000002 /* ReframedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReframedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E570000000000000000000C /* LaunchEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchEnvironment.swift; sourceTree = "<group>"; };
 		7E570000000000000000000E /* ReframedPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReframedPaths.swift; sourceTree = "<group>"; };
+		7E570000000000000000001A /* CutTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CutTimeline.swift; sourceTree = "<group>"; };
 		815C681612F3844727C988EF /* CaptureToolbar+ModeSelection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CaptureToolbar+ModeSelection.swift"; sourceTree = "<group>"; };
 		8BF80E50CD7B9915C3047A7C /* EditorState+Playback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+Playback.swift"; sourceTree = "<group>"; };
 		93CAA4A89B98885B510AB739 /* TimelineView+Shared.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "TimelineView+Shared.swift"; sourceTree = "<group>"; };
@@ -851,6 +853,7 @@
 				6EE449D73A2EC8D96C664647 /* EditorState+AudioRegions.swift */,
 				E1183EC0D0DA57B9B73BC950 /* EditorState+CameraRegions.swift */,
 				C8427D1DE351C8DEC7E3104F /* EditorState+VideoRegions.swift */,
+				7E570000000000000000001A /* CutTimeline.swift */,
 				E8596CD61869ECC16EAECA92 /* EditorState+CameraLayout.swift */,
 				B2354223AAA382DB82EF31D5 /* EditorState+Zoom.swift */,
 				3596F81A6E600975B1EB8104 /* EditorState+Cursor.swift */,
@@ -1219,6 +1222,7 @@
 				59A4F86AAF355E2353596D35 /* EditorState+AudioRegions.swift in Sources */,
 				099C5B4AFE46AC44C6636A86 /* EditorState+CameraRegions.swift in Sources */,
 				E351B15E58A9971DB73296AD /* EditorState+VideoRegions.swift in Sources */,
+				7E570000000000000000001B /* CutTimeline.swift in Sources */,
 				77030A22115111C9D1325490 /* EditorState+CameraLayout.swift in Sources */,
 				D231D2CA1110B032A7D42474 /* EditorState+Zoom.swift in Sources */,
 				3FD352F00D9D9EE89C9A34AB /* EditorState+Cursor.swift in Sources */,
