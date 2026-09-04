@@ -8,7 +8,7 @@
 | 03 | music-tracks | Feature 02: external audio in the bundle, track UI, preview sync, export mix (`docs/features/02-music-tracks/`) | code complete; PR #5 |
 | 04 | agent-chat | Feature 03: collapsible chat panel with Claude Code / Codex providers, ported from Toone (`docs/features/03-agent-chat/`) | code complete; PR #6 |
 | 05 | agent-tools-readonly | Feature 04 part 1: MCP transport and read-only project tools (`docs/features/04-agent-tools/`) | code complete; PR #7 |
-| 06 | agent-tools-editing | Feature 04 part 2: mutating tools for existing editor features with live feedback and undo | planned |
+| 06 | agent-tools-editing | Feature 04 part 2: mutating tools for existing editor features with live feedback and undo | in progress: transaction foundation and first three tools |
 | 07 | primitives | Text overlay, image overlay, blur, silence detection, transitions, each shipped with its tool | in progress: silence removal and text overlays complete |
 | 08 | upstream-sync-1 | First merge of upstream changes after divergence, exercising `upstream-sync.md`; schedule it after milestone 02 lands, not at the end | planned |
 | 09 | appshow-identity | Rename the app, identifiers, paths, release metadata, and user-facing copy to AppShow before public release (ADR 0005) | planned |

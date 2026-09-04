@@ -460,7 +460,7 @@ struct CaptionSettingsData: Codable, Sendable, Equatable {
   var audioSource: CaptionAudioSource = .microphone
 }
 
-struct EditorStateData: Codable, Sendable {
+struct EditorStateData: Codable, Sendable, Equatable {
   var trimStartSeconds: Double
   var trimEndSeconds: Double
   var backgroundStyle: BackgroundStyle
