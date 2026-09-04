@@ -9,7 +9,7 @@ Goal: ship the integrated product as AppShow without breaking legacy Reframed pr
 - [x] P3: rename active symbols, environment variables, log labels, test harness paths, and helper metadata.
 - [x] P4: update Info.plist document registrations, permission copy, update metadata, release scripts, and packaging.
 - [x] P5: update active documentation and repository metadata while retaining explicit upstream/provenance history.
-- [ ] P6: run formatting, lint, build, the full test suite, packaging checks, and compatibility tests from a clean checkout.
+- [x] P6: run formatting, lint, build, the full test suite, packaging checks, and compatibility tests from a clean checkout.
 
 ## Compatibility contract
 
@@ -17,5 +17,5 @@ Goal: ship the integrated product as AppShow without breaking legacy Reframed pr
 - New projects use `.appshow`.
 - Renaming preserves `.frm` on legacy bundles and `.appshow` on new bundles.
 - `~/.reframed` moves to `~/.appshow` only when the destination is absent.
-- `APPSHOW_*` variables are canonical; `APPSHOW_*` inputs remain temporary fallbacks where an external integration may still provide them.
+- `APPSHOW_*` variables are canonical; selected `REFRAMED_*` inputs remain temporary fallbacks where an external integration may still provide them.
 - Project metadata version 1 and its media filenames remain unchanged.
