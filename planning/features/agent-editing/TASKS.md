@@ -12,3 +12,5 @@
 - [x] P9. Add `set_transition` for text overlays, image overlays, and kept slices with remapping and midpoint-render proofs.
 - [x] P10. Add confirmed external-music import plus update/remove tools over the milestone 03 model.
 - [x] P11. Materialize the five initial skills for both providers and prove every referenced tool exists.
+- [x] P12. Exercise skill discovery and an exact title mutation through each installed provider.
+- [x] P13. Replay the deterministic presentation scenario and add workspace-only draft export.

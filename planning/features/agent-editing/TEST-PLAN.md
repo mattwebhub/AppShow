@@ -13,6 +13,6 @@
 | P8 runtime E2E | both providers call a read and mutation through the shim | green |
 | P9 transitions | text/image/slice targets update and undo; remapping preserves settings; golden midpoint frames | green |
 | P10 music tools | confirmed import, update/remove/undo, fades, compact timeline result | green |
-| P11 skills | valid provider skill trees, catalog-only tool references, idempotent workspace materialization | green; runtime discovery manual |
+| P11 skills | valid provider skill trees, catalog-only tool references, idempotent workspace materialization, live discovery and mutation | green |
 
 Manual verification belongs in `planning/milestones/06-agent-tools-editing/VERIFY.md`.

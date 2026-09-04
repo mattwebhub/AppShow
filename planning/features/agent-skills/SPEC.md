@@ -1,6 +1,6 @@
 # Feature: bundled agent skills
 
-Status: code complete; manual provider verification pending
+Status: complete
 Milestone: 06
 
 ## Contract

@@ -127,6 +127,31 @@ struct AgentToolSilencesHandler: AgentToolHandler {
 }
 
 @MainActor
+struct AgentToolExportDraftHandler: AgentToolHandler {
+  var definition: AgentToolDefinition { AgentToolCatalog.exportDraft }
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    guard let workspace = context.workspaceDirectory else {
+      throw AgentToolError.failed("A project workspace is required for draft export")
+    }
+    let drafts = workspace.appendingPathComponent("drafts", isDirectory: true)
+    try FileManager.default.createDirectory(at: drafts, withIntermediateDirectories: true)
+    let destination = drafts.appendingPathComponent("draft-\(UUID().uuidString.lowercased()).mp4")
+    var settings = ExportSettings()
+    settings.maximumWidth = CGFloat(arguments["maxWidth"]?.intValue ?? 640)
+    settings.frameRateOverride = arguments["fps"]?.intValue ?? 15
+    settings.codec = .h264
+    settings.mode = .normal
+    let url = try await context.editorState.export(settings: settings, outputURL: destination)
+    return [
+      "path": .string(url.path),
+      "maxWidth": JSONValue(Int(settings.maximumWidth ?? 640)),
+      "fps": JSONValue(settings.frameRateOverride ?? 15),
+    ]
+  }
+}
+
+@MainActor
 struct AgentToolUnavailableHandler: AgentToolHandler {
   let definition: AgentToolDefinition
 

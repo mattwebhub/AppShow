@@ -53,6 +53,8 @@ struct ExportSettingsTests {
     #expect(settings.mode == .parallel)
     #expect(settings.gifQuality == .high)
     #expect(settings.captionExportMode == .burnIn)
+    #expect(settings.maximumWidth == nil)
+    #expect(settings.frameRateOverride == nil)
   }
 
   @Test(arguments: [

@@ -10,6 +10,8 @@ struct ExportSettings: Sendable {
   var mode: ExportMode = .parallel
   var gifQuality: GIFQuality = .high
   var captionExportMode: CaptionExportMode = .burnIn
+  var maximumWidth: CGFloat?
+  var frameRateOverride: Int?
 
   var burnInCaptions: Bool { captionExportMode == .burnIn }
   var exportSRT: Bool { captionExportMode == .srt }

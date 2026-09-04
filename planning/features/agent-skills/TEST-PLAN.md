@@ -8,4 +8,5 @@
 | Canonical guidance | `AGENTS.md` is written and `CLAUDE.md` points to it relatively | green |
 | Idempotence | rerunning restores an edited AppShow skill copy | green |
 | Package validation | every canonical source passes the bundled `quick_validate.py` validator | green |
-| Runtime discovery | Codex and Claude Code each list and invoke one materialized skill | manual |
+| Runtime discovery | Codex and Claude Code each list and invoke one materialized skill | green: Codex 0.149.1 and Claude Code 2.1.260 |
+| Live skill mutation | each provider invokes `add-title-cards`, calls the signed bridge, and leaves exactly one requested title | green: `make test-agent-skills CLAUDE_MODEL=sonnet` |

@@ -29,7 +29,8 @@ extension VideoCompositor {
     }()
     let needsReencode =
       !sourceCodecMatchesExport || config.exportSettings.resolution != ExportResolution.original
-      || config.exportSettings.fps != ExportFPS.original
+      || config.exportSettings.fps != ExportFPS.original || config.exportSettings.maximumWidth != nil
+      || config.exportSettings.frameRateOverride != nil
     return hasVisualEffects
       || result.webcamVideoURL != nil
       || needsReencode
@@ -65,9 +66,11 @@ extension VideoCompositor {
 
   static func computeRenderSize(
     canvasSize: CGSize,
-    resolution: ExportResolution
+    resolution: ExportResolution,
+    maximumWidth: CGFloat? = nil
   ) -> CGSize {
-    if let targetWidth = resolution.pixelWidth {
+    let targetWidth = maximumWidth.map { min($0, canvasSize.width) } ?? resolution.pixelWidth
+    if let targetWidth {
       let aspect = canvasSize.height / max(canvasSize.width, 1)
       return CGSize(width: targetWidth, height: round(targetWidth * aspect))
     }

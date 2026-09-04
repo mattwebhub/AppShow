@@ -1,6 +1,6 @@
 # Feature: Agent tools (read-only)
 
-Status: building
+Status: complete
 Milestone: 05 (read-only inspection); mutating tools follow in milestone 06, primitives in 07
 
 ## Problem
@@ -10,7 +10,7 @@ The chat panel from milestone 04 runs a coding-agent runtime against the open pr
 ## Behavior
 
 1. A JSON value type (`JSONValue`) and a JSON-RPC 2.0 codec (`JSONRPC*`) exist in `Reframed/Agent/Tools/`; both are `Sendable`, decode tolerantly (missing `jsonrpc`, int or string ids, absent params), and frame messages as newline-delimited JSON.
-2. `AgentToolCatalog.all` lists every tool as data: `name` (`snake_case`, unique), `description`, `inputSchema` (JSON Schema object with `additionalProperties: false`), `mutating`, `slow`, `availability`. `AgentToolCatalog.available` excludes tools whose backing code is on another branch (`get_silences`, pending merge of `milestone-07-primitives`). `tools/list` advertises only available tools in MCP shape (`name`, `description`, `inputSchema`, `annotations.readOnlyHint`).
+2. `AgentToolCatalog.all` lists every tool as data: `name` (`snake_case`, unique), `description`, `inputSchema` (JSON Schema object with `additionalProperties: false`), `mutating`, `slow`, `availability`. `AgentToolCatalog.available` excludes tools whose backing code is not integrated. `tools/list` advertises only available tools in MCP shape (`name`, `description`, `inputSchema`, `annotations.readOnlyHint`).
 3. Read-only catalog for this milestone (times in source seconds, ids are the region UUIDs from `EditorStateData`):
 
    | Tool | Input | Output |
@@ -21,7 +21,8 @@ The chat panel from milestone 04 runs a coding-agent runtime against the open pr
    | `get_cursor_activity` | `{dwellSeconds?: number (default 0.5), from?, to?}` | `{available, sampleRateHz?, clickCount, clickClusters:[{start,end,x,y,clicks}], keystrokeBursts:[{start,end,count}]}`; clusters group clicks whose gap is under `dwellSeconds` (the `ZoomDetector` rule), bursts group key-down events with gaps under 1 s |
    | `get_history` | `{}` | `{index, count, canUndo, canRedo, entries:[{index, timestamp, label, changes:[String], isCurrent}]}`; `label` is the first line of `History.describeChanges` between consecutive snapshots ("Initial state" for the first) until `HistoryEntry.label` lands in milestone 06 |
    | `render_preview_frame` (slow) | `{atSeconds: number ≥ 0, width?: integer 16…1920 (default 640)}` | `{path, width, height, atSeconds}`; PNG under `<workspace>/frames/`, rendered through `VideoCompositor.buildCompositionInstruction` + `FrameRenderer.renderFrame` from the current state (background, canvas, padding, corner radius, camera regions, cursor, zoom, spotlight, captions); the playhead seeks to `atSeconds` when playback is paused |
-   | `get_silences` (pending merge) | `{thresholdDb?, minGapSeconds?, source?}` | listed in `all`, absent from `tools/list`; calling it returns `TOOL_UNAVAILABLE` until `SilenceDetector` merges from `milestone-07-primitives` |
+   | `export_draft` (slow) | `{maxWidth?: integer 320…640, fps?: integer 10…30}` | `{path, maxWidth, fps}`; MP4 under `<workspace>/drafts/`, capped without upscaling, and never written to a user-selected path |
+   | `get_silences` (slow) | `{thresholdDb?, minGapSeconds?, source?}` | detected silent ranges and total duration for the selected captured-audio source |
 
    Compact timeline shape returned by `get_timeline` and, from milestone 06, by every mutating tool:
 
@@ -67,7 +68,7 @@ As implemented, the third `PBXNativeTarget` compiles `Tools/appshow-mcp/main.swi
 ## Not doing
 
 - Mutating tools, batches, history labels, the editing badge, confirmations (milestone 06).
-- `get_silences`, `export_draft`, skills folder, HTTP transport, the shim executable, chat-panel wiring (milestones 06 and 07).
+- HTTP transport. The authenticated Unix socket plus signed stdio shim is the implemented boundary.
 - Any change to `EditorState`, `History`, `ReframedProject`, or the compositor.
 
 ## Touch points

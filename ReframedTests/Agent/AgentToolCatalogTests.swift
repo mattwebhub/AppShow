@@ -6,7 +6,7 @@ import Testing
 struct AgentToolCatalogTests {
   private static let expectedNames: Set<String> = [
     "get_project_summary", "get_timeline", "get_transcript", "get_cursor_activity", "get_history", "render_preview_frame",
-    "get_silences",
+    "get_silences", "export_draft",
   ]
 
   @Test func everyToolHasUniqueSnakeCaseNameAndObjectSchema() throws {
@@ -35,6 +35,7 @@ struct AgentToolCatalogTests {
     #expect(AgentToolCatalog.all.filter { $0.name.hasPrefix("get_") }.allSatisfy { !$0.mutating })
     #expect(AgentToolCatalog.definition(named: "get_silences")?.slow == true)
     #expect(AgentToolCatalog.definition(named: "render_preview_frame")?.slow == true)
+    #expect(AgentToolCatalog.definition(named: "export_draft")?.slow == true)
   }
 
   @Test func toolsListAdvertisesOnlyAvailableToolsInMCPShape() throws {
