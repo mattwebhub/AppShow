@@ -202,6 +202,8 @@ plus, in `ConfigService` and `StateService`, an internal `init(fileURL: URL)` th
 
 ### S4 — `ReframedProject.create` wipes the shared temp directory
 
+> Landed 2026-09-04 as `create(..., cleanupTemp: Bool = true)`; the production caller is unchanged.
+
 **Problem.** `Reframed/Project/ReframedProject.swift:97` calls `fm.cleanupTempDir()` (deletes every file in `/tmp/Reframed`) as part of creating a bundle. A project test running while a real recording is in flight, or two tests in parallel, would delete each other's files.
 
 **Fix.** Move the call to the recording-stop path in `Reframed/State/SessionState+Recording.swift` (the only production caller), or add a `cleanupTemp: Bool = true` parameter. Combined with S2's `REFRAMED_TMP` either is safe.
@@ -221,6 +223,8 @@ plus, in `ConfigService` and `StateService`, an internal `init(fileURL: URL)` th
 **Fix, phase 2 (when a feature touches these files).** `protocol TimelineRegion { var startSeconds: Double { get set }; var endSeconds: Double { get set } }` adopted by `AudioRegionData`, `CameraRegionData`, `VideoRegionData`, `SpotlightRegionData`, and `enum RegionMath` with `insert(into:at:duration:)`, `clampStart/clampEnd/move`. The four extensions become one-liners and `RegionMath` is T1. Record as an ADR when done.
 
 ### S7 — `private static` helpers that are the actual logic
+
+> Landed 2026-09-04 for `TranscriptionService.mergeShortSegments` and `stripSpecialTokens`. The rest stay private until a test needs them.
 
 `TranscriptionService.mergeShortSegments/stripSpecialTokens` (`Reframed/Utilities/TranscriptionService.swift`), `EditorState.filterNonSpeechSegments` (`Reframed/Editor/EditorState+Captions.swift`), `AudioWaveformGenerator.downsample` (`Reframed/Editor/AudioWaveformGenerator.swift`), `MediaFileInfo.formatBitrate`, `SubtitleExporter.srtTimestamp/vttTimestamp`, `ReframedProject.projectPrefix`, `CursorSmoothing.buildTypingIntervals`. **Fix:** drop `private` (internal is enough for `@testable`). Do it lazily, one function per test that needs it, and list each in `planning/upstream-sync.md`.
 
@@ -463,6 +467,8 @@ XCTest classes use `ReframedTests/ClassName/testMethod` without parentheses.
 ---
 
 ## 5. First fifteen tests
+
+> All fifteen landed 2026-09-04 (milestone 01) plus the audio-mix pairing characterization. Where the code disagreed with the rows below, the tests pin the code: the legacy document cannot both lack `captionSettings` and carry `captionPosition` (both variants are tested); `rename` sanitizes with `CharacterSet.alphanumerics`, not ASCII; row 6's `scaleX` border scaling holds only on the cut path (the trim path leaves `borderWidth` unscaled, a likely upstream bug); row 14's solid red background renders colour-matched as `(255, 38, 0)` through the 8-bit Generic RGB path, so golden tests assert dominance and derive blends from the measured background; row 9's equal-time keyframes resolve to the first at the very first time; row 10's hold keyframe is not clamped to the duration; row 13's "nil once the next segment has started" branch is unreachable. `FrameRenderer.visibleText` crashes for `time < segment.startSeconds` with more than two lines and loops forever for `maxWordsPerLine <= 0`; both are unreachable from `drawCaptions` today and are left untested.
 
 Ordered by (a) whether a bug would corrupt a user's `.frm` or export and (b) whether the code is about to be touched. Files are `ReframedTests/<Suite>.swift`.
 
