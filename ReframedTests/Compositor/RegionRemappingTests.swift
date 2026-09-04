@@ -320,4 +320,42 @@ struct RegionRemappingTests {
     #expect(second.customRadius == 90)
     #expect(second.fadeDuration == 0.2)
   }
+
+  @Test func textOverlayIsClippedAndShiftedByTrimStart() throws {
+    let trim = range(5, 10)
+    var config = config(trim: trim)
+    let original = TextOverlayData(startSeconds: 2, endSeconds: 8, text: "Kept")
+    config.textOverlays = [original, TextOverlayData(startSeconds: 0, endSeconds: 4, text: "Dropped")]
+
+    let remapped = remap(config, trim: trim)
+
+    #expect(remapped.textOverlays.count == 1)
+    let result = try #require(remapped.textOverlays.first)
+    #expect(result.id == original.id)
+    #expect(result.startSeconds == 0)
+    #expect(result.endSeconds == 3)
+    #expect(result.text == "Kept")
+  }
+
+  @Test func textOverlaySpanningTwoSegmentsIsSplitWithFreshIds() throws {
+    var config = config(trim: range(0, 10))
+    var original = TextOverlayData(startSeconds: 1, endSeconds: 6, text: "Split")
+    original.position = .topLeft
+    config.textOverlays = [original, TextOverlayData(startSeconds: 3, endSeconds: 4, text: "Gone")]
+
+    let remapped = remapWithCuts(config)
+
+    #expect(remapped.textOverlays.count == 2)
+    let first = try #require(remapped.textOverlays.first)
+    let second = try #require(remapped.textOverlays.last)
+    #expect(first.startSeconds == 1)
+    #expect(first.endSeconds == 2)
+    #expect(second.startSeconds == 2)
+    #expect(second.endSeconds == 3)
+    #expect(first.id != original.id)
+    #expect(second.id != original.id)
+    #expect(first.id != second.id)
+    #expect(second.text == "Split")
+    #expect(second.position == .topLeft)
+  }
 }

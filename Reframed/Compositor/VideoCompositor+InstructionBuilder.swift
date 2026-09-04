@@ -39,6 +39,7 @@ extension VideoCompositor {
       || hasVideoRegions
       || (config.captionsEnabled && !config.captionSegments.isEmpty)
       || (!config.spotlightRegions.isEmpty && config.cursorSnapshot != nil)
+      || !config.textOverlays.isEmpty
       || clickSoundURL != nil
   }
 
@@ -228,6 +229,7 @@ extension VideoCompositor {
       spotlightRadius: config.spotlightRadius,
       spotlightDimOpacity: config.spotlightDimOpacity,
       spotlightEdgeSoftness: config.spotlightEdgeSoftness,
+      textOverlays: regions.textOverlays.map { TextOverlayLayout.resolve($0, canvasSize: renderSize) },
       isHDR: result.isHDR
     )
   }
