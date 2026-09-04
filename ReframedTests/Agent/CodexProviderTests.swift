@@ -25,6 +25,13 @@ struct CodexProviderTests {
     #expect(provider.arguments(for: turn) == ["exec"] + commonFlags + ["resume", "--", "019f-session", "Continue"])
   }
 
+  @Test func codexConfiguredTurnPrependsScopedMCPOverrides() {
+    let config = AgentSessionConfig.testFixture
+    let arguments = provider.arguments(for: AgentTurn(prompt: "Edit", configuration: config))
+
+    #expect(arguments == ["exec"] + commonFlags + config.codexArguments + ["--", "Edit"])
+  }
+
   @Test func codexPromptIsPreservedAsOneLiteralArgumentAfterTheSeparator() {
     let prompt = "Review $(touch /tmp/never) `whoami` \"quoted\" and $HOME"
     let arguments = provider.arguments(for: AgentTurn(prompt: prompt))

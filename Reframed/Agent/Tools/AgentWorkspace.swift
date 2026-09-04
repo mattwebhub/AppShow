@@ -86,6 +86,7 @@ struct AgentWorkspace: Sendable, Equatable {
 
   func close() {
     try? FileManager.default.removeItem(at: sessionFileURL)
+    try? FileManager.default.removeItem(at: directory.appendingPathComponent(AgentSessionConfig.claudeConfigFileName))
     try? FileManager.default.removeItem(at: socketURL)
   }
 }

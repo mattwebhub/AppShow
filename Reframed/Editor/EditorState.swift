@@ -26,6 +26,9 @@ final class EditorState {
   var isPreviewMode = false
   var agentTranscript: AgentTranscript
   var agentConfirmations = AgentConfirmations()
+  var agentBridgeController = AgentBridgeController()
+  var agentActivity: AgentActivity?
+  var lastAgentChange: AgentTimelineChange?
 
   var backgroundStyle: BackgroundStyle = .solidColor(CodableColor(r: 0, g: 0, b: 0))
   var backgroundImage: NSImage?
@@ -346,5 +349,8 @@ final class EditorState {
     }
 
     startAutoSave()
+    if !LaunchEnvironment.isTestHost, project != nil {
+      try? await agentBridgeController.start(editorState: self)
+    }
   }
 }

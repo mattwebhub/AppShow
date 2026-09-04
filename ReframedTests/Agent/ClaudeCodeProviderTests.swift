@@ -27,6 +27,20 @@ struct ClaudeCodeProviderTests {
     #expect(provider.arguments(for: turn) == firstTurnArguments + ["--resume", "abc"])
   }
 
+  @Test func claudeConfiguredTurnUsesOnlyTheGeneratedMCPFile() {
+    let config = AgentSessionConfig.testFixture
+    let turn = AgentTurn(prompt: "Edit", configuration: config)
+
+    #expect(
+      provider.arguments(for: turn)
+        == firstTurnArguments + [
+          "--mcp-config", config.claudeConfigURL.path,
+          "--strict-mcp-config",
+          "--allowedTools", "mcp__appshow__*",
+        ]
+    )
+  }
+
   @Test func claudePromptGoesToStandardInputAndNeverToArguments() {
     let prompt = "Review $(touch /tmp/never) `whoami` and $HOME"
     let turn = AgentTurn(prompt: prompt)

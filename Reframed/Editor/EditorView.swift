@@ -48,6 +48,7 @@ struct EditorView: View {
           AgentChatPanel(
             transcript: editorState.agentTranscript,
             confirmations: editorState.agentConfirmations,
+            sessionConfiguration: editorState.agentBridgeController.configuration,
             project: editorState.project,
             isExporting: editorState.isExporting
           )

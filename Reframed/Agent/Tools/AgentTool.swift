@@ -1,5 +1,19 @@
 import Foundation
 
+struct AgentActivity: Sendable, Equatable, Identifiable {
+  var id = UUID()
+  var toolName: String
+  var label: String
+  var startedAt = Date()
+}
+
+struct AgentTimelineChange: Sendable, Equatable {
+  var track: String
+  var startSeconds: Double
+  var endSeconds: Double
+  var label: String
+}
+
 enum AgentToolAvailability: Sendable, Equatable {
   case available
   case pendingMerge(branch: String)

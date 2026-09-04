@@ -7,6 +7,10 @@ import Testing
 @MainActor
 @Suite(.serialized)
 struct MutatingToolsTests {
+  private final class ActivityRecorder {
+    var value: AgentActivity?
+  }
+
   private struct FailingMutation: AgentToolHandler {
     let definition = AgentToolDefinition(
       name: "failing_mutation",
@@ -18,6 +22,29 @@ struct MutatingToolsTests {
     func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
       context.editorState.padding = 0.5
       throw AgentToolError.failed("boom")
+    }
+  }
+
+  private struct RecordingMutation: AgentToolHandler {
+    let recorder: ActivityRecorder
+    let definition = AgentToolDefinition(
+      name: "recording_mutation",
+      description: "Record activity",
+      inputSchema: AgentToolSchema.object(
+        [
+          "start": AgentToolSchema.number("Start"),
+          "end": AgentToolSchema.number("End"),
+          "label": AgentToolSchema.string("Label"),
+        ],
+        required: ["start", "end"]
+      ),
+      mutating: true
+    )
+
+    func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+      recorder.value = context.editorState.agentActivity
+      context.editorState.padding = 0.25
+      return [:]
     }
   }
 
@@ -379,6 +406,34 @@ struct MutatingToolsTests {
 
     #expect(state.createSnapshot() == before)
     #expect(state.history.entries.count == historyCount)
+  }
+
+  @Test func mutationPublishesEphemeralActivityAndLastTimelineChange() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let recorder = ActivityRecorder()
+    let dispatcher = AgentToolDispatcher(
+      editorState: state,
+      framesDirectory: directory,
+      handlers: [RecordingMutation(recorder: recorder)],
+      allowsMutations: true
+    )
+
+    _ = try await dispatcher.call(
+      "recording_mutation",
+      arguments: ["start": 0.4, "end": 1.2, "label": "highlight change"]
+    )
+
+    #expect(recorder.value?.toolName == "recording_mutation")
+    #expect(recorder.value?.label == "Agent: highlight change")
+    #expect(state.agentActivity == nil)
+    #expect(
+      state.lastAgentChange
+        == AgentTimelineChange(track: "recording", startSeconds: 0.4, endSeconds: 1.2, label: "Agent: highlight change")
+    )
+    #expect(state.createSnapshot().padding == 0.25)
   }
 
   @Test func editingDispatcherAdvertisesMutationsWithDestructiveHints() async throws {

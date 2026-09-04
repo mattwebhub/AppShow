@@ -8,10 +8,11 @@ struct CodexProvider: AgentProvider {
   let environmentKeys = ["CODEX_HOME"]
 
   func arguments(for turn: AgentTurn) -> [String] {
+    let configuration = turn.configuration?.codexArguments ?? []
     if let resumeID = turn.resumeID {
-      return ["exec"] + Self.commonFlags + ["resume", "--", resumeID, turn.prompt]
+      return ["exec"] + Self.commonFlags + configuration + ["resume", "--", resumeID, turn.prompt]
     }
-    return ["exec"] + Self.commonFlags + ["--", turn.prompt]
+    return ["exec"] + Self.commonFlags + configuration + ["--", turn.prompt]
   }
 
   func standardInput(for turn: AgentTurn) -> String? {

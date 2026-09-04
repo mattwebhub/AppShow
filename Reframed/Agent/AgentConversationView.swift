@@ -5,6 +5,7 @@ import SwiftUI
 struct AgentConversationView: View {
   @Bindable var transcript: AgentTranscript
   @Bindable var confirmations: AgentConfirmations
+  let sessionConfiguration: AgentSessionConfig?
   let project: ReframedProject?
   let isExporting: Bool
 
@@ -227,7 +228,7 @@ struct AgentConversationView: View {
       let project
     else { return }
     let provider = transcript.provider.makeProvider()
-    let workspace = AgentProjectWorkspace.directory(for: project.bundleURL)
+    let workspace = sessionConfiguration?.workspace.directory ?? AgentProjectWorkspace.directory(for: project.bundleURL)
     do {
       try FileManager.default.createDirectory(at: workspace, withIntermediateDirectories: true)
     } catch {
@@ -237,16 +238,18 @@ struct AgentConversationView: View {
     Task {
       let searchPath = await toolchain.searchPath()
       let home = FileManager.default.homeDirectoryForCurrentUser.path
-      let environment = AgentEnvironment.scrubbed(
+      var environment = AgentEnvironment.scrubbed(
         path: searchPath,
         home: home,
         forwarding: provider.environmentKeys
       )
+      environment.merge(sessionConfiguration?.processEnvironment ?? [:]) { _, configured in configured }
       let session = AgentSession(
         provider: provider,
         executable: executable,
         workingDirectory: workspace,
         environment: environment,
+        configuration: sessionConfiguration,
         resumeIDs: transcript.resumeIDs
       )
       transcript.send(text, using: session)

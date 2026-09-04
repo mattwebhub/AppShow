@@ -3,6 +3,20 @@ import Testing
 
 @testable import Reframed
 
+extension AgentSessionConfig {
+  static var testFixture: AgentSessionConfig {
+    AgentSessionConfig(
+      workspace: AgentWorkspace(
+        bundleURL: URL(fileURLWithPath: "/tmp/Demo.frm"),
+        directory: URL(fileURLWithPath: "/tmp/.agent/Demo", isDirectory: true),
+        socketURL: URL(fileURLWithPath: "/tmp/.agent/Demo/bridge.sock"),
+        token: "token"
+      ),
+      helperURL: URL(fileURLWithPath: "/tmp/appshow-mcp")
+    )
+  }
+}
+
 struct AgentWorkspaceTests {
   private func makeBundle(in dir: URL, name: String = "Screen-2026-09-04-101010") throws -> URL {
     let bundle = dir.appendingPathComponent("\(name).frm", isDirectory: true)
@@ -92,14 +106,63 @@ struct AgentWorkspaceTests {
     if workspace.socketURL.path.hasPrefix(workspace.directory.path) {
       try Data().write(to: workspace.socketURL)
     }
+    let config = workspace.directory.appendingPathComponent(AgentSessionConfig.claudeConfigFileName)
+    try Data("secret".utf8).write(to: config)
 
     workspace.close()
 
     #expect(FileManager.default.fileExists(atPath: workspace.sessionFileURL.path) == false)
     #expect(FileManager.default.fileExists(atPath: workspace.socketURL.path) == false)
+    #expect(FileManager.default.fileExists(atPath: config.path) == false)
     #expect(FileManager.default.fileExists(atPath: frame.path))
     #expect(throws: (any Error).self) {
       try AgentWorkspace.readSession(in: workspace.directory)
     }
+  }
+
+  @Test func sessionConfigGeneratesClaudeMCPJSONAndCodexOverrides() throws {
+    let workspace = AgentWorkspace(
+      bundleURL: URL(fileURLWithPath: "/tmp/Demo.frm"),
+      directory: URL(fileURLWithPath: "/tmp/.agent/Demo", isDirectory: true),
+      socketURL: URL(fileURLWithPath: "/tmp/.agent/Demo/bridge.sock"),
+      token: "secret-token"
+    )
+    let config = AgentSessionConfig(
+      workspace: workspace,
+      helperURL: URL(fileURLWithPath: "/Applications/AppShow.app/Contents/Helpers/appshow-mcp")
+    )
+
+    let claude = try config.claudeMCPConfigJSON()
+    #expect(claude["mcpServers"]?["appshow"]?["type"] == "stdio")
+    #expect(
+      claude["mcpServers"]?["appshow"]?["command"]
+        == "/Applications/AppShow.app/Contents/Helpers/appshow-mcp"
+    )
+    #expect(claude["mcpServers"]?["appshow"]?["env"]?["REFRAMED_AGENT_SOCKET"] == .string(workspace.socketURL.path))
+    #expect(claude["mcpServers"]?["appshow"]?["env"]?["REFRAMED_AGENT_TOKEN"] == .string(workspace.token))
+
+    let codex = config.codexArguments
+    #expect(Array(codex.prefix(2)) == ["-c", "mcp_servers={}"])
+    #expect(codex.contains("mcp_servers.appshow.command=\"/Applications/AppShow.app/Contents/Helpers/appshow-mcp\""))
+    #expect(codex.contains("mcp_servers.appshow.tool_timeout_sec=600"))
+    #expect(codex.contains("mcp_servers.appshow.default_tools_approval_mode=\"approve\""))
+    #expect(codex.contains { $0.contains("REFRAMED_AGENT_SOCKET") && $0.contains("REFRAMED_AGENT_TOKEN") })
+  }
+
+  @Test func sessionConfigWritesPrivateClaudeConfig() throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let bundle = try makeBundle(in: dir, name: "Demo")
+    let workspace = try AgentWorkspace.create(forBundle: bundle, token: "token")
+    let config = AgentSessionConfig(workspace: workspace, helperURL: URL(fileURLWithPath: "/tmp/appshow-mcp"))
+
+    let url = try config.writeClaudeMCPConfig()
+
+    #expect(url == workspace.directory.appendingPathComponent("mcp.json"))
+    let written = try JSONValue.parse(Data(contentsOf: url))
+    let expected = try config.claudeMCPConfigJSON()
+    #expect(written == expected)
+    let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+    #expect((attributes[.posixPermissions] as? Int) == 0o600)
   }
 }

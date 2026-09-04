@@ -14,6 +14,20 @@ struct EditorTopBar: View {
         .foregroundStyle(ReframedColors.primaryText)
 
       HStack(spacing: 8) {
+        if let activity = editorState.agentActivity {
+          HStack(spacing: 6) {
+            ProgressView()
+              .controlSize(.small)
+            Text(activity.label)
+              .lineLimit(1)
+          }
+          .font(.system(size: FontSize.xxs, weight: .medium))
+          .foregroundStyle(ReframedColors.primaryText)
+          .padding(.horizontal, 10)
+          .frame(height: 28)
+          .background(ReframedColors.muted)
+          .clipShape(Capsule())
+        }
         Spacer()
 
         IconButton(systemName: "folder", color: ReframedColors.secondaryText, action: onOpenFolder)
@@ -28,5 +42,6 @@ struct EditorTopBar: View {
     }
     .padding(.leading, 16)
     .frame(height: 44)
+    .animation(.easeInOut(duration: 0.15), value: editorState.agentActivity?.id)
   }
 }

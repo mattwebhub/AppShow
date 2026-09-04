@@ -2,6 +2,24 @@ import AVFoundation
 import SwiftUI
 
 extension TimelineView {
+  func agentChangeOverlay(contentWidth: CGFloat, inset: CGFloat) -> some View {
+    let change = editorState.lastAgentChange
+    let start = change.map { xPosition(forSource: $0.startSeconds, width: contentWidth) } ?? 0
+    let end = change.map { xPosition(forSource: $0.endSeconds, width: contentWidth) } ?? 0
+    let width = max(4, end - start)
+
+    return ZStack(alignment: .leading) {
+      if change != nil {
+        RoundedRectangle(cornerRadius: Radius.sm)
+          .fill(Color.orange.opacity(0.13))
+          .frame(width: width, height: timelineHeight - rulerHeight)
+          .offset(x: inset + start, y: rulerHeight)
+      }
+    }
+    .frame(width: contentWidth + inset * 2, height: timelineHeight, alignment: .topLeading)
+    .allowsHitTesting(false)
+  }
+
   func trimBorderOverlay(
     width: CGFloat,
     height: CGFloat,

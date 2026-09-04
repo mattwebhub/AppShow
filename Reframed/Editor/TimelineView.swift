@@ -243,6 +243,7 @@ struct TimelineView: View {
             .padding(.horizontal, playheadInset)
             .padding(.bottom, timelineZoom > 1 ? 10 : 0)
 
+            agentChangeOverlay(contentWidth: cw, inset: playheadInset)
             playheadOverlay(contentWidth: cw, inset: playheadInset)
           }
           .frame(width: frameWidth)

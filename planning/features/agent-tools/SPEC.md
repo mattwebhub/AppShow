@@ -52,9 +52,9 @@ The chat panel from milestone 04 runs a coding-agent runtime against the open pr
 7. Workspace: `AgentWorkspace.create(forBundle:)` makes `<projectFolder>/.agent/<bundle-name>/` with a `frames/` folder and writes `session.json` (mode 0600) holding `socketPath`, `token`, `bundlePath`, `workspacePath`, `protocolVersion`, `createdAt`. The socket is `<workspace>/bridge.sock` when that path fits the 104-byte `sun_path` limit, otherwise `ReframedPaths.temp/agent/<12 hex>.sock`; `session.json` always says which. `close()` removes `session.json` and the socket file and leaves `frames/` in place.
 8. Nothing in this feature imports SwiftUI or touches upstream files other than `Reframed.xcodeproj/project.pbxproj`.
 
-## Stdio shim (not built in this milestone)
+## Stdio shim (implemented in milestone 06)
 
-The runtime spawns MCP servers itself, so the app cannot own a stdio server. A later phase adds a command-line target `reframed-mcp` (Foundation only, under 150 lines, copied to `Reframed.app/Contents/Helpers/` by a Copy Files phase, signed with the app):
+The runtime spawns MCP servers itself, so the app cannot own a stdio server. Milestone 06 adds a command-line target `appshow-mcp` (Foundation only, under 150 lines, copied to the app's `Contents/Helpers/` by a Copy Files phase, signed with the app):
 
 1. Reads `REFRAMED_AGENT_SOCKET` and `REFRAMED_AGENT_TOKEN` from its environment (the chat panel writes them into the runtime's MCP config from `session.json`).
 2. Opens `NWConnection(to: .unix(path:), using: .tcp)` and fails fast with a JSON-RPC error on stdout if the socket is gone.
@@ -62,7 +62,7 @@ The runtime spawns MCP servers itself, so the app cannot own a stdio server. A l
 4. Relays every line received from the socket to stdout unchanged and flushes after each line.
 5. Exits when stdin closes (runtime ended the session) or when the socket closes (editor window closed), whichever comes first; the exit code is 0 on stdin close and 1 on socket loss.
 
-pbxproj shape to add later: a third `PBXNativeTarget` (`productType = "com.apple.product-type.tool"`, id in the `7E57…D0` range) with its own `PBXSourcesBuildPhase` over `Tools/reframed-mcp/main.swift`, `MACOSX_DEPLOYMENT_TARGET = 15.0`, `SWIFT_VERSION = 6.0`, `baseConfigurationReference = CC0000000000000000000001`, a `PBXTargetDependency` from the app target, and a `PBXCopyFilesBuildPhase` on the app target with `dstSubfolderSpec = 1` (Wrapper) and `dstPath = Contents/Helpers`. The `Makefile` gains `test-shim`, gated like `test-export`.
+As implemented, the third `PBXNativeTarget` compiles `Tools/appshow-mcp/main.swift`, inherits `Config.xcconfig`, is an app dependency, and is signed on copy into `Contents/Helpers`. `make test-shim` runs the gated real-process integration test.
 
 ## Not doing
 
