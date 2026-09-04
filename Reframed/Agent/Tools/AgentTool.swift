@@ -53,6 +53,11 @@ enum AgentToolError: Error, Equatable, Sendable {
   case noActiveBatch
   case batchTimedOut
   case userUndo
+  case confirmationRequired(id: UUID, title: String, detail: String)
+  case confirmationPending(UUID)
+  case confirmationDenied(UUID)
+  case confirmationExpired(UUID)
+  case confirmationMismatch(UUID)
   case failed(String)
 
   var code: String {
@@ -66,6 +71,11 @@ enum AgentToolError: Error, Equatable, Sendable {
     case .noActiveBatch: "NO_ACTIVE_BATCH"
     case .batchTimedOut: "BATCH_TIMEOUT"
     case .userUndo: "USER_UNDO"
+    case .confirmationRequired: "NEEDS_CONFIRMATION"
+    case .confirmationPending: "CONFIRMATION_PENDING"
+    case .confirmationDenied: "CONFIRMATION_DENIED"
+    case .confirmationExpired: "CONFIRMATION_EXPIRED"
+    case .confirmationMismatch: "CONFIRMATION_MISMATCH"
     case .failed: "TOOL_FAILED"
     }
   }
@@ -81,6 +91,11 @@ enum AgentToolError: Error, Equatable, Sendable {
     case .noActiveBatch: "No agent edit batch is active"
     case .batchTimedOut: "The agent edit batch timed out and was restored"
     case .userUndo: "The user changed history, so the agent edit batch was cancelled and restored"
+    case .confirmationRequired(_, let title, _): "Confirmation required: \(title)"
+    case .confirmationPending: "The confirmation is still waiting for the user"
+    case .confirmationDenied: "The user denied the operation"
+    case .confirmationExpired: "The confirmation expired or was already used"
+    case .confirmationMismatch: "The confirmation does not match this operation"
     case .failed(let detail): detail
     }
   }
@@ -93,12 +108,29 @@ enum AgentToolError: Error, Equatable, Sendable {
     case .unavailable: -32004
     case .timedOut: -32005
     case .batchAlreadyActive, .noActiveBatch, .batchTimedOut, .userUndo: -32006
+    case .confirmationRequired, .confirmationPending, .confirmationDenied, .confirmationExpired, .confirmationMismatch:
+      -32007
     case .failed: -32000
     }
   }
 
   var jsonRPCError: JSONRPCError {
-    JSONRPCError(code: jsonRPCCode, message: message, data: ["code": .string(code)])
+    var data: JSONValue = ["code": .string(code)]
+    switch self {
+    case .confirmationRequired(let id, let title, let detail):
+      data = [
+        "code": .string(code),
+        "confirmationId": .string(id.uuidString),
+        "title": .string(title),
+        "detail": .string(detail),
+      ]
+    case .confirmationPending(let id), .confirmationDenied(let id), .confirmationExpired(let id),
+      .confirmationMismatch(let id):
+      data = ["code": .string(code), "confirmationId": .string(id.uuidString)]
+    default:
+      break
+    }
+    return JSONRPCError(code: jsonRPCCode, message: message, data: data)
   }
 }
 

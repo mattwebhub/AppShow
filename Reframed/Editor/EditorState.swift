@@ -25,6 +25,7 @@ final class EditorState {
   var exportStatusMessage: String?
   var isPreviewMode = false
   var agentTranscript: AgentTranscript
+  var agentConfirmations = AgentConfirmations()
 
   var backgroundStyle: BackgroundStyle = .solidColor(CodableColor(r: 0, g: 0, b: 0))
   var backgroundImage: NSImage?

@@ -3,6 +3,7 @@ import SwiftUI
 @MainActor
 struct AgentChatPanel: View {
   @Bindable var transcript: AgentTranscript
+  @Bindable var confirmations: AgentConfirmations
   let project: ReframedProject?
   let isExporting: Bool
   @State private var collapsed: Bool
@@ -11,8 +12,14 @@ struct AgentChatPanel: View {
   @State private var showClearConfirmation = false
   @Environment(\.colorScheme) private var colorScheme
 
-  init(transcript: AgentTranscript, project: ReframedProject?, isExporting: Bool) {
+  init(
+    transcript: AgentTranscript,
+    confirmations: AgentConfirmations,
+    project: ReframedProject?,
+    isExporting: Bool
+  ) {
     self.transcript = transcript
+    self.confirmations = confirmations
     self.project = project
     self.isExporting = isExporting
     let state = StateService.shared
@@ -47,6 +54,7 @@ struct AgentChatPanel: View {
     ) {
       Button("Clear Conversation", role: .destructive) {
         transcript.clear()
+        confirmations.clear()
       }
       Button("Cancel", role: .cancel) {}
     } message: {
@@ -59,9 +67,9 @@ struct AgentChatPanel: View {
       IconButton(systemName: "sparkles") {
         setCollapsed(false)
       }
-      if transcript.isRunning {
+      if transcript.isRunning || !confirmations.pending.isEmpty {
         Circle()
-          .fill(Color.green)
+          .fill(confirmations.pending.isEmpty ? Color.green : Color.orange)
           .frame(width: 6, height: 6)
       }
       Spacer()
@@ -114,6 +122,7 @@ struct AgentChatPanel: View {
   private var content: some View {
     AgentConversationView(
       transcript: transcript,
+      confirmations: confirmations,
       project: project,
       isExporting: isExporting
     )

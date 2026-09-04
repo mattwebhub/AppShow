@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 struct AgentConversationView: View {
   @Bindable var transcript: AgentTranscript
+  @Bindable var confirmations: AgentConfirmations
   let project: ReframedProject?
   let isExporting: Bool
 
@@ -23,6 +24,11 @@ struct AgentConversationView: View {
     .task {
       await refreshReadiness()
     }
+    .onChange(of: transcript.isRunning) { wasRunning, isRunning in
+      if wasRunning && !isRunning {
+        confirmations.clear()
+      }
+    }
   }
 
   private var transcriptView: some View {
@@ -36,6 +42,13 @@ struct AgentConversationView: View {
               AgentMessageView(message: message)
                 .id(message.id)
             }
+          }
+          ForEach(confirmations.pending) { request in
+            AgentConfirmationView(
+              request: request,
+              onAllow: { confirmations.approve(request.id) },
+              onDeny: { confirmations.deny(request.id) }
+            )
           }
         }
         .padding(12)

@@ -21,6 +21,18 @@ struct MutatingToolsTests {
     }
   }
 
+  private func confirmationError(_ body: () throws -> Void) -> AgentToolError? {
+    do {
+      try body()
+      return nil
+    } catch let error as AgentToolError {
+      return error
+    } catch {
+      Issue.record("unexpected error \(error)")
+      return nil
+    }
+  }
+
   private func makeState(in directory: URL) async throws -> EditorState {
     let sources = directory.appendingPathComponent("sources", isDirectory: true)
     try FileManager.default.createDirectory(at: sources, withIntermediateDirectories: true)
@@ -215,6 +227,119 @@ struct MutatingToolsTests {
     }
     #expect(state.createSnapshot() == beforeBatch)
     #expect(state.history.currentIndex == startingIndex)
+  }
+
+  @Test func confirmationApprovesOneNormalizedOperationExactlyOnce() throws {
+    let confirmations = AgentConfirmations()
+    let operation = AgentConfirmationOperation.externalFile(
+      kind: "import_audio",
+      url: URL(fileURLWithPath: "/tmp/appshow/music/../song.mp3")
+    )
+
+    let required = confirmationError {
+      try confirmations.authorize(operation: operation, confirmationID: nil, title: "Import song", detail: "song.mp3")
+    }
+    guard case .confirmationRequired(let id, _, _) = required else {
+      Issue.record("expected confirmation request")
+      return
+    }
+    #expect(operation.arguments["path"] == "/tmp/appshow/song.mp3")
+    #expect(confirmations.pending.map(\.id) == [id])
+    #expect(required?.jsonRPCError.data?["confirmationId"] == .string(id.uuidString))
+    #expect(
+      confirmationError {
+        try confirmations.authorize(operation: operation, confirmationID: id, title: "Import song", detail: "song.mp3")
+      } == .confirmationPending(id)
+    )
+    #expect(confirmations.approve(id))
+
+    try confirmations.authorize(operation: operation, confirmationID: id, title: "Import song", detail: "song.mp3")
+
+    #expect(confirmations.pending.isEmpty)
+    #expect(
+      confirmationError {
+        try confirmations.authorize(operation: operation, confirmationID: id, title: "Import song", detail: "song.mp3")
+      } == .confirmationExpired(id)
+    )
+  }
+
+  @Test func deniedConfirmationCannotAuthorizeTheOperation() {
+    let confirmations = AgentConfirmations()
+    let operation = AgentConfirmationOperation(kind: "export", arguments: ["format": "mp4"])
+    let required = confirmationError {
+      try confirmations.authorize(operation: operation, confirmationID: nil, title: "Export video", detail: "MP4")
+    }
+    guard case .confirmationRequired(let id, _, _) = required else {
+      Issue.record("expected confirmation request")
+      return
+    }
+
+    #expect(confirmations.deny(id))
+    #expect(
+      confirmationError {
+        try confirmations.authorize(operation: operation, confirmationID: id, title: "Export video", detail: "MP4")
+      } == .confirmationDenied(id)
+    )
+  }
+
+  @Test func confirmationIsConsumedWhenItsOperationDoesNotMatch() {
+    let confirmations = AgentConfirmations()
+    let approved = AgentConfirmationOperation(kind: "import_audio", arguments: ["path": "/tmp/one.mp3"])
+    let different = AgentConfirmationOperation(kind: "import_audio", arguments: ["path": "/tmp/two.mp3"])
+    let required = confirmationError {
+      try confirmations.authorize(operation: approved, confirmationID: nil, title: "Import song", detail: "one.mp3")
+    }
+    guard case .confirmationRequired(let id, _, _) = required else {
+      Issue.record("expected confirmation request")
+      return
+    }
+    #expect(confirmations.approve(id))
+
+    #expect(
+      confirmationError {
+        try confirmations.authorize(operation: different, confirmationID: id, title: "Import song", detail: "two.mp3")
+      } == .confirmationMismatch(id)
+    )
+    #expect(
+      confirmationError {
+        try confirmations.authorize(operation: approved, confirmationID: id, title: "Import song", detail: "one.mp3")
+      } == .confirmationExpired(id)
+    )
+  }
+
+  @Test func confirmationExpiresAndSessionClearInvalidatesEverything() {
+    var now = Date(timeIntervalSince1970: 100)
+    let confirmations = AgentConfirmations(expirationInterval: 5, now: { now })
+    let operation = AgentConfirmationOperation(kind: "export", arguments: ["format": "mov"])
+    let first = confirmationError {
+      try confirmations.authorize(operation: operation, confirmationID: nil, title: "Export", detail: "MOV")
+    }
+    guard case .confirmationRequired(let expiredID, _, _) = first else {
+      Issue.record("expected confirmation request")
+      return
+    }
+    now.addTimeInterval(6)
+    #expect(!confirmations.approve(expiredID))
+    #expect(
+      confirmationError {
+        try confirmations.authorize(operation: operation, confirmationID: expiredID, title: "Export", detail: "MOV")
+      } == .confirmationExpired(expiredID)
+    )
+
+    let second = confirmationError {
+      try confirmations.authorize(operation: operation, confirmationID: nil, title: "Export", detail: "MOV")
+    }
+    guard case .confirmationRequired(let clearedID, _, _) = second else {
+      Issue.record("expected confirmation request")
+      return
+    }
+    confirmations.clear()
+    #expect(confirmations.pending.isEmpty)
+    #expect(
+      confirmationError {
+        try confirmations.authorize(operation: operation, confirmationID: clearedID, title: "Export", detail: "MOV")
+      } == .confirmationExpired(clearedID)
+    )
   }
 
   @Test func mutationsStayDisabledUnlessTheDispatcherOptsIn() async throws {
