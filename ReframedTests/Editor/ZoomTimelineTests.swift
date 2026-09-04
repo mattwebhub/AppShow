@@ -77,4 +77,24 @@ struct ZoomTimelineTests {
     ])
     #expect(timeline.allKeyframes.map(\.t) == [0, 1, 2])
   }
+
+  @Test func equalTimeKeyframesResolveToTheLaterOne() {
+    let timeline = ZoomTimeline(keyframes: [
+      ZoomKeyframe(t: 0, zoomLevel: 1, centerX: 0.5, centerY: 0.5, isAuto: false),
+      ZoomKeyframe(t: 1, zoomLevel: 2, centerX: 0.5, centerY: 0.5, isAuto: false),
+      ZoomKeyframe(t: 1, zoomLevel: 4, centerX: 0.5, centerY: 0.5, isAuto: false),
+      ZoomKeyframe(t: 2, zoomLevel: 1, centerX: 0.5, centerY: 0.5, isAuto: false),
+    ])
+    #expect(timeline.zoomRect(at: 1) == CGRect(x: 0.375, y: 0.375, width: 0.25, height: 0.25))
+    #expect(timeline.zoomRect(at: 0.999).width > 0.49)
+  }
+
+  @Test func equalTimeKeyframesAtTheStartResolveToTheFirstOne() {
+    let timeline = ZoomTimeline(keyframes: [
+      ZoomKeyframe(t: 1, zoomLevel: 2, centerX: 0.5, centerY: 0.5, isAuto: false),
+      ZoomKeyframe(t: 1, zoomLevel: 4, centerX: 0.5, centerY: 0.5, isAuto: false),
+      ZoomKeyframe(t: 2, zoomLevel: 1, centerX: 0.5, centerY: 0.5, isAuto: false),
+    ])
+    #expect(timeline.zoomRect(at: 1) == CGRect(x: 0.25, y: 0.25, width: 0.5, height: 0.5))
+  }
 }
