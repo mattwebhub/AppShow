@@ -1,55 +1,74 @@
 import SwiftUI
 
-extension TimelineView {
-  func overlayTrackContent(width: CGFloat) -> some View {
-    let h = trackHeight
-    let overlays = OverlayChip.timeline(
-      text: editorState.textOverlays,
-      images: editorState.imageOverlays
-    )
+enum OverlayChip: Identifiable {
+  enum ID: Hashable {
+    case text(UUID)
+    case image(UUID)
+  }
 
-    return ZStack(alignment: .leading) {
-      ForEach(overlays) { overlay in
-        overlayChipView(chip: overlay, width: width, height: h)
-      }
-    }
-    .frame(width: width, height: h)
-    .clipped()
-    .coordinateSpace(name: "overlayRegion")
-    .contentShape(Rectangle())
-    .onTapGesture(count: 2) { location in
-      guard isTrackEditable else { return }
-      let time = sourceTime(forX: location.x, width: width)
-      let hit = overlays.contains { overlay in
-        let startX = xPosition(forSource: overlay.startSeconds, width: width)
-        let endX = xPosition(forSource: overlay.endSeconds, width: width)
-        return location.x >= startX && location.x <= endX
-      }
-      if !hit {
-        editorState.addTextOverlay(atTime: time)
-      }
+  case text(TextOverlayData)
+  case image(ImageOverlayData)
+
+  var id: ID {
+    switch self {
+    case .text(let overlay): .text(overlay.id)
+    case .image(let overlay): .image(overlay.id)
     }
   }
 
+  var startSeconds: Double {
+    switch self {
+    case .text(let overlay): overlay.startSeconds
+    case .image(let overlay): overlay.startSeconds
+    }
+  }
+
+  var endSeconds: Double {
+    switch self {
+    case .text(let overlay): overlay.endSeconds
+    case .image(let overlay): overlay.endSeconds
+    }
+  }
+
+  static func timeline(text: [TextOverlayData], images: [ImageOverlayData]) -> [OverlayChip] {
+    let chips = text.map(OverlayChip.text) + images.map(OverlayChip.image)
+    return chips.enumerated().sorted {
+      if $0.element.startSeconds != $1.element.startSeconds {
+        return $0.element.startSeconds < $1.element.startSeconds
+      }
+      return $0.offset < $1.offset
+    }.map(\.element)
+  }
+}
+
+extension TimelineView {
   @ViewBuilder
-  func textOverlayChipView(overlay: TextOverlayData, width: CGFloat, height: CGFloat) -> some View {
-    let effective = effectiveTextOverlay(overlay, width: width)
+  func overlayChipView(chip: OverlayChip, width: CGFloat, height: CGFloat) -> some View {
+    switch chip {
+    case .text(let overlay):
+      textOverlayChipView(overlay: overlay, width: width, height: height)
+    case .image(let overlay):
+      imageOverlayChipView(overlay: overlay, width: width, height: height)
+    }
+  }
+
+  func imageOverlayChipView(overlay: ImageOverlayData, width: CGFloat, height: CGFloat) -> some View {
+    let effective = effectiveImageOverlay(overlay, width: width)
     let startX = max(0, xPosition(forSource: effective.start, width: width))
     let endX = min(width, xPosition(forSource: effective.end, width: width))
     let regionWidth = max(4, endX - startX)
     let edgeThreshold = min(8.0, regionWidth * 0.2)
     let isPopoverShown = popoverOverlayId == overlay.id
-    let chipText = overlay.text.replacingOccurrences(of: "\n", with: " ")
 
-    ZStack {
+    return ZStack {
       RoundedRectangle(cornerRadius: Track.borderRadius)
         .fill(Track.background)
 
       HStack(spacing: 3) {
-        Image(systemName: "textformat")
+        Image(systemName: "photo")
           .font(.system(size: Track.fontSize))
         if regionWidth > 40 {
-          Text(chipText)
+          Text(overlay.displayName)
             .font(.system(size: Track.fontSize, weight: Track.fontWeight))
             .lineLimit(1)
             .truncationMode(.tail)
@@ -86,14 +105,15 @@ extension TimelineView {
       ),
       arrowEdge: .top
     ) {
-      TextOverlayEditPopover(
+      ImageOverlayEditPopover(
         overlay: overlay,
+        imageURL: editorState.imageOverlayURL(overlay),
         onUpdate: { updated in
-          editorState.updateTextOverlay(id: overlay.id) { $0 = updated }
+          editorState.updateImageOverlay(id: overlay.id) { $0 = updated }
         },
         onRemove: {
           popoverOverlayId = nil
-          editorState.removeTextOverlay(id: overlay.id)
+          editorState.removeImageOverlay(id: overlay.id)
         }
       )
       .presentationBackground(ReframedColors.backgroundPopover)
@@ -121,7 +141,7 @@ extension TimelineView {
         }
         .onEnded { _ in
           guard overlayDragType != nil else { return }
-          commitOverlayDrag(overlay: overlay, width: width)
+          commitImageOverlayDrag(overlay: overlay, width: width)
           overlayDragOffset = 0
           overlayDragType = nil
           overlayDragRegionId = nil
@@ -146,38 +166,38 @@ extension TimelineView {
     .position(x: startX + regionWidth / 2, y: height / 2)
   }
 
-  func effectiveTextOverlay(_ overlay: TextOverlayData, width: CGFloat) -> (start: Double, end: Double) {
-    guard overlayDragRegionId == overlay.id, let dt = overlayDragType else {
+  func effectiveImageOverlay(_ overlay: ImageOverlayData, width: CGFloat) -> (start: Double, end: Double) {
+    guard overlayDragRegionId == overlay.id, let dragType = overlayDragType else {
       return (overlay.startSeconds, overlay.endSeconds)
     }
     let timeDelta = (overlayDragOffset / width) * visibleSeconds
-    let dur = totalSeconds
-    let minDuration = max(TextOverlayData.minimumLength, (24.0 / width) * dur)
+    let duration = totalSeconds
+    let minimumDuration = max(ImageOverlayData.minimumLength, (24.0 / width) * duration)
 
-    switch dt {
+    switch dragType {
     case .move:
       let length = overlay.endSeconds - overlay.startSeconds
-      let clampedStart = max(0, min(dur - length, overlay.startSeconds + timeDelta))
-      return (clampedStart, clampedStart + length)
+      let start = max(0, min(duration - length, overlay.startSeconds + timeDelta))
+      return (start, start + length)
     case .resizeLeft:
-      let newStart = max(0, min(overlay.endSeconds - minDuration, overlay.startSeconds + timeDelta))
-      return (newStart, overlay.endSeconds)
+      let start = max(0, min(overlay.endSeconds - minimumDuration, overlay.startSeconds + timeDelta))
+      return (start, overlay.endSeconds)
     case .resizeRight:
-      let newEnd = max(overlay.startSeconds + minDuration, min(dur, overlay.endSeconds + timeDelta))
-      return (overlay.startSeconds, newEnd)
+      let end = max(overlay.startSeconds + minimumDuration, min(duration, overlay.endSeconds + timeDelta))
+      return (overlay.startSeconds, end)
     }
   }
 
-  func commitOverlayDrag(overlay: TextOverlayData, width: CGFloat) {
+  func commitImageOverlayDrag(overlay: ImageOverlayData, width: CGFloat) {
     let timeDelta = (overlayDragOffset / width) * visibleSeconds
 
     switch overlayDragType {
     case .move:
-      editorState.moveTextOverlay(id: overlay.id, newStart: overlay.startSeconds + timeDelta)
+      editorState.moveImageOverlay(id: overlay.id, newStart: overlay.startSeconds + timeDelta)
     case .resizeLeft:
-      editorState.updateTextOverlayStart(id: overlay.id, newStart: overlay.startSeconds + timeDelta)
+      editorState.updateImageOverlayStart(id: overlay.id, newStart: overlay.startSeconds + timeDelta)
     case .resizeRight:
-      editorState.updateTextOverlayEnd(id: overlay.id, newEnd: overlay.endSeconds + timeDelta)
+      editorState.updateImageOverlayEnd(id: overlay.id, newEnd: overlay.endSeconds + timeDelta)
     case nil:
       break
     }
