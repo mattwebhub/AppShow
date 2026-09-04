@@ -1,12 +1,12 @@
-APP_NAME = Reframed
-SCHEME = Reframed
+APP_NAME = AppShow
+SCHEME = AppShow
 ARCH = $(shell uname -m)
 DESTINATION = platform=macOS,arch=$(ARCH)
 BUILD_DIR = .build
 VERSION = $(shell grep MARKETING_VERSION Config.xcconfig | cut -d'=' -f2 | tr -d ' ')
 RELEASE_DIR = $(BUILD_DIR)/Build/Products/Release
 DEBUG_DIR = $(BUILD_DIR)/Build/Products/Debug
-TEST_TARGET = ReframedTests
+TEST_TARGET = AppShowTests
 TEST_FILTER = $(if $(T),-only-testing:'$(TEST_TARGET)/$(T)',-only-testing:$(TEST_TARGET))
 TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning:|failed
 
@@ -15,10 +15,10 @@ TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning
 all: help
 
 build:
-	@xcodebuild -project Reframed.xcodeproj -scheme $(SCHEME) -configuration Debug build -quiet -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)'
+	@xcodebuild -project AppShow.xcodeproj -scheme $(SCHEME) -configuration Debug build -quiet -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)'
 
 release:
-	@xcodebuild -project Reframed.xcodeproj -scheme $(SCHEME) -configuration Release build -quiet -derivedDataPath $(BUILD_DIR) -destination 'generic/platform=macOS' ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO
+	@xcodebuild -project AppShow.xcodeproj -scheme $(SCHEME) -configuration Release build -quiet -derivedDataPath $(BUILD_DIR) -destination 'generic/platform=macOS' ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO
 
 run: release
 	@open $(RELEASE_DIR)/$(APP_NAME).app
@@ -27,7 +27,7 @@ dev: build
 	@open $(DEBUG_DIR)/$(APP_NAME).app
 
 test:
-	@set -o pipefail; xcodebuild -project Reframed.xcodeproj -scheme $(SCHEME) -configuration Debug test -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)' -parallel-testing-enabled NO $(TEST_FILTER) 2>&1 | grep -E '$(TEST_OUTPUT_FILTER)'
+	@set -o pipefail; xcodebuild -project AppShow.xcodeproj -scheme $(SCHEME) -configuration Debug test -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)' -parallel-testing-enabled NO $(TEST_FILTER) 2>&1 | grep -E '$(TEST_OUTPUT_FILTER)'
 
 test-shim:
 	@TEST_RUNNER_REFRAMED_RUN_SHIM_TESTS=1 $(MAKE) test T=AgentShimTests
@@ -68,16 +68,16 @@ publish: tag dmg-release appcast
 	@./scripts/publish-release.sh
 
 format:
-	@swift format -i -r Reframed/ Tools/ $(wildcard ReframedTests)
+	@swift format -i -r AppShow/ Tools/ $(wildcard AppShowTests)
 
 lint:
-	@swift format lint -r -s Reframed/ Tools/ $(wildcard ReframedTests)
+	@swift format lint -r -s AppShow/ Tools/ $(wildcard AppShowTests)
 
 clean:
 	@rm -rf $(BUILD_DIR) dist
 
 help:
-	@echo "Reframed Build System"
+	@echo "AppShow Build System"
 	@echo ""
 	@echo "Usage: make [target]"
 	@echo ""
