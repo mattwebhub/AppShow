@@ -12,8 +12,8 @@ Reminder: **these folders are not Swift modules.** Everything compiles into the 
 
 | Cluster | Key types | Notes |
 | --- | --- | --- |
-| Provider protocol | `AgentProvider`, `ClaudeCodeProvider`, `CodexProvider`, `AgentEvent` | Builds safe read-only arguments and reduces versioned NDJSON into typed events. Unknown events are tolerated. |
-| Process boundary | `AgentProcessRunner`, `AgentSession` | Actors. One fresh child process per turn; cancellation terminates it. `AgentSession` maps process lines to events and accepts saved provider resume ids. |
+| Provider protocol | `AgentProvider`, `ClaudeCodeProvider`, `CodexProvider`, `AgentEvent` | Keeps each CLI's filesystem sandbox read-only, adds only the scoped AppShow MCP server, and reduces versioned NDJSON into typed events. Unknown events are tolerated. |
+| Process boundary | `AgentProcessRunner`, `AgentSession` | Actors. One fresh child process per turn; cancellation terminates it. `AgentSession` maps process lines to events and accepts saved provider resume ids. The scrubbed environment retains `USER`/`LOGNAME`, which Claude's first-party credential lookup requires. |
 | Discovery | `AgentToolchain`, `AgentProbe`, `AgentReadiness` | Actors resolve executables and run bounded version/authentication probes without invoking a real CLI in tests. |
 | Persistence | `AgentConversationData`, `AgentConversationStore`, `AgentTranscript` | Exactly one `agent/conversation.json` inside each `.frm`; provider resume ids are stored independently. `AgentTranscript` is `@MainActor @Observable`. |
 | UI | `AgentChatPanel`, `AgentConversationView`, `AgentMarkdownView` | Persisted collapse/width, provider picker, explicit clear, streamed Markdown and expandable tool rows. |

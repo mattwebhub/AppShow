@@ -24,11 +24,14 @@ enum AgentEnvironment {
     forwarding: [String],
     source: [String: String] = ProcessInfo.processInfo.environment
   ) -> [String: String] {
+    let user = source["USER"] ?? URL(fileURLWithPath: home).lastPathComponent
     var environment = [
       "PATH": path,
       "HOME": home,
       "LANG": source["LANG"] ?? "en_US.UTF-8",
       "TERM": source["TERM"] ?? "xterm-256color",
+      "USER": user,
+      "LOGNAME": source["LOGNAME"] ?? user,
     ]
     for key in forwarding where key != "PATH" && key != "HOME" {
       if let value = source[key] {
