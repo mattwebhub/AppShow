@@ -14,3 +14,11 @@ enum AgentPanelLayout {
     collapsed ? collapsedWidth : clamp(expandedWidth)
   }
 }
+
+enum AgentProjectWorkspace {
+  static func directory(for bundleURL: URL) -> URL {
+    bundleURL.deletingLastPathComponent()
+      .appendingPathComponent(".agent", isDirectory: true)
+      .appendingPathComponent(bundleURL.deletingPathExtension().lastPathComponent, isDirectory: true)
+  }
+}
