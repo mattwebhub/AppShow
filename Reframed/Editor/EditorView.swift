@@ -47,6 +47,7 @@ struct EditorView: View {
         HStack(spacing: 8) {
           AgentChatPanel(
             transcript: editorState.agentTranscript,
+            confirmations: editorState.agentConfirmations,
             project: editorState.project,
             isExporting: editorState.isExporting
           )

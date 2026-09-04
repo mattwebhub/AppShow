@@ -49,6 +49,7 @@ Keep this list current. Each entry links the ADR that justifies it.
 - `AGENTS.md` canonical, `CLAUDE.md` symlink; assistant-neutral wording: `decisions/0007-assistant-agnostic-docs.md`
 - Read-only agent tool bridge (milestone 05): new `Reframed/Agent/Tools/` module with JSON-RPC framing, MCP-shaped catalog and results, main-actor dispatcher, preview-frame renderer, authenticated Unix socket server, and sibling `.agent/` workspace; source registration only in `Reframed.xcodeproj/project.pbxproj`: `planning/milestones/05-agent-tools-readonly/PLAN.md`
 - Agent editing transactions (milestone 06): `AgentToolDispatcher.swift` adds mutation opt-in, rollback, labeled calls, grouped batches, timeout restoration and user-history cancellation; `AgentEditingTools.swift` adds trim, zoom, spotlight, exact kept-slice and removed-range tools; `AgentTool.swift` validates nested array schemas and reports structured batch errors; `EditorState+Persistence.swift` suppresses delayed batch snapshots and correctly restores saved trim; `CutTimeline.swift` subtracts exact source ranges: `planning/features/agent-editing/SPEC.md`
+- Agent confirmation capability (milestone 06): new `AgentConfirmations.swift` owns expiring, single-use approvals bound to exact normalized operations; `AgentConfirmationView.swift`, `AgentChatPanel.swift`, `AgentConversationView.swift`, `EditorView.swift`, and `EditorState.swift` expose Allow Once/Deny inside the single project conversation and clear grants with the runtime session: `planning/features/agent-editing/SPEC.md`
 
 ## Cadence
 

@@ -445,6 +445,7 @@ extension EditorState {
 
   func teardown() {
     agentTranscript.teardown()
+    agentConfirmations.clear()
     pendingSaveTask?.cancel()
     pendingUndoTask?.cancel()
     micProcessingTask?.cancel()
