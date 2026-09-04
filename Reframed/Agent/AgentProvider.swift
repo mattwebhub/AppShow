@@ -24,10 +24,12 @@ enum AgentProviderKind: String, Codable, CaseIterable, Sendable, Identifiable {
 struct AgentTurn: Sendable, Equatable {
   var prompt: String
   var resumeID: String?
+  var configuration: AgentSessionConfig?
 
-  init(prompt: String, resumeID: String? = nil) {
+  init(prompt: String, resumeID: String? = nil, configuration: AgentSessionConfig? = nil) {
     self.prompt = prompt
     self.resumeID = resumeID
+    self.configuration = configuration
   }
 }
 

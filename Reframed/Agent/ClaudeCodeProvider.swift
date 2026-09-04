@@ -12,6 +12,9 @@ struct ClaudeCodeProvider: AgentProvider {
     for tool in Self.allowedTools {
       parts += ["--allowedTools", tool]
     }
+    if let configuration = turn.configuration {
+      parts += configuration.claudeArguments
+    }
     if let resumeID = turn.resumeID {
       parts += ["--resume", resumeID]
     }

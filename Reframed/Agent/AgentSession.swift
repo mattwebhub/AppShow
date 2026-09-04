@@ -7,6 +7,7 @@ actor AgentSession {
   private let executable: URL
   private let workingDirectory: URL
   private let environment: [String: String]
+  private let configuration: AgentSessionConfig?
   private var runner: AgentProcessRunner?
   private var cancelPending = false
   private(set) var resumeIDs: [AgentProviderKind: String]
@@ -17,12 +18,14 @@ actor AgentSession {
     executable: URL,
     workingDirectory: URL,
     environment: [String: String],
+    configuration: AgentSessionConfig? = nil,
     resumeIDs: [AgentProviderKind: String] = [:]
   ) {
     self.provider = provider
     self.executable = executable
     self.workingDirectory = workingDirectory
     self.environment = environment
+    self.configuration = configuration
     self.resumeIDs = resumeIDs
   }
 
@@ -45,7 +48,7 @@ actor AgentSession {
       continuation.finish(throwing: AgentError.cancelled)
       return stream
     }
-    let turn = AgentTurn(prompt: prompt, resumeID: resumeIDs[provider.id])
+    let turn = AgentTurn(prompt: prompt, resumeID: resumeIDs[provider.id], configuration: configuration)
     let launch = AgentProcessLaunch(
       executable: executable,
       arguments: provider.arguments(for: turn),

@@ -54,12 +54,12 @@ Phases 1, 3, 5, 6, 7, 8 can be built and fully tested before spike 03 lands, usi
 | `toolsCallIsDispatchedOnMainActorAndAnswersOnTheSocket()` | same | send `tools/call get_timeline` → response contains `duration` from the fixture editor | T2 |
 | `slowToolTimesOutWithStructuredError()` | same | register a test tool that sleeps 2 s with a 0.5 s timeout → `TOOL_TIMEOUT`, server still answers the next call | T2 |
 | `claudeMCPConfigAndCodexOverridesAreGenerated()` | `ReframedTests/Agent/AgentSessionConfigTests.swift` | `AgentSessionConfig.claudeMCPConfigJSON` == `{"mcpServers":{"reframed":{"type":"stdio","command":…,"env":{…}}}}` (sorted keys); `codexArguments` starts with `["-c","mcp_servers={}"]` and contains `mcp_servers.reframed.command=…`, `.env_vars=[…]`, `.tool_timeout_sec=600`, one `approval_mode="approve"` per non-gated tool | T1 |
-| `shimForwardsStdinToSocketAndBack()` | `ReframedTests/Agent/AgentShimTests.swift`, `.enabled(if: env["REFRAMED_RUN_SHIM_TESTS"] == "1")` | spawn the built `reframed-mcp` with a fake socket server in the test, write `initialize`, read the response (mirrors Toone's `tool-advertising.test.ts`) | T2, gated |
+| `bundledShimInjectsAuthenticationAndListsEditingTools()` | `ReframedTests/Agent/AgentShimTests.swift`, `.enabled(if: env["REFRAMED_RUN_SHIM_TESTS"] == "1")` | spawn the embedded `appshow-mcp`, initialize without the private token field, and discover the editing catalog through the live app socket | T2, gated |
 
 **Production**
 
 - `Reframed/Agent/JSONRPC.swift` (codec), `Reframed/Agent/AgentRPCHandler.swift` (`initialize`, `tools/list`, `tools/call`, `ping`), `Reframed/Agent/AgentBridgeServer.swift` (`actor`, `NWListener` on `NWEndpoint.unix`, one connection per session, token + editor id check, per-tool timeout).
-- New target `reframed-mcp` (`Tools/reframed-mcp/main.swift`, Foundation only, ~120 lines): reads stdin lines, connects to `REFRAMED_AGENT_SOCKET`, forwards, relays; exits when stdin closes. Copied into `Contents/Helpers` by a Copy Files phase; inherits `Config.xcconfig` signing.
+- New target `appshow-mcp` (`Tools/appshow-mcp/main.swift`, Foundation only): reads stdin lines, injects session authentication into `initialize`, connects to `REFRAMED_AGENT_SOCKET`, forwards and relays; exits when stdin closes. Copied into `Contents/Helpers` by a Copy Files phase and signed with the app.
 - `Reframed/Agent/AgentSessionConfig.swift`: workspace layout, token generation, `claudeMCPConfigJSON`, `codexArguments`, `processEnvironment`.
 - `Makefile`: `test-shim` target gated like `test-export`.
 

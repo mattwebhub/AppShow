@@ -1,7 +1,7 @@
 import Foundation
 
 enum AgentToolCatalog {
-  static let serverName = "reframed"
+  static let serverName = "appshow"
   static let protocolVersion = "2025-06-18"
 
   static let getProjectSummary = AgentToolDefinition(

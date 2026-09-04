@@ -53,7 +53,7 @@ actor AgentRPCSession {
       return .silent
     }
     if request.method == "initialize" {
-      return initialize(request)
+      return await initialize(request)
     }
     if request.method.hasPrefix("notifications/") {
       return .silent
@@ -78,18 +78,22 @@ actor AgentRPCSession {
     }
   }
 
-  private func initialize(_ request: JSONRPCRequest) -> AgentRPCOutcome {
+  private func initialize(_ request: JSONRPCRequest) async -> AgentRPCOutcome {
     guard request.params?["token"]?.stringValue == token else {
       let error = JSONRPCError(code: Self.unauthorizedCode, message: "Unauthorized: wrong session token", data: ["code": "UNAUTHORIZED"])
       return AgentRPCOutcome(reply: JSONRPCResponse(id: request.id, error: error), closeAfterReply: true)
     }
     initialized = true
+    let supportsMutations = await dispatcher.supportsMutations
+    let instructions =
+      supportsMutations
+      ? "Tools inspect and edit the recording open in AppShow. Times are seconds in source time. Mutations appear live and are undoable."
+      : "Tools inspect the recording open in AppShow. Times are seconds in source time. This connection is read-only."
     let result: JSONValue = [
       "protocolVersion": .string(AgentToolCatalog.protocolVersion),
       "capabilities": ["tools": ["listChanged": false]],
       "serverInfo": ["name": .string(AgentToolCatalog.serverName), "version": .string(serverVersion)],
-      "instructions":
-        "Tools inspect the recording that is open in the Reframed editor. Times are seconds in source time. Nothing here changes the project.",
+      "instructions": .string(instructions),
     ]
     return reply(to: request, result: result)
   }

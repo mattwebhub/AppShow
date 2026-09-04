@@ -4,6 +4,7 @@ import SwiftUI
 struct AgentChatPanel: View {
   @Bindable var transcript: AgentTranscript
   @Bindable var confirmations: AgentConfirmations
+  let sessionConfiguration: AgentSessionConfig?
   let project: ReframedProject?
   let isExporting: Bool
   @State private var collapsed: Bool
@@ -15,11 +16,13 @@ struct AgentChatPanel: View {
   init(
     transcript: AgentTranscript,
     confirmations: AgentConfirmations,
+    sessionConfiguration: AgentSessionConfig?,
     project: ReframedProject?,
     isExporting: Bool
   ) {
     self.transcript = transcript
     self.confirmations = confirmations
+    self.sessionConfiguration = sessionConfiguration
     self.project = project
     self.isExporting = isExporting
     let state = StateService.shared
@@ -123,6 +126,7 @@ struct AgentChatPanel: View {
     AgentConversationView(
       transcript: transcript,
       confirmations: confirmations,
+      sessionConfiguration: sessionConfiguration,
       project: project,
       isExporting: isExporting
     )

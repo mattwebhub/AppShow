@@ -85,6 +85,10 @@
 		7E5900000000000000000002 /* AgentEditingTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5900000000000000000001 /* AgentEditingTools.swift */; };
 		7E5A00000000000000000002 /* AgentConfirmations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A00000000000000000001 /* AgentConfirmations.swift */; };
 		7E5A00000000000000000004 /* AgentConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A00000000000000000003 /* AgentConfirmationView.swift */; };
+		7E5A00000000000000000006 /* AgentSessionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A00000000000000000005 /* AgentSessionConfig.swift */; };
+		7E5A00000000000000000008 /* AgentBridgeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A00000000000000000007 /* AgentBridgeController.swift */; };
+		7E5B00000000000000000001 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B00000000000000000003 /* main.swift */; };
+		7E5B00000000000000000002 /* appshow-mcp in Embed Helpers */ = {isa = PBXBuildFile; fileRef = 7E5B00000000000000000004 /* appshow-mcp */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7E57000000000000000000C0 /* AgentToolPreviewFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BF /* AgentToolPreviewFrame.swift */; };
 		7E57000000000000000000BE /* AgentToolHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BD /* AgentToolHandlers.swift */; };
 		7E57000000000000000000BC /* AgentToolCursorActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BB /* AgentToolCursorActivity.swift */; };
@@ -308,6 +312,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		7E5B0000000000000000000A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F10000000000000000000002 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7E5B00000000000000000008;
+			remoteInfo = "appshow-mcp";
+		};
 		7E570000000000000000000A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F10000000000000000000002 /* Project object */;
@@ -317,7 +328,23 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		7E5B00000000000000000009 /* Embed Helpers */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Helpers;
+			dstSubfolderSpec = 1;
+			files = (
+				7E5B00000000000000000002 /* appshow-mcp in Embed Helpers */,
+			);
+			name = "Embed Helpers";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		7E5B00000000000000000003 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		7E5B00000000000000000004 /* appshow-mcp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "appshow-mcp"; sourceTree = BUILT_PRODUCTS_DIR; };
 		028393B5A95F5605BC666DB9 /* VideoPreviewView+Coordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "VideoPreviewView+Coordinator.swift"; sourceTree = "<group>"; };
 		09CFADDE8FE6ED6F3B706F61 /* TimelineView+Overlays.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "TimelineView+Overlays.swift"; sourceTree = "<group>"; };
 		15FC8EFFF8F25B538B770019 /* ZoomKeyframeEditor+RegionView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "ZoomKeyframeEditor+RegionView.swift"; sourceTree = "<group>"; };
@@ -393,6 +420,8 @@
 		7E5900000000000000000001 /* AgentEditingTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentEditingTools.swift; sourceTree = "<group>"; };
 		7E5A00000000000000000001 /* AgentConfirmations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfirmations.swift; sourceTree = "<group>"; };
 		7E5A00000000000000000003 /* AgentConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfirmationView.swift; sourceTree = "<group>"; };
+		7E5A00000000000000000005 /* AgentSessionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSessionConfig.swift; sourceTree = "<group>"; };
+		7E5A00000000000000000007 /* AgentBridgeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBridgeController.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BF /* AgentToolPreviewFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolPreviewFrame.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BD /* AgentToolHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolHandlers.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BB /* AgentToolCursorActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolCursorActivity.swift; sourceTree = "<group>"; };
@@ -627,6 +656,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		7E5B00000000000000000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7E5700000000000000000008 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -651,6 +687,7 @@
 			isa = PBXGroup;
 			children = (
 				CC0000000000000000000001 /* Config.xcconfig */,
+				7E5B00000000000000000005 /* Tools */,
 				D10000000000000000000002 /* Reframed */,
 				7E5700000000000000000001 /* ReframedTests */,
 				D1000000000000000000000A /* Frameworks */,
@@ -798,8 +835,25 @@
 			children = (
 				B1000000000000000000001B /* Reframed.app */,
 				7E5700000000000000000002 /* ReframedTests.xctest */,
+				7E5B00000000000000000004 /* appshow-mcp */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7E5B00000000000000000005 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				7E5B0000000000000000000F /* appshow-mcp */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		7E5B0000000000000000000F /* appshow-mcp */ = {
+			isa = PBXGroup;
+			children = (
+				7E5B00000000000000000003 /* main.swift */,
+			);
+			path = "appshow-mcp";
 			sourceTree = "<group>";
 		};
 		D1000000000000000000000C /* UI */ = {
@@ -934,6 +988,7 @@
 				7E570000000000000000007F /* AgentReadiness.swift */,
 				7E5700000000000000000081 /* AgentMarkdownView.swift */,
 				7E5A00000000000000000003 /* AgentConfirmationView.swift */,
+				7E5A00000000000000000005 /* AgentSessionConfig.swift */,
 			);
 			path = Agent;
 			sourceTree = "<group>";
@@ -1055,6 +1110,7 @@
 				7E57000000000000000000C3 /* AgentRPCSession.swift */,
 				7E57000000000000000000C5 /* AgentBridgeServer.swift */,
 				7E57000000000000000000C7 /* AgentWorkspace.swift */,
+				7E5A00000000000000000007 /* AgentBridgeController.swift */,
 			);
 			name = Tools;
 			path = Agent/Tools;
@@ -1111,6 +1167,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		7E5B00000000000000000008 /* appshow-mcp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7E5B0000000000000000000E /* Build configuration list for PBXNativeTarget "appshow-mcp" */;
+			buildPhases = (
+				7E5B00000000000000000007 /* Sources */,
+				7E5B00000000000000000006 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "appshow-mcp";
+			packageProductDependencies = (
+			);
+			productName = "appshow-mcp";
+			productReference = 7E5B00000000000000000004 /* appshow-mcp */;
+			productType = "com.apple.product-type.tool";
+		};
 		7E5700000000000000000003 /* ReframedTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7E5700000000000000000004 /* Build configuration list for PBXNativeTarget "ReframedTests" */;
@@ -1141,10 +1215,12 @@
 				C10000000000000000000002 /* Sources */,
 				C10000000000000000000001 /* Frameworks */,
 				C10000000000000000000003 /* Resources */,
+				7E5B00000000000000000009 /* Embed Helpers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				7E5B0000000000000000000B /* PBXTargetDependency */,
 			);
 			name = Reframed;
 			packageProductDependencies = (
@@ -1168,6 +1244,9 @@
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
+					7E5B00000000000000000008 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 					7E5700000000000000000003 = {
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = F10000000000000000000001;
@@ -1199,6 +1278,7 @@
 			targets = (
 				F10000000000000000000001 /* Reframed */,
 				7E5700000000000000000003 /* ReframedTests */,
+				7E5B00000000000000000008 /* appshow-mcp */,
 			);
 		};
 /* End PBXProject section */
@@ -1219,6 +1299,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7E5B00000000000000000007 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E5B00000000000000000001 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7E5700000000000000000007 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -1430,12 +1518,14 @@
 				7E5700000000000000000043 /* PropertiesPanel+MusicSection.swift in Sources */,
 				7E5700000000000000000041 /* ExternalAudioSchedule.swift in Sources */,
 				7E57000000000000000000C8 /* AgentWorkspace.swift in Sources */,
+				7E5A00000000000000000008 /* AgentBridgeController.swift in Sources */,
 				7E57000000000000000000C6 /* AgentBridgeServer.swift in Sources */,
 				7E57000000000000000000C4 /* AgentRPCSession.swift in Sources */,
 				7E57000000000000000000C2 /* AgentToolDispatcher.swift in Sources */,
 				7E5900000000000000000002 /* AgentEditingTools.swift in Sources */,
 				7E5A00000000000000000002 /* AgentConfirmations.swift in Sources */,
 				7E5A00000000000000000004 /* AgentConfirmationView.swift in Sources */,
+				7E5A00000000000000000006 /* AgentSessionConfig.swift in Sources */,
 				7E57000000000000000000C0 /* AgentToolPreviewFrame.swift in Sources */,
 				7E57000000000000000000BE /* AgentToolHandlers.swift in Sources */,
 				7E57000000000000000000BC /* AgentToolCursorActivity.swift in Sources */,
@@ -1521,6 +1611,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		7E5B0000000000000000000B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7E5B00000000000000000008 /* appshow-mcp */;
+			targetProxy = 7E5B0000000000000000000A /* PBXContainerItemProxy */;
+		};
 		7E570000000000000000000B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F10000000000000000000001 /* Reframed */;
@@ -1529,6 +1624,30 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		7E5B0000000000000000000C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC0000000000000000000001 /* Config.xcconfig */;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_NAME = "appshow-mcp";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		7E5B0000000000000000000D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC0000000000000000000001 /* Config.xcconfig */;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_NAME = "appshow-mcp";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
 		7E5700000000000000000005 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CC0000000000000000000001 /* Config.xcconfig */;
@@ -1776,6 +1895,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7E5B0000000000000000000E /* Build configuration list for PBXNativeTarget "appshow-mcp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7E5B0000000000000000000C /* Debug */,
+				7E5B0000000000000000000D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		7E5700000000000000000004 /* Build configuration list for PBXNativeTarget "ReframedTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

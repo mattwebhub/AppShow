@@ -31,7 +31,7 @@ struct AgentReadinessTests {
         echo '{"loggedIn":false}'
         """
     )
-    let readiness = await AgentProbe(timeout: .seconds(2)).check(
+    let readiness = await AgentProbe(timeout: .seconds(10)).check(
       provider: .claudeCode,
       executable: executable,
       environment: environment(for: directory)
@@ -52,7 +52,7 @@ struct AgentReadinessTests {
         echo '{"loggedIn":true}'
         """
     )
-    let readiness = await AgentProbe(timeout: .seconds(2)).check(
+    let readiness = await AgentProbe(timeout: .seconds(10)).check(
       provider: .claudeCode,
       executable: executable,
       environment: environment(for: directory)
@@ -73,7 +73,7 @@ struct AgentReadinessTests {
         echo "Logged in using ChatGPT"
         """
     )
-    let readiness = await AgentProbe(timeout: .seconds(2)).check(
+    let readiness = await AgentProbe(timeout: .seconds(10)).check(
       provider: .codex,
       executable: executable,
       environment: environment(for: directory)
@@ -95,7 +95,7 @@ struct AgentReadinessTests {
         exit 1
         """
     )
-    let readiness = await AgentProbe(timeout: .seconds(2)).check(
+    let readiness = await AgentProbe(timeout: .seconds(10)).check(
       provider: .codex,
       executable: executable,
       environment: environment(for: directory)

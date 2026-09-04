@@ -51,6 +51,10 @@ final class AgentToolDispatcher {
     definitions.filter { $0.isAvailable && (allowsMutations || !$0.mutating) }
   }
 
+  var supportsMutations: Bool {
+    allowsMutations
+  }
+
   var toolsListResult: JSONValue {
     ["tools": .array(advertisedDefinitions.map(\.mcpValue))]
   }
@@ -73,6 +77,17 @@ final class AgentToolDispatcher {
       throw AgentToolError.mutationNotAllowed(name)
     }
     let validated = try AgentToolSchema.validate(arguments, against: definition.inputSchema)
+    let activity =
+      definition.mutating
+      ? AgentActivity(toolName: name, label: Self.mutationLabel(arguments: validated, fallback: name)) : nil
+    if let activity {
+      context.editorState.agentActivity = activity
+    }
+    defer {
+      if let activity, context.editorState.agentActivity?.id == activity.id {
+        context.editorState.agentActivity = nil
+      }
+    }
     if name == AgentEditingToolCatalog.beginBatch.name {
       return try beginBatch(arguments: validated)
     }
@@ -88,6 +103,7 @@ final class AgentToolDispatcher {
           let label = Self.mutationLabel(arguments: validated, fallback: name)
           context.editorState.history.pushSnapshot(context.editorState.createSnapshot(), label: label)
         }
+        context.editorState.lastAgentChange = Self.timelineChange(name: name, arguments: validated)
       }
       logger.info("Agent tool \(name) completed")
       return definition.mutating ? context.timelineResult() : value
@@ -165,5 +181,23 @@ final class AgentToolDispatcher {
     let requested = arguments["label"]?.stringValue?.trimmingCharacters(in: .whitespacesAndNewlines)
     let value = requested.flatMap { $0.isEmpty ? nil : $0 } ?? fallback.replacingOccurrences(of: "_", with: " ")
     return "Agent: \(value.prefix(80))"
+  }
+
+  private static func timelineChange(name: String, arguments: JSONValue) -> AgentTimelineChange {
+    let start = arguments["start"]?.doubleValue ?? arguments["at"]?.doubleValue ?? 0
+    let end = arguments["end"]?.doubleValue ?? start
+    let track: String =
+      switch name {
+      case "set_trim", "set_kept_slices", "remove_time_range": "screen"
+      case "add_zoom": "zoom"
+      case "add_spotlight": "spotlight"
+      default: name.split(separator: "_").first.map(String.init) ?? name
+      }
+    return AgentTimelineChange(
+      track: track,
+      startSeconds: start,
+      endSeconds: end,
+      label: mutationLabel(arguments: arguments, fallback: name)
+    )
   }
 }
