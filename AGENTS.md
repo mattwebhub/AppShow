@@ -50,7 +50,7 @@ Reframed is a macOS screen recording app with a menu bar interface, floating cap
 
 ```
 Reframed/
-├── Agent/            Agent protocol models, read-only tools, preview rendering, and local socket bridge
+├── Agent/            Claude Code/Codex chat, protocol models, editor tools, preview rendering, and local socket bridge
 ├── App/              AppDelegate, Permissions, WindowController
 ├── CaptureModes/     Area/Screen/Window/Device selection + Common overlay components
 ├── Compositor/       Video composition & export (VideoCompositor, FrameRenderer, ExportSettings, BackgroundStyle, CameraLayout, GradientPresets)
@@ -104,6 +104,7 @@ After selection, ScreenCaptureKit captures the chosen target. CVPixelBuffers flo
 Built-in editor with:
 - Timeline trimming (independent trim ranges for video, system audio, mic audio)
 - Keep-slices (`CutTimeline`): the transport-bar cut button splits at the playhead, a Cuts track appears under Screen, playback jumps over gaps, export concatenates kept slices
+- Assistant panel: collapsible project chat using Claude Code or Codex, one persisted conversation per `.frm`, fresh process per turn with provider-specific session resumption
 - Audio regions (per-track independent audio trimming with volume and mute controls)
 - Background styles (none, solid color, gradient presets, background image with fill modes)
 - Canvas aspect ratios (original, 16:9, 1:1, 4:3, 9:16)
@@ -133,7 +134,7 @@ The `Compositor/` module handles all video composition and export:
 
 ### Agent tool bridge
 
-`Reframed/Agent/Tools/` exposes read-only editor inspection over newline-framed JSON-RPC on an authenticated Unix socket. The catalog and results use MCP-compatible `tools/list` and `tools/call` shapes. Calls enter the main-actor `AgentToolDispatcher`, and the milestone-05 dispatcher refuses every mutating definition. Ephemeral socket, token, and frame files live in a sibling `.agent/` workspace; portable conversation history belongs inside the `.frm` project (ADR 0010).
+`Reframed/Agent/Tools/` exposes editor inspection and opt-in editing over newline-framed JSON-RPC on an authenticated Unix socket. The catalog and results use MCP-compatible `tools/list` and `tools/call` shapes. Calls enter the main-actor `AgentToolDispatcher`; read-only sessions refuse mutations, while editing sessions create one labeled undo step per call or explicit batch. Ephemeral socket, token, and frame files live in a sibling `.agent/` workspace; portable conversation history belongs inside the `.frm` project (ADR 0010).
 
 ### Project management
 
@@ -150,6 +151,8 @@ recording-YYYY-MM-DD-HHmmss.frm/
 ```
 
 Projects can be reopened and re-edited. Editor state is persisted in `project.json` including: trim ranges, background style, canvas aspect, camera layout/regions with transitions, cursor settings, zoom keyframes, animation settings, audio settings (volume/mute/noise reduction), and audio regions.
+
+Each project may also contain `agent/conversation.json`, the single persisted assistant conversation and provider-specific resume ids. Ephemeral agent sockets, tokens, and preview frames live beside the bundle in `.agent/<project-name>/`.
 
 ### Coordinate system
 

@@ -2,6 +2,8 @@
 
 Companion to `SPIKE.md`. Rules from `planning/tdd-strategy.md`: failing test first, one behaviour per test named as a sentence, no test touches `~/.reframed`, `~/.claude`, `~/.codex`, the network, or a real CLI. Tiers T1/T2/T3 are from `docs/architecture/07-testability.md` §1. Sizes: S ≤ 1 day, M 2–3 days, L 4–6 days.
 
+Owner decision 2026-09-04: ADR 0010 supersedes the multi-thread portions of the original spike. Each project has exactly one persisted conversation, a confirmed clear action, and provider-specific resume ids. Every turn still launches a fresh operating-system process.
+
 Toone paths below are relative to `/Users/matheusparanhos/Projects/toone/apps/toone-desktop/Toone`.
 
 ## Toone files to copy first, in this order
@@ -19,8 +21,6 @@ Toone paths below are relative to `/Users/matheusparanhos/Projects/toone/apps/to
 | 9 | `Toone/Features/Chat/Views/MarkdownTextView.swift:35-53, 59-610, 614-833, 877-1074` | `Reframed/Agent/AgentMarkdownView.swift` (+ `AgentMarkdownParser.swift` for the pure block parser) | `Colors.`, `layoutStyle`, `appEnvironment`, Mermaid |
 | 10 | `Toone/Features/Chat/Views/RichMessageBubble.swift:852-867, 880-1004, 1040-1062` | `AgentStreamingCursor.swift`, `AgentToolCallRow.swift` | file-viewer links, `DesignTokens` |
 | 11 | `Toone/Features/Chat/Views/ChatPanelView.swift:136-186` | `Reframed/Agent/AgentTranscriptLayoutPolicy.swift` | nothing |
-| 12 | `Toone/Features/Chat/Models/ThreadActivityState.swift:10-68` | `Reframed/Agent/AgentThreadActivity.swift` | `RoutineExecution` |
-| 13 | `Toone/Features/Chat/Models/SlashSubmissionResolver.swift:8-41` | `Reframed/Agent/AgentSlashResolver.swift` (phase 7) | nothing |
 
 ## Phase 1 — provider protocol and stream parsers (pure) · size M · T1
 
@@ -76,27 +76,27 @@ Production: `Reframed/Agent/AgentProcessRunner.swift` (actor), `AgentSession.swi
 
 Manual check: Activity Monitor shows no `claude`/`codex` process after closing the editor window (T3, record in `VERIFY.md`).
 
-## Phase 3 — transcript model and persistence · size M · T1/T2
+## Phase 3 — conversation model and persistence · size M · T1/T2
 
 | Test | File | Assertion |
 | --- | --- | --- |
-| `threadDataRoundTripsThroughJson` | `AgentThreadDataTests.swift` | encode → decode equality with `.iso8601` dates |
-| `messageContentWithUnknownTypeDecodesAsText` | same | forward-compatible discriminator |
-| `legacyThreadWithoutProviderFieldDecodesAsClaude` | same | `decodeOrDefault` path |
+| `conversationRoundTripsThroughJson` | `AgentConversationStoreTests.swift` | encode → decode equality with provider-scoped resume ids |
+| `messageContentWithUnknownTypeDecodesAsText` | `AgentTranscriptTests.swift` | forward-compatible discriminator |
+| `legacySessionIdMigratesToProviderResumeIds` | `AgentConversationStoreTests.swift` | one-time compatibility path |
 | `assistantTextEventReplacesStreamingMessageText` | `AgentTranscriptTests.swift` (`@MainActor`) | two `.assistantText` events → one message, `isStreaming == true`, latest text |
 | `toolCallEventAppendsToolRowToStreamingMessage` | same | content array gains `.toolCall(status: .executing)` |
 | `toolResultEventCompletesMatchingToolRow` | same | status `.completed`/`.failed` by `isError` |
 | `turnCompletedFinalisesMessageAndClearsRunning` | same | `isStreaming == false`, `isRunning == false` |
 | `failedTurnMarksMessageFailedWithReason` | same | `status == .failed`, reason text present |
-| `sessionStartedStoresProviderScopedSessionId` | same | `thread.sessionID == "…"`, `thread.provider == .claudeCode` |
-| `switchingProviderStartsANewThread` | same | old thread untouched, new thread has `sessionID == nil` |
+| `sessionStartedStoresProviderScopedResumeId` | same | the active provider's id changes without removing the other provider's id |
+| `switchingProviderKeepsTheConversation` | same | messages remain and future turns use the selected provider's resume id |
 | `transcriptIdsAreUniqueAcrossCodexItemReuse` | same | closes phase-1 `codexReusedItemIdsDoNotCollide` |
-| `transcriptSavesToAgentDirectoryInsideBundle` | `AgentTranscriptPersistenceTests.swift` | temp `.frm` dir; `agent/threads.json` and `agent/<id>.json` exist, sorted keys |
-| `transcriptLoadsThreadsAndLastActiveThread` | same | round trip through a temp bundle |
-| `transcriptSaveIsDebouncedAndFlushedOnTurnEnd` | same | one write after N events, another on completion |
+| `conversationSavesInsideTheBundle` | `AgentConversationStoreTests.swift` | temp `.frm` dir; `agent/conversation.json` exists |
+| `conversationLoadsWhenTheProjectReopens` | same | round trip through a temp bundle |
+| `clearRemovesMessagesAndResumeIds` | `AgentTranscriptTests.swift` | provider stays selected; transcript and ids reset |
 | `renamedProjectKeepsAgentDirectory` | `ReframedProjectTests.swift` | `ReframedProject.rename(to:)` on a temp bundle with `agent/` moves it |
 
-Production: `AgentThreadData.swift`, `AgentTranscript.swift`, `AgentTranscript+Persistence.swift`. `AgentTranscript` takes the session as a protocol (`AgentSessionProviding`) so tests inject a scripted double instead of a process.
+Production: `AgentConversationData.swift`, `AgentConversationStore.swift`, `AgentTranscript.swift`. `AgentTranscript` consumes an `AgentSession` created for each turn; reducer behavior is tested without a process and process integration uses fake executables.
 
 Manual check: none.
 
@@ -146,21 +146,18 @@ Production: `AgentReadiness.swift`, `AgentToolchain.swift` (actor `AgentProbe` w
 
 Manual check (T3): on a machine with neither CLI the panel shows the `.missing` card and the searched directories; after `brew install`/`npm i -g` "Check again" flips to ready without restarting; logged-out state shows the Terminal instruction.
 
-## Phase 7 — thread management · size S · T1/T2
+## Phase 7 — conversation lifecycle · size S · T1/T2
 
 | Test | File | Assertion |
 | --- | --- | --- |
-| `newThreadBecomesActiveAndIsPersisted` | `AgentTranscriptTests.swift` | count +1, `activeThreadID` updated, `threads.json` rewritten |
-| `deletingActiveThreadActivatesMostRecentRemaining` | same | ordering by `lastActivityAt` |
-| `threadTitleDefaultsToFirstPromptTruncatedToSixtyCharacters` | same | no model call for titles in v1 |
-| `slashClearResolvesToBuiltinClear` | `AgentSlashResolverTests.swift` | ported from `SlashSubmissionResolver.swift` |
-| `slashNewResolvesToBuiltinNew` | same | |
-| `textStartingWithSlashButUnknownIsAMessage` | same | falls through to `.message` |
-| `activityLifecycleMapsRunningAndFailedStates` | `AgentThreadActivityTests.swift` | ported from `ThreadActivityState.swift:10-46` |
+| `aProjectStartsWithOneEmptyConversation` | `AgentTranscriptTests.swift` | messages empty, configured provider selected |
+| `clearKeepsTheProviderAndRemovesConversationState` | same | messages and all resume ids are empty |
+| `clearIsRefusedDuringARunningTurn` | same | transcript remains unchanged |
+| `legacyThreadDirectoryMigratesNewestConversation` | `AgentConversationStoreTests.swift` | newest legacy draft is written to canonical storage and the old directory is removed |
 
-Production: thread strip in `AgentChatPanel+Header.swift` (bare `SectionHeader(title: "Threads")`, rows with `PlainCustomButtonStyle` and `.hoverEffect(id:)`), `AgentSlashResolver.swift`, `AgentThreadActivity.swift`, the status dot on the collapsed rail.
+Production: confirmed Clear Conversation action in `AgentChatPanel`, canonical `AgentConversationStore`, and the active-turn status dot on the collapsed rail. No thread strip or slash-command layer is present.
 
-Manual check (T3): two threads on the same project resume independently after quit and relaunch, each on its own provider session id.
+Manual check (T3): reopen the project and verify its single conversation resumes; clear it and verify messages and both provider session ids are gone after another reopen.
 
 ## Parallelism, order, and size
 
@@ -172,7 +169,7 @@ Manual check (T3): two threads on the same project resume independently after qu
 | 4 panel shell | — | 1, 2, 3 | S |
 | 5 rendering | 4 (shell), 3 (model shape) | 1, 2 | L |
 | 6 setup UI | 2 (probe uses the runner), 4 | 5, 7 | M |
-| 7 threads | 3, 4 | 5, 6 | S |
+| 7 conversation lifecycle | 3, 4 | 5, 6 | S |
 
 Two people: one takes 1 → 2 → 3 → 6 (runtime), the other 4 → 5 → 7 (UI); they meet at the `AgentTranscript` API, which is frozen at the end of phase 3 and stubbed with a scripted double for the UI track until then. Total: about 4–5 weeks for one developer, 3 weeks for two.
 
@@ -187,3 +184,7 @@ Two people: one takes 1 → 2 → 3 → 6 (runtime), the other 4 → 5 → 7 (UI
 - [ ] T3 checklist run on a machine with both CLIs, with one, and with none; results in the milestone `VERIFY.md`; no orphan process after closing the editor.
 - [ ] ADR in `planning/decisions/` covering the module boundary, the one-process-per-turn decision, the transcript location, and the provenance of copied Toone code.
 - [ ] `docs/architecture/01-module-map.md` gains an `Agent/` section and `02-concurrency.md` lists the two new actors.
+
+## As landed (2026-09-04)
+
+Codex resume argv is `exec --json --skip-git-repo-check --sandbox read-only resume -- <id> <prompt>` (flags before `resume`, `--` before positionals). Events carry tool-call ids. One conversation persists at `agent/conversation.json`, including one resume id per provider. `FileHandle.bytes` must not be iterated inside an actor; the runner uses `readabilityHandler` bridged through an `AsyncStream`. The UI has a persisted collapsible width, bounded provider probes, Foundation Markdown prose, copyable fenced code, expandable tool calls, a streaming cursor, and an explicit clear action.

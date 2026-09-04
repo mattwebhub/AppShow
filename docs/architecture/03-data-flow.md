@@ -363,3 +363,13 @@ sequenceDiagram
 | `ZoomTimeline`, `ZoomDetector`, `CursorSmoothing`, `CursorMetadataProvider`, `VideoCompositor+RegionRemapping` | pure logic | Unit tests. |
 | `SharedRecordingClock`, `VideoTrackWriter`/`AudioTrackWriter` with synthetic `CMSampleBuffer`s | queue-confined classes | Deterministic when driven synchronously on their queue. |
 | `ReframedProject.create/open/saveEditorState`, `EditorStateData` lenient decoding | file system in a temp dir | Round-trip and backward-compatibility tests against checked-in `project.json` fixtures. |
+
+## Flow D — Project conversation to live editor mutation
+
+1. `EditorView` owns an `AgentBridgeController` for the open `EditorState`. Starting it creates a sibling `.agent/<project>/` workspace with a private token, Unix socket, frame directory, and provider configuration.
+2. `AgentConversationView` starts one fresh `AgentSession` child process for the selected provider turn. The child environment is allow-listed and retains only the search path, home, locale, terminal, user identity needed for credential lookup, provider-specific configuration, and the socket/token pair.
+3. `ClaudeCodeProvider` supplies a strict one-server MCP file; `CodexProvider` supplies equivalent `mcp_servers.appshow` overrides. Both CLIs start the signed `Contents/Helpers/appshow-mcp` executable.
+4. The helper injects the private token into `initialize` and relays newline-framed JSON-RPC to `AgentBridgeServer`. `AgentRPCSession` rejects unauthenticated or pre-initialize calls, then delegates `tools/list` and `tools/call` to the main-actor `AgentToolDispatcher`.
+5. Read-only handlers snapshot the open project or analyze its media. Mutating handlers validate their JSON schema, publish `AgentActivity`, capture a pre-call snapshot, and use the editor's existing state primitives. Success creates at most one `Agent: …` history entry and returns the compact updated timeline; failure restores the snapshot.
+6. External image reads, exact-path exports, and silence passes that would remove more than 40% pause as an `AgentConfirmationRequest`. Allow Once is bound to the normalized operation and consumed on use; denial, mismatch, expiry, or session clear cannot authorize another operation.
+7. `AgentTranscript` reduces streamed provider events into the single persisted project conversation. Tool rows and timeline highlights update while calls run; clearing the conversation also clears provider resume ids and outstanding confirmations.

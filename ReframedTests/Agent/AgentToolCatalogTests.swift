@@ -6,6 +6,7 @@ import Testing
 struct AgentToolCatalogTests {
   private static let expectedNames: Set<String> = [
     "get_project_summary", "get_timeline", "get_transcript", "get_cursor_activity", "get_history", "render_preview_frame",
+    "get_silences", "export_draft",
   ]
 
   @Test func everyToolHasUniqueSnakeCaseNameAndObjectSchema() throws {
@@ -29,10 +30,12 @@ struct AgentToolCatalogTests {
     }
   }
 
-  @Test func noToolIsMutatingInThisMilestone() {
+  @Test func readOnlyCatalogMarksOnlyExpensiveMediaWorkAsSlow() {
     #expect(AgentToolCatalog.all.allSatisfy { !$0.mutating })
-    #expect(AgentToolCatalog.all.filter { $0.name.hasPrefix("get_") }.allSatisfy { !$0.mutating && !$0.slow })
+    #expect(AgentToolCatalog.all.filter { $0.name.hasPrefix("get_") }.allSatisfy { !$0.mutating })
+    #expect(AgentToolCatalog.definition(named: "get_silences")?.slow == true)
     #expect(AgentToolCatalog.definition(named: "render_preview_frame")?.slow == true)
+    #expect(AgentToolCatalog.definition(named: "export_draft")?.slow == true)
   }
 
   @Test func toolsListAdvertisesOnlyAvailableToolsInMCPShape() throws {
@@ -51,11 +54,11 @@ struct AgentToolCatalogTests {
     #expect(roundTrip == list)
   }
 
-  @Test func pendingMergeToolIsListedInAllButNotAvailable() throws {
+  @Test func silenceToolIsAvailableAfterPrimitiveIntegration() throws {
     let silences = try #require(AgentToolCatalog.definition(named: "get_silences"))
-    #expect(silences.availability == .pendingMerge(branch: "milestone-07-primitives"))
-    #expect(silences.isAvailable == false)
-    #expect(AgentToolCatalog.available.contains { $0.name == "get_silences" } == false)
+    #expect(silences.availability == .available)
+    #expect(silences.isAvailable)
+    #expect(AgentToolCatalog.available.contains { $0.name == "get_silences" })
     #expect(AgentToolCatalog.all.contains { $0.name == "get_silences" })
     #expect(Set(AgentToolCatalog.available.map(\.name)) == Self.expectedNames)
   }
@@ -91,6 +94,35 @@ struct AgentToolCatalogTests {
     #expect(failure([1, 2], timeline)?.contains("object") == true)
   }
 
+  @Test func schemaValidationRecursesIntoArrayItems() throws {
+    let schema = AgentToolSchema.object(
+      [
+        "slices": AgentToolSchema.array(
+          "Kept source-time slices",
+          items: AgentToolSchema.object(
+            [
+              "start": AgentToolSchema.number("Start", minimum: 0),
+              "end": AgentToolSchema.number("End", minimum: 0),
+            ],
+            required: ["start", "end"]
+          ),
+          minimumItems: 1
+        )
+      ],
+      required: ["slices"]
+    )
+
+    #expect(throws: AgentToolError.invalidArguments("slices must contain at least 1 item")) {
+      try AgentToolSchema.validate(["slices": []], against: schema)
+    }
+    #expect(throws: AgentToolError.invalidArguments("slices[0].end is below the minimum 0.0")) {
+      try AgentToolSchema.validate(["slices": [["start": 0, "end": -1]]], against: schema)
+    }
+    #expect(throws: AgentToolError.invalidArguments("slices[0] missing required key end")) {
+      try AgentToolSchema.validate(["slices": [["start": 0]]], against: schema)
+    }
+  }
+
   @Test func toolErrorsMapToJSONRPCCodes() {
     #expect(AgentToolError.unknownTool("x").jsonRPCError.code == JSONRPCError.methodNotFoundCode)
     #expect(AgentToolError.unknownTool("x").jsonRPCError.data?["code"] == "UNKNOWN_TOOL")
@@ -100,6 +132,8 @@ struct AgentToolCatalogTests {
     #expect(AgentToolError.unavailable(name: "x", reason: "r").jsonRPCError.code == -32004)
     #expect(AgentToolError.unavailable(name: "x", reason: "r").code == "TOOL_UNAVAILABLE")
     #expect(AgentToolError.timedOut("x").code == "TOOL_TIMEOUT")
+    #expect(AgentToolError.batchTimedOut.jsonRPCError.data?["code"] == "BATCH_TIMEOUT")
+    #expect(AgentToolError.userUndo.jsonRPCError.data?["code"] == "USER_UNDO")
     #expect(AgentToolError.failed("x").jsonRPCError.code == -32000)
     #expect(AgentToolError.failed("boom").message == "boom")
   }

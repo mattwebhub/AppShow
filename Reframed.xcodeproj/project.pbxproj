@@ -42,6 +42,23 @@
 		7E570000000000000000000D /* LaunchEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000000C /* LaunchEnvironment.swift */; };
 		7E570000000000000000000F /* ReframedPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000000E /* ReframedPaths.swift */; };
 		7E570000000000000000001B /* CutTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000001A /* CutTimeline.swift */; };
+		7E5700000000000000000062 /* AgentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000061 /* AgentProvider.swift */; };
+		7E5700000000000000000064 /* AgentEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000063 /* AgentEvent.swift */; };
+		7E5700000000000000000066 /* AgentJSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000065 /* AgentJSONValue.swift */; };
+		7E5700000000000000000068 /* ClaudeCodeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000067 /* ClaudeCodeProvider.swift */; };
+		7E570000000000000000006A /* CodexProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000069 /* CodexProvider.swift */; };
+		7E570000000000000000006C /* AgentError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000006B /* AgentError.swift */; };
+		7E570000000000000000006E /* AgentProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000006D /* AgentProcessRunner.swift */; };
+		7E5700000000000000000070 /* AgentToolchain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000006F /* AgentToolchain.swift */; };
+		7E5700000000000000000072 /* AgentConversationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000071 /* AgentConversationData.swift */; };
+		7E5700000000000000000074 /* AgentConversationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000073 /* AgentConversationStore.swift */; };
+		7E5700000000000000000076 /* AgentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000075 /* AgentSession.swift */; };
+		7E5700000000000000000078 /* AgentTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000077 /* AgentTranscript.swift */; };
+		7E570000000000000000007A /* AgentPanelLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000079 /* AgentPanelLayout.swift */; };
+		7E570000000000000000007C /* AgentChatPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000007B /* AgentChatPanel.swift */; };
+		7E570000000000000000007E /* AgentConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000007D /* AgentConversationView.swift */; };
+		7E5700000000000000000080 /* AgentReadiness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000007F /* AgentReadiness.swift */; };
+		7E5700000000000000000082 /* AgentMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000081 /* AgentMarkdownView.swift */; };
 		7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000001C /* TimelineView+CutTrack.swift */; };
 		7E5700000000000000000021 /* TimelineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000020 /* TimelineGeometry.swift */; };
 		7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000022 /* TimelineView+Geometry.swift */; };
@@ -65,6 +82,13 @@
 		7E57000000000000000000C6 /* AgentBridgeServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000C5 /* AgentBridgeServer.swift */; };
 		7E57000000000000000000C4 /* AgentRPCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000C3 /* AgentRPCSession.swift */; };
 		7E57000000000000000000C2 /* AgentToolDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000C1 /* AgentToolDispatcher.swift */; };
+		7E5900000000000000000002 /* AgentEditingTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5900000000000000000001 /* AgentEditingTools.swift */; };
+		7E5A00000000000000000002 /* AgentConfirmations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A00000000000000000001 /* AgentConfirmations.swift */; };
+		7E5A00000000000000000004 /* AgentConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A00000000000000000003 /* AgentConfirmationView.swift */; };
+		7E5A00000000000000000006 /* AgentSessionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A00000000000000000005 /* AgentSessionConfig.swift */; };
+		7E5A00000000000000000008 /* AgentBridgeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A00000000000000000007 /* AgentBridgeController.swift */; };
+		7E5B00000000000000000001 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5B00000000000000000003 /* main.swift */; };
+		7E5B00000000000000000002 /* appshow-mcp in Embed Helpers */ = {isa = PBXBuildFile; fileRef = 7E5B00000000000000000004 /* appshow-mcp */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7E57000000000000000000C0 /* AgentToolPreviewFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BF /* AgentToolPreviewFrame.swift */; };
 		7E57000000000000000000BE /* AgentToolHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BD /* AgentToolHandlers.swift */; };
 		7E57000000000000000000BC /* AgentToolCursorActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000BB /* AgentToolCursorActivity.swift */; };
@@ -73,6 +97,37 @@
 		7E57000000000000000000B6 /* AgentTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000B5 /* AgentTool.swift */; };
 		7E57000000000000000000B4 /* JSONRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000B3 /* JSONRPC.swift */; };
 		7E57000000000000000000B2 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000B1 /* JSONValue.swift */; };
+		7E5C0000000000000000000087 /* PropertiesPanel+SilencesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C0000000000000000000086 /* PropertiesPanel+SilencesSection.swift */; };
+		7E5C0000000000000000000085 /* EditorState+SilenceRemoval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C0000000000000000000084 /* EditorState+SilenceRemoval.swift */; };
+		7E5C0000000000000000000083 /* SilenceAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C0000000000000000000082 /* SilenceAnalysis.swift */; };
+		7E5C0000000000000000000081 /* SilenceDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C0000000000000000000080 /* SilenceDetector.swift */; };
+		7E5C00000000000000000000A1 /* PropertiesPanel+OverlaysSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000A0 /* PropertiesPanel+OverlaysSection.swift */; };
+		7E5C00000000000000000000A3 /* ImageOverlayData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000A2 /* ImageOverlayData.swift */; };
+		7E5C00000000000000000000A5 /* ImageOverlayImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000A4 /* ImageOverlayImporter.swift */; };
+		7E5C00000000000000000000A7 /* EditorState+ImageOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000A6 /* EditorState+ImageOverlays.swift */; };
+		7E5C00000000000000000000A9 /* ImageOverlayLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000A8 /* ImageOverlayLayout.swift */; };
+		7E5C00000000000000000000AB /* FrameRenderer+ImageOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000AA /* FrameRenderer+ImageOverlays.swift */; };
+		7E5C00000000000000000000AD /* VideoPreviewContainer+ImageOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000AC /* VideoPreviewContainer+ImageOverlays.swift */; };
+		7E5D000000000000000000D2 /* BlurRegionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D1 /* BlurRegionData.swift */; };
+		7E5D000000000000000000D4 /* EditorState+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D3 /* EditorState+BlurRegions.swift */; };
+		7E5D000000000000000000D6 /* FrameRenderer+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D5 /* FrameRenderer+BlurRegions.swift */; };
+		7E5D000000000000000000D8 /* VideoPreviewContainer+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D7 /* VideoPreviewContainer+BlurRegions.swift */; };
+		7E5D000000000000000000DA /* TimelineView+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D9 /* TimelineView+BlurRegions.swift */; };
+		7E5D000000000000000000DC /* BlurRegionEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000DB /* BlurRegionEditPopover.swift */; };
+		7E5E00000000000000000001 /* AgentSkillBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5E00000000000000000002 /* AgentSkillBundle.swift */; };
+		7E5E00000000000000000003 /* skills in Resources */ = {isa = PBXBuildFile; fileRef = 7E5E00000000000000000004 /* skills */; };
+		7E5E00000000000000000005 /* AgentWorkspaceGuidance.md in Resources */ = {isa = PBXBuildFile; fileRef = 7E5E00000000000000000006 /* AgentWorkspaceGuidance.md */; };
+		7E5C00000000000000000000AF /* TimelineView+OverlayChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000AE /* TimelineView+OverlayChip.swift */; };
+		7E5C00000000000000000000B1 /* ImageOverlayEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000B0 /* ImageOverlayEditPopover.swift */; };
+		7E5C00000000000000000000B3 /* OverlayPositionControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000B2 /* OverlayPositionControls.swift */; };
+		7E5C000000000000000000009F /* TextOverlayEditPopover+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C000000000000000000009E /* TextOverlayEditPopover+Style.swift */; };
+		7E5C000000000000000000009D /* TextOverlayEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C000000000000000000009C /* TextOverlayEditPopover.swift */; };
+		7E5C000000000000000000009B /* TimelineView+OverlayTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C000000000000000000009A /* TimelineView+OverlayTrack.swift */; };
+		7E5C0000000000000000000099 /* VideoPreviewContainer+TextOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C0000000000000000000098 /* VideoPreviewContainer+TextOverlays.swift */; };
+		7E5C0000000000000000000097 /* FrameRenderer+TextOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C0000000000000000000096 /* FrameRenderer+TextOverlays.swift */; };
+		7E5C0000000000000000000095 /* TextOverlayLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C0000000000000000000094 /* TextOverlayLayout.swift */; };
+		7E5C0000000000000000000093 /* EditorState+TextOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C0000000000000000000092 /* EditorState+TextOverlays.swift */; };
+		7E5C0000000000000000000091 /* TextOverlayData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C0000000000000000000090 /* TextOverlayData.swift */; };
 		828909551C8795EF72269706 /* PropertiesPanel+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C03E11186EDDA74B1B6958 /* PropertiesPanel+Background.swift */; };
 		86BD45F487E80051EC653B68 /* CursorRenderer+Shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC84C35E4DD49FCEA9DE6CBB /* CursorRenderer+Shapes.swift */; };
 		922F814E886E4D2B242E4541 /* VideoPreviewContainer+Cursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17A303B9C60827322EAE0A9 /* VideoPreviewContainer+Cursor.swift */; };
@@ -288,6 +343,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		7E5B0000000000000000000A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F10000000000000000000002 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7E5B00000000000000000008;
+			remoteInfo = "appshow-mcp";
+		};
 		7E570000000000000000000A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F10000000000000000000002 /* Project object */;
@@ -297,7 +359,23 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		7E5B00000000000000000009 /* Embed Helpers */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Helpers;
+			dstSubfolderSpec = 1;
+			files = (
+				7E5B00000000000000000002 /* appshow-mcp in Embed Helpers */,
+			);
+			name = "Embed Helpers";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		7E5B00000000000000000003 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		7E5B00000000000000000004 /* appshow-mcp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "appshow-mcp"; sourceTree = BUILT_PRODUCTS_DIR; };
 		028393B5A95F5605BC666DB9 /* VideoPreviewView+Coordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "VideoPreviewView+Coordinator.swift"; sourceTree = "<group>"; };
 		09CFADDE8FE6ED6F3B706F61 /* TimelineView+Overlays.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "TimelineView+Overlays.swift"; sourceTree = "<group>"; };
 		15FC8EFFF8F25B538B770019 /* ZoomKeyframeEditor+RegionView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "ZoomKeyframeEditor+RegionView.swift"; sourceTree = "<group>"; };
@@ -330,6 +408,23 @@
 		7E570000000000000000000C /* LaunchEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchEnvironment.swift; sourceTree = "<group>"; };
 		7E570000000000000000000E /* ReframedPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReframedPaths.swift; sourceTree = "<group>"; };
 		7E570000000000000000001A /* CutTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CutTimeline.swift; sourceTree = "<group>"; };
+		7E5700000000000000000061 /* AgentProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentProvider.swift; sourceTree = "<group>"; };
+		7E5700000000000000000063 /* AgentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentEvent.swift; sourceTree = "<group>"; };
+		7E5700000000000000000065 /* AgentJSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentJSONValue.swift; sourceTree = "<group>"; };
+		7E5700000000000000000067 /* ClaudeCodeProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeCodeProvider.swift; sourceTree = "<group>"; };
+		7E5700000000000000000069 /* CodexProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexProvider.swift; sourceTree = "<group>"; };
+		7E570000000000000000006B /* AgentError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentError.swift; sourceTree = "<group>"; };
+		7E570000000000000000006D /* AgentProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentProcessRunner.swift; sourceTree = "<group>"; };
+		7E570000000000000000006F /* AgentToolchain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolchain.swift; sourceTree = "<group>"; };
+		7E5700000000000000000071 /* AgentConversationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationData.swift; sourceTree = "<group>"; };
+		7E5700000000000000000073 /* AgentConversationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationStore.swift; sourceTree = "<group>"; };
+		7E5700000000000000000075 /* AgentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSession.swift; sourceTree = "<group>"; };
+		7E5700000000000000000077 /* AgentTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentTranscript.swift; sourceTree = "<group>"; };
+		7E5700000000000000000079 /* AgentPanelLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentPanelLayout.swift; sourceTree = "<group>"; };
+		7E570000000000000000007B /* AgentChatPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentChatPanel.swift; sourceTree = "<group>"; };
+		7E570000000000000000007D /* AgentConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationView.swift; sourceTree = "<group>"; };
+		7E570000000000000000007F /* AgentReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentReadiness.swift; sourceTree = "<group>"; };
+		7E5700000000000000000081 /* AgentMarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentMarkdownView.swift; sourceTree = "<group>"; };
 		7E570000000000000000001C /* TimelineView+CutTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CutTrack.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000020 /* TimelineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineGeometry.swift; sourceTree = "<group>"; };
 		7E5700000000000000000022 /* TimelineView+Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+Geometry.swift"; sourceTree = "<group>"; };
@@ -353,6 +448,14 @@
 		7E57000000000000000000C5 /* AgentBridgeServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBridgeServer.swift; sourceTree = "<group>"; };
 		7E57000000000000000000C3 /* AgentRPCSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRPCSession.swift; sourceTree = "<group>"; };
 		7E57000000000000000000C1 /* AgentToolDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolDispatcher.swift; sourceTree = "<group>"; };
+		7E5900000000000000000001 /* AgentEditingTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentEditingTools.swift; sourceTree = "<group>"; };
+		7E5A00000000000000000001 /* AgentConfirmations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfirmations.swift; sourceTree = "<group>"; };
+		7E5A00000000000000000003 /* AgentConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfirmationView.swift; sourceTree = "<group>"; };
+		7E5A00000000000000000005 /* AgentSessionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSessionConfig.swift; sourceTree = "<group>"; };
+		7E5A00000000000000000007 /* AgentBridgeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBridgeController.swift; sourceTree = "<group>"; };
+		7E5E00000000000000000002 /* AgentSkillBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSkillBundle.swift; sourceTree = "<group>"; };
+		7E5E00000000000000000004 /* skills */ = {isa = PBXFileReference; lastKnownFileType = folder; name = skills; path = Skills; sourceTree = "<group>"; };
+		7E5E00000000000000000006 /* AgentWorkspaceGuidance.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = AgentWorkspaceGuidance.md; sourceTree = "<group>"; };
 		7E57000000000000000000BF /* AgentToolPreviewFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolPreviewFrame.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BD /* AgentToolHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolHandlers.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BB /* AgentToolCursorActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolCursorActivity.swift; sourceTree = "<group>"; };
@@ -361,6 +464,34 @@
 		7E57000000000000000000B5 /* AgentTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentTool.swift; sourceTree = "<group>"; };
 		7E57000000000000000000B3 /* JSONRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONRPC.swift; sourceTree = "<group>"; };
 		7E57000000000000000000B1 /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
+		7E5C0000000000000000000086 /* PropertiesPanel+SilencesSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+SilencesSection.swift"; sourceTree = "<group>"; };
+		7E5C0000000000000000000084 /* EditorState+SilenceRemoval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+SilenceRemoval.swift"; sourceTree = "<group>"; };
+		7E5C0000000000000000000082 /* SilenceAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilenceAnalysis.swift; sourceTree = "<group>"; };
+		7E5C0000000000000000000080 /* SilenceDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilenceDetector.swift; sourceTree = "<group>"; };
+		7E5C00000000000000000000A0 /* PropertiesPanel+OverlaysSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+OverlaysSection.swift"; sourceTree = "<group>"; };
+		7E5C00000000000000000000A2 /* ImageOverlayData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayData.swift; sourceTree = "<group>"; };
+		7E5C00000000000000000000A4 /* ImageOverlayImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayImporter.swift; sourceTree = "<group>"; };
+		7E5C00000000000000000000A6 /* EditorState+ImageOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+ImageOverlays.swift"; sourceTree = "<group>"; };
+		7E5C00000000000000000000A8 /* ImageOverlayLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayLayout.swift; sourceTree = "<group>"; };
+		7E5C00000000000000000000AA /* FrameRenderer+ImageOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FrameRenderer+ImageOverlays.swift"; sourceTree = "<group>"; };
+		7E5C00000000000000000000AC /* VideoPreviewContainer+ImageOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewContainer+ImageOverlays.swift"; sourceTree = "<group>"; };
+		7E5D000000000000000000D1 /* BlurRegionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurRegionData.swift; sourceTree = "<group>"; };
+		7E5D000000000000000000D3 /* EditorState+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+BlurRegions.swift"; sourceTree = "<group>"; };
+		7E5D000000000000000000D5 /* FrameRenderer+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FrameRenderer+BlurRegions.swift"; sourceTree = "<group>"; };
+		7E5D000000000000000000D7 /* VideoPreviewContainer+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewContainer+BlurRegions.swift"; sourceTree = "<group>"; };
+		7E5D000000000000000000D9 /* TimelineView+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+BlurRegions.swift"; sourceTree = "<group>"; };
+		7E5D000000000000000000DB /* BlurRegionEditPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurRegionEditPopover.swift; sourceTree = "<group>"; };
+		7E5C00000000000000000000AE /* TimelineView+OverlayChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+OverlayChip.swift"; sourceTree = "<group>"; };
+		7E5C00000000000000000000B0 /* ImageOverlayEditPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayEditPopover.swift; sourceTree = "<group>"; };
+		7E5C00000000000000000000B2 /* OverlayPositionControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPositionControls.swift; sourceTree = "<group>"; };
+		7E5C000000000000000000009E /* TextOverlayEditPopover+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextOverlayEditPopover+Style.swift"; sourceTree = "<group>"; };
+		7E5C000000000000000000009C /* TextOverlayEditPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayEditPopover.swift; sourceTree = "<group>"; };
+		7E5C000000000000000000009A /* TimelineView+OverlayTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+OverlayTrack.swift"; sourceTree = "<group>"; };
+		7E5C0000000000000000000098 /* VideoPreviewContainer+TextOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewContainer+TextOverlays.swift"; sourceTree = "<group>"; };
+		7E5C0000000000000000000096 /* FrameRenderer+TextOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FrameRenderer+TextOverlays.swift"; sourceTree = "<group>"; };
+		7E5C0000000000000000000094 /* TextOverlayLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayLayout.swift; sourceTree = "<group>"; };
+		7E5C0000000000000000000092 /* EditorState+TextOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+TextOverlays.swift"; sourceTree = "<group>"; };
+		7E5C0000000000000000000090 /* TextOverlayData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayData.swift; sourceTree = "<group>"; };
 		815C681612F3844727C988EF /* CaptureToolbar+ModeSelection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CaptureToolbar+ModeSelection.swift"; sourceTree = "<group>"; };
 		8BF80E50CD7B9915C3047A7C /* EditorState+Playback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+Playback.swift"; sourceTree = "<group>"; };
 		93CAA4A89B98885B510AB739 /* TimelineView+Shared.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "TimelineView+Shared.swift"; sourceTree = "<group>"; };
@@ -587,6 +718,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		7E5B00000000000000000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7E5700000000000000000008 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -611,6 +749,7 @@
 			isa = PBXGroup;
 			children = (
 				CC0000000000000000000001 /* Config.xcconfig */,
+				7E5B00000000000000000005 /* Tools */,
 				D10000000000000000000002 /* Reframed */,
 				7E5700000000000000000001 /* ReframedTests */,
 				D1000000000000000000000A /* Frameworks */,
@@ -633,6 +772,7 @@
 				D1000000000000000000000D /* CaptureModes */,
 				D10000000000000000000008 /* Recording */,
 				D20000000000000000000001 /* Editor */,
+				7E5700000000000000000060 /* Agent */,
 				D40000000000000000000001 /* Compositor */,
 				7E57000000000000000000B0 /* Tools */,
 				D30000000000000000000001 /* Project */,
@@ -757,8 +897,25 @@
 			children = (
 				B1000000000000000000001B /* Reframed.app */,
 				7E5700000000000000000002 /* ReframedTests.xctest */,
+				7E5B00000000000000000004 /* appshow-mcp */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7E5B00000000000000000005 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				7E5B0000000000000000000F /* appshow-mcp */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		7E5B0000000000000000000F /* appshow-mcp */ = {
+			isa = PBXGroup;
+			children = (
+				7E5B00000000000000000003 /* main.swift */,
+			);
+			path = "appshow-mcp";
 			sourceTree = "<group>";
 		};
 		D1000000000000000000000C /* UI */ = {
@@ -786,6 +943,7 @@
 				B1000000000000000000003A /* SliderRow.swift */,
 				FB10000000000000000000D2 /* Dropdown.swift */,
 				FB10000000000000000000D3 /* ImageDropSection.swift */,
+				7E5C00000000000000000000B2 /* OverlayPositionControls.swift */,
 				FB10000000000000000000D4 /* AreaSizePresetsPopover.swift */,
 				B1000000000000000000003B /* TailwindColorPicker.swift */,
 				FB10000000000000000000C4 /* TransitionControlsSection.swift */,
@@ -872,6 +1030,35 @@
 			path = CaptureWindow;
 			sourceTree = "<group>";
 		};
+		7E5700000000000000000060 /* Agent */ = {
+			isa = PBXGroup;
+			children = (
+				7E5700000000000000000061 /* AgentProvider.swift */,
+				7E5700000000000000000063 /* AgentEvent.swift */,
+				7E5700000000000000000065 /* AgentJSONValue.swift */,
+				7E5700000000000000000067 /* ClaudeCodeProvider.swift */,
+				7E5700000000000000000069 /* CodexProvider.swift */,
+				7E570000000000000000006B /* AgentError.swift */,
+				7E570000000000000000006D /* AgentProcessRunner.swift */,
+				7E570000000000000000006F /* AgentToolchain.swift */,
+				7E5700000000000000000071 /* AgentConversationData.swift */,
+				7E5700000000000000000073 /* AgentConversationStore.swift */,
+				7E5700000000000000000075 /* AgentSession.swift */,
+				7E5700000000000000000077 /* AgentTranscript.swift */,
+				7E5700000000000000000079 /* AgentPanelLayout.swift */,
+				7E570000000000000000007B /* AgentChatPanel.swift */,
+				7E570000000000000000007D /* AgentConversationView.swift */,
+				7E570000000000000000007F /* AgentReadiness.swift */,
+				7E5700000000000000000081 /* AgentMarkdownView.swift */,
+				7E5A00000000000000000003 /* AgentConfirmationView.swift */,
+				7E5A00000000000000000005 /* AgentSessionConfig.swift */,
+				7E5E00000000000000000002 /* AgentSkillBundle.swift */,
+				7E5E00000000000000000004 /* skills */,
+				7E5E00000000000000000006 /* AgentWorkspaceGuidance.md */,
+			);
+			path = Agent;
+			sourceTree = "<group>";
+		};
 		D20000000000000000000001 /* Editor */ = {
 			isa = PBXGroup;
 			children = (
@@ -922,6 +1109,18 @@
 				7E570000000000000000001C /* TimelineView+CutTrack.swift */,
 				7E5700000000000000000020 /* TimelineGeometry.swift */,
 				7E5700000000000000000022 /* TimelineView+Geometry.swift */,
+				7E5C0000000000000000000086 /* PropertiesPanel+SilencesSection.swift */,
+				7E5C00000000000000000000A0 /* PropertiesPanel+OverlaysSection.swift */,
+				7E5C0000000000000000000084 /* EditorState+SilenceRemoval.swift */,
+				7E5C0000000000000000000082 /* SilenceAnalysis.swift */,
+				7E5C0000000000000000000080 /* SilenceDetector.swift */,
+				7E5C0000000000000000000092 /* EditorState+TextOverlays.swift */,
+				7E5C00000000000000000000A6 /* EditorState+ImageOverlays.swift */,
+				7E5C00000000000000000000AC /* VideoPreviewContainer+ImageOverlays.swift */,
+				7E5D000000000000000000D3 /* EditorState+BlurRegions.swift */,
+				7E5D000000000000000000D7 /* VideoPreviewContainer+BlurRegions.swift */,
+				7E5D000000000000000000D9 /* TimelineView+BlurRegions.swift */,
+				7E5D000000000000000000DB /* BlurRegionEditPopover.swift */,
 				E8596CD61869ECC16EAECA92 /* EditorState+CameraLayout.swift */,
 				B2354223AAA382DB82EF31D5 /* EditorState+Zoom.swift */,
 				3596F81A6E600975B1EB8104 /* EditorState+Cursor.swift */,
@@ -937,10 +1136,16 @@
 				CA20000000000000000000A5 /* PropertiesPanel+CaptionsTab.swift */,
 				FB10000000000000000000A1 /* SpotlightOverlayLayer.swift */,
 				FB10000000000000000000A2 /* VideoPreviewContainer+Spotlight.swift */,
+				7E5C0000000000000000000098 /* VideoPreviewContainer+TextOverlays.swift */,
 				FB10000000000000000000A7 /* ClickSoundPlayer.swift */,
 				FB10000000000000000000C1 /* EditorState+SpotlightRegions.swift */,
 				FB10000000000000000000C2 /* TimelineView+SpotlightTrack.swift */,
+				7E5C000000000000000000009A /* TimelineView+OverlayTrack.swift */,
+				7E5C00000000000000000000AE /* TimelineView+OverlayChip.swift */,
 				FB10000000000000000000C3 /* SpotlightRegionEditPopover.swift */,
+				7E5C000000000000000000009C /* TextOverlayEditPopover.swift */,
+				7E5C000000000000000000009E /* TextOverlayEditPopover+Style.swift */,
+				7E5C00000000000000000000B0 /* ImageOverlayEditPopover.swift */,
 				34448E948FE88A1C6C011585 /* VideoPreviewContainer.swift */,
 				AFB8530E54B2C3F5B4C5C547 /* VideoPreviewContainer+Webcam.swift */,
 				2A4372FBF544C917CA59B98B /* WebcamCameraView.swift */,
@@ -984,9 +1189,12 @@
 				7E57000000000000000000BD /* AgentToolHandlers.swift */,
 				7E57000000000000000000BF /* AgentToolPreviewFrame.swift */,
 				7E57000000000000000000C1 /* AgentToolDispatcher.swift */,
+				7E5900000000000000000001 /* AgentEditingTools.swift */,
+				7E5A00000000000000000001 /* AgentConfirmations.swift */,
 				7E57000000000000000000C3 /* AgentRPCSession.swift */,
 				7E57000000000000000000C5 /* AgentBridgeServer.swift */,
 				7E57000000000000000000C7 /* AgentWorkspace.swift */,
+				7E5A00000000000000000007 /* AgentBridgeController.swift */,
 			);
 			name = Tools;
 			path = Agent/Tools;
@@ -999,6 +1207,10 @@
 				B3000000000000000000001C /* ProjectMetadata.swift */,
 				7E5700000000000000000030 /* ExternalAudioTrackData.swift */,
 				7E5700000000000000000034 /* ExternalAudioImporter.swift */,
+				7E5C0000000000000000000090 /* TextOverlayData.swift */,
+				7E5C00000000000000000000A2 /* ImageOverlayData.swift */,
+				7E5C00000000000000000000A4 /* ImageOverlayImporter.swift */,
+				7E5D000000000000000000D1 /* BlurRegionData.swift */,
 			);
 			path = Project;
 			sourceTree = "<group>";
@@ -1006,10 +1218,14 @@
 		D40000000000000000000001 /* Compositor */ = {
 			isa = PBXGroup;
 			children = (
+				7E5C00000000000000000000A8 /* ImageOverlayLayout.swift */,
+				7E5C00000000000000000000AA /* FrameRenderer+ImageOverlays.swift */,
+				7E5D000000000000000000D5 /* FrameRenderer+BlurRegions.swift */,
 				B20000000000000000000013 /* BackgroundStyle.swift */,
 				B20000000000000000000004 /* CameraLayout.swift */,
 				B2000000000000000000000F /* FrameRenderer.swift */,
 				B2000000000000000000001A /* CompositionInstruction.swift */,
+				7E5C0000000000000000000094 /* TextOverlayLayout.swift */,
 				B20000000000000000000015 /* ExportSettings.swift */,
 				B20000000000000000000017 /* ExportSheet.swift */,
 				B20000000000000000000014 /* GradientPresets.swift */,
@@ -1031,6 +1247,7 @@
 				CAB002000000000000000002 /* PersonSegmentationProcessor.swift */,
 				CA20000000000000000000A8 /* FrameRenderer+Captions.swift */,
 				FB10000000000000000000A9 /* FrameRenderer+Spotlight.swift */,
+				7E5C0000000000000000000096 /* FrameRenderer+TextOverlays.swift */,
 				CA20000000000000000000B0 /* FrameRenderer+HDR.swift */,
 				CA20000000000000000000B1 /* FrameRenderer+Helpers.swift */,
 				496C1D98B8AB2982DF4AA7D4 /* ExportSheet+Phases.swift */,
@@ -1043,6 +1260,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		7E5B00000000000000000008 /* appshow-mcp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7E5B0000000000000000000E /* Build configuration list for PBXNativeTarget "appshow-mcp" */;
+			buildPhases = (
+				7E5B00000000000000000007 /* Sources */,
+				7E5B00000000000000000006 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "appshow-mcp";
+			packageProductDependencies = (
+			);
+			productName = "appshow-mcp";
+			productReference = 7E5B00000000000000000004 /* appshow-mcp */;
+			productType = "com.apple.product-type.tool";
+		};
 		7E5700000000000000000003 /* ReframedTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7E5700000000000000000004 /* Build configuration list for PBXNativeTarget "ReframedTests" */;
@@ -1073,10 +1308,12 @@
 				C10000000000000000000002 /* Sources */,
 				C10000000000000000000001 /* Frameworks */,
 				C10000000000000000000003 /* Resources */,
+				7E5B00000000000000000009 /* Embed Helpers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				7E5B0000000000000000000B /* PBXTargetDependency */,
 			);
 			name = Reframed;
 			packageProductDependencies = (
@@ -1100,6 +1337,9 @@
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
+					7E5B00000000000000000008 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 					7E5700000000000000000003 = {
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = F10000000000000000000001;
@@ -1131,6 +1371,7 @@
 			targets = (
 				F10000000000000000000001 /* Reframed */,
 				7E5700000000000000000003 /* ReframedTests */,
+				7E5B00000000000000000008 /* appshow-mcp */,
 			);
 		};
 /* End PBXProject section */
@@ -1146,11 +1387,21 @@
 			files = (
 				3DCA03E12F3B511C003FE309 /* Assets.xcassets in Resources */,
 				AA0000000000000000000001 /* Credits.html in Resources */,
+				7E5E00000000000000000003 /* skills in Resources */,
+				7E5E00000000000000000005 /* AgentWorkspaceGuidance.md in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7E5B00000000000000000007 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E5B00000000000000000001 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7E5700000000000000000007 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -1286,6 +1537,7 @@
 				A1000000000000000000003A /* SliderRow.swift in Sources */,
 				FA10000000000000000000D2 /* Dropdown.swift in Sources */,
 				FA10000000000000000000D3 /* ImageDropSection.swift in Sources */,
+				7E5C00000000000000000000B3 /* OverlayPositionControls.swift in Sources */,
 				FA10000000000000000000D4 /* AreaSizePresetsPopover.swift in Sources */,
 				A1000000000000000000003B /* TailwindColorPicker.swift in Sources */,
 				FA10000000000000000000C4 /* TransitionControlsSection.swift in Sources */,
@@ -1325,6 +1577,24 @@
 				099C5B4AFE46AC44C6636A86 /* EditorState+CameraRegions.swift in Sources */,
 				E351B15E58A9971DB73296AD /* EditorState+VideoRegions.swift in Sources */,
 				7E570000000000000000001B /* CutTimeline.swift in Sources */,
+				7E5700000000000000000062 /* AgentProvider.swift in Sources */,
+				7E5700000000000000000064 /* AgentEvent.swift in Sources */,
+				7E5700000000000000000066 /* AgentJSONValue.swift in Sources */,
+				7E5700000000000000000068 /* ClaudeCodeProvider.swift in Sources */,
+				7E570000000000000000006A /* CodexProvider.swift in Sources */,
+				7E570000000000000000006C /* AgentError.swift in Sources */,
+				7E570000000000000000006E /* AgentProcessRunner.swift in Sources */,
+				7E5700000000000000000070 /* AgentToolchain.swift in Sources */,
+				7E5E00000000000000000001 /* AgentSkillBundle.swift in Sources */,
+				7E5700000000000000000072 /* AgentConversationData.swift in Sources */,
+				7E5700000000000000000074 /* AgentConversationStore.swift in Sources */,
+				7E5700000000000000000076 /* AgentSession.swift in Sources */,
+				7E5700000000000000000078 /* AgentTranscript.swift in Sources */,
+				7E570000000000000000007A /* AgentPanelLayout.swift in Sources */,
+				7E570000000000000000007C /* AgentChatPanel.swift in Sources */,
+				7E570000000000000000007E /* AgentConversationView.swift in Sources */,
+				7E5700000000000000000080 /* AgentReadiness.swift in Sources */,
+				7E5700000000000000000082 /* AgentMarkdownView.swift in Sources */,
 				7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */,
 				7E5700000000000000000021 /* TimelineGeometry.swift in Sources */,
 				7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */,
@@ -1345,9 +1615,14 @@
 				7E5700000000000000000043 /* PropertiesPanel+MusicSection.swift in Sources */,
 				7E5700000000000000000041 /* ExternalAudioSchedule.swift in Sources */,
 				7E57000000000000000000C8 /* AgentWorkspace.swift in Sources */,
+				7E5A00000000000000000008 /* AgentBridgeController.swift in Sources */,
 				7E57000000000000000000C6 /* AgentBridgeServer.swift in Sources */,
 				7E57000000000000000000C4 /* AgentRPCSession.swift in Sources */,
 				7E57000000000000000000C2 /* AgentToolDispatcher.swift in Sources */,
+				7E5900000000000000000002 /* AgentEditingTools.swift in Sources */,
+				7E5A00000000000000000002 /* AgentConfirmations.swift in Sources */,
+				7E5A00000000000000000004 /* AgentConfirmationView.swift in Sources */,
+				7E5A00000000000000000006 /* AgentSessionConfig.swift in Sources */,
 				7E57000000000000000000C0 /* AgentToolPreviewFrame.swift in Sources */,
 				7E57000000000000000000BE /* AgentToolHandlers.swift in Sources */,
 				7E57000000000000000000BC /* AgentToolCursorActivity.swift in Sources */,
@@ -1356,6 +1631,33 @@
 				7E57000000000000000000B6 /* AgentTool.swift in Sources */,
 				7E57000000000000000000B4 /* JSONRPC.swift in Sources */,
 				7E57000000000000000000B2 /* JSONValue.swift in Sources */,
+				7E5C0000000000000000000087 /* PropertiesPanel+SilencesSection.swift in Sources */,
+				7E5C0000000000000000000085 /* EditorState+SilenceRemoval.swift in Sources */,
+				7E5C0000000000000000000083 /* SilenceAnalysis.swift in Sources */,
+				7E5C0000000000000000000081 /* SilenceDetector.swift in Sources */,
+				7E5C00000000000000000000A1 /* PropertiesPanel+OverlaysSection.swift in Sources */,
+				7E5C00000000000000000000A3 /* ImageOverlayData.swift in Sources */,
+				7E5C00000000000000000000A5 /* ImageOverlayImporter.swift in Sources */,
+				7E5C00000000000000000000A7 /* EditorState+ImageOverlays.swift in Sources */,
+				7E5C00000000000000000000A9 /* ImageOverlayLayout.swift in Sources */,
+				7E5C00000000000000000000AB /* FrameRenderer+ImageOverlays.swift in Sources */,
+				7E5C00000000000000000000AD /* VideoPreviewContainer+ImageOverlays.swift in Sources */,
+				7E5D000000000000000000D2 /* BlurRegionData.swift in Sources */,
+				7E5D000000000000000000D4 /* EditorState+BlurRegions.swift in Sources */,
+				7E5D000000000000000000D6 /* FrameRenderer+BlurRegions.swift in Sources */,
+				7E5D000000000000000000D8 /* VideoPreviewContainer+BlurRegions.swift in Sources */,
+				7E5D000000000000000000DA /* TimelineView+BlurRegions.swift in Sources */,
+				7E5D000000000000000000DC /* BlurRegionEditPopover.swift in Sources */,
+				7E5C00000000000000000000AF /* TimelineView+OverlayChip.swift in Sources */,
+				7E5C00000000000000000000B1 /* ImageOverlayEditPopover.swift in Sources */,
+				7E5C000000000000000000009F /* TextOverlayEditPopover+Style.swift in Sources */,
+				7E5C000000000000000000009D /* TextOverlayEditPopover.swift in Sources */,
+				7E5C000000000000000000009B /* TimelineView+OverlayTrack.swift in Sources */,
+				7E5C0000000000000000000099 /* VideoPreviewContainer+TextOverlays.swift in Sources */,
+				7E5C0000000000000000000097 /* FrameRenderer+TextOverlays.swift in Sources */,
+				7E5C0000000000000000000095 /* TextOverlayLayout.swift in Sources */,
+				7E5C0000000000000000000093 /* EditorState+TextOverlays.swift in Sources */,
+				7E5C0000000000000000000091 /* TextOverlayData.swift in Sources */,
 				77030A22115111C9D1325490 /* EditorState+CameraLayout.swift in Sources */,
 				D231D2CA1110B032A7D42474 /* EditorState+Zoom.swift in Sources */,
 				3FD352F00D9D9EE89C9A34AB /* EditorState+Cursor.swift in Sources */,
@@ -1433,6 +1735,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		7E5B0000000000000000000B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7E5B00000000000000000008 /* appshow-mcp */;
+			targetProxy = 7E5B0000000000000000000A /* PBXContainerItemProxy */;
+		};
 		7E570000000000000000000B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F10000000000000000000001 /* Reframed */;
@@ -1441,6 +1748,30 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		7E5B0000000000000000000C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC0000000000000000000001 /* Config.xcconfig */;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_NAME = "appshow-mcp";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		7E5B0000000000000000000D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC0000000000000000000001 /* Config.xcconfig */;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_NAME = "appshow-mcp";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
 		7E5700000000000000000005 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CC0000000000000000000001 /* Config.xcconfig */;
@@ -1688,6 +2019,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7E5B0000000000000000000E /* Build configuration list for PBXNativeTarget "appshow-mcp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7E5B0000000000000000000C /* Debug */,
+				7E5B0000000000000000000D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		7E5700000000000000000004 /* Build configuration list for PBXNativeTarget "ReframedTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

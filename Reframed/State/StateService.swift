@@ -109,10 +109,24 @@ final class StateService {
     }
   }
 
-  private init() {
-    let dir = ReframedPaths.home
+  var agentPanelCollapsed: Bool {
+    get { data.agentPanelCollapsed }
+    set { data.agentPanelCollapsed = newValue; save() }
+  }
+
+  var agentPanelWidth: CGFloat {
+    get { AgentPanelLayout.clamp(data.agentPanelWidth) }
+    set { data.agentPanelWidth = AgentPanelLayout.clamp(newValue); save() }
+  }
+
+  private convenience init() {
+    self.init(fileURL: ReframedPaths.home.appendingPathComponent("state.json"))
+  }
+
+  init(fileURL: URL) {
+    let dir = fileURL.deletingLastPathComponent()
     try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-    fileURL = dir.appendingPathComponent("state.json")
+    self.fileURL = fileURL
     data = StateData()
     load()
   }
@@ -156,4 +170,6 @@ private struct StateData: Codable {
   var recordingPreviewPosition: PointData? = nil
   var recordingPreviewHeight: CGFloat? = nil
   var editorWindowFrame: RectData? = nil
+  var agentPanelCollapsed: Bool = false
+  var agentPanelWidth: CGFloat = AgentPanelLayout.defaultWidth
 }

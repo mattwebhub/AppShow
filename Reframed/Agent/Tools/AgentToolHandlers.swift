@@ -105,6 +105,53 @@ struct AgentToolHistoryHandler: AgentToolHandler {
 }
 
 @MainActor
+struct AgentToolSilencesHandler: AgentToolHandler {
+  var definition: AgentToolDefinition { AgentToolCatalog.getSilences }
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let sourceName = arguments["source"]?.stringValue ?? "mic"
+    let source: SilenceSource = sourceName == "system" ? .system : .microphone
+    let config = SilenceDetectorConfig(
+      thresholdDb: arguments["thresholdDb"]?.doubleValue ?? -40,
+      minimumSilence: arguments["minGapSeconds"]?.doubleValue ?? 0.8
+    )
+    let preview = await context.editorState.previewSilenceRemoval(config: config, source: source)
+    if let error = preview.errorDescription { throw AgentToolError.failed(error) }
+    return [
+      "source": .string(sourceName),
+      "count": JSONValue(preview.count),
+      "totalSeconds": AgentToolSummaries.seconds(preview.silences.reduce(0) { $0 + $1.upperBound - $1.lowerBound }),
+      "silences": .array(preview.silences.map { AgentToolSummaries.range($0.lowerBound, $0.upperBound) }),
+    ]
+  }
+}
+
+@MainActor
+struct AgentToolExportDraftHandler: AgentToolHandler {
+  var definition: AgentToolDefinition { AgentToolCatalog.exportDraft }
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    guard let workspace = context.workspaceDirectory else {
+      throw AgentToolError.failed("A project workspace is required for draft export")
+    }
+    let drafts = workspace.appendingPathComponent("drafts", isDirectory: true)
+    try FileManager.default.createDirectory(at: drafts, withIntermediateDirectories: true)
+    let destination = drafts.appendingPathComponent("draft-\(UUID().uuidString.lowercased()).mp4")
+    var settings = ExportSettings()
+    settings.maximumWidth = CGFloat(arguments["maxWidth"]?.intValue ?? 640)
+    settings.frameRateOverride = arguments["fps"]?.intValue ?? 15
+    settings.codec = .h264
+    settings.mode = .normal
+    let url = try await context.editorState.export(settings: settings, outputURL: destination)
+    return [
+      "path": .string(url.path),
+      "maxWidth": JSONValue(Int(settings.maximumWidth ?? 640)),
+      "fps": JSONValue(settings.frameRateOverride ?? 15),
+    ]
+  }
+}
+
+@MainActor
 struct AgentToolUnavailableHandler: AgentToolHandler {
   let definition: AgentToolDefinition
 

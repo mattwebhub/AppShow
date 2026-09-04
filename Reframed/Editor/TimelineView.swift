@@ -78,6 +78,10 @@ struct TimelineView: View {
   @State var externalDragType: RegionDragType?
   @State var externalDragTrackId: UUID?
   @State var popoverExternalTrackId: UUID?
+  @State var overlayDragOffset: CGFloat = 0
+  @State var overlayDragType: RegionDragType?
+  @State var overlayDragRegionId: UUID?
+  @State var popoverOverlayId: UUID?
 
   private var showSystemAudioTrack: Bool {
     !editorState.systemAudioMuted
@@ -102,6 +106,7 @@ struct TimelineView: View {
     count += editorState.externalAudioTracks.count
     if editorState.zoomEnabled { count += 1 }
     if showSpotlightTrack { count += 1 }
+    if editorState.showOverlayTrack { count += 1 }
     return count
   }
 
@@ -157,6 +162,12 @@ struct TimelineView: View {
 
           if showSpotlightTrack {
             trackSidebar(label: "Spotlight", icon: "light.max")
+              .frame(height: trackHeight)
+              .transition(.trackTransition)
+          }
+
+          if editorState.showOverlayTrack {
+            trackSidebar(label: "Overlays", icon: "square.on.square")
               .frame(height: trackHeight)
               .transition(.trackTransition)
           }
@@ -238,11 +249,17 @@ struct TimelineView: View {
                   spotlightTrackContent(width: cw)
                     .transition(.trackTransition)
                 }
+
+                if editorState.showOverlayTrack {
+                  overlayTrackContent(width: cw)
+                    .transition(.trackTransition)
+                }
               }
             }
             .padding(.horizontal, playheadInset)
             .padding(.bottom, timelineZoom > 1 ? 10 : 0)
 
+            agentChangeOverlay(contentWidth: cw, inset: playheadInset)
             playheadOverlay(contentWidth: cw, inset: playheadInset)
           }
           .frame(width: frameWidth)

@@ -271,6 +271,10 @@ extension VideoPreviewView {
     }
   }
 
+  func updateTextOverlays(_ nsView: VideoPreviewContainer) {
+    nsView.updateTextOverlays(textOverlays, time: currentTime)
+  }
+
   func updateClickSound(_ coordinator: Coordinator) {
     if clickSoundEnabled, isPlaying, let provider = cursorMetadataProvider {
       if coordinator.clickSoundPlayer == nil {

@@ -64,6 +64,11 @@ enum AgentToolSummaries {
         "count": JSONValue(snapshot.captionSegments?.count ?? 0),
         "segments": .array((snapshot.captionSegments ?? []).map { caption($0, withWords: false) }),
       ],
+      "overlays": [
+        "text": .array((snapshot.textOverlays ?? []).map(textOverlay)),
+        "images": .array((snapshot.imageOverlays ?? []).map(imageOverlay)),
+        "blurs": .array((snapshot.blurRegions ?? []).map(blurRegion)),
+      ],
       "audio": [
         "system": audioTrack(
           present: media.hasSystemAudio,
@@ -127,7 +132,7 @@ enum AgentToolSummaries {
       items.append([
         "index": JSONValue(index),
         "timestamp": .string(formatter.string(from: entry.timestamp)),
-        "label": .string(changes.first ?? "Editor settings updated"),
+        "label": .string(entry.label ?? changes.first ?? "Editor settings updated"),
         "changes": .array(changes.map { .string($0) }),
         "isCurrent": .bool(index == currentIndex),
       ])
@@ -148,7 +153,9 @@ enum AgentToolSummaries {
       "end": seconds(region.endSeconds),
     ]
     if let entry = region.entryTransition { object["entryTransition"] = .string(entry.rawValue) }
+    if let duration = region.entryTransitionDuration { object["entryDuration"] = seconds(duration) }
     if let exit = region.exitTransition { object["exitTransition"] = .string(exit.rawValue) }
+    if let duration = region.exitTransitionDuration { object["exitDuration"] = seconds(duration) }
     return .object(object)
   }
 
@@ -223,6 +230,53 @@ enum AgentToolSummaries {
       "muted": .bool(track.muted),
       "fadeIn": seconds(track.fadeInSeconds),
       "fadeOut": seconds(track.fadeOutSeconds),
+    ]
+  }
+
+  private static func textOverlay(_ overlay: TextOverlayData) -> JSONValue {
+    [
+      "id": .string(overlay.id.uuidString),
+      "start": seconds(overlay.startSeconds),
+      "end": seconds(overlay.endSeconds),
+      "text": .string(overlay.text),
+      "position": .string(overlay.position.rawValue),
+      "offsetX": .number(Double(overlay.offsetX)),
+      "offsetY": .number(Double(overlay.offsetY)),
+      "entryTransition": .string(overlay.entryTransition.rawValue),
+      "entryDuration": seconds(overlay.entryTransitionDuration),
+      "exitTransition": .string(overlay.exitTransition.rawValue),
+      "exitDuration": seconds(overlay.exitTransitionDuration),
+    ]
+  }
+
+  private static func imageOverlay(_ overlay: ImageOverlayData) -> JSONValue {
+    [
+      "id": .string(overlay.id.uuidString),
+      "start": seconds(overlay.startSeconds),
+      "end": seconds(overlay.endSeconds),
+      "name": .string(overlay.displayName),
+      "position": .string(overlay.position.rawValue),
+      "width": .number(Double(overlay.width)),
+      "opacity": .number(Double(overlay.opacity)),
+      "entryTransition": .string(overlay.entryTransition.rawValue),
+      "entryDuration": seconds(overlay.entryTransitionDuration),
+      "exitTransition": .string(overlay.exitTransition.rawValue),
+      "exitDuration": seconds(overlay.exitTransitionDuration),
+    ]
+  }
+
+  private static func blurRegion(_ region: BlurRegionData) -> JSONValue {
+    [
+      "id": .string(region.id.uuidString),
+      "start": seconds(region.startSeconds),
+      "end": seconds(region.endSeconds),
+      "rect": [
+        "x": .number(Double(region.x)),
+        "y": .number(Double(region.y)),
+        "width": .number(Double(region.width)),
+        "height": .number(Double(region.height)),
+      ],
+      "radius": .number(Double(region.radius)),
     ]
   }
 

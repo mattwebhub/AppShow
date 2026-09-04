@@ -320,4 +320,132 @@ struct RegionRemappingTests {
     #expect(second.customRadius == 90)
     #expect(second.fadeDuration == 0.2)
   }
+
+  @Test func textOverlayIsClippedAndShiftedByTrimStart() throws {
+    let trim = range(5, 10)
+    var config = config(trim: trim)
+    let original = TextOverlayData(startSeconds: 2, endSeconds: 8, text: "Kept")
+    config.textOverlays = [original, TextOverlayData(startSeconds: 0, endSeconds: 4, text: "Dropped")]
+
+    let remapped = remap(config, trim: trim)
+
+    #expect(remapped.textOverlays.count == 1)
+    let result = try #require(remapped.textOverlays.first)
+    #expect(result.id == original.id)
+    #expect(result.startSeconds == 0)
+    #expect(result.endSeconds == 3)
+    #expect(result.text == "Kept")
+  }
+
+  @Test func textOverlaySpanningTwoSegmentsIsSplitWithFreshIds() throws {
+    var config = config(trim: range(0, 10))
+    var original = TextOverlayData(startSeconds: 1, endSeconds: 6, text: "Split")
+    original.position = .topLeft
+    original.entryTransition = .scale
+    original.entryTransitionDuration = 0.7
+    original.exitTransition = .slide
+    original.exitTransitionDuration = 0.8
+    config.textOverlays = [original, TextOverlayData(startSeconds: 3, endSeconds: 4, text: "Gone")]
+
+    let remapped = remapWithCuts(config)
+
+    #expect(remapped.textOverlays.count == 2)
+    let first = try #require(remapped.textOverlays.first)
+    let second = try #require(remapped.textOverlays.last)
+    #expect(first.startSeconds == 1)
+    #expect(first.endSeconds == 2)
+    #expect(second.startSeconds == 2)
+    #expect(second.endSeconds == 3)
+    #expect(first.id != original.id)
+    #expect(second.id != original.id)
+    #expect(first.id != second.id)
+    #expect(second.text == "Split")
+    #expect(second.position == .topLeft)
+    #expect(second.entryTransition == .scale)
+    #expect(second.entryTransitionDuration == 0.7)
+    #expect(second.exitTransition == .slide)
+    #expect(second.exitTransitionDuration == 0.8)
+  }
+
+  @Test func imageOverlayIsClippedAndShiftedByTrimStart() throws {
+    let trim = range(5, 10)
+    var config = config(trim: trim)
+    let original = ImageOverlayData(startSeconds: 2, endSeconds: 8, filename: "kept.png")
+    config.imageOverlays = [original, ImageOverlayData(startSeconds: 0, endSeconds: 4, filename: "dropped.png")]
+
+    let remapped = remap(config, trim: trim)
+
+    #expect(remapped.imageOverlays.count == 1)
+    let result = try #require(remapped.imageOverlays.first)
+    #expect(result.id == original.id)
+    #expect(result.startSeconds == 0)
+    #expect(result.endSeconds == 3)
+    #expect(result.filename == "kept.png")
+  }
+
+  @Test func imageOverlaySpanningTwoSegmentsIsSplitWithFreshIds() throws {
+    var config = config(trim: range(0, 10))
+    var original = ImageOverlayData(startSeconds: 1, endSeconds: 6, filename: "split.png")
+    original.position = .topLeft
+    original.entryTransition = .scale
+    original.entryTransitionDuration = 0.7
+    original.exitTransition = .slide
+    original.exitTransitionDuration = 0.8
+    config.imageOverlays = [original, ImageOverlayData(startSeconds: 3, endSeconds: 4, filename: "gone.png")]
+
+    let remapped = remapWithCuts(config)
+
+    #expect(remapped.imageOverlays.count == 2)
+    let first = try #require(remapped.imageOverlays.first)
+    let second = try #require(remapped.imageOverlays.last)
+    #expect(first.startSeconds == 1)
+    #expect(first.endSeconds == 2)
+    #expect(second.startSeconds == 2)
+    #expect(second.endSeconds == 3)
+    #expect(first.id != original.id)
+    #expect(second.id != original.id)
+    #expect(first.id != second.id)
+    #expect(second.filename == "split.png")
+    #expect(second.position == .topLeft)
+    #expect(second.entryTransition == .scale)
+    #expect(second.entryTransitionDuration == 0.7)
+    #expect(second.exitTransition == .slide)
+    #expect(second.exitTransitionDuration == 0.8)
+  }
+
+  @Test func blurRegionIsClippedAndShiftedByTrimStart() throws {
+    let trim = range(5, 10)
+    var config = config(trim: trim)
+    let original = BlurRegionData(startSeconds: 2, endSeconds: 8, x: 0.1, y: 0.2, width: 0.3, height: 0.4)
+    config.blurRegions = [original, BlurRegionData(startSeconds: 0, endSeconds: 4)]
+
+    let remapped = remap(config, trim: trim)
+
+    #expect(remapped.blurRegions.count == 1)
+    let result = try #require(remapped.blurRegions.first)
+    #expect(result.id == original.id)
+    #expect(result.startSeconds == 0)
+    #expect(result.endSeconds == 3)
+    #expect(result.rect == original.rect)
+  }
+
+  @Test func blurRegionSpanningTwoSegmentsIsSplitWithFreshIds() throws {
+    var config = config(trim: range(0, 10))
+    let original = BlurRegionData(startSeconds: 1, endSeconds: 6, radius: 30)
+    config.blurRegions = [original, BlurRegionData(startSeconds: 3, endSeconds: 4)]
+
+    let remapped = remapWithCuts(config)
+
+    #expect(remapped.blurRegions.count == 2)
+    let first = try #require(remapped.blurRegions.first)
+    let second = try #require(remapped.blurRegions.last)
+    #expect(first.startSeconds == 1)
+    #expect(first.endSeconds == 2)
+    #expect(second.startSeconds == 2)
+    #expect(second.endSeconds == 3)
+    #expect(first.id != original.id)
+    #expect(second.id != original.id)
+    #expect(first.id != second.id)
+    #expect(second.radius == 30)
+  }
 }

@@ -169,7 +169,7 @@ Both runtimes implement the same open format: a folder with `SKILL.md` whose YAM
 
 ### 5.2 Where the app ships them and how they reach the runtime
 
-- Canonical source: `Reframed/Agent/Skills/<name>/SKILL.md` in the repo, copied into `Reframed.app/Contents/Resources/skills/` at build time (a folder reference, no code).
+- Canonical source: `Reframed/Agent/Skills/<name>/SKILL.md` in the repo, copied into `Reframed.app/Contents/Resources/Skills/` at build time as a folder resource.
 - At chat-session start the app materializes the workspace: `<workspace>/.claude/skills/<name>/` and `<workspace>/.agents/skills/<name>/` (real copies, not symlinks, since Toone's parser precedent rejects symlinked skills, `SkillParserService.swift:27-35`), plus `<workspace>/AGENTS.md` with the always-on rules from §6 and a `CLAUDE.md` symlink to it (the convention this repo already uses, ADR 0007). Re-materialized on every launch so app updates propagate; user edits inside the workspace are overwritten, which is the intended contract for v1.
 - Each `SKILL.md` names only tools in the catalog; a test enforces that (ATTACK-PLAN phase 11).
 
@@ -177,11 +177,11 @@ Both runtimes implement the same open format: a folder with `SKILL.md` whose YAM
 
 | Skill | Purpose | Tools used | Checks it performs before finishing |
 | --- | --- | --- | --- |
-| `presentation-cut` | Turn a raw flow into a structured demo: intro, 3–6 chapters, outro | `get_project`, `get_transcript`, `get_click_clusters`, `get_silences`, `begin_batch`, `set_keep_slices` (or `add_cut`), `add_zoom`, `add_spotlight`, `add_text`, `set_background`, `set_canvas`, `end_batch`, `render_preview_frame` | total kept duration within the requested target; no chapter shorter than 3 s; no zoom overlapping a cut boundary; a preview frame rendered at each title card; timeline re-read after the batch |
-| `remove-silences` | Remove dead air and long pauses | `get_silences` (dry run), `remove_silences`, `get_timeline` | never removes a gap that contains a click or a transcript word; keeps `padding` of speech; reports seconds removed and asks before removing more than 40 % |
-| `spotlight-clicks` | Highlight every meaningful click cluster | `get_click_clusters`, `add_spotlight`, `add_zoom` | one spotlight per cluster, radius scaled to cluster spread; skips clusters inside removed ranges; cursor must be shown (`set_cursor {show:true}`) or the export drops spotlights (`EditorState+Export.swift:201`) |
+| `presentation-cut` | Turn a raw flow into a structured demo: intro, 3–6 chapters, outro | `get_project_summary`, `get_timeline`, `get_transcript`, `get_cursor_activity`, `get_silences`, `begin_batch`, `set_kept_slices`, `add_zoom`, `add_spotlight`, `add_text`, `set_transition`, `set_canvas`, `end_batch`, `render_preview_frame` | total kept duration is reported; no chapter shorter than 3 s where the source permits; no zoom on a cut boundary; a preview frame rendered at each title card; timeline re-read after the batch |
+| `remove-silences` | Remove dead air and long pauses | `get_silences`, `get_transcript`, `get_cursor_activity`, `remove_silences`, `set_kept_slices`, `get_timeline` | never removes a gap that contains a click or a transcript word; keeps speech padding; reports retained candidates and removed duration; app confirmation applies above 40 % |
+| `spotlight-clicks` | Highlight every meaningful click cluster | `get_cursor_activity`, `get_timeline`, `set_cursor`, `add_spotlight`, `add_zoom`, `render_preview_frame` | one spotlight per meaningful cluster; skips clusters inside removed ranges; keeps the cursor visible and verifies representative frames |
 | `add-title-cards` | Title, chapter and outro cards from the transcript | `get_transcript`, `add_text`, `set_transition` | text fits the safe area for the current `canvasAspect`; card duration 2–3 s; no overlap with captions position |
-| `music-bed` | Lay a music track under the narration | `add_music`, `set_music`, `set_volume` | ducks under speech using transcript word ranges; fade-in/out at trim edges; never louder than −18 dBFS relative to mic |
+| `music-bed` | Lay a music track under the narration | `get_project_summary`, `get_timeline`, `get_transcript`, `add_music`, `set_music`, `remove_music` | starts conservatively, fades at the presentation edge, reports placement and level, and states that automatic ducking and looping are not yet available |
 
 ---
 

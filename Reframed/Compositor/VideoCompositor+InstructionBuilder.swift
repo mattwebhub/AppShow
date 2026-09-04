@@ -29,7 +29,8 @@ extension VideoCompositor {
     }()
     let needsReencode =
       !sourceCodecMatchesExport || config.exportSettings.resolution != ExportResolution.original
-      || config.exportSettings.fps != ExportFPS.original
+      || config.exportSettings.fps != ExportFPS.original || config.exportSettings.maximumWidth != nil
+      || config.exportSettings.frameRateOverride != nil
     return hasVisualEffects
       || result.webcamVideoURL != nil
       || needsReencode
@@ -39,6 +40,9 @@ extension VideoCompositor {
       || hasVideoRegions
       || (config.captionsEnabled && !config.captionSegments.isEmpty)
       || (!config.spotlightRegions.isEmpty && config.cursorSnapshot != nil)
+      || !config.textOverlays.isEmpty
+      || !config.imageOverlays.isEmpty
+      || !config.blurRegions.isEmpty
       || clickSoundURL != nil
       || !config.externalAudioTracks.isEmpty
   }
@@ -62,9 +66,11 @@ extension VideoCompositor {
 
   static func computeRenderSize(
     canvasSize: CGSize,
-    resolution: ExportResolution
+    resolution: ExportResolution,
+    maximumWidth: CGFloat? = nil
   ) -> CGSize {
-    if let targetWidth = resolution.pixelWidth {
+    let targetWidth = maximumWidth.map { min($0, canvasSize.width) } ?? resolution.pixelWidth
+    if let targetWidth {
       let aspect = canvasSize.height / max(canvasSize.width, 1)
       return CGSize(width: targetWidth, height: round(targetWidth * aspect))
     }
@@ -146,6 +152,7 @@ extension VideoCompositor {
       effectiveTrim: effectiveTrim,
       scaleX: scaleX
     )
+    let images = ImageOverlayImporter.loadImages(for: regions.imageOverlays, in: config.imageOverlayDirectory)
 
     return CompositionInstruction(
       timeRange: CMTimeRange(start: .zero, duration: compositionDuration),
@@ -229,6 +236,20 @@ extension VideoCompositor {
       spotlightRadius: config.spotlightRadius,
       spotlightDimOpacity: config.spotlightDimOpacity,
       spotlightEdgeSoftness: config.spotlightEdgeSoftness,
+      textOverlays: regions.textOverlays.map { TextOverlayLayout.resolve($0, canvasSize: renderSize) },
+      imageOverlays: regions.imageOverlays.compactMap { overlay in
+        images[overlay.filename].map { ImageOverlayLayout.resolve(overlay, image: $0, canvasSize: renderSize) }
+      },
+      blurRegions: regions.blurRegions.map {
+        BlurRegionInstruction(
+          timeRange: CMTimeRange(
+            start: CMTime(seconds: $0.startSeconds, preferredTimescale: 600),
+            end: CMTime(seconds: $0.endSeconds, preferredTimescale: 600)
+          ),
+          rect: $0.rect,
+          radius: $0.radius
+        )
+      },
       isHDR: result.isHDR
     )
   }

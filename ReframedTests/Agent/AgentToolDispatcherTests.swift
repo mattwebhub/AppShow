@@ -301,16 +301,17 @@ struct AgentToolDispatcherTests {
     #expect(recorder.calls == 2)
   }
 
-  @Test func pendingMergeToolIsUnavailable() async throws {
+  @Test func getSilencesUsesTheOpenProjectsAudio() async throws {
     let dir = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(dir) }
     let (state, _) = try await makeState(in: dir, webcam: false, cursor: false)
     defer { state.teardown() }
     let dispatcher = makeDispatcher(state, in: dir)
 
-    let error = await toolError { try await dispatcher.call("get_silences", arguments: ["source": "mic"]) }
-    #expect(error == .unavailable(name: "get_silences", reason: "pending merge of milestone-07-primitives"))
-    #expect(error?.jsonRPCError.code == -32004)
+    let result = try await dispatcher.call("get_silences", arguments: ["source": "system"])
+    #expect(result["source"] == "system")
+    #expect(result["count"] == 0)
+    #expect(result["silences"] == [])
   }
 
   @Test func renderPreviewFrameWritesADecodablePNGOfTheRequestedSize() async throws {

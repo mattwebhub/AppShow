@@ -24,6 +24,38 @@ struct CameraCustomRegion: Sendable {
   let exitDuration: Double
 }
 
+struct TextOverlayInstruction: Sendable {
+  let transition: RegionTransitionInfo
+  let text: String
+  let fontPixelSize: CGFloat
+  let fontWeight: CaptionFontWeight
+  let textColor: CodableColor
+  let backgroundColor: CodableColor?
+  let cornerRadius: CGFloat
+  let rect: CGRect
+  let paddingH: CGFloat
+  let paddingV: CGFloat
+
+  var timeRange: CMTimeRange { transition.timeRange }
+}
+
+struct ImageOverlayInstruction: @unchecked Sendable {
+  let transition: RegionTransitionInfo
+  let image: CGImage
+  let rect: CGRect
+  let cornerRadius: CGFloat
+  let opacity: CGFloat
+  let shadow: CGFloat
+
+  var timeRange: CMTimeRange { transition.timeRange }
+}
+
+struct BlurRegionInstruction: Sendable {
+  let timeRange: CMTimeRange
+  let rect: CGRect
+  let radius: CGFloat
+}
+
 struct VideoSegmentMapping: Sendable {
   let compositionStart: Double
   let sourceStart: Double
@@ -102,6 +134,9 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
   let spotlightRadius: CGFloat
   let spotlightDimOpacity: CGFloat
   let spotlightEdgeSoftness: CGFloat
+  let textOverlays: [TextOverlayInstruction]
+  let imageOverlays: [ImageOverlayInstruction]
+  let blurRegions: [BlurRegionInstruction]
   let isHDR: Bool
 
   init(
@@ -167,6 +202,9 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
     spotlightRadius: CGFloat = 200,
     spotlightDimOpacity: CGFloat = 0.6,
     spotlightEdgeSoftness: CGFloat = 50,
+    textOverlays: [TextOverlayInstruction] = [],
+    imageOverlays: [ImageOverlayInstruction] = [],
+    blurRegions: [BlurRegionInstruction] = [],
     isHDR: Bool = false
   ) {
     self.timeRange = timeRange
@@ -231,6 +269,9 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
     self.spotlightRadius = spotlightRadius
     self.spotlightDimOpacity = spotlightDimOpacity
     self.spotlightEdgeSoftness = spotlightEdgeSoftness
+    self.textOverlays = textOverlays
+    self.imageOverlays = imageOverlays
+    self.blurRegions = blurRegions
     self.isHDR = isHDR
     var trackIDs: [NSValue] = [NSNumber(value: screenTrackID)]
     if let wid = webcamTrackID {
