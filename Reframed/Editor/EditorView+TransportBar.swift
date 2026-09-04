@@ -40,6 +40,24 @@ extension EditorView {
         Spacer()
 
         if !isPreview {
+          let canCut = editorState.cutTimeline.canCut(at: CMTimeGetSeconds(editorState.currentTime))
+          IconButton(
+            systemName: "hand.point.up.left",
+            color: canCut ? ReframedColors.primaryText : ReframedColors.disabledText
+          ) {
+            editorState.splitVideoRegion(atTime: CMTimeGetSeconds(editorState.currentTime))
+          }
+          .disabled(!canCut)
+
+          if editorState.showCutTrack {
+            IconButton(
+              systemName: "arrow.left.and.right.square",
+              color: timelineDisplayMode == .compressed ? ReframedColors.primaryText : ReframedColors.secondaryText
+            ) {
+              timelineDisplayMode = timelineDisplayMode == .compressed ? .source : .compressed
+            }
+          }
+
           IconButton(
             systemName: "minus.magnifyingglass",
             color: timelineZoom > 1.0 ? ReframedColors.primaryText : ReframedColors.disabledText

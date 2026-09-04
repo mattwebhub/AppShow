@@ -39,6 +39,16 @@ extension EditorState {
     videoRegions.sort { $0.startSeconds < $1.startSeconds }
   }
 
+  func splitVideoRegion(atTime time: Double) {
+    let split = cutTimeline.split(at: time)
+    guard split != cutTimeline else { return }
+    videoRegions = split.slices
+  }
+
+  func clearVideoCuts() {
+    videoRegions = [VideoRegionData(startSeconds: 0, endSeconds: CMTimeGetSeconds(duration))]
+  }
+
   func removeVideoRegion(regionId: UUID) {
     videoRegions.removeAll { $0.id == regionId }
   }

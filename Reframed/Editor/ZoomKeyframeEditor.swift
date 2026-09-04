@@ -3,6 +3,7 @@ import SwiftUI
 struct ZoomKeyframeEditor: View {
   let keyframes: [ZoomKeyframe]
   let duration: Double
+  let geometry: TimelineGeometry
   let width: CGFloat
   let height: CGFloat
   let scrollOffset: CGFloat
@@ -21,6 +22,10 @@ struct ZoomKeyframeEditor: View {
     groupZoomRegions(from: keyframes)
   }
 
+  var isEditable: Bool {
+    geometry.mode == .source
+  }
+
   var body: some View {
     let _ = colorScheme
     ZStack(alignment: .leading) {
@@ -29,11 +34,11 @@ struct ZoomKeyframeEditor: View {
         .frame(width: width, height: height)
         .contentShape(Rectangle())
         .onTapGesture(count: 2) { location in
-          let fraction = max(0, min(1, location.x / width))
-          let time = fraction * duration
+          guard isEditable else { return }
+          let time = geometry.sourceTime(forX: location.x)
           let hitRegion = regions.first { region in
-            let startX = (region.startTime / duration) * width
-            let endX = (region.endTime / duration) * width
+            let startX = geometry.x(forSource: region.startTime)
+            let endX = geometry.x(forSource: region.endTime)
             return location.x >= startX && location.x <= endX
           }
           if hitRegion == nil {

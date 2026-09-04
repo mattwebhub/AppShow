@@ -116,6 +116,7 @@ extension EditorView {
             )
           },
           isPreviewMode: editorState.isPreviewMode,
+          hasCuts: editorState.hasVideoRegionCuts,
           isPlaying: editorState.isPlaying,
           clickSoundEnabled: editorState.clickSoundEnabled && editorState.showCursor
             && editorState.cursorMetadataProvider != nil,

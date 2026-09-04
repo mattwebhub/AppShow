@@ -138,7 +138,7 @@ extension VideoPreviewView {
     }()
     nsView.screenTransitionProgress = screenTransitionProgress
     nsView.screenTransitionType = screenTransitionType
-    nsView.isScreenHidden = isPreviewMode && !videoRegions.isEmpty && videoRegion == nil
+    nsView.isScreenHidden = (isPreviewMode || hasCuts) && !videoRegions.isEmpty && videoRegion == nil
   }
 
   func updateWebcamOutput(_ nsView: VideoPreviewContainer) {

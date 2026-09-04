@@ -211,7 +211,7 @@ extension EditorState {
       }
     }
     if let savedVideoRegions = data.videoRegions, !savedVideoRegions.isEmpty {
-      videoRegions = savedVideoRegions
+      videoRegions = CutTimeline(slices: savedVideoRegions, duration: CMTimeGetSeconds(duration)).normalized().slices
     } else {
       let dur = CMTimeGetSeconds(duration)
       videoRegions = [VideoRegionData(startSeconds: 0, endSeconds: dur)]

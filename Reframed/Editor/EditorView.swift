@@ -11,6 +11,7 @@ struct EditorView: View {
   @State var showHistoryPopover = false
   @State var timelineZoom: CGFloat = 1.0
   @State var baseZoom: CGFloat = 1.0
+  @State var timelineDisplayMode: TimelineDisplayMode = .source
   @Environment(\.colorScheme) private var colorScheme
 
   let onDelete: () -> Void
@@ -22,6 +23,7 @@ struct EditorView: View {
     if !editorState.micAudioMuted { h |= 4 }
     if editorState.zoomEnabled { h |= 8 }
     if editorState.spotlightEnabled { h |= 16 }
+    if editorState.showCutTrack { h |= 32 }
     return h
   }
 
@@ -109,6 +111,11 @@ struct EditorView: View {
       guard didFinishSetup else { return }
       regenerateMicWaveform()
     }
+    .onChange(of: editorState.showCutTrack) { _, isShown in
+      if !isShown {
+        timelineDisplayMode = .source
+      }
+    }
     .sheet(isPresented: $editorState.showExportSheet) {
       ExportSheet(
         editorState: editorState,
@@ -150,7 +157,8 @@ struct EditorView: View {
         editorState.seek(to: time)
       },
       timelineZoom: $timelineZoom,
-      baseZoom: $baseZoom
+      baseZoom: $baseZoom,
+      displayMode: $timelineDisplayMode
     )
   }
 

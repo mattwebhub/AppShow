@@ -9,7 +9,7 @@ extension EditorState {
     if isPlaying {
       pause()
     } else {
-      if isPreviewMode && hasVideoRegionCuts {
+      if hasVideoRegionCuts {
         let t = CMTimeGetSeconds(currentTime)
         let inRegion = videoRegions.contains { t >= $0.startSeconds && t < $0.endSeconds }
         if !inRegion {

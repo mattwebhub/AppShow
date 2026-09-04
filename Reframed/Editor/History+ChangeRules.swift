@@ -258,9 +258,9 @@ extension History {
     ),
     regions(
       \.videoRegions,
-      added: "Video region added",
-      removed: "Video region removed",
-      adjusted: "Video region adjusted"
+      added: "Cut added",
+      removed: "Cut removed",
+      adjusted: "Cut adjusted"
     ),
     regions(
       \.spotlightRegions,
