@@ -54,6 +54,8 @@
 		7E5700000000000000000074 /* AgentConversationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000073 /* AgentConversationStore.swift */; };
 		7E5700000000000000000076 /* AgentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000075 /* AgentSession.swift */; };
 		7E5700000000000000000078 /* AgentTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000077 /* AgentTranscript.swift */; };
+		7E570000000000000000007A /* AgentPanelLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000079 /* AgentPanelLayout.swift */; };
+		7E570000000000000000007C /* AgentChatPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000007B /* AgentChatPanel.swift */; };
 		7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000001C /* TimelineView+CutTrack.swift */; };
 		7E5700000000000000000021 /* TimelineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000020 /* TimelineGeometry.swift */; };
 		7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000022 /* TimelineView+Geometry.swift */; };
@@ -327,6 +329,8 @@
 		7E5700000000000000000073 /* AgentConversationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationStore.swift; sourceTree = "<group>"; };
 		7E5700000000000000000075 /* AgentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSession.swift; sourceTree = "<group>"; };
 		7E5700000000000000000077 /* AgentTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentTranscript.swift; sourceTree = "<group>"; };
+		7E5700000000000000000079 /* AgentPanelLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentPanelLayout.swift; sourceTree = "<group>"; };
+		7E570000000000000000007B /* AgentChatPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentChatPanel.swift; sourceTree = "<group>"; };
 		7E570000000000000000001C /* TimelineView+CutTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CutTrack.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000020 /* TimelineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineGeometry.swift; sourceTree = "<group>"; };
 		7E5700000000000000000022 /* TimelineView+Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+Geometry.swift"; sourceTree = "<group>"; };
@@ -856,6 +860,8 @@
 				7E5700000000000000000073 /* AgentConversationStore.swift */,
 				7E5700000000000000000075 /* AgentSession.swift */,
 				7E5700000000000000000077 /* AgentTranscript.swift */,
+				7E5700000000000000000079 /* AgentPanelLayout.swift */,
+				7E570000000000000000007B /* AgentChatPanel.swift */,
 			);
 			path = Agent;
 			sourceTree = "<group>";
@@ -1291,6 +1297,8 @@
 				7E5700000000000000000074 /* AgentConversationStore.swift in Sources */,
 				7E5700000000000000000076 /* AgentSession.swift in Sources */,
 				7E5700000000000000000078 /* AgentTranscript.swift in Sources */,
+				7E570000000000000000007A /* AgentPanelLayout.swift in Sources */,
+				7E570000000000000000007C /* AgentChatPanel.swift in Sources */,
 				7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */,
 				7E5700000000000000000021 /* TimelineGeometry.swift in Sources */,
 				7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */,
