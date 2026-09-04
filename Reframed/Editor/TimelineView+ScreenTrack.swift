@@ -12,7 +12,7 @@ extension TimelineView {
         HStack(spacing: 3) {
           Image(systemName: "film")
             .font(.system(size: Track.fontSize))
-          Text(formatTimeRange(start: 0, end: totalSeconds))
+          Text(formatTimeRange(start: 0, end: visibleSeconds))
             .font(.system(size: Track.fontSize, weight: Track.fontWeight))
             .lineLimit(1)
         }
@@ -37,7 +37,7 @@ extension TimelineView {
       .coordinateSpace(name: "videoRegion")
       .contentShape(Rectangle())
       .onTapGesture(count: 2) { location in
-        let time = (location.x / width) * totalSeconds
+        let time = sourceTime(forX: location.x, width: width)
         editorState.addVideoRegion(atTime: time)
       }
     }

@@ -4,8 +4,8 @@ extension ZoomKeyframeEditor {
   @ViewBuilder
   func regionView(for region: ZoomRegion) -> some View {
     let times = effectiveTimes(for: region)
-    let startX = max(0, (times.start / duration) * width)
-    let endX = min(width, (times.end / duration) * width)
+    let startX = max(0, geometry.x(forSource: times.start))
+    let endX = min(width, geometry.x(forSource: times.end))
     let regionWidth = max(4, endX - startX)
     let totalDur = times.end - times.start
     let easeIn = times.zoomStart - times.start
@@ -40,11 +40,19 @@ extension ZoomKeyframeEditor {
 
       RoundedRectangle(cornerRadius: Track.borderRadius)
         .strokeBorder(Track.borderColor, lineWidth: Track.borderWidth)
+
+      RegionCutMarkers(
+        geometry: geometry,
+        start: times.start,
+        end: times.end,
+        originX: startX,
+        height: height
+      )
     }
     .frame(width: regionWidth, height: height)
     .contentShape(Rectangle())
     .overlay {
-      if !region.isAuto {
+      if !region.isAuto && isEditable {
         RightClickOverlay {
           popoverRegionIndex = region.startIndex
         }
@@ -53,11 +61,11 @@ extension ZoomKeyframeEditor {
     .gesture(
       DragGesture(minimumDistance: 3, coordinateSpace: .named("zoomEditor"))
         .onChanged { value in
-          guard !region.isAuto else { return }
+          guard !region.isAuto, isEditable else { return }
           popoverRegionIndex = nil
           if dragType == nil {
-            let origStartX = (region.startTime / duration) * width
-            let origEndX = (region.endTime / duration) * width
+            let origStartX = geometry.x(forSource: region.startTime)
+            let origEndX = geometry.x(forSource: region.endTime)
             let origWidth = origEndX - origStartX
             let relX = value.startLocation.x - origStartX
             let effectiveEdge = min(8.0, origWidth * 0.2)
@@ -99,7 +107,7 @@ extension ZoomKeyframeEditor {
       .presentationBackground(ReframedColors.backgroundPopover)
     }
     .onContinuousHover { phase in
-      guard !region.isAuto else { return }
+      guard !region.isAuto, isEditable else { return }
       switch phase {
       case .active(let location):
         if location.x <= edgeThreshold || location.x >= regionWidth - edgeThreshold {

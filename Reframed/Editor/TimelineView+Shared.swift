@@ -16,6 +16,7 @@ extension TimelineView {
     ZoomKeyframeEditor(
       keyframes: keyframes,
       duration: totalSeconds,
+      geometry: geometry(width: width),
       width: width,
       height: trackHeight,
       scrollOffset: scrollOffset,

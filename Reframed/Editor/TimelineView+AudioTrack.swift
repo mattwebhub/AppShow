@@ -42,11 +42,12 @@ extension TimelineView {
     .coordinateSpace(name: trackType)
     .contentShape(Rectangle())
     .onTapGesture(count: 2) { location in
-      let time = (location.x / width) * totalSeconds
+      guard isTrackEditable else { return }
+      let time = sourceTime(forX: location.x, width: width)
       let hitRegion = regions.first { r in
         let eff = effectiveAudioRegion(r, width: width)
-        let startX = (eff.start / totalSeconds) * width
-        let endX = (eff.end / totalSeconds) * width
+        let startX = xPosition(forSource: eff.start, width: width)
+        let endX = xPosition(forSource: eff.end, width: width)
         return location.x >= startX && location.x <= endX
       }
       if hitRegion == nil {
@@ -97,23 +98,10 @@ extension TimelineView {
     width: CGFloat,
     height: CGFloat
   ) -> some View {
-    Canvas { context, size in
-      let count = samples.count
-      guard count > 1 else { return }
-      let midY = size.height / 2
-      let maxAmp = size.height * 0.4
-      let step = size.width / CGFloat(count - 1)
-
-      var topPoints: [CGPoint] = []
-      var bottomPoints: [CGPoint] = []
-      for i in 0..<count {
-        let x = CGFloat(i) * step
-        let amp = CGFloat(samples[i]) * maxAmp
-        topPoints.append(CGPoint(x: x, y: midY - amp))
-        bottomPoints.append(CGPoint(x: x, y: midY + amp))
-      }
-
-      let fullPath = buildWaveformPath(top: topPoints, bottom: bottomPoints, minX: 0, maxX: size.width)
+    let points = waveformPoints(samples: samples, width: width, height: height)
+    return Canvas { context, size in
+      guard points.top.count > 1 else { return }
+      let fullPath = buildWaveformPath(top: points.top, bottom: points.bottom, minX: 0, maxX: size.width)
       context.fill(fullPath, with: .color(ReframedColors.mutedForeground.opacity(0.2)))
     }
     .frame(width: width, height: height)
@@ -129,8 +117,8 @@ extension TimelineView {
     height: CGFloat
   ) -> some View {
     let effective = effectiveAudioRegion(region, width: width)
-    let startX = max(0, CGFloat(effective.start / totalSeconds) * width)
-    let endX = min(width, CGFloat(effective.end / totalSeconds) * width)
+    let startX = max(0, xPosition(forSource: effective.start, width: width))
+    let endX = min(width, xPosition(forSource: effective.end, width: width))
     let regionWidth = max(4, endX - startX)
     let edgeThreshold = min(8.0, regionWidth * 0.2)
 
@@ -150,20 +138,31 @@ extension TimelineView {
 
       RoundedRectangle(cornerRadius: Track.borderRadius)
         .strokeBorder(Track.borderColor, lineWidth: Track.borderWidth)
+
+      RegionCutMarkers(
+        geometry: geometry(width: width),
+        start: effective.start,
+        end: effective.end,
+        originX: startX,
+        height: height
+      )
     }
     .frame(width: regionWidth, height: height)
     .contentShape(Rectangle())
     .overlay {
-      RightClickOverlay {
-        editorState.removeRegion(trackType: trackType, regionId: region.id)
+      if isTrackEditable {
+        RightClickOverlay {
+          editorState.removeRegion(trackType: trackType, regionId: region.id)
+        }
       }
     }
     .gesture(
       DragGesture(minimumDistance: 3, coordinateSpace: .named(trackType))
         .onChanged { value in
+          guard isTrackEditable else { return }
           if audioDragType == nil {
-            let origStartX = CGFloat(region.startSeconds / totalSeconds) * width
-            let origEndX = CGFloat(region.endSeconds / totalSeconds) * width
+            let origStartX = xPosition(forSource: region.startSeconds, width: width)
+            let origEndX = xPosition(forSource: region.endSeconds, width: width)
             let origWidth = origEndX - origStartX
             let relX = value.startLocation.x - origStartX
             let effectiveEdge = min(8.0, origWidth * 0.2)
@@ -189,7 +188,9 @@ extension TimelineView {
     .onContinuousHover { phase in
       switch phase {
       case .active(let location):
-        if location.x <= edgeThreshold || location.x >= regionWidth - edgeThreshold {
+        if !isTrackEditable {
+          NSCursor.arrow.set()
+        } else if location.x <= edgeThreshold || location.x >= regionWidth - edgeThreshold {
           NSCursor.resizeLeftRight.set()
         } else {
           NSCursor.openHand.set()
@@ -211,25 +212,12 @@ extension TimelineView {
     fullHeight: CGFloat,
     accentColor: Color
   ) -> some View {
-    Canvas { context, size in
-      let count = samples.count
-      guard count > 1 else { return }
-      let midY = fullHeight / 2
-      let maxAmp = fullHeight * 0.4
-      let step = fullWidth / CGFloat(count - 1)
-
-      var topPoints: [CGPoint] = []
-      var bottomPoints: [CGPoint] = []
-      for i in 0..<count {
-        let x = CGFloat(i) * step
-        let amp = CGFloat(samples[i]) * maxAmp
-        topPoints.append(CGPoint(x: x, y: midY - amp))
-        bottomPoints.append(CGPoint(x: x, y: midY + amp))
-      }
-
+    let points = waveformPoints(samples: samples, width: fullWidth, height: fullHeight)
+    return Canvas { context, size in
+      guard points.top.count > 1 else { return }
       let yOffset = (fullHeight - size.height) / 2
       context.translateBy(x: -startX, y: -yOffset)
-      let activePath = buildWaveformPath(top: topPoints, bottom: bottomPoints, minX: startX, maxX: endX)
+      let activePath = buildWaveformPath(top: points.top, bottom: points.bottom, minX: startX, maxX: endX)
       context.fill(activePath, with: .color(accentColor))
     }
     .allowsHitTesting(false)
@@ -296,7 +284,7 @@ extension TimelineView {
     guard audioDragRegionId == region.id, let dt = audioDragType else {
       return (region.startSeconds, region.endSeconds)
     }
-    let timeDelta = (audioDragOffset / width) * totalSeconds
+    let timeDelta = (audioDragOffset / width) * visibleSeconds
 
     switch dt {
     case .move:
@@ -309,7 +297,7 @@ extension TimelineView {
   }
 
   func commitAudioDrag(region: AudioRegionData, trackType: AudioTrackType, width: CGFloat) {
-    let timeDelta = (audioDragOffset / width) * totalSeconds
+    let timeDelta = (audioDragOffset / width) * visibleSeconds
 
     switch audioDragType {
     case .move:
