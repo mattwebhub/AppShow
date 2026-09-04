@@ -105,6 +105,7 @@ struct AgentChatPanel: View {
           }
         )
       )
+      .disabled(transcript.isRunning)
     }
     .foregroundStyle(ReframedColors.primaryText)
     .padding(12)
