@@ -312,6 +312,31 @@ enum AgentEditingToolCatalog {
     mutating: true
   )
 
+  static let addMusic = AgentToolDefinition(
+    name: "add_music",
+    description: "Import an audio file after in-app confirmation and place it on the timeline.",
+    inputSchema: musicSchema(requirePath: true),
+    mutating: true,
+    slow: true
+  )
+
+  static let setMusic = AgentToolDefinition(
+    name: "set_music",
+    description: "Move or change the volume, mute state, and fades of an imported audio track.",
+    inputSchema: musicSchema(requireIdentity: true),
+    mutating: true
+  )
+
+  static let removeMusic = AgentToolDefinition(
+    name: "remove_music",
+    description: "Remove an imported audio track by id while retaining its bundled asset for undo.",
+    inputSchema: AgentToolSchema.object(
+      ["id": AgentToolSchema.string("External audio track UUID"), "label": AgentToolSchema.string("Short undo-history label")],
+      required: ["id"]
+    ),
+    mutating: true
+  )
+
   static let beginBatch = AgentToolDefinition(
     name: "begin_batch",
     description: "Begin a labeled edit transaction whose mutations become one undo step.",
@@ -355,6 +380,9 @@ enum AgentEditingToolCatalog {
       AgentUpdateBlurTool(),
       AgentRemoveBlurTool(),
       AgentSetTransitionTool(),
+      AgentAddMusicTool(),
+      AgentSetMusicTool(),
+      AgentRemoveMusicTool(),
       AgentBatchBoundaryTool(definition: beginBatch),
       AgentBatchBoundaryTool(definition: endBatch),
     ]
@@ -415,6 +443,24 @@ enum AgentEditingToolCatalog {
     var required: [String] = []
     if requireIdentity { required.append("id") }
     if requireRangeAndRect { required.append(contentsOf: ["start", "end", "rect"]) }
+    return AgentToolSchema.object(properties, required: required)
+  }
+
+  private static func musicSchema(requirePath: Bool = false, requireIdentity: Bool = false) -> JSONValue {
+    let properties: [String: JSONValue] = [
+      "id": AgentToolSchema.string("External audio track UUID"),
+      "path": AgentToolSchema.string("Absolute source audio path"),
+      "start": AgentToolSchema.number("Timeline start in source seconds", minimum: 0),
+      "volume": AgentToolSchema.number("Track volume from 0 to 2", minimum: 0, maximum: 2),
+      "muted": AgentToolSchema.boolean("Whether the track is muted"),
+      "fadeIn": AgentToolSchema.number("Fade-in duration in seconds", minimum: 0, maximum: 5),
+      "fadeOut": AgentToolSchema.number("Fade-out duration in seconds", minimum: 0, maximum: 5),
+      "confirmationId": AgentToolSchema.string("Single-use confirmation identifier"),
+      "label": AgentToolSchema.string("Short undo-history label"),
+    ]
+    var required: [String] = []
+    if requirePath { required.append("path") }
+    if requireIdentity { required.append("id") }
     return AgentToolSchema.object(properties, required: required)
   }
 
@@ -996,7 +1042,75 @@ private struct AgentSetTransitionTool: AgentToolHandler {
   }
 }
 
+@MainActor
+private struct AgentAddMusicTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.addMusic
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    guard let path = arguments["path"]?.stringValue, path.hasPrefix("/") else {
+      throw AgentToolError.invalidArguments("path must be absolute")
+    }
+    let source = URL(fileURLWithPath: path).standardizedFileURL
+    try context.editorState.agentConfirmations.authorize(
+      operation: .externalFile(kind: definition.name, url: source),
+      confirmationID: try agentConfirmationID(arguments),
+      title: "Import music",
+      detail: "Copy \(source.lastPathComponent) into this project"
+    )
+    let start = arguments["start"]?.doubleValue ?? CMTimeGetSeconds(context.editorState.currentTime)
+    let track: ExternalAudioTrackData
+    do {
+      track = try await context.editorState.importExternalAudio(from: source, atTime: start, recordsHistory: false)
+    } catch {
+      throw AgentToolError.failed(error.localizedDescription)
+    }
+    try updateMusicTrack(track.id, arguments: arguments, state: context.editorState)
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentSetMusicTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.setMusic
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let id = try agentMusicID(arguments)
+    guard context.editorState.externalAudioTracks.contains(where: { $0.id == id }) else {
+      throw AgentToolError.invalidArguments("music track does not exist")
+    }
+    guard
+      arguments["start"] != nil || arguments["volume"] != nil || arguments["muted"] != nil
+        || arguments["fadeIn"] != nil || arguments["fadeOut"] != nil
+    else {
+      throw AgentToolError.invalidArguments("at least one music setting is required")
+    }
+    try updateMusicTrack(id, arguments: arguments, state: context.editorState)
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentRemoveMusicTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.removeMusic
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let id = try agentMusicID(arguments)
+    guard context.editorState.externalAudioTracks.contains(where: { $0.id == id }) else {
+      throw AgentToolError.invalidArguments("music track does not exist")
+    }
+    context.editorState.removeExternalAudioTrack(id: id)
+    return context.timelineResult()
+  }
+}
+
 private func agentOverlayID(_ arguments: JSONValue) throws -> UUID {
+  guard let value = arguments["id"]?.stringValue, let id = UUID(uuidString: value) else {
+    throw AgentToolError.invalidArguments("id must be a UUID")
+  }
+  return id
+}
+
+private func agentMusicID(_ arguments: JSONValue) throws -> UUID {
   guard let value = arguments["id"]?.stringValue, let id = UUID(uuidString: value) else {
     throw AgentToolError.invalidArguments("id must be a UUID")
   }
@@ -1113,6 +1227,22 @@ private func updateBlurRegion(
   region.endSeconds = range.upperBound
   state.blurRegions[index] = region.normalized()
   state.blurRegions.sort { $0.startSeconds < $1.startSeconds }
+}
+
+@MainActor
+private func updateMusicTrack(
+  _ id: UUID,
+  arguments: JSONValue,
+  state: EditorState
+) throws {
+  guard state.externalAudioTracks.contains(where: { $0.id == id }) else {
+    throw AgentToolError.invalidArguments("music track does not exist")
+  }
+  if let start = arguments["start"]?.doubleValue { state.moveExternalAudioTrack(id: id, newStart: start) }
+  if let volume = arguments["volume"]?.doubleValue { state.setExternalAudioTrackVolume(id: id, volume: Float(volume)) }
+  if let muted = arguments["muted"]?.boolValue { state.setExternalAudioTrackMuted(id: id, muted: muted) }
+  if let fadeIn = arguments["fadeIn"]?.doubleValue { state.setExternalAudioTrackFadeIn(id: id, seconds: fadeIn) }
+  if let fadeOut = arguments["fadeOut"]?.doubleValue { state.setExternalAudioTrackFadeOut(id: id, seconds: fadeOut) }
 }
 
 private func applyOverlayValues(_ arguments: JSONValue, to overlay: inout TextOverlayData) {

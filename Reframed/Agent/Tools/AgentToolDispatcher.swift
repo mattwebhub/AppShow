@@ -194,6 +194,7 @@ final class AgentToolDispatcher {
       case "add_text", "update_text", "remove_text", "add_image", "update_image", "remove_image", "add_blur",
         "update_blur", "remove_blur", "set_transition":
         "overlays"
+      case "add_music", "set_music", "remove_music": "external-audio"
       default: name.split(separator: "_").first.map(String.init) ?? name
       }
     return AgentTimelineChange(
