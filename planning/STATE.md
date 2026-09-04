@@ -11,6 +11,7 @@ Last updated: 2026-09-04
 - Milestone 05 read-only agent tools is code-complete on green PR #7: JSON-RPC codec, MCP-shaped catalog and results, dispatcher, preview frames, authenticated Unix socket, and sibling `.agent/` workspace.
 - Milestone 06 is code-complete on PR #8; it integrates milestones 03–05 and milestone 07's completed primitives. Labeled history, rollback, exact cuts, grouped transactions, single-use confirmations, provider-scoped MCP configuration, the signed stdio shim, bridge lifecycle, live activity UI, presentation settings, timed captions, workspace-only draft export, confirmed exact-path full export, silence removal, external music, transitions, text/image/blur tools, and five dual-provider skills are implemented test-first. Both providers pass the live MCP read/mutate/undo path and discover and invoke the bundled title skill; manual UI checks remain.
 - Milestone 07 PR #4 contains silence removal, text overlays, image overlays, source-space blur regions, and entry/exit transitions on overlays and kept slices. T1 to T9 are code-complete; its manual checks remain.
+- Milestone 08 is complete as a verified no-op: the freshly fetched `upstream/main` and the fork base are both `b6a1709` (v0.14.7), so there was nothing to merge before the identity migration.
 
 ## Verified on this machine
 
@@ -43,5 +44,4 @@ Last updated: 2026-09-04
 1. Run the remaining human UI rows for milestone 06 and review its stacked PR.
 2. Human runs the manual rows for milestones 02, 03, 04, and 07.
 3. Run the full checked-in presentation scenario and its draft export.
-4. Run the upstream-sync milestone after the stacked feature branches are integrated.
-5. Perform the AppShow identity migration before the first public release.
+4. Perform the AppShow identity migration before the first public release.
