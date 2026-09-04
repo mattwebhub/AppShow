@@ -40,6 +40,7 @@ Keep this list current. Each entry links the ADR that justifies it.
 - Test-host seams in upstream files: `Reframed/App/AppDelegate.swift` (one guard line), `Reframed/State/ConfigService.swift`, `Reframed/State/StateService.swift`, `Reframed/Recording/FileManager+Reframed.swift` (paths via `ReframedPaths`); new files `Reframed/App/LaunchEnvironment.swift`, `Reframed/Utilities/ReframedPaths.swift`: `decisions/0006-test-target-shape.md`
 - About tab links and changelog fetch point at the fork (`Reframed/UI/SettingsAboutTab.swift`, `Reframed/Utilities/UpdateChecker.swift`): `decisions/0004-disable-upstream-sparkle-feed.md`
 - `Reframed/Libraries/gifski/LICENSE` (AGPL text) and gifski attribution in `Reframed/Credits.html` and `README.md`: `decisions/0008-gifski-licence.md`
+- Test seams (milestone 01): `Reframed/Project/ReframedProject.swift` `create(..., cleanupTemp: Bool = true)` (S4); `Reframed/Utilities/TranscriptionService.swift` `mergeShortSegments` and `stripSpecialTokens` widened from `private static` to `static` (S7): `docs/architecture/07-testability.md`
 - Lint fix in `Reframed/State/SessionState+WindowInfo.swift` (labeled closure argument) so `make lint` is clean
 - `AGENTS.md` canonical, `CLAUDE.md` symlink; assistant-neutral wording: `decisions/0007-assistant-agnostic-docs.md`
 
