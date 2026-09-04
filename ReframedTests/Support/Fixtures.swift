@@ -17,6 +17,14 @@ enum TestPaths {
   }
 }
 
+enum BundledFixtures {
+  static func url(_ name: String, extension ext: String) -> URL? {
+    let bundle = Bundle(for: FixtureAnchor.self)
+    return bundle.url(forResource: name, withExtension: ext, subdirectory: "Fixtures")
+      ?? bundle.url(forResource: name, withExtension: ext)
+  }
+}
+
 enum AudioFixtures {
   enum Container {
     case wav
