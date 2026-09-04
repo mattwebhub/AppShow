@@ -4,17 +4,17 @@ Written before the production code. Layers from `planning/tdd-strategy.md`.
 
 | Spec # | Test name | Layer | File | Fixture | Status |
 |--------|-----------|-------|------|---------|--------|
-| 3 | `rmsWindowsAverageEachWindow` | unit T1 | `ReframedTests/Editor/SilenceDetectorTests.swift` | none | red |
-| 3 | `silentSpansFindGapsBelowRelativeThreshold` (10 s signal, silence at 3–5 and 8–10) | unit T1 | same | none | red |
-| 3 | `silentSpansIgnoreGapsShorterThanMinimum` | unit T1 | same | none | red |
-| 3 | `thresholdIsRelativeToPeakNotAbsolute` (same shape 20 dB quieter gives the same spans) | unit T1 | same | none | red |
-| 3 | `allSilentSignalIsOneSpan`, `allLoudSignalHasNoSpans` | unit T1 | same | none | red |
-| 4 | `keepSlicesPadSpeechEdges` (3–5 → keep ends at 3.15, next starts at 4.85) | unit T1 | same | none | red |
-| 4 | `keepSlicesKeepRecordingEdgesUnpadded` (silence 8–10 → last slice ends at 8.15, nothing after) | unit T1 | same | none | red |
-| 4 | `keepSlicesDropSlicesShorterThanMinimum` | unit T1 | same | none | red |
-| 4 | `keepSlicesFromNoSilencesIsOneFullSlice`, `keepSlicesFromAllSilentIsEmpty` | unit T1 | same | none | red |
-| 5 | `intersectKeepsExistingCutsAndSplitsAroundSilences` | unit T1 | same | none | red |
-| 5 | `intersectPreservesTransitionsOnOuterPieces` | unit T1 | same | none | red |
+| 3 | `rmsWindowsAverageEachWindow` | unit T1 | `ReframedTests/Editor/SilenceDetectorTests.swift` | none | green |
+| 3 | `silentSpansFindGapsBelowRelativeThreshold` (10 s signal, silence at 3–5 and 8–10) | unit T1 | same | none | green |
+| 3 | `silentSpansIgnoreGapsShorterThanMinimum` | unit T1 | same | none | green |
+| 3 | `thresholdIsRelativeToPeakNotAbsolute` (same shape 20 dB quieter gives the same spans) | unit T1 | same | none | green |
+| 3 | `allSilentSignalIsOneSpan`, `allLoudSignalHasNoSpans` | unit T1 | same | none | green |
+| 4 | `keepSlicesPadSpeechEdges` (3–5 → keep ends at 3.15, next starts at 4.85) | unit T1 | same | none | green |
+| 4 | `keepSlicesKeepRecordingEdgesUnpadded` (silence 8–10 → last slice ends at 8.15, nothing after) | unit T1 | same | none | green |
+| 4 | `keepSlicesDropSlicesShorterThanMinimum` | unit T1 | same | none | green |
+| 4 | `keepSlicesFromNoSilencesIsOneFullSlice`, `keepSlicesFromAllSilentIsEmpty` | unit T1 | same | none | green |
+| 5 | `intersectKeepsExistingCutsAndSplitsAroundSilences` | unit T1 | same | none | green |
+| 5 | `intersectPreservesTransitionsOnOuterPieces` | unit T1 | same | none | green |
 | 2, 3 | `analyzeFindsGapInGeneratedTone` | T2 | `ReframedTests/Editor/SilenceAnalysisTests.swift` | `AudioFixtures.toneWithGap` (wav) | red |
 | 3 | `analyzeMixesTwoSourcesByLouderWindow` | T2 | same | two `toneWithGap` files | red |
 | 2 | `analyzeThrowsForMissingFile` | T2 | same | none | red |
