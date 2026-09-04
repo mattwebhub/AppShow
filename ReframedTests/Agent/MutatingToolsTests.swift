@@ -82,6 +82,50 @@ struct MutatingToolsTests {
     return state
   }
 
+  private func makeStateWithAudioGap(
+    in directory: URL,
+    gap: ClosedRange<Double> = 0.7...1.5
+  ) async throws -> EditorState {
+    let sources = directory.appendingPathComponent("sources", isDirectory: true)
+    try FileManager.default.createDirectory(at: sources, withIntermediateDirectories: true)
+    let base = try await ProjectFixtures.recordingResult(
+      in: sources,
+      webcam: false,
+      systemAudio: false,
+      microphone: false,
+      cursor: false
+    )
+    let microphone = try AudioFixtures.toneWithGap(
+      duration: 2,
+      gap: gap,
+      container: .m4a,
+      in: sources,
+      name: "mic-gap"
+    )
+    let result = RecordingResult(
+      screenVideoURL: base.screenVideoURL,
+      webcamVideoURL: nil,
+      systemAudioURL: nil,
+      microphoneAudioURL: microphone,
+      cursorMetadataURL: nil,
+      screenSize: base.screenSize,
+      webcamSize: nil,
+      fps: base.fps,
+      captureQuality: base.captureQuality,
+      isHDR: base.isHDR
+    )
+    let project = try ReframedProject.create(
+      from: result,
+      fps: result.fps,
+      captureMode: .entireScreen,
+      in: directory,
+      cleanupTemp: false
+    )
+    let state = EditorState(project: project)
+    await state.setup()
+    return state
+  }
+
   private func dispatcher(
     _ state: EditorState,
     in directory: URL,
@@ -447,7 +491,10 @@ struct MutatingToolsTests {
     let names = Set(definitions.map(\.name))
     #expect(
       names.isSuperset(
-        of: ["set_trim", "add_zoom", "add_spotlight", "set_kept_slices", "remove_time_range", "begin_batch", "end_batch"]
+        of: [
+          "set_trim", "add_zoom", "add_spotlight", "set_kept_slices", "remove_time_range", "remove_silences",
+          "add_text", "update_text", "remove_text", "add_image", "update_image", "remove_image", "begin_batch", "end_batch",
+        ]
       )
     )
     let trim = try #require(definitions.first { $0.name == "set_trim" })
@@ -531,6 +578,147 @@ struct MutatingToolsTests {
     #expect(state.systemAudioVolume == 1)
     #expect(state.micAudioVolume == 1)
     #expect(!state.systemAudioMuted)
+  }
+
+  @Test func silenceToolsPreviewApplyAndUndoOneAnalysis() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeStateWithAudioGap(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+    let initialCount = state.history.entries.count
+
+    let preview = try await dispatcher.call(
+      "get_silences",
+      arguments: ["source": "mic", "thresholdDb": -40, "minGapSeconds": 0.5]
+    )
+    #expect(preview["count"] == 1)
+    #expect(preview["silences"]?[0]?["start"]?.doubleValue.map { abs($0 - 0.7) < 0.1 } == true)
+
+    _ = try await dispatcher.call(
+      "remove_silences",
+      arguments: ["source": "mic", "thresholdDb": -40, "minGapSeconds": 0.5, "padding": 0.15]
+    )
+    #expect(state.videoRegions.count == 2)
+    #expect(state.history.entries.count == initialCount + 1)
+    #expect(state.history.entries.last?.label == "Agent: remove silences")
+    state.undo()
+    #expect(state.videoRegions.count == 1)
+  }
+
+  @Test func textOverlayToolsCreateUpdateRemoveAndUndo() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+
+    let added = try await dispatcher.call(
+      "add_text",
+      arguments: [
+        "text": "Introduction", "start": 0.2, "end": 1.2, "position": "top",
+        "fontSize": 0.08, "weight": "semibold",
+      ]
+    )
+    let overlay = try #require(state.textOverlays.first)
+    #expect(overlay.text == "Introduction")
+    #expect(overlay.startSeconds == 0.2)
+    #expect(overlay.endSeconds == 1.2)
+    #expect(overlay.position == .top)
+    #expect(added["overlays"]?["text"]?[0]?["id"] == .string(overlay.id.uuidString))
+
+    _ = try await dispatcher.call(
+      "update_text",
+      arguments: [
+        "id": .string(overlay.id.uuidString), "text": "Chapter one", "start": 0.4,
+        "end": 1.6, "position": "bottom", "offsetX": 0.1,
+      ]
+    )
+    #expect(state.textOverlays.first?.text == "Chapter one")
+    #expect(state.textOverlays.first?.startSeconds == 0.4)
+    #expect(state.textOverlays.first?.endSeconds == 1.6)
+    #expect(state.textOverlays.first?.position == .bottom)
+
+    _ = try await dispatcher.call("remove_text", arguments: ["id": .string(overlay.id.uuidString)])
+    #expect(state.textOverlays.isEmpty)
+    state.undo()
+    #expect(state.textOverlays.first?.text == "Chapter one")
+  }
+
+  @Test func extensiveSilenceRemovalRequiresApprovalForTheExactAnalysis() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeStateWithAudioGap(in: directory, gap: 0.3...1.7)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+
+    await #expect(throws: AgentToolError.self) {
+      try await dispatcher.call(
+        "remove_silences",
+        arguments: ["source": "mic", "thresholdDb": -40, "minGapSeconds": 0.5, "padding": 0.05]
+      )
+    }
+    let request = try #require(state.agentConfirmations.pending.first)
+    #expect(request.operation.kind == "remove_silences")
+    #expect(request.operation.arguments["padding"] == 0.05)
+    #expect(state.videoRegions.count == 1)
+    #expect(state.agentConfirmations.approve(request.id))
+
+    _ = try await dispatcher.call(
+      "remove_silences",
+      arguments: [
+        "source": "mic", "thresholdDb": -40, "minGapSeconds": 0.5, "padding": 0.05,
+        "confirmationId": .string(request.id.uuidString),
+      ]
+    )
+    #expect(state.videoRegions.count == 2)
+  }
+
+  @Test func imageOverlayToolsRequireExactFileApprovalAndSupportEdits() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+    let source = try ImageFixtures.solidPNG(width: 24, height: 12, in: directory, name: "Logo.png")
+
+    await #expect(throws: AgentToolError.self) {
+      try await dispatcher.call(
+        "add_image",
+        arguments: ["path": .string(source.path), "start": 0.1, "end": 1.1, "position": "topRight"]
+      )
+    }
+    let request = try #require(state.agentConfirmations.pending.first)
+    #expect(request.operation == AgentConfirmationOperation.externalFile(kind: "add_image", url: source))
+    #expect(state.agentConfirmations.approve(request.id))
+
+    let added = try await dispatcher.call(
+      "add_image",
+      arguments: [
+        "path": .string(source.path), "start": 0.1, "end": 1.1, "position": "topRight",
+        "confirmationId": .string(request.id.uuidString),
+      ]
+    )
+    let overlay = try #require(state.imageOverlays.first)
+    #expect(overlay.position == .topRight)
+    #expect(added["overlays"]?["images"]?[0]?["id"] == .string(overlay.id.uuidString))
+    #expect(FileManager.default.fileExists(atPath: state.imageOverlayURL(overlay)?.path ?? ""))
+
+    _ = try await dispatcher.call(
+      "update_image",
+      arguments: [
+        "id": .string(overlay.id.uuidString), "start": 0.4, "end": 1.6,
+        "position": "bottomLeft", "width": 0.5, "opacity": 0.75,
+      ]
+    )
+    #expect(state.imageOverlays.first?.position == .bottomLeft)
+    #expect(state.imageOverlays.first?.width == 0.5)
+    #expect(state.imageOverlays.first?.opacity == 0.75)
+
+    _ = try await dispatcher.call("remove_image", arguments: ["id": .string(overlay.id.uuidString)])
+    #expect(state.imageOverlays.isEmpty)
+    state.undo()
+    #expect(state.imageOverlays.first?.width == 0.5)
   }
 
   @Test func exportRequiresApprovalBoundToAnExactNewDestination() async throws {

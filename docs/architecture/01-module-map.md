@@ -17,6 +17,8 @@ Reminder: **these folders are not Swift modules.** Everything compiles into the 
 | Discovery | `AgentToolchain`, `AgentProbe`, `AgentReadiness` | Actors resolve executables and run bounded version/authentication probes without invoking a real CLI in tests. |
 | Persistence | `AgentConversationData`, `AgentConversationStore`, `AgentTranscript` | Exactly one `agent/conversation.json` inside each `.frm`; provider resume ids are stored independently. `AgentTranscript` is `@MainActor @Observable`. |
 | UI | `AgentChatPanel`, `AgentConversationView`, `AgentMarkdownView` | Persisted collapse/width, provider picker, explicit clear, streamed Markdown and expandable tool rows. |
+| Tool bridge | `AgentBridgeController`, `AgentBridgeServer`, `AgentRPCSession`, `AgentSessionConfig` | The editor owns an authenticated Unix socket. A signed `appshow-mcp` stdio helper relays MCP JSON-RPC for the selected CLI; session configuration exposes only this per-project server. |
+| Tool surface | `AgentToolCatalog`, `AgentToolDispatcher`, `AgentEditingToolCatalog`, `AgentConfirmations` | Read-only inspection and reversible mutations run on the main actor. Each call validates its schema, creates at most one labeled history entry, rolls back on failure, and returns the compact current timeline. External image reads, exports, and destructive silence passes are confirmation-bound. |
 
 The portable conversation lives inside the project bundle. Ephemeral runtime state lives in the sibling `.agent/<project-name>/` workspace. `Agent/` depends on `Project`, `State`, and reusable `UI` tokens; only `EditorState` and `EditorView` depend on it.
 
