@@ -187,3 +187,7 @@ Two people: one takes 1 → 2 → 3 → 6 (runtime), the other 4 → 5 → 7 (UI
 - [ ] T3 checklist run on a machine with both CLIs, with one, and with none; results in the milestone `VERIFY.md`; no orphan process after closing the editor.
 - [ ] ADR in `planning/decisions/` covering the module boundary, the one-process-per-turn decision, the transcript location, and the provenance of copied Toone code.
 - [ ] `docs/architecture/01-module-map.md` gains an `Agent/` section and `02-concurrency.md` lists the two new actors.
+
+## As landed (phases 1–3, 2026-09-04)
+
+Codex resume argv is `exec --json --skip-git-repo-check --sandbox read-only resume -- <id> <prompt>` (flags before `resume`, `--` before positionals). Events carry tool-call ids. Threads persist one file each under `agent/threads/`. `FileHandle.bytes` must not be iterated inside an actor; use `readabilityHandler` bridged through an `AsyncStream`. Test counts: providers 22 + 27, security 6, runner 10, toolchain 10, transcript 24, thread store 10, session 6.

@@ -6,10 +6,10 @@ Depends on: milestone 02 (editor layout as of the Cuts track); ADR 0009 accepted
 
 ## Tasks
 
-- [ ] T0. ADR 0009 accepted by the owner. Proof: status line in the ADR.
-- [ ] T1. P1 providers and parsers. Proof: provider test suites green on recorded fixtures.
-- [ ] T2. P2 process runner. Proof: `AgentProcessRunnerTests` including cancellation.
-- [ ] T3. P3 transcript and persistence. Proof: `AgentTranscriptTests`.
+- [x] T0. ADR 0009 accepted by the owner. Proof: status line in the ADR.
+- [x] T1. P1 providers and parsers. Proof: provider test suites green on recorded fixtures.
+- [x] T2. P2 process runner. Proof: `AgentProcessRunnerTests` including cancellation.
+- [x] T3. P3 transcript and persistence. Proof: `AgentTranscriptTests`.
 - [ ] T4. P4 panel shell. Proof: `AgentPanelStateTests`; manual look check.
 - [ ] T5. P5 rendering. Proof: `AgentMarkdownParserTests`; manual streaming check.
 - [ ] T6. P6 setup UI. Proof: readiness and toolchain tests.
