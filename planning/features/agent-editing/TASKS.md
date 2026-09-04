@@ -8,4 +8,4 @@
 - [x] P5. Build and sign the stdio shim; wire the bridge lifecycle and live activity UI into the single project conversation.
 - [x] P6. Add captions, background/canvas/cursor/camera/audio and confirmed export tools.
 - [x] P7. Merge primitive-backed silence/text/image tools after the Xcode object-id ranges are reconciled.
-- [ ] P8. Verify Claude Code and Codex end to end, update architecture and upstream-sync documentation, and open the milestone PR.
+- [x] P8. Verify Claude Code and Codex end to end, update architecture and upstream-sync documentation, and open the milestone PR.
