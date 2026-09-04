@@ -5,7 +5,7 @@ Goal: ship the integrated product as AppShow without breaking legacy Reframed pr
 ## Phases
 
 - [x] P1: identity constants, new defaults, legacy path migration, and project-extension compatibility tests.
-- [ ] P2: rename the Xcode project, app/test targets, scheme, module, products, source roots, and bundle identifiers.
+- [x] P2: rename the Xcode project, app/test targets, scheme, module, products, source roots, and bundle identifiers.
 - [ ] P3: rename active symbols, environment variables, log labels, test harness paths, and helper metadata.
 - [ ] P4: update Info.plist document registrations, permission copy, update metadata, release scripts, and packaging.
 - [ ] P5: update active documentation and repository metadata while retaining explicit upstream/provenance history.

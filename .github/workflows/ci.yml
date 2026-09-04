@@ -25,7 +25,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .build/SourcePackages
-          key: spm-${{ runner.os }}-${{ hashFiles('Reframed.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          key: spm-${{ runner.os }}-${{ hashFiles('AppShow.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: spm-${{ runner.os }}-
 
       - name: Lint
