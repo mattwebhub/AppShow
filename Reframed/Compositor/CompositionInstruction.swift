@@ -39,6 +39,17 @@ struct TextOverlayInstruction: Sendable {
   var timeRange: CMTimeRange { transition.timeRange }
 }
 
+struct ImageOverlayInstruction: @unchecked Sendable {
+  let transition: RegionTransitionInfo
+  let image: CGImage
+  let rect: CGRect
+  let cornerRadius: CGFloat
+  let opacity: CGFloat
+  let shadow: CGFloat
+
+  var timeRange: CMTimeRange { transition.timeRange }
+}
+
 struct VideoSegmentMapping: Sendable {
   let compositionStart: Double
   let sourceStart: Double
@@ -118,6 +129,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
   let spotlightDimOpacity: CGFloat
   let spotlightEdgeSoftness: CGFloat
   let textOverlays: [TextOverlayInstruction]
+  let imageOverlays: [ImageOverlayInstruction]
   let isHDR: Bool
 
   init(
@@ -184,6 +196,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
     spotlightDimOpacity: CGFloat = 0.6,
     spotlightEdgeSoftness: CGFloat = 50,
     textOverlays: [TextOverlayInstruction] = [],
+    imageOverlays: [ImageOverlayInstruction] = [],
     isHDR: Bool = false
   ) {
     self.timeRange = timeRange
@@ -249,6 +262,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
     self.spotlightDimOpacity = spotlightDimOpacity
     self.spotlightEdgeSoftness = spotlightEdgeSoftness
     self.textOverlays = textOverlays
+    self.imageOverlays = imageOverlays
     self.isHDR = isHDR
     var trackIDs: [NSValue] = [NSNumber(value: screenTrackID)]
     if let wid = webcamTrackID {

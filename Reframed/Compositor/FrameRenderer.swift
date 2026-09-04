@@ -289,6 +289,7 @@ final class FrameRenderer: NSObject, AVVideoCompositing, @unchecked Sendable {
     if let webcamBuffer {
       if state.webcamFullyHidden {
         drawTextOverlays(in: context, canvasRect: state.canvasRect, instruction: instruction, compositionTime: compositionTime)
+        drawImageOverlays(in: context, instruction: instruction, compositionTime: compositionTime)
         drawCaptions(
           in: context,
           videoRect: state.videoRect,
@@ -322,6 +323,7 @@ final class FrameRenderer: NSObject, AVVideoCompositing, @unchecked Sendable {
       let screenAspect = CGSize(width: screenImage.width, height: screenImage.height)
       let vRect = AVMakeRect(aspectRatio: screenAspect, insideRect: state.paddedArea)
       drawTextOverlays(in: context, canvasRect: state.canvasRect, instruction: instruction, compositionTime: compositionTime)
+      drawImageOverlays(in: context, instruction: instruction, compositionTime: compositionTime)
       drawCaptions(
         in: context,
         videoRect: vRect,

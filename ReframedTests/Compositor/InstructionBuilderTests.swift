@@ -267,4 +267,11 @@ struct InstructionBuilderTests {
 
     #expect(needsCompositor(config))
   }
+
+  @Test func imageOverlayNeedsCompositor() {
+    var config = config()
+    config.imageOverlays = [ImageOverlayData(startSeconds: 0, endSeconds: 1, filename: "image.png")]
+
+    #expect(needsCompositor(config))
+  }
 }

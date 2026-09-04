@@ -54,6 +54,8 @@
 		7E57000000000000000000A3 /* ImageOverlayData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000A2 /* ImageOverlayData.swift */; };
 		7E57000000000000000000A5 /* ImageOverlayImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000A4 /* ImageOverlayImporter.swift */; };
 		7E57000000000000000000A7 /* EditorState+ImageOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000A6 /* EditorState+ImageOverlays.swift */; };
+		7E57000000000000000000A9 /* ImageOverlayLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000A8 /* ImageOverlayLayout.swift */; };
+		7E57000000000000000000AB /* FrameRenderer+ImageOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000AA /* FrameRenderer+ImageOverlays.swift */; };
 		7E570000000000000000009F /* TextOverlayEditPopover+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000009E /* TextOverlayEditPopover+Style.swift */; };
 		7E570000000000000000009D /* TextOverlayEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000009C /* TextOverlayEditPopover.swift */; };
 		7E570000000000000000009B /* TimelineView+OverlayTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000009A /* TimelineView+OverlayTrack.swift */; };
@@ -331,6 +333,8 @@
 		7E57000000000000000000A2 /* ImageOverlayData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayData.swift; sourceTree = "<group>"; };
 		7E57000000000000000000A4 /* ImageOverlayImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayImporter.swift; sourceTree = "<group>"; };
 		7E57000000000000000000A6 /* EditorState+ImageOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+ImageOverlays.swift"; sourceTree = "<group>"; };
+		7E57000000000000000000A8 /* ImageOverlayLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayLayout.swift; sourceTree = "<group>"; };
+		7E57000000000000000000AA /* FrameRenderer+ImageOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FrameRenderer+ImageOverlays.swift"; sourceTree = "<group>"; };
 		7E570000000000000000009E /* TextOverlayEditPopover+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextOverlayEditPopover+Style.swift"; sourceTree = "<group>"; };
 		7E570000000000000000009C /* TextOverlayEditPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayEditPopover.swift; sourceTree = "<group>"; };
 		7E570000000000000000009A /* TimelineView+OverlayTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+OverlayTrack.swift"; sourceTree = "<group>"; };
@@ -964,6 +968,8 @@
 		D40000000000000000000001 /* Compositor */ = {
 			isa = PBXGroup;
 			children = (
+				7E57000000000000000000A8 /* ImageOverlayLayout.swift */,
+				7E57000000000000000000AA /* FrameRenderer+ImageOverlays.swift */,
 				B20000000000000000000013 /* BackgroundStyle.swift */,
 				B20000000000000000000004 /* CameraLayout.swift */,
 				B2000000000000000000000F /* FrameRenderer.swift */,
@@ -1295,6 +1301,8 @@
 				7E57000000000000000000A3 /* ImageOverlayData.swift in Sources */,
 				7E57000000000000000000A5 /* ImageOverlayImporter.swift in Sources */,
 				7E57000000000000000000A7 /* EditorState+ImageOverlays.swift in Sources */,
+				7E57000000000000000000A9 /* ImageOverlayLayout.swift in Sources */,
+				7E57000000000000000000AB /* FrameRenderer+ImageOverlays.swift in Sources */,
 				7E570000000000000000009F /* TextOverlayEditPopover+Style.swift in Sources */,
 				7E570000000000000000009D /* TextOverlayEditPopover.swift in Sources */,
 				7E570000000000000000009B /* TimelineView+OverlayTrack.swift in Sources */,
