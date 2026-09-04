@@ -109,7 +109,7 @@ enum TranscriptionService {
     return mergeShortSegments(valid)
   }
 
-  private static func mergeShortSegments(_ segments: [CaptionSegment]) -> [CaptionSegment] {
+  static func mergeShortSegments(_ segments: [CaptionSegment]) -> [CaptionSegment] {
     guard segments.count > 1 else { return segments }
 
     let sorted = segments.sorted { $0.startSeconds < $1.startSeconds }
@@ -151,7 +151,7 @@ enum TranscriptionService {
     return merged
   }
 
-  private static func stripSpecialTokens(_ text: String) -> String {
+  static func stripSpecialTokens(_ text: String) -> String {
     text.replacingOccurrences(
       of: "<\\|[^|]+\\|>",
       with: "",
