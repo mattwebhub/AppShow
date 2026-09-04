@@ -6,13 +6,13 @@ Depends on: milestone 02 (keep-slices and the Cuts track) for silence removal; m
 
 ## Tasks
 
-Silence removal mirrors `planning/features/silence-removal/TASKS.md`; tick both.
+Silence removal mirrors `planning/features/silence-removal/TASKS.md` and text overlays mirror `planning/features/text-overlays/TASKS.md`; tick both.
 
 - [x] T1. Silence removal, pure detector. Proof: `ReframedTests/Editor/SilenceDetectorTests.swift` green.
 - [x] T2. Silence removal, PCM analysis of a real file. Proof: `ReframedTests/Editor/SilenceAnalysisTests.swift` green on generated tones.
 - [x] T3. Silence removal, editor wiring and labelled history entry. Proof: `ReframedTests/Editor/EditorStateSilenceRemovalTests.swift` and the `HistoryTests` label round trip green.
 - [x] T4. Silence removal, Silences section in the Video tab. Proof: `make build` warning-free, manual rows in `VERIFY.md`.
-- [ ] T5. Text overlay primitive (`docs/features/04-agent-tools/ATTACK-PLAN.md` phase 6). Proof: golden-frame test in `ReframedTests/Compositor/`, `project.json` decode test, history rule test.
+- [x] T5. Text overlay primitive (`docs/features/04-agent-tools/ATTACK-PLAN.md` phase 6; `planning/features/text-overlays/`). Proof: `TextOverlayLayoutTests`, the overlay rows in `RegionRemappingTests`, `InstructionBuilderTests` and `FrameRendererGoldenTests`, `TextOverlayDataTests` (`project.json` decode), `EditorStateTextOverlaysTests`, and the overlay rule in `HistoryChangeRulesTests` green; Overlays track, popover and Effects-tab section built warning-free, manual rows in `VERIFY.md`.
 - [ ] T6. Image overlay primitive (phase 7, after T5). Proof: golden-frame test, bundle copy test.
 - [ ] T7. Blur region primitive (phase 8). Proof: golden-frame test that the region differs from the source and its surroundings do not.
 - [ ] T8. Transitions on overlays and keep-slices. Proof: `RegionRemappingTests` and golden frames at transition midpoints.
