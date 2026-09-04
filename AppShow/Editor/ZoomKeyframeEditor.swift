@@ -13,7 +13,7 @@ struct ZoomKeyframeEditor: View {
   let onUpdateRegion: (Int, Int, [ZoomKeyframe]) -> Void
   @Environment(\.colorScheme) private var colorScheme
 
-  @State var dragOffset: CGFloat = 0
+  @State var dragSourceDelta: Double = 0
   @State var dragType: RegionDragType?
   @State var dragRegionStartIndex: Int?
   @State var popoverRegionIndex: Int?
@@ -23,7 +23,7 @@ struct ZoomKeyframeEditor: View {
   }
 
   var isEditable: Bool {
-    geometry.mode == .source
+    duration > 0 && width > 0
   }
 
   var body: some View {

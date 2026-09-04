@@ -191,4 +191,18 @@ struct CutTimelineTests {
     #expect(t.slice(containing: 5)?.startSeconds == 5)
     #expect(t.slice(containing: 3) == nil)
   }
+  @Test func movingASplitClampsBothSlicesToTheMinimumLength() {
+    let original = timeline([(0, 4), (4, 10)])
+    let right = original.slices[1].id
+    let left = original.slices[0].id
+    let atStart = original.adjustingEdge(of: right, leading: true, to: -2)
+    #expect(atStart.slices[0].endSeconds == CutTimeline.minSliceLength)
+    #expect(atStart.slices[1].startSeconds == CutTimeline.minSliceLength)
+    let atEnd = original.adjustingEdge(of: left, leading: false, to: 20)
+    #expect(atEnd.slices[0].endSeconds == 10 - CutTimeline.minSliceLength)
+    #expect(atEnd.slices[1].startSeconds == 10 - CutTimeline.minSliceLength)
+    #expect(atEnd.totalDuration == original.totalDuration)
+    #expect(atEnd.slices.map(\.id) == original.slices.map(\.id))
+  }
+
 }

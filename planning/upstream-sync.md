@@ -72,3 +72,5 @@ Sync at the start of every milestone and before any release. Never sync in the m
 ## Sync log
 
 - 2026-09-04: fetched `upstream/main`; it remained at the fork base `b6a1709` (v0.14.7). Milestone 08 required no merge or conflict resolution.
+
+- Interactive testing follow-up (2026-09-04): keep slice selection ephemeral on `EditorState`; use `CutTimeline.adjustingEdge`/`movingSlice` for cut preview and commit; preserve media and commit discrete slice edits to history immediately. `RightClickOverlay.hitTest` handles right mouse events only. Zoom timing edits use `ZoomRegion.editedKeyframes` and source-time mapping in compressed views. Provider complete-text events are distinct from deltas; Markdown block rendering lives in `AgentMarkdownParser`, with reusable message/code views under `UI/`. Timeline and chat view sections are split into extensions without changing their data contracts.

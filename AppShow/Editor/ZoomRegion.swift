@@ -11,6 +11,47 @@ struct ZoomRegion {
   let peakZoom: Double
 }
 
+extension ZoomRegion {
+  func editedKeyframes(from original: [ZoomKeyframe], drag: RegionDragType, delta: Double, bounds: ClosedRange<Double>) -> [ZoomKeyframe] {
+    guard delta.isFinite, endTime > startTime else { return original }
+    var start = startTime
+    var end = endTime
+    switch drag {
+    case .move:
+      let shift = max(bounds.lowerBound - startTime, min(bounds.upperBound - endTime, delta))
+      return original.map { frame in
+        var moved = frame
+        moved.t += shift
+        moved.isAuto = false
+        return moved
+      }
+    case .resizeLeft:
+      start = max(bounds.lowerBound, min(endTime - 0.05, startTime + delta))
+    case .resizeRight:
+      end = min(bounds.upperBound, max(startTime + 0.05, endTime + delta))
+    }
+    let easeIn = max(0, zoomStartTime - startTime)
+    let easeOut = max(0, endTime - zoomEndTime)
+    let transitionScale = min(1, max(0, end - start - 0.01) / max(0.001, easeIn + easeOut))
+    let holdStart = start + easeIn * transitionScale
+    let holdEnd = end - easeOut * transitionScale
+    return original.map { frame in
+      var edited = frame
+      if frame.t <= zoomStartTime, easeIn > 0 {
+        edited.t = start + (frame.t - startTime) / easeIn * (holdStart - start)
+      } else if frame.t >= zoomEndTime, easeOut > 0 {
+        edited.t = holdEnd + (frame.t - zoomEndTime) / easeOut * (end - holdEnd)
+      } else {
+        let fraction = (frame.t - zoomStartTime) / max(0.001, zoomEndTime - zoomStartTime)
+        edited.t = holdStart + fraction * (holdEnd - holdStart)
+      }
+      edited.t = max(start, min(end, edited.t))
+      edited.isAuto = false
+      return edited
+    }
+  }
+}
+
 func groupZoomRegions(from keyframes: [ZoomKeyframe]) -> [ZoomRegion] {
   guard keyframes.count >= 2 else { return [] }
 

@@ -10,9 +10,9 @@ struct AgentConversationView: View {
   let isExporting: Bool
 
   @State private var prompt = ""
-  @State private var readiness: [AgentProviderKind: AgentReadiness] = [:]
-  @State private var isResolving = false
-  @State private var toolchain = AgentToolchain.standard()
+  @State var readiness: [AgentProviderKind: AgentReadiness] = [:]
+  @State var isResolving = false
+  @State var toolchain = AgentToolchain.standard()
   @FocusState private var composerFocused: Bool
 
   var body: some View {
@@ -35,7 +35,7 @@ struct AgentConversationView: View {
   private var transcriptView: some View {
     ScrollViewReader { proxy in
       ScrollView {
-        LazyVStack(alignment: .leading, spacing: 12) {
+        LazyVStack(alignment: .leading, spacing: 20) {
           if transcript.messages.isEmpty {
             emptyState
           } else {
@@ -127,98 +127,6 @@ struct AgentConversationView: View {
       && !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
   }
 
-  @ViewBuilder
-  private var readinessView: some View {
-    if isResolving, selectedReadiness == nil {
-      statusRow(icon: "ellipsis", text: "Checking \(transcript.provider.displayName)…")
-    } else {
-      switch selectedReadiness {
-      case .ready(_, let version):
-        statusRow(icon: "checkmark.circle.fill", text: "Ready · \(version)", color: Color.green)
-      case .missing:
-        setupCard(
-          message: "\(transcript.provider.displayName) was not found in PATH or common install locations."
-        )
-      case .notLoggedIn:
-        setupCard(message: "Sign in from Terminal with `\(loginCommand)`.")
-      case .unhealthy(_, let reason):
-        setupCard(message: reason)
-      case nil:
-        setupCard(message: "\(transcript.provider.displayName) has not been checked yet.")
-      }
-    }
-  }
-
-  private var selectedReadiness: AgentReadiness? {
-    readiness[transcript.provider]
-  }
-
-  private var loginCommand: String {
-    switch transcript.provider {
-    case .claudeCode: "claude auth login"
-    case .codex: "codex login"
-    }
-  }
-
-  private func statusRow(icon: String, text: String, color: Color = AppShowColors.secondaryText) -> some View {
-    HStack(spacing: 6) {
-      Image(systemName: icon)
-      Text(text)
-    }
-    .font(.system(size: FontSize.xxs))
-    .foregroundStyle(color)
-  }
-
-  private func setupCard(message: String) -> some View {
-    VStack(alignment: .leading, spacing: Layout.compactSpacing) {
-      statusRow(icon: "exclamationmark.triangle", text: selectedReadiness?.statusLabel ?? "Not checked")
-      Text(message)
-        .font(.system(size: FontSize.xxs))
-        .foregroundStyle(AppShowColors.secondaryText)
-      Button("Check Again") {
-        Task { await refreshReadiness() }
-      }
-      .buttonStyle(SecondaryButtonStyle(size: .small))
-      .disabled(isResolving)
-    }
-    .padding(8)
-    .background(AppShowColors.muted)
-    .clipShape(RoundedRectangle(cornerRadius: Radius.md))
-  }
-
-  private func refreshReadiness() async {
-    isResolving = true
-    await toolchain.invalidate()
-    let searchPath = await toolchain.searchPath()
-    let home = FileManager.default.homeDirectoryForCurrentUser.path
-    let searchedPaths = searchPath.split(separator: ":").map(String.init)
-    var statuses: [AgentProviderKind: AgentReadiness] = [:]
-    for kind in AgentProviderKind.allCases {
-      let provider = kind.makeProvider()
-      guard let executable = await toolchain.resolve(provider.executableNames) else {
-        statuses[kind] = .missing(searchedPaths: searchedPaths)
-        continue
-      }
-      let environment = AgentEnvironment.scrubbed(
-        path: await toolchain.searchPath(),
-        home: home,
-        forwarding: provider.environmentKeys
-      )
-      statuses[kind] = await AgentProbe().check(
-        provider: kind,
-        executable: executable,
-        environment: environment
-      )
-    }
-    readiness = statuses
-    let selected = AgentReadinessSnapshot(statuses: statuses).selection(remembered: transcript.provider)
-    if selected != transcript.provider {
-      transcript.setProvider(selected)
-      ConfigService.shared.agentProvider = selected
-    }
-    isResolving = false
-  }
-
   private func send() {
     let text = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
     guard
@@ -253,96 +161,6 @@ struct AgentConversationView: View {
         resumeIDs: transcript.resumeIDs
       )
       transcript.send(text, using: session)
-    }
-  }
-}
-
-@MainActor
-private struct AgentMessageView: View {
-  let message: AgentMessageData
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      ForEach(Array(message.content.enumerated()), id: \.offset) { _, content in
-        switch content {
-        case .text(let text):
-          AgentMarkdownView(text: text)
-        case .toolCall(let call):
-          AgentToolCallView(call: call)
-        }
-      }
-      if message.status == .streaming {
-        Text("▋")
-          .foregroundStyle(AppShowColors.secondaryText)
-      }
-      if let reason = message.failureReason {
-        Text(reason)
-          .font(.system(size: FontSize.xxs))
-          .foregroundStyle(Color.red)
-      }
-    }
-    .font(.system(size: FontSize.xs))
-    .foregroundStyle(AppShowColors.primaryText)
-    .padding(message.role == .user ? 10 : 0)
-    .background(message.role == .user ? AppShowColors.muted : Color.clear)
-    .clipShape(RoundedRectangle(cornerRadius: Radius.lg))
-    .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
-  }
-
-}
-
-@MainActor
-private struct AgentToolCallView: View {
-  let call: AgentToolCallData
-  @State private var expanded = false
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: Layout.compactSpacing) {
-      Button {
-        if hasDetails { expanded.toggle() }
-      } label: {
-        HStack(spacing: Layout.compactSpacing) {
-          Image(systemName: icon)
-          Text(call.name)
-            .font(.system(size: FontSize.xs, weight: .medium))
-          Spacer()
-          if hasDetails {
-            Image(systemName: expanded ? "chevron.up" : "chevron.down")
-              .foregroundStyle(AppShowColors.secondaryText)
-          }
-        }
-      }
-      .buttonStyle(PlainCustomButtonStyle())
-      if expanded {
-        if !call.input.isEmpty {
-          detail(call.input)
-        }
-        if let output = call.output, !output.isEmpty {
-          detail(output)
-        }
-      }
-    }
-    .padding(8)
-    .background(AppShowColors.muted)
-    .clipShape(RoundedRectangle(cornerRadius: Radius.md))
-  }
-
-  private var hasDetails: Bool {
-    !call.input.isEmpty || call.output?.isEmpty == false
-  }
-
-  private func detail(_ text: String) -> some View {
-    Text(text)
-      .font(.system(size: FontSize.xxs, design: .monospaced))
-      .foregroundStyle(AppShowColors.secondaryText)
-      .textSelection(.enabled)
-  }
-
-  private var icon: String {
-    switch call.status {
-    case .executing: "hourglass"
-    case .completed: "checkmark.circle"
-    case .failed: "exclamationmark.circle"
     }
   }
 }

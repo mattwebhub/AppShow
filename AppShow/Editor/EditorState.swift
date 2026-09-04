@@ -17,7 +17,14 @@ final class EditorState {
   var micAudioRegions: [AudioRegionData] = []
   var externalAudioTracks: [ExternalAudioTrackData] = []
   var cameraRegions: [CameraRegionData] = []
-  var videoRegions: [VideoRegionData] = []
+  var selectedVideoRegionID: UUID?
+  var videoRegions: [VideoRegionData] = [] {
+    didSet {
+      if let selectedVideoRegionID, !videoRegions.contains(where: { $0.id == selectedVideoRegionID }) {
+        self.selectedVideoRegionID = nil
+      }
+    }
+  }
   var isExporting = false
   var exportProgress: Double = 0
   var exportETA: Double?

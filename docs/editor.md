@@ -130,3 +130,11 @@ Each project owns exactly one conversation at `agent/conversation.json` inside i
 Each submitted turn launches a fresh provider process, streams Markdown and tool events into the transcript, and exits at completion or cancellation. The process runs in `.agent/<project-name>/` beside the bundle. That sibling directory is ephemeral workspace for sockets, tokens, and generated preview frames; it is not the portable conversation record.
 
 The chat is read-only toward the editor in milestone 04. Project inspection and mutation arrive through the authenticated agent bridge in milestones 05 and 06.
+
+## Interactive timeline controls
+
+Click a kept slice to select it. Delete/Backspace or the transport trash button removes the selected slice, closes its visible gap, and creates one immediate Undo step. Source media is unchanged. Drag a shared cut edge to move the split point between its two neighbors; drag an exposed edge to trim that slice. Source mode also allows moving slices into available gaps without reordering the recording.
+
+Zoom regions have visible edge handles for changing duration and can be dragged to move, including while cut gaps are hidden. Editing an automatically generated zoom converts its keyframes to manual. The drag preview and final keyframes use the same clamped timing calculation.
+
+Assistant replies render separate paragraphs, headings, list rows, and code blocks. Complete provider messages are separated by paragraph breaks; incremental text chunks remain contiguous.

@@ -21,9 +21,15 @@ Mirror of `planning/features/lossless-cut/TASKS.md`; tick both.
 
 ## Out of scope
 
-Literal passthrough export (optional phase 8), editing other tracks in compressed mode, ripple edits of audio regions.
+Literal passthrough export (optional phase 8), editing audio, camera, spotlight, and overlay tracks in compressed mode, ripple edits of audio regions.
 
 ## Risks
 
 - Boundary observers and the 60 Hz periodic observer can both fire at a slice end; the decision function must be idempotent.
 - Compressed mode touches every timeline file; land it last and behind the toggle.
+
+## Interactive testing follow-up
+
+- [x] Slice selection, keyboard/button deletion, immediate Undo, source-media preservation, and shared-boundary repositioning.
+- [x] Zoom movement/resizing remains available after gaps are hidden; drag preview and committed keyframes use one calculation.
+- [ ] Repeat human drag/delete checks on the updated build.

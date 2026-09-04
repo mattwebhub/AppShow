@@ -51,7 +51,7 @@ struct CodexProviderTests {
 
   @Test func codexAgentMessageYieldsTextDelta() throws {
     let events = provider.parse(line: try AgentFixtures.line("codex-toone-literals", 2))
-    #expect(events == [.textDelta("Postgres Timeout Investigation")])
+    #expect(events == [.textBlock("Postgres Timeout Investigation")])
   }
 
   @Test func codexCommandExecutionStartYieldsToolCallStarted() throws {
@@ -198,6 +198,6 @@ struct CodexProviderTests {
     let first = try AgentFixtures.events("codex-0.149.1-turn", provider: provider)
     let resumed = try AgentFixtures.events("codex-0.149.1-resume", provider: provider)
     #expect(first.first == resumed.first)
-    #expect(resumed.contains(.textDelta("second turn")))
+    #expect(resumed.contains(.textBlock("second turn")))
   }
 }

@@ -97,4 +97,53 @@ struct ZoomTimelineTests {
     ])
     #expect(timeline.zoomRect(at: 1) == CGRect(x: 0.25, y: 0.25, width: 0.5, height: 0.5))
   }
+  @MainActor
+  @Test func zoomRemainsEditableWhenCutGapsAreHidden() {
+    let geometry = TimelineGeometry(
+      timeline: CutTimeline(
+        slices: [VideoRegionData(startSeconds: 0, endSeconds: 2), VideoRegionData(startSeconds: 5, endSeconds: 10)],
+        duration: 10
+      ),
+      width: 700,
+      mode: .compressed
+    )
+    let editor = ZoomKeyframeEditor(
+      keyframes: [],
+      duration: 10,
+      geometry: geometry,
+      width: 700,
+      height: 36,
+      scrollOffset: 0,
+      timelineZoom: 1,
+      onAddKeyframe: { _ in },
+      onRemoveRegion: { _, _ in },
+      onUpdateRegion: { _, _, _ in }
+    )
+    #expect(editor.isEditable)
+  }
+
+  @Test func movingZoomPastTheEndPreservesItsDurationAndShape() throws {
+    let frames = [1.0, 2, 6, 7].enumerated().map { index, time in
+      ZoomKeyframe(t: time, zoomLevel: index == 0 || index == 3 ? 1 : 2, centerX: 0.5, centerY: 0.5, isAuto: false)
+    }
+    let region = try #require(groupZoomRegions(from: frames).first)
+    let moved = region.editedKeyframes(from: frames, drag: .move, delta: 3, bounds: 0...7)
+    #expect(moved.map(\.t) == [1, 2, 6, 7])
+    let earlier = region.editedKeyframes(from: frames, drag: .move, delta: -4, bounds: 0...7)
+    #expect(earlier.map(\.t) == [0, 1, 5, 6])
+  }
+
+  @Test func resizingZoomShortensTheHoldAndClampsTransitionsWithoutCrossingKeyframes() throws {
+    let frames = [1.0, 2, 6, 7].enumerated().map { index, time in
+      ZoomKeyframe(t: time, zoomLevel: index == 0 || index == 3 ? 1 : 2, centerX: 0.5, centerY: 0.5, isAuto: true)
+    }
+    let region = try #require(groupZoomRegions(from: frames).first)
+    let resized = region.editedKeyframes(from: frames, drag: .resizeRight, delta: -5, bounds: 0...7)
+    #expect(resized.first?.t == 1)
+    #expect(resized.last?.t == 2)
+    #expect(resized.map(\.t) == resized.map(\.t).sorted())
+    #expect(resized.allSatisfy { !$0.isAuto })
+    #expect(resized.map(\.zoomLevel) == frames.map(\.zoomLevel))
+  }
+
 }

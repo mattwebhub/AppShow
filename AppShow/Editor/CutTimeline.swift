@@ -99,6 +99,40 @@ struct CutTimeline: Sendable, Equatable {
     return CutTimeline(slices: kept, duration: duration)
   }
 
+  func adjustingEdge(of id: UUID, leading: Bool, to time: Double) -> CutTimeline {
+    guard time.isFinite, let index = slices.firstIndex(where: { $0.id == id }) else { return self }
+    var result = self
+    let slice = slices[index]
+    if leading {
+      let joinsPrevious = index > 0 && abs(slices[index - 1].endSeconds - slice.startSeconds) < Self.cutTolerance
+      let lower = index == 0 ? 0 : (joinsPrevious ? slices[index - 1].startSeconds + Self.minSliceLength : slices[index - 1].endSeconds)
+      let boundary = max(lower, min(slice.endSeconds - Self.minSliceLength, time))
+      result.slices[index].startSeconds = boundary
+      if joinsPrevious { result.slices[index - 1].endSeconds = boundary }
+    } else {
+      let joinsNext = index + 1 < slices.count && abs(slices[index + 1].startSeconds - slice.endSeconds) < Self.cutTolerance
+      let upper =
+        index + 1 == slices.count
+        ? duration : (joinsNext ? slices[index + 1].endSeconds - Self.minSliceLength : slices[index + 1].startSeconds)
+      let boundary = min(upper, max(slice.startSeconds + Self.minSliceLength, time))
+      result.slices[index].endSeconds = boundary
+      if joinsNext { result.slices[index + 1].startSeconds = boundary }
+    }
+    return result
+  }
+
+  func movingSlice(_ id: UUID, to time: Double) -> CutTimeline {
+    guard time.isFinite, let index = slices.firstIndex(where: { $0.id == id }) else { return self }
+    let length = slices[index].endSeconds - slices[index].startSeconds
+    let lower = index > 0 ? slices[index - 1].endSeconds : 0
+    let upper = (index + 1 < slices.count ? slices[index + 1].startSeconds : duration) - length
+    let start = max(lower, min(upper, time))
+    var result = self
+    result.slices[index].startSeconds = start
+    result.slices[index].endSeconds = start + length
+    return result
+  }
+
   func elapsed(forSource time: Double) -> Double {
     var elapsed = 0.0
     for slice in slices {

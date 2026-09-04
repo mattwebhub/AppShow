@@ -39,48 +39,68 @@ extension EditorState {
     videoRegions.sort { $0.startSeconds < $1.startSeconds }
   }
 
+  var canDeleteSelectedVideoRegion: Bool {
+    !isExporting && videoRegions.count > 1 && videoRegions.contains { $0.id == selectedVideoRegionID }
+  }
+
+  func selectVideoRegion(_ id: UUID) {
+    guard let region = videoRegions.first(where: { $0.id == id }) else { return }
+    selectedVideoRegionID = id
+    pause()
+    seek(to: CMTime(seconds: region.startSeconds, preferredTimescale: 600))
+  }
+
+  @discardableResult
+  func deleteSelectedVideoRegion() -> Bool {
+    guard canDeleteSelectedVideoRegion, let id = selectedVideoRegionID else { return false }
+    removeVideoRegion(regionId: id)
+    return true
+  }
+
   func splitVideoRegion(atTime time: Double) {
     let split = cutTimeline.split(at: time)
     guard split != cutTimeline else { return }
-    videoRegions = split.slices
+    commitVideoRegions(split.slices, label: "Cut added")
+    selectedVideoRegionID = split.slices.first { $0.startSeconds == time }?.id
   }
 
   func clearVideoCuts() {
-    videoRegions = [VideoRegionData(startSeconds: 0, endSeconds: CMTimeGetSeconds(duration))]
+    commitVideoRegions([VideoRegionData(startSeconds: 0, endSeconds: CMTimeGetSeconds(duration))], label: "Cuts cleared")
   }
 
   func removeVideoRegion(regionId: UUID) {
-    videoRegions.removeAll { $0.id == regionId }
+    guard !isExporting, videoRegions.count > 1,
+      let index = videoRegions.firstIndex(where: { $0.id == regionId })
+    else { return }
+    var kept = videoRegions
+    kept.remove(at: index)
+    let next = kept[min(index, kept.count - 1)]
+    pause()
+    commitVideoRegions(kept, label: "Cut removed")
+    selectedVideoRegionID = next.id
+    seek(to: CMTime(seconds: next.startSeconds, preferredTimescale: 600))
   }
 
   func updateVideoRegionStart(regionId: UUID, newStart: Double) {
-    guard let idx = videoRegions.firstIndex(where: { $0.id == regionId }) else { return }
-    let dur = CMTimeGetSeconds(duration)
-    let minStart: Double = idx > 0 ? videoRegions[idx - 1].endSeconds : 0
-    let maxStart = videoRegions[idx].endSeconds - 0.01
-    videoRegions[idx].startSeconds = max(minStart, min(maxStart, min(dur, newStart)))
-    videoRegions.sort { $0.startSeconds < $1.startSeconds }
+    commitVideoRegions(cutTimeline.adjustingEdge(of: regionId, leading: true, to: newStart).slices, label: "Cut adjusted")
   }
 
   func updateVideoRegionEnd(regionId: UUID, newEnd: Double) {
-    guard let idx = videoRegions.firstIndex(where: { $0.id == regionId }) else { return }
-    let dur = CMTimeGetSeconds(duration)
-    let maxEnd: Double = idx < videoRegions.count - 1 ? videoRegions[idx + 1].startSeconds : dur
-    let minEnd = videoRegions[idx].startSeconds + 0.01
-    videoRegions[idx].endSeconds = max(minEnd, min(maxEnd, newEnd))
-    videoRegions.sort { $0.startSeconds < $1.startSeconds }
+    commitVideoRegions(cutTimeline.adjustingEdge(of: regionId, leading: false, to: newEnd).slices, label: "Cut adjusted")
   }
 
   func moveVideoRegion(regionId: UUID, newStart: Double) {
-    guard let idx = videoRegions.firstIndex(where: { $0.id == regionId }) else { return }
-    let dur = CMTimeGetSeconds(duration)
-    let regionDuration = videoRegions[idx].endSeconds - videoRegions[idx].startSeconds
-    let minStart: Double = idx > 0 ? videoRegions[idx - 1].endSeconds : 0
-    let maxStart: Double = (idx < videoRegions.count - 1 ? videoRegions[idx + 1].startSeconds : dur) - regionDuration
-    let clampedStart = max(minStart, min(maxStart, newStart))
-    videoRegions[idx].startSeconds = clampedStart
-    videoRegions[idx].endSeconds = clampedStart + regionDuration
-    videoRegions.sort { $0.startSeconds < $1.startSeconds }
+    commitVideoRegions(cutTimeline.movingSlice(regionId, to: newStart).slices, label: "Cut moved")
+  }
+
+  func commitVideoRegions(_ slices: [VideoRegionData], label: String) {
+    guard !isExporting, !slices.isEmpty, slices != videoRegions else { return }
+    pendingUndoTask?.cancel()
+    if !agentMutationBatchActive { history.pushSnapshot(createSnapshot()) }
+    videoRegions = slices
+    syncVideoRegionsToPlayer()
+    scheduleSave()
+    if !agentMutationBatchActive { history.pushSnapshot(createSnapshot(), label: label) }
   }
 
   func updateVideoRegionTransition(

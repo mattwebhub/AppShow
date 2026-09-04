@@ -60,7 +60,7 @@ struct CodexProvider: AgentProvider {
     switch item.type {
     case "agent_message", "message":
       guard item.role != "user", let text = messageText(item), !text.isEmpty else { return [] }
-      return [.textDelta(text)]
+      return [.textBlock(text)]
     case "user_message", "reasoning":
       return []
     case "command_execution":
