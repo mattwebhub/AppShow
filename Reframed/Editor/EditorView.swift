@@ -22,6 +22,7 @@ struct EditorView: View {
     if !editorState.micAudioMuted { h |= 4 }
     if editorState.zoomEnabled { h |= 8 }
     if editorState.spotlightEnabled { h |= 16 }
+    if editorState.showCutTrack { h |= 32 }
     return h
   }
 
