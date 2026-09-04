@@ -134,7 +134,7 @@ The `Compositor/` module handles all video composition and export:
 
 ### Agent tool bridge
 
-`Reframed/Agent/Tools/` exposes read-only editor inspection over newline-framed JSON-RPC on an authenticated Unix socket. The catalog and results use MCP-compatible `tools/list` and `tools/call` shapes. Calls enter the main-actor `AgentToolDispatcher`, and the milestone-05 dispatcher refuses every mutating definition. Ephemeral socket, token, and frame files live in a sibling `.agent/` workspace; portable conversation history belongs inside the `.frm` project (ADR 0010).
+`Reframed/Agent/Tools/` exposes editor inspection and opt-in editing over newline-framed JSON-RPC on an authenticated Unix socket. The catalog and results use MCP-compatible `tools/list` and `tools/call` shapes. Calls enter the main-actor `AgentToolDispatcher`; read-only sessions refuse mutations, while editing sessions create one labeled undo step per call or explicit batch. Ephemeral socket, token, and frame files live in a sibling `.agent/` workspace; portable conversation history belongs inside the `.frm` project (ADR 0010).
 
 ### Project management
 

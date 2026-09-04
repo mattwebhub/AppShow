@@ -87,6 +87,7 @@ final class EditorState {
 
   var history = History()
   var isRestoringState = false
+  var agentMutationBatchActive = false
   var pendingUndoTask: Task<Void, Never>?
 
   let logger = Logger(label: "eu.jankuri.reframed.editor-state")

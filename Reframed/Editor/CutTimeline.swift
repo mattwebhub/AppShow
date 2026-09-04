@@ -65,6 +65,40 @@ struct CutTimeline: Sendable, Equatable {
     return result
   }
 
+  func removing(_ range: ClosedRange<Double>) -> CutTimeline {
+    let start = max(0, min(duration, range.lowerBound))
+    let end = max(0, min(duration, range.upperBound))
+    guard end - start >= Self.minSliceLength else { return self }
+    var kept: [VideoRegionData] = []
+
+    for slice in normalized().slices {
+      if slice.endSeconds <= start || slice.startSeconds >= end {
+        kept.append(slice)
+        continue
+      }
+
+      let keepsLeft = start - slice.startSeconds >= Self.minSliceLength
+      let keepsRight = slice.endSeconds - end >= Self.minSliceLength
+      if keepsLeft {
+        var left = slice
+        left.endSeconds = start
+        left.exitTransition = nil
+        left.exitTransitionDuration = nil
+        kept.append(left)
+      }
+      if keepsRight {
+        var right = slice
+        if keepsLeft { right.id = UUID() }
+        right.startSeconds = end
+        right.entryTransition = nil
+        right.entryTransitionDuration = nil
+        kept.append(right)
+      }
+    }
+
+    return CutTimeline(slices: kept, duration: duration)
+  }
+
   func elapsed(forSource time: Double) -> Double {
     var elapsed = 0.0
     for slice in slices {

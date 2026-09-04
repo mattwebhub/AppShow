@@ -43,13 +43,18 @@ struct MutatingToolsTests {
     return state
   }
 
-  private func dispatcher(_ state: EditorState, in directory: URL) -> AgentToolDispatcher {
+  private func dispatcher(
+    _ state: EditorState,
+    in directory: URL,
+    batchTimeout: Duration = .seconds(300)
+  ) -> AgentToolDispatcher {
     AgentToolDispatcher(
       editorState: state,
       framesDirectory: directory.appendingPathComponent("frames", isDirectory: true),
       workspaceDirectory: directory,
       handlers: AgentToolCatalog.readOnlyHandlers() + AgentEditingToolCatalog.handlers,
-      allowsMutations: true
+      allowsMutations: true,
+      batchTimeout: batchTimeout
     )
   }
 
@@ -106,6 +111,112 @@ struct MutatingToolsTests {
     #expect(spotlight.customRadius == 150)
   }
 
+  @Test func setKeptSlicesNormalizesRangesAndUndoRestoresTheTimeline() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+
+    let result = try await dispatcher.call(
+      "set_kept_slices",
+      arguments: [
+        "slices": [
+          ["start": 1.25, "end": 3],
+          ["start": 0, "end": 0.75],
+          ["start": 0.5, "end": 1],
+        ]
+      ]
+    )
+
+    #expect(state.videoRegions.map(\.startSeconds) == [0, 1.25])
+    #expect(state.videoRegions.map(\.endSeconds) == [1, 2])
+    #expect(result["cuts"]?["slices"]?.arrayValue?.count == 2)
+    state.undo()
+    #expect(state.videoRegions.map(\.startSeconds) == [0])
+    #expect(state.videoRegions.map(\.endSeconds) == [2])
+  }
+
+  @Test func removeTimeRangeCreatesExactGapAndUndoRestoresTheTimeline() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+
+    _ = try await dispatcher.call("remove_time_range", arguments: ["start": 0.4, "end": 0.9])
+
+    #expect(state.videoRegions.map(\.startSeconds) == [0, 0.9])
+    #expect(state.videoRegions.map(\.endSeconds) == [0.4, 2])
+    state.undo()
+    #expect(state.videoRegions.map(\.startSeconds) == [0])
+    #expect(state.videoRegions.map(\.endSeconds) == [2])
+  }
+
+  @Test func batchProducesOneLabelledUndoStepForSeveralMutations() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+    let before = state.createSnapshot()
+    let initialCount = state.history.entries.count
+
+    _ = try await dispatcher.call("begin_batch", arguments: ["label": "polish presentation"])
+    _ = try await dispatcher.call("set_trim", arguments: ["start": 0.2, "end": 1.8])
+    _ = try await dispatcher.call("remove_time_range", arguments: ["start": 0.7, "end": 0.9])
+    _ = try await dispatcher.call("add_spotlight", arguments: ["start": 0.3, "end": 0.6])
+    #expect(state.history.entries.count == initialCount)
+
+    _ = try await dispatcher.call("end_batch", arguments: [:])
+
+    #expect(state.history.entries.count == initialCount + 1)
+    #expect(state.history.entries.last?.label == "Agent: polish presentation")
+    state.undo()
+    #expect(state.createSnapshot() == before)
+  }
+
+  @Test func batchTimeoutRestoresThePreBatchState() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory, batchTimeout: .milliseconds(10))
+    let before = state.createSnapshot()
+    let initialCount = state.history.entries.count
+
+    _ = try await dispatcher.call("begin_batch", arguments: ["label": "expired"])
+    _ = try await dispatcher.call("set_trim", arguments: ["start": 0.2, "end": 1.8])
+    try await Task.sleep(for: .milliseconds(20))
+
+    await #expect(throws: AgentToolError.batchTimedOut) {
+      try await dispatcher.call("get_timeline", arguments: [:])
+    }
+    #expect(state.createSnapshot() == before)
+    #expect(state.history.entries.count == initialCount)
+  }
+
+  @Test func userUndoCancelsTheBatchAndRestoresItsStartingState() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+
+    _ = try await dispatcher.call("set_trim", arguments: ["start": 0.1, "end": 1.9])
+    let beforeBatch = state.createSnapshot()
+    let startingIndex = state.history.currentIndex
+    _ = try await dispatcher.call("begin_batch", arguments: ["label": "cancel me"])
+    _ = try await dispatcher.call("add_spotlight", arguments: ["start": 0.3, "end": 0.6])
+    state.undo()
+
+    await #expect(throws: AgentToolError.userUndo) {
+      try await dispatcher.call("get_timeline", arguments: [:])
+    }
+    #expect(state.createSnapshot() == beforeBatch)
+    #expect(state.history.currentIndex == startingIndex)
+  }
+
   @Test func mutationsStayDisabledUnlessTheDispatcherOptsIn() async throws {
     let directory = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(directory) }
@@ -154,7 +265,11 @@ struct MutatingToolsTests {
 
     let definitions = dispatcher.advertisedDefinitions
     let names = Set(definitions.map(\.name))
-    #expect(names.isSuperset(of: ["set_trim", "add_zoom", "add_spotlight"]))
+    #expect(
+      names.isSuperset(
+        of: ["set_trim", "add_zoom", "add_spotlight", "set_kept_slices", "remove_time_range", "begin_batch", "end_batch"]
+      )
+    )
     let trim = try #require(definitions.first { $0.name == "set_trim" })
     #expect(trim.mcpValue["annotations"]?["readOnlyHint"] == false)
     #expect(trim.mcpValue["annotations"]?["destructiveHint"] == true)

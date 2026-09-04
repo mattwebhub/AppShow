@@ -134,9 +134,12 @@ extension EditorState {
 
     let prev = createSnapshot()
 
-    trimStart = .zero
-    trimEnd = playerController.duration
-    playerController.trimEnd = playerController.duration
+    let sourceDuration = CMTimeGetSeconds(playerController.duration)
+    let restoredStart = max(0, min(sourceDuration, data.trimStartSeconds))
+    let restoredEnd = max(restoredStart, min(sourceDuration, data.trimEndSeconds))
+    trimStart = CMTime(seconds: restoredStart, preferredTimescale: 600)
+    trimEnd = CMTime(seconds: restoredEnd, preferredTimescale: 600)
+    playerController.trimEnd = trimEnd
 
     backgroundStyle = data.backgroundStyle
     backgroundImageFillMode = data.backgroundImageFillMode ?? .fill
@@ -432,7 +435,7 @@ extension EditorState {
         self.syncVideoRegionsToPlayer()
         self.playerController.previewMode = self.isPreviewMode
         self.scheduleSave()
-        if !self.isRestoringState {
+        if !self.isRestoringState && !self.agentMutationBatchActive {
           self.scheduleUndoSnapshot()
         }
         self.observeChanges()

@@ -50,6 +50,40 @@ struct CutTimelineTests {
     #expect(t.split(at: 4) == t)
   }
 
+  @Test func removingMiddleRangeSplitsTheKeptSlice() {
+    var original = slice(0, 10)
+    original.entryTransition = .fade
+    original.entryTransitionDuration = 0.3
+    original.exitTransition = .slide
+    original.exitTransitionDuration = 0.4
+
+    let result = CutTimeline(slices: [original], duration: 10).removing(3...7)
+
+    #expect(result.slices.count == 2)
+    #expect(result.slices[0].startSeconds == 0)
+    #expect(result.slices[0].endSeconds == 3)
+    #expect(result.slices[1].startSeconds == 7)
+    #expect(result.slices[1].endSeconds == 10)
+    #expect(result.slices[0].id == original.id)
+    #expect(result.slices[1].id != original.id)
+    #expect(result.slices[0].entryTransition == .fade)
+    #expect(result.slices[0].exitTransition == nil)
+    #expect(result.slices[1].entryTransition == nil)
+    #expect(result.slices[1].exitTransition == .slide)
+  }
+
+  @Test func removingRangeTrimsOrDropsEveryOverlappingSlice() {
+    let result = timeline([(0, 2), (3, 5), (6, 8), (9, 10)]).removing(1...7)
+
+    #expect(result.slices.map(\.startSeconds) == [0, 7, 9])
+    #expect(result.slices.map(\.endSeconds) == [1, 8, 10])
+  }
+
+  @Test func removingRangeOutsideKeptSlicesIsNoOp() {
+    let original = timeline([(0, 2), (5, 10)])
+    #expect(original.removing(3...4) == original)
+  }
+
   @Test func totalDurationSumsSlices() {
     #expect(timeline([(0, 2), (5, 7)]).totalDuration == 4)
   }
