@@ -15,7 +15,7 @@ Milestone: 06
 
 ## Safety
 
-- Full export is permitted by the owner, but requires explicit in-app confirmation and a destination selected by the user.
+- Draft export stays inside the ephemeral workspace. Any full export must require explicit in-app confirmation, a destination selected by the user, and a no-silent-overwrite rule.
 - Reading or importing a path outside the project workspace requires confirmation.
 - One confirmation authorizes one normalized operation and expires when resolved or when the session closes.
 - Batch timeout or user undo restores the pre-batch state.

@@ -26,7 +26,7 @@ Last updated: 2026-09-04
 - Each `.frm` owns exactly one persisted, explicitly clearable conversation; there is no thread list (ADR 0010).
 - Each turn launches a fresh Claude Code or Codex process and resumes through that provider's stored logical-session id (ADR 0010).
 - Socket, token, and rendered-frame state stays in the sibling `.agent/` workspace; the conversation travels inside the project.
-- The agent may mutate the project and trigger exports through typed tools, with confirmation for sensitive file access and one labelled undo step per call or batch.
+- The agent may mutate the project through typed tools, with confirmation for sensitive file access and one labelled undo step per call or batch. Draft exports stay in the ephemeral workspace; any full-export tool must be explicitly confirmed in-app.
 
 ## Notes
 
