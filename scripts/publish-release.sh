@@ -6,9 +6,9 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
 VERSION=$(grep MARKETING_VERSION "$ROOT_DIR/Config.xcconfig" | cut -d'=' -f2 | tr -d ' ')
 TAG="v${VERSION}"
-DMG_PATH="$DIST_DIR/Reframed-${VERSION}.dmg"
+DMG_PATH="$DIST_DIR/AppShow-${VERSION}.dmg"
 APPCAST_PATH="$DIST_DIR/appcast.xml"
-REPO="mattwebhub/Reframed"
+REPO="mattwebhub/AppShow"
 
 if ! command -v gh &>/dev/null; then
   echo "Error: gh CLI not found. Install it: brew install gh"
@@ -30,7 +30,7 @@ if [ ! -f "$APPCAST_PATH" ]; then
   exit 1
 fi
 
-echo "Publishing Reframed ${TAG}..."
+echo "Publishing AppShow ${TAG}..."
 
 echo "Pushing commits and tag..."
 git push --follow-tags
@@ -41,13 +41,13 @@ echo "Creating GitHub release ${TAG}..."
 if [ -n "$CHANGELOG" ]; then
   gh release create "$TAG" \
     --repo "$REPO" \
-    --title "Reframed ${TAG}" \
+    --title "AppShow ${TAG}" \
     --notes "$CHANGELOG" \
     "$DMG_PATH"
 else
   gh release create "$TAG" \
     --repo "$REPO" \
-    --title "Reframed ${TAG}" \
+    --title "AppShow ${TAG}" \
     --generate-notes \
     "$DMG_PATH"
 fi
@@ -65,6 +65,6 @@ else
 fi
 
 echo ""
-echo "Published Reframed ${TAG}!"
+echo "Published AppShow ${TAG}!"
 echo "  Release: https://github.com/${REPO}/releases/tag/${TAG}"
 echo "  Appcast: https://github.com/${REPO}/releases/download/appcast/appcast.xml"

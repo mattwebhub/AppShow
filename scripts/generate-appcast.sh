@@ -6,10 +6,10 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
 VERSION=$(grep MARKETING_VERSION "$ROOT_DIR/Config.xcconfig" | cut -d'=' -f2 | tr -d ' ')
 BUILD_NUMBER=$(grep CURRENT_PROJECT_VERSION "$ROOT_DIR/Config.xcconfig" | cut -d'=' -f2 | tr -d ' ')
-DMG_NAME="Reframed-${VERSION}.dmg"
+DMG_NAME="AppShow-${VERSION}.dmg"
 DMG_PATH="$DIST_DIR/$DMG_NAME"
 APPCAST_PATH="$DIST_DIR/appcast.xml"
-DOWNLOAD_URL="https://github.com/mattwebhub/Reframed/releases/download/v${VERSION}/${DMG_NAME}"
+DOWNLOAD_URL="https://github.com/mattwebhub/AppShow/releases/download/v${VERSION}/${DMG_NAME}"
 
 if [ ! -f "$DMG_PATH" ]; then
   echo "Error: DMG not found at $DMG_PATH"
@@ -32,16 +32,16 @@ else
   exit 1
 fi
 
-if [ -z "${REFRAMED_SPARKLE_KEY:-}" ]; then
-  echo "Error: REFRAMED_SPARKLE_KEY is not set."
+if [ -z "${APPSHOW_SPARKLE_KEY:-}" ]; then
+  echo "Error: APPSHOW_SPARKLE_KEY is not set."
   echo "Export your EdDSA private key:"
   echo "  .build/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_keys -x /tmp/sparkle_key"
-  echo "  export REFRAMED_SPARKLE_KEY=\"\$(cat /tmp/sparkle_key)\""
+  echo "  export APPSHOW_SPARKLE_KEY=\"\$(cat /tmp/sparkle_key)\""
   exit 1
 fi
 
 LENGTH=$(stat -f%z "$DMG_PATH")
-SIGNATURE=$(echo "$REFRAMED_SPARKLE_KEY" | "$SIGN_UPDATE" --ed-key-file - "$DMG_PATH" -p)
+SIGNATURE=$(echo "$APPSHOW_SPARKLE_KEY" | "$SIGN_UPDATE" --ed-key-file - "$DMG_PATH" -p)
 
 if [ -z "$SIGNATURE" ]; then
   echo "Error: Failed to generate EdDSA signature."
@@ -102,9 +102,9 @@ cat > "$APPCAST_PATH" << EOF
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>Reframed</title>
-    <link>https://github.com/mattwebhub/Reframed</link>
-    <description>Reframed Updates</description>
+    <title>AppShow</title>
+    <link>https://github.com/mattwebhub/AppShow</link>
+    <description>AppShow Updates</description>
     <language>en</language>
     <item>
       <title>Version ${VERSION}</title>

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-REPO_URL="https://github.com/mattwebhub/Reframed"
+REPO_URL="https://github.com/mattwebhub/AppShow"
 OUTPUT="CHANGELOG.md"
 HEADER="# Changelog"
 
