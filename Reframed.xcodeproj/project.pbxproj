@@ -58,6 +58,7 @@
 		7E570000000000000000007C /* AgentChatPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000007B /* AgentChatPanel.swift */; };
 		7E570000000000000000007E /* AgentConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000007D /* AgentConversationView.swift */; };
 		7E5700000000000000000080 /* AgentReadiness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000007F /* AgentReadiness.swift */; };
+		7E5700000000000000000082 /* AgentMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000081 /* AgentMarkdownView.swift */; };
 		7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000001C /* TimelineView+CutTrack.swift */; };
 		7E5700000000000000000021 /* TimelineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000020 /* TimelineGeometry.swift */; };
 		7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000022 /* TimelineView+Geometry.swift */; };
@@ -335,6 +336,7 @@
 		7E570000000000000000007B /* AgentChatPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentChatPanel.swift; sourceTree = "<group>"; };
 		7E570000000000000000007D /* AgentConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationView.swift; sourceTree = "<group>"; };
 		7E570000000000000000007F /* AgentReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentReadiness.swift; sourceTree = "<group>"; };
+		7E5700000000000000000081 /* AgentMarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentMarkdownView.swift; sourceTree = "<group>"; };
 		7E570000000000000000001C /* TimelineView+CutTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CutTrack.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000020 /* TimelineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineGeometry.swift; sourceTree = "<group>"; };
 		7E5700000000000000000022 /* TimelineView+Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+Geometry.swift"; sourceTree = "<group>"; };
@@ -868,6 +870,7 @@
 				7E570000000000000000007B /* AgentChatPanel.swift */,
 				7E570000000000000000007D /* AgentConversationView.swift */,
 				7E570000000000000000007F /* AgentReadiness.swift */,
+				7E5700000000000000000081 /* AgentMarkdownView.swift */,
 			);
 			path = Agent;
 			sourceTree = "<group>";
@@ -1307,6 +1310,7 @@
 				7E570000000000000000007C /* AgentChatPanel.swift in Sources */,
 				7E570000000000000000007E /* AgentConversationView.swift in Sources */,
 				7E5700000000000000000080 /* AgentReadiness.swift in Sources */,
+				7E5700000000000000000082 /* AgentMarkdownView.swift in Sources */,
 				7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */,
 				7E5700000000000000000021 /* TimelineGeometry.swift in Sources */,
 				7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */,

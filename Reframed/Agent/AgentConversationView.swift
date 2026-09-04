@@ -250,11 +250,14 @@ private struct AgentMessageView: View {
       ForEach(Array(message.content.enumerated()), id: \.offset) { _, content in
         switch content {
         case .text(let text):
-          Text(attributed(text))
-            .textSelection(.enabled)
+          AgentMarkdownView(text: text)
         case .toolCall(let call):
           AgentToolCallView(call: call)
         }
+      }
+      if message.status == .streaming {
+        Text("▋")
+          .foregroundStyle(ReframedColors.secondaryText)
       }
       if let reason = message.failureReason {
         Text(reason)
@@ -270,33 +273,53 @@ private struct AgentMessageView: View {
     .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
   }
 
-  private func attributed(_ text: String) -> AttributedString {
-    (try? AttributedString(markdown: text)) ?? AttributedString(text)
-  }
 }
 
 @MainActor
 private struct AgentToolCallView: View {
   let call: AgentToolCallData
+  @State private var expanded = false
 
   var body: some View {
-    HStack(spacing: Layout.compactSpacing) {
-      Image(systemName: icon)
-      VStack(alignment: .leading, spacing: 2) {
-        Text(call.name)
-          .font(.system(size: FontSize.xs, weight: .medium))
-        if !call.input.isEmpty {
-          Text(call.input)
-            .font(.system(size: FontSize.xxs, design: .monospaced))
-            .lineLimit(2)
-            .foregroundStyle(ReframedColors.secondaryText)
+    VStack(alignment: .leading, spacing: Layout.compactSpacing) {
+      Button {
+        if hasDetails { expanded.toggle() }
+      } label: {
+        HStack(spacing: Layout.compactSpacing) {
+          Image(systemName: icon)
+          Text(call.name)
+            .font(.system(size: FontSize.xs, weight: .medium))
+          Spacer()
+          if hasDetails {
+            Image(systemName: expanded ? "chevron.up" : "chevron.down")
+              .foregroundStyle(ReframedColors.secondaryText)
+          }
         }
       }
-      Spacer()
+      .buttonStyle(PlainCustomButtonStyle())
+      if expanded {
+        if !call.input.isEmpty {
+          detail(call.input)
+        }
+        if let output = call.output, !output.isEmpty {
+          detail(output)
+        }
+      }
     }
     .padding(8)
     .background(ReframedColors.muted)
     .clipShape(RoundedRectangle(cornerRadius: Radius.md))
+  }
+
+  private var hasDetails: Bool {
+    !call.input.isEmpty || call.output?.isEmpty == false
+  }
+
+  private func detail(_ text: String) -> some View {
+    Text(text)
+      .font(.system(size: FontSize.xxs, design: .monospaced))
+      .foregroundStyle(ReframedColors.secondaryText)
+      .textSelection(.enabled)
   }
 
   private var icon: String {
