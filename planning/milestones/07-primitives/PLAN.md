@@ -11,7 +11,7 @@ Silence removal mirrors `planning/features/silence-removal/TASKS.md`; tick both.
 - [x] T1. Silence removal, pure detector. Proof: `ReframedTests/Editor/SilenceDetectorTests.swift` green.
 - [x] T2. Silence removal, PCM analysis of a real file. Proof: `ReframedTests/Editor/SilenceAnalysisTests.swift` green on generated tones.
 - [x] T3. Silence removal, editor wiring and labelled history entry. Proof: `ReframedTests/Editor/EditorStateSilenceRemovalTests.swift` and the `HistoryTests` label round trip green.
-- [ ] T4. Silence removal, Silences section in the Video tab. Proof: `make build` warning-free, manual rows in `VERIFY.md`.
+- [x] T4. Silence removal, Silences section in the Video tab. Proof: `make build` warning-free, manual rows in `VERIFY.md`.
 - [ ] T5. Text overlay primitive (`docs/features/04-agent-tools/ATTACK-PLAN.md` phase 6). Proof: golden-frame test in `ReframedTests/Compositor/`, `project.json` decode test, history rule test.
 - [ ] T6. Image overlay primitive (phase 7, after T5). Proof: golden-frame test, bundle copy test.
 - [ ] T7. Blur region primitive (phase 8). Proof: golden-frame test that the region differs from the source and its surroundings do not.

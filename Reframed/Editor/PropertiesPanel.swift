@@ -64,6 +64,7 @@ struct PropertiesPanel: View {
           cornerRadiusSection
           videoShadowSection
           backgroundSection
+          silencesSection
         case .camera:
           cameraSection
           cameraPositionSection
