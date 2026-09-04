@@ -1,10 +1,10 @@
 # Recording pipeline
 
-This covers how Reframed captures screen content, audio, webcam, and cursor data, and how everything ends up synchronized in the output files.
+This covers how AppShow captures screen content, audio, webcam, and cursor data, and how everything ends up synchronized in the output files.
 
 ## Capture modes
 
-Reframed has four ways to start a recording:
+AppShow has four ways to start a recording:
 
 **Entire screen** -- captures the full display. The user clicks a screen in the overlay to select it, then a countdown starts.
 
@@ -107,7 +107,7 @@ All cursor timestamps get shifted by this offset before writing the JSON file, s
 
 ### Output format
 
-Saved as `cursor-metadata.json` in the .frm bundle:
+Saved as `cursor-metadata.json` in the .appshow bundle:
 
 ```json
 {
@@ -135,7 +135,7 @@ The cursor metadata recorder does the same thing independently with its own `tot
 1. All writers finish asynchronously.
 2. Cursor metadata timestamps are adjusted and written to a temp JSON file.
 3. RecordingCoordinator returns a `RecordingResult` with URLs to all output files plus metadata (screen size, webcam size, FPS, capture quality).
-4. SessionState passes the result to `ReframedProject.create()`, which bundles everything into a `.frm` directory.
+4. SessionState passes the result to `AppShowProject.create()`, which bundles everything into a `.appshow` directory.
 5. The editor window opens with the project loaded.
 
 ## Audio level monitoring

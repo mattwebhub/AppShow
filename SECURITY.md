@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Only the latest release gets security fixes. Check [Releases](https://github.com/jkuri/Reframed/releases) for the current version.
+Only the latest release gets security fixes. Check [Releases](https://github.com/mattwebhub/AppShow/releases) for the current version.
 
 | Version | Supported |
 | ------- | --------- |
@@ -11,7 +11,7 @@ Only the latest release gets security fixes. Check [Releases](https://github.com
 
 ## Reporting a vulnerability
 
-If you find a security issue, please don't open a public issue. Instead, email [jkuri88@gmail.com](mailto:jkuri88@gmail.com) with:
+If you find a security issue, please don't open a public issue. Instead, email [matheus_paranhos@outlook.com.br](mailto:matheus_paranhos@outlook.com.br) with:
 
 - A description of the vulnerability
 - Steps to reproduce it
@@ -21,7 +21,7 @@ I'll acknowledge your report within 48 hours and work with you on a fix before a
 
 ## Scope
 
-Reframed runs without the App Sandbox (ScreenCaptureKit requires it) and requests several system permissions:
+AppShow runs without the App Sandbox (ScreenCaptureKit requires it) and requests several system permissions:
 
 - Screen Recording
 - Accessibility (cursor and keystroke capture)

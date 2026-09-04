@@ -1,18 +1,18 @@
 <p align="center">
-  <img width="64" alt="Reframed AppIcon" src="https://github.com/user-attachments/assets/ab90875f-4092-4ca9-b475-9a60b9c6445a" />
+  <img width="64" alt="AppShow AppIcon" src="https://github.com/user-attachments/assets/ab90875f-4092-4ca9-b475-9a60b9c6445a" />
 </p>
 
-# <p align="center">Reframed</p>
+# <p align="center">AppShow</p>
 
 > Open-source macOS screen recorder and capture editor. A free alternative to Screen Studio - capture your screen, windows, or iOS devices with a webcam overlay, then edit on a timeline with auto-captions and smooth cursor zooms.
 
 <p align="center">
-  <img width="100%" alt="Reframed Editor" src="https://github.com/user-attachments/assets/ea3d9554-8695-4d98-846f-90c422b25550" />
+  <img width="100%" alt="AppShow Editor" src="https://github.com/user-attachments/assets/ea3d9554-8695-4d98-846f-90c422b25550" />
 </p>
 
 ## The idea
 
-Screen recorders give you a raw .mp4. Getting cursor-tracking zoom effects, auto-captions, or webcam overlays on top of that usually means paying for a proprietary app. Reframed is the open-source alternative - record, edit and export in one app.
+Screen recorders give you a raw .mp4. Getting cursor-tracking zoom effects, auto-captions, or webcam overlays on top of that usually means paying for a proprietary app. AppShow is the open-source alternative - record, edit and export in one app.
 
 ### Core features
 
@@ -24,13 +24,7 @@ Screen recorders give you a raw .mp4. Getting cursor-tracking zoom effects, auto
 
 ## Install
 
-Via `homebrew` (recommended):
-
-```bash
-brew install --cask jkuri/reframed/reframed
-```
-
-Or grab the `.dmg` from [Releases](https://github.com/jkuri/reframed/releases).
+Grab the latest `.dmg` from [AppShow Releases](https://github.com/mattwebhub/AppShow/releases). Until the first AppShow release is published, clone the repository and run `make build` or `make dev`.
 
 ## Features
 
@@ -40,7 +34,7 @@ Or grab the `.dmg` from [Releases](https://github.com/jkuri/reframed/releases).
 - **System audio and microphone** capture with real-time level indicators
 - **Webcam overlay** (Picture-in-Picture) that can be hidden while recording
 - **120 Hz cursor tracking** records position and click data independently from video frame rate
-- **`.frm` project bundles** preserve all source recordings and editor state for re-editing
+- **`.appshow` project bundles** preserve all source recordings, editor state, and the project conversation for re-editing; legacy `.frm` projects still open
 
 ### Video editor
 
@@ -53,6 +47,10 @@ Or grab the `.dmg` from [Releases](https://github.com/jkuri/reframed/releases).
 - **Webcam background replacement** via person segmentation (blur, solid color, gradient, or custom image)
 - **Camera regions** set webcam visibility per-segment on the timeline (fullscreen, hidden, or custom position) with entry/exit transitions
 - **Video regions** for cutting segments from the timeline
+- **External music tracks** with waveform placement, trims, volume, fades, preview sync, and export mixing
+- **Text, image, spotlight, and blur overlays** with timeline placement and transitions
+- **Project assistant** using Codex or Claude Code, with live editor tools, one persisted thread, grouped undo, and explicit confirmation for sensitive actions
+- **Silence removal** that turns detected pauses into editable keep-slices
 - **Undo/redo history** and fullscreen preview with scrub
 
 ### Cursor
@@ -95,4 +93,6 @@ Or grab the `.dmg` from [Releases](https://github.com/jkuri/reframed/releases).
 
 ## License
 
-MIT. GIF export links [gifski](https://gif.ski), which is licensed AGPL-3.0-or-later (text in `Reframed/Libraries/gifski/LICENSE`); distributed builds of this app are therefore offered with full source under AGPL-compatible terms.
+MIT. GIF export links [gifski](https://gif.ski), which is licensed AGPL-3.0-or-later (text in `AppShow/Libraries/gifski/LICENSE`); distributed builds of this app are therefore offered with full source under AGPL-compatible terms.
+
+AppShow is derived from [Reframed](https://github.com/jkuri/Reframed); its MIT attribution remains in the repository history and credits.

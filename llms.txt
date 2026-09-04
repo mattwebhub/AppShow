@@ -1,9 +1,9 @@
-# Reframed
+# AppShow
 
 > A native and open-source macOS screen recorder and video editor for professional product demos.
 
 ## Overview
-Reframed is a high-performance macOS application designed to create polished, professional-grade screen recordings. It targets developers and creators who need a "Screen Studio" alternative that is open-source and local-first. It allows users to capture their Mac screen or tethered iOS devices and then refine the footage using a built-in, non-destructive editor.
+AppShow is a high-performance macOS application designed to create polished, professional-grade screen recordings. It targets developers and creators who need a "Screen Studio" alternative that is open-source and local-first. It allows users to capture their Mac screen or tethered iOS devices and then refine the footage using a built-in, non-destructive editor.
 
 ## Key Features
 - **Capture Sources:** Record full screen, specific windows, custom regions, or connected iOS devices (iPhone/iPad) via USB.
@@ -24,6 +24,5 @@ Reframed is a high-performance macOS application designed to create polished, pr
 - Creating clean, styled tutorials without needing heavy video editing suites like Final Cut or Premiere.
 
 ## Links
-- Homepage: https://reframed.dev
-- Repository: https://github.com/jkuri/Reframed
-- Issues: https://github.com/jkuri/Reframed/issues
+- Repository: https://github.com/mattwebhub/AppShow
+- Issues: https://github.com/mattwebhub/AppShow/issues

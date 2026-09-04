@@ -1,23 +1,23 @@
 # Architecture
 
-Reframed is a macOS screen recording app targeting macOS 15+, built with Swift 6 strict concurrency. It runs as a menu bar app with a floating capture toolbar, full-screen selection overlays, and a built-in video editor.
+AppShow is a macOS screen recording app targeting macOS 15+, built with Swift 6 strict concurrency. It runs as a menu bar app with a floating capture toolbar, full-screen selection overlays, and a built-in video editor.
 
 ## Source layout
 
 ```
-Reframed/
+AppShow/
 ├── App/              AppDelegate, Permissions, WindowController
 ├── CaptureModes/     Area/Screen/Window/Device selection + shared overlay components
 ├── Compositor/       Video composition and export pipeline
 ├── Editor/           Video editor (timeline, properties, preview, cursor, zoom, camera regions)
 ├── Libraries/        Native C/C++ dependencies (gifski for GIF encoding)
 ├── Logging/          LogBootstrap, RotatingFileLogHandler
-├── Project/          .frm bundle management
+├── Project/          .appshow bundle management
 ├── Recording/        Capture pipeline (coordinators, writers, devices, cursor metadata)
 ├── State/            SessionState, CaptureState, ConfigService, StateService, KeyboardShortcutManager
 ├── UI/               Toolbar, menu bar, popovers, settings, reusable components
 ├── Utilities/        Extensions, helpers, encoding settings, sound effects
-└── ReframedApp.swift Entry point
+└── AppShowApp.swift Entry point
 ```
 
 ## State machine
@@ -70,9 +70,9 @@ This conversion happens at selection time and when configuring cursor metadata r
 
 ## Persistence
 
-Two separate files in `~/.reframed/`:
+Two separate files in `~/.appshow/`:
 
-- **ConfigService** reads/writes `reframed.json` -- user preferences like output folder, FPS, capture quality, appearance, keyboard shortcuts, device selections.
+- **ConfigService** reads/writes `config.json` -- user preferences like output folder, FPS, capture quality, appearance, keyboard shortcuts, device selections.
 - **StateService** reads/writes `state.json` -- transient layout state like last selection rect, window positions for the toolbar and previews, editor window frame.
 
 Both are `@MainActor` singletons. ConfigService merges saved values with defaults on load, so new preferences get their default values without migration code.

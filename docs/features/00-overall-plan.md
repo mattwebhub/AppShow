@@ -46,7 +46,7 @@ These surface in feature 04's spike but are real editor features in their own ri
 ## Principles for every feature
 
 - Tests first, per `planning/tdd-strategy.md`. Pure logic (remaps, parsers, tool dispatch) is tier 1 and gets tested before any UI exists.
-- New code goes in new folders where possible (`Reframed/Agent/`, `ReframedTests/`), upstream files get the smallest seams. Every divergence lands in `planning/upstream-sync.md`.
+- New code goes in new folders where possible (`AppShow/Agent/`, `AppShowTests/`), upstream files get the smallest seams. Every divergence lands in `planning/upstream-sync.md`.
 - UI follows `docs/architecture/05-coding-patterns.md` and the checklist in `06-conventions-checklist.md`: existing button styles, color tokens, track patterns (Zoom and Spotlight tracks are the template for new tracks).
 - Every agent mutation is one undoable history step with a readable label, so the user can watch and revert.
 - The agent runtime is pluggable: Claude Code and Codex are the first two providers behind one protocol.

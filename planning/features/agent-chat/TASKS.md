@@ -17,5 +17,5 @@ ADR 0009 accepted 2026-09-04. Phases from the attack plan:
 - One canonical `agent/conversation.json` per project; it saves on user append, turn completion/cancellation, provider change, and explicit clear. Legacy draft files under `agent/threads/` migrate once.
 - `AgentToolchain` includes a login-shell fallback.
 - `FileHandle.bytes` blocks an actor's executor until EOF; the runner bridges `readabilityHandler` chunks through an `AsyncStream` and force-finishes after 2 s with SIGKILL.
-- Fixtures under `ReframedTests/Fixtures/agent/` were recorded once from Claude Code 2.1.260 and Codex 0.149.1; tests never launch the CLIs.
+- Fixtures under `AppShowTests/Fixtures/agent/` were recorded once from Claude Code 2.1.260 and Codex 0.149.1; tests never launch the CLIs.
 - The renderer uses Foundation Markdown for prose and a pure local parser only to split fenced code, avoiding a new package dependency.

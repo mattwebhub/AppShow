@@ -26,8 +26,10 @@ final class ShimState: @unchecked Sendable {
   }
 }
 
-func environment(_ name: String) throws -> String {
-  guard let value = ProcessInfo.processInfo.environment[name], !value.isEmpty else {
+func environment(_ name: String, legacyName: String? = nil) throws -> String {
+  let current = ProcessInfo.processInfo.environment[name]
+  let legacy = legacyName.flatMap { ProcessInfo.processInfo.environment[$0] }
+  guard let value = current ?? legacy, !value.isEmpty else {
     throw ShimFailure.missingEnvironment(name)
   }
   return value
@@ -125,8 +127,8 @@ func socketReader(_ descriptor: Int32, state: ShimState) -> DispatchWorkItem {
 }
 
 do {
-  let path = try environment("REFRAMED_AGENT_SOCKET")
-  let token = try environment("REFRAMED_AGENT_TOKEN")
+  let path = try environment("APPSHOW_AGENT_SOCKET", legacyName: "REFRAMED_AGENT_SOCKET")
+  let token = try environment("APPSHOW_AGENT_TOKEN", legacyName: "REFRAMED_AGENT_TOKEN")
   let descriptor = try connectSocket(path: path)
   let state = ShimState()
   let reader = socketReader(descriptor, state: state)

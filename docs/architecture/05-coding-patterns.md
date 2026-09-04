@@ -1,7 +1,7 @@
 # 05 — Coding Patterns and Conventions
 
 **Analysis date:** 2026-09-03
-**Scope:** `Reframed/` (235 Swift files, ~33k LOC), Swift 6 strict concurrency, SwiftUI + AppKit, macOS 15+.
+**Scope:** `AppShow/` (235 Swift files, ~33k LOC), Swift 6 strict concurrency, SwiftUI + AppKit, macOS 15+.
 **Source of rules:** `AGENTS.md`, `CONTRIBUTING.md`, `.swift-format`. Every pattern below is grounded in a verbatim excerpt from the tree. Where the codebase does not follow its own rules, the deviation is called out under **Inconsistency** so a fork can decide whether to fix or codify it.
 
 ---
@@ -28,12 +28,12 @@ Observed families (file counts):
 The primary file for `RecordingCoordinator` is nothing but state and handler setters; all lifecycle logic is in extensions:
 
 ```swift
-// Reframed/Recording/RecordingCoordinator.swift
+// AppShow/Recording/RecordingCoordinator.swift
 actor RecordingCoordinator {
   var captureSession: ScreenCaptureSession?
   var systemAudioCapture: SystemAudioCapture?
   ...
-  let logger = Logger(label: "eu.jankuri.reframed.recording-coordinator")
+  let logger = Logger(label: "com.mattwebhub.appshow.recording-coordinator")
   var onStreamError: (@Sendable (any Error) -> Void)?
   var onDeviceLost: (@Sendable (String) -> Void)?
   ...
@@ -43,7 +43,7 @@ actor RecordingCoordinator {
 ```
 
 ```swift
-// Reframed/Recording/RecordingCoordinator+Lifecycle.swift
+// AppShow/Recording/RecordingCoordinator+Lifecycle.swift
 import CoreMedia
 import Foundation
 
@@ -60,7 +60,7 @@ extension RecordingCoordinator {
 For `@MainActor` classes the extension re-declares the isolation on the extension itself:
 
 ```swift
-// Reframed/State/SessionState+Recording.swift
+// AppShow/State/SessionState+Recording.swift
 @MainActor
 extension SessionState {
   func beginRecordingWithCountdown() {
@@ -69,7 +69,7 @@ extension SessionState {
 For SwiftUI views the extension exposes `var xSection: some View` computed properties that the primary `body` composes:
 
 ```swift
-// Reframed/Editor/PropertiesPanel+VideoTab.swift
+// AppShow/Editor/PropertiesPanel+VideoTab.swift
 extension PropertiesPanel {
   var canvasSection: some View {
     VStack(alignment: .leading, spacing: Layout.itemSpacing) {
@@ -94,7 +94,7 @@ Nested/private helper types that only one extension needs are declared `private`
 `.swift-format` enforces `OrderedImports`. Imports are alphabetical by module name, with `@preconcurrency` attributes sorting with the module (so `@preconcurrency import ScreenCaptureKit` comes after `Logging`):
 
 ```swift
-// Reframed/Recording/RecordingCoordinator+Screen.swift
+// AppShow/Recording/RecordingCoordinator+Screen.swift
 import AVFoundation
 import CoreGraphics
 import CoreMedia
@@ -114,12 +114,12 @@ Files import only what they use; `Foundation` is omitted when `AppKit`/`SwiftUI`
 The two central models are `SessionState` (app/recording lifecycle) and `EditorState` (editor). Both are `@MainActor`, `@Observable`, `final class`, with plain `var` stored properties and defaults inline. `RecordingOptions` and `History` follow the same shape.
 
 ```swift
-// Reframed/Editor/EditorState.swift
+// AppShow/Editor/EditorState.swift
 @MainActor
 @Observable
 final class EditorState {
   var result: RecordingResult
-  var project: ReframedProject?
+  var project: AppShowProject?
   var playerController: SyncedPlayerController
   var cameraLayout = CameraLayout()
   var trimStart: CMTime = .zero
@@ -137,7 +137,7 @@ Two access patterns depending on whether the view needs `$` bindings:
 - Views that only read (or call methods) take a plain `let session: SessionState` (`CaptureToolbar`, `MenuBarView`, `CaptureAreaView`). `@Observable` tracking works through a plain `let` reference.
 
 ```swift
-// Reframed/Editor/PropertiesPanel.swift
+// AppShow/Editor/PropertiesPanel.swift
 struct PropertiesPanel: View {
   @Bindable var editorState: EditorState
   let selectedTab: EditorTab
@@ -145,7 +145,7 @@ struct PropertiesPanel: View {
 ```
 
 ```swift
-// Reframed/UI/CaptureToolbar.swift
+// AppShow/UI/CaptureToolbar.swift
 struct CaptureToolbar: View {
   let session: SessionState
   @State var showOptions = false
@@ -155,7 +155,7 @@ struct CaptureToolbar: View {
 Controls bind straight into model properties (`$editorState.padding`), so a slider drag writes to the model on every tick; there is no local draft copy for simple properties:
 
 ```swift
-// Reframed/Editor/PropertiesPanel+VideoTab.swift
+// AppShow/Editor/PropertiesPanel+VideoTab.swift
       SliderRow(
         value: $editorState.padding,
         range: 0...0.50,
@@ -171,7 +171,7 @@ The model is created and owned outside SwiftUI: `AppDelegate` owns `let session 
 `@State` (134 occurrences) is used for view-local, non-persisted UI state: popover/sheet visibility flags, drag offsets, hover, tab selection, and **local mirrors of model values that need an intermediate representation**. `PropertiesPanel` keeps a `BackgroundMode` enum and selected-gradient/colour IDs in `@State` and folds them into the single `editorState.backgroundStyle` enum in `onChange`:
 
 ```swift
-// Reframed/Editor/PropertiesPanel.swift
+// AppShow/Editor/PropertiesPanel.swift
   @State var backgroundMode: BackgroundMode = .color
   @State var selectedGradientId: Int = 0
   @State var selectedColorId: String? = "Black"
@@ -186,7 +186,7 @@ The model is created and owned outside SwiftUI: `AppDelegate` owns `let session 
 Popovers that edit a region take the region as a `let` value plus callbacks, copy it into `@State` on first appear, and push changes out through `onChange`:
 
 ```swift
-// Reframed/Editor/VideoRegionEditPopover.swift
+// AppShow/Editor/VideoRegionEditPopover.swift
   @State private var localEntryTransition: RegionTransitionType = .none
   @State private var didInit = false
   ...
@@ -207,7 +207,7 @@ Popovers that edit a region take the region as a `let` value plus callbacks, cop
 Derived values are computed properties on the model, never cached in stored vars:
 
 ```swift
-// Reframed/Editor/EditorState.swift
+// AppShow/Editor/EditorState.swift
   var hasSystemAudio: Bool { result.systemAudioURL != nil }
   var hasMicAudio: Bool { result.microphoneAudioURL != nil }
   var effectiveSystemAudioVolume: Float { systemAudioMuted ? 0 : systemAudioVolume }
@@ -218,7 +218,7 @@ Derived values are computed properties on the model, never cached in stored vars
 Views compute their own cheap derived flags as `private var` for animation keys:
 
 ```swift
-// Reframed/Editor/EditorView.swift
+// AppShow/Editor/EditorView.swift
   private var timelineTrackSignature: Int {
     var h = 0
     if editorState.hasWebcam && editorState.webcamEnabled { h |= 1 }
@@ -227,10 +227,10 @@ Views compute their own cheap derived flags as `private var` for animation keys:
 
 ### 2.5 The `let _ = colorScheme` idiom
 
-Nearly every view declares `@Environment(\.colorScheme) private var colorScheme` and starts `body` with `let _ = colorScheme` (44 occurrences). `ReframedColors` reads `NSApp.effectiveAppearance` rather than SwiftUI's environment, so this forces a re-render when the appearance flips. Copy it into any new view that uses `ReframedColors`.
+Nearly every view declares `@Environment(\.colorScheme) private var colorScheme` and starts `body` with `let _ = colorScheme` (44 occurrences). `AppShowColors` reads `NSApp.effectiveAppearance` rather than SwiftUI's environment, so this forces a re-render when the appearance flips. Copy it into any new view that uses `AppShowColors`.
 
 ```swift
-// Reframed/UI/ToggleRow.swift
+// AppShow/UI/ToggleRow.swift
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
@@ -241,7 +241,7 @@ Nearly every view declares `@Environment(\.colorScheme) private var colorScheme`
 **Inconsistency.** `App/WindowController.swift` is the one model still on the old `ObservableObject` / `@Published` API:
 
 ```swift
-// Reframed/App/WindowController.swift
+// AppShow/App/WindowController.swift
 final class WindowController: ObservableObject {
   @Published var currentWindow: WindowInfo?
 ```
@@ -253,7 +253,7 @@ New code must use `@Observable`.
 AppKit callbacks that are documented main-thread but not annotated use `MainActor.assumeIsolated` (25 uses) rather than `Task { @MainActor in }`:
 
 ```swift
-// Reframed/State/SessionState+Project.swift
+// AppShow/State/SessionState+Project.swift
     editor.onSave = { [weak self, weak editor] url in
       MainActor.assumeIsolated {
         guard let self else { return }
@@ -269,7 +269,7 @@ AppKit callbacks that are documented main-thread but not annotated use `MainActo
 `Editor/History.swift` is a `@MainActor @Observable` class holding up to 50 full `EditorStateData` snapshots plus a cursor. There is no command pattern; every undo step is a whole-state diff.
 
 ```swift
-// Reframed/Editor/History.swift
+// AppShow/Editor/History.swift
   func pushSnapshot(_ snapshot: EditorStateData) {
     if currentIndex < entries.count - 1 {
       entries.removeSubrange((currentIndex + 1)...)
@@ -289,7 +289,7 @@ AppKit callbacks that are documented main-thread but not annotated use `MainActo
 Recording is automatic and debounced. `EditorState+Persistence.swift` registers a `withObservationTracking` closure that touches **every** undoable property; on any change it schedules a save (1 s) and an undo snapshot (1.5 s), then re-registers itself:
 
 ```swift
-// Reframed/Editor/EditorState+Persistence.swift
+// AppShow/Editor/EditorState+Persistence.swift
   func observeChanges() {
     withObservationTracking {
       _ = self.backgroundStyle
@@ -325,7 +325,7 @@ Recording is automatic and debounced. `EditorState+Persistence.swift` registers 
 Gesture-driven edits (camera drag, caption drag) bypass the debounce and push a snapshot explicitly on drag end:
 
 ```swift
-// Reframed/Editor/EditorView+Preview.swift
+// AppShow/Editor/EditorView+Preview.swift
             onDragEnd: {
               editorState.scheduleSave()
               editorState.history.pushSnapshot(editorState.createSnapshot())
@@ -335,7 +335,7 @@ Gesture-driven edits (camera drag, caption drag) bypass the debounce and push a 
 Undo/redo call `restoreFromSnapshot`, which sets `isRestoringState = true` so the observation callback does not record the restore as a new change, then clears the flag on the next main-actor hop:
 
 ```swift
-// Reframed/Editor/EditorState+Persistence.swift
+// AppShow/Editor/EditorState+Persistence.swift
   func restoreFromSnapshot(_ data: EditorStateData) {
     isRestoringState = true
     pendingUndoTask?.cancel()
@@ -353,7 +353,7 @@ Undo/redo call `restoreFromSnapshot`, which sets `isRestoringState = true` so th
 `History+ChangeRules.swift` turns two snapshots into human-readable strings for `HistoryPopover`. A rule is `typealias ChangeRule = (EditorStateData, EditorStateData) -> [String]`. Rules are built from four keypath helpers in `History.swift` (`prop`, `toggle`, `sub`, `subToggle`, `regions`) and collected in `static let rules: [ChangeRule]`:
 
 ```swift
-// Reframed/Editor/History+ChangeRules.swift
+// AppShow/Editor/History+ChangeRules.swift
     prop(\.canvasAspect) { "Canvas aspect ratio set to \(($0 ?? .original).label)" },
     prop(\.padding) { "Padding set to \(Int($0 * 100))%" },
     ...
@@ -400,14 +400,14 @@ A property that is missing from any one of these places silently degrades (not u
 
 ---
 
-## 4. Persistence and the `.frm` project format
+## 4. Persistence and the `.appshow` project format
 
-### 4.1 Bundle layout and `ReframedProject`
+### 4.1 Bundle layout and `AppShowProject`
 
-`Project/ReframedProject.swift` is a `Sendable` struct with `bundleURL` + `metadata`. File URLs inside the bundle are computed properties that return `nil` when the file is absent:
+`Project/AppShowProject.swift` is a `Sendable` struct with `bundleURL` + `metadata`. File URLs inside the bundle are computed properties that return `nil` when the file is absent:
 
 ```swift
-// Reframed/Project/ReframedProject.swift
+// AppShow/Project/AppShowProject.swift
   var webcamVideoURL: URL? {
     let url = bundleURL.appendingPathComponent("webcam.mp4")
     return FileManager.default.fileExists(atPath: url.path) ? url : nil
@@ -428,7 +428,7 @@ Encoding is `JSONEncoder` with ISO-8601 dates and `[.prettyPrinted, .sortedKeys]
   }
 ```
 
-**Inconsistency.** The encoder setup block is copy-pasted four times in `ReframedProject.swift` (`create`, `saveEditorState`, `rename`, `saveHistory`) rather than being a shared helper.
+**Inconsistency.** The encoder setup block is copy-pasted four times in `AppShowProject.swift` (`create`, `saveEditorState`, `rename`, `saveHistory`) rather than being a shared helper.
 
 ### 4.2 Codable conventions
 
@@ -436,7 +436,7 @@ Encoding is `JSONEncoder` with ISO-8601 dates and `[.prettyPrinted, .sortedKeys]
 - Newer fields are declared with inline defaults and decoded leniently. The decoders live in `extension` blocks so the synthesized memberwise `init` survives:
 
 ```swift
-// Reframed/Project/ProjectMetadata.swift
+// AppShow/Project/ProjectMetadata.swift
 extension CursorSettingsData {
   init(from decoder: Decoder) throws {
     let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -447,7 +447,7 @@ extension CursorSettingsData {
 ```
 
 ```swift
-// Reframed/Utilities/LenientCodable.swift
+// AppShow/Utilities/LenientCodable.swift
 extension KeyedDecodingContainer {
   func decodeOrDefault<T: Decodable>(
     _ key: Key,
@@ -461,7 +461,7 @@ extension KeyedDecodingContainer {
 - Top-level `EditorStateData` uses **optionals** for anything added after v1 and omits empty collections (`nil` rather than `[]`) when snapshotting:
 
 ```swift
-// Reframed/Editor/EditorState+Persistence.swift
+// AppShow/Editor/EditorState+Persistence.swift
       systemAudioRegions: systemAudioRegions.isEmpty ? nil : systemAudioRegions,
       micAudioRegions: micAudioRegions.isEmpty ? nil : micAudioRegions,
       cameraBackgroundStyle: cameraBackgroundStyle == .none ? nil : cameraBackgroundStyle,
@@ -470,7 +470,7 @@ extension KeyedDecodingContainer {
 - Enums with associated values encode a string `type` discriminator plus per-case keys, and decode unknown types to a safe default:
 
 ```swift
-// Reframed/Compositor/BackgroundStyle.swift
+// AppShow/Compositor/BackgroundStyle.swift
   private enum CodingKeys: String, CodingKey {
     case type, gradientId, color, filename
   }
@@ -492,7 +492,7 @@ extension KeyedDecodingContainer {
 `ProjectMetadata.version: Int = 1` exists but nothing switches on it. Forward compatibility is entirely "optional field or default". The single legacy migration is done at load time in `EditorState.setup()`:
 
 ```swift
-// Reframed/Editor/EditorState.swift
+// AppShow/Editor/EditorState.swift
       if let savedCameraRegions = saved.cameraRegions, !savedCameraRegions.isEmpty {
         cameraRegions = savedCameraRegions
       } else if let legacyRegions = saved.cameraFullscreenRegions, !legacyRegions.isEmpty {
@@ -514,10 +514,10 @@ Defaults are repeated, not centralised: the `EditorState` stored-property initia
 
 ### 5.1 `ConfigService` and `StateService`
 
-Both are `@MainActor final class` singletons with `static let shared`, a `private var data: <PrivateStruct>` and one JSON file under `~/.reframed/` (`reframed.json` and `state.json`). Every public property is a get/set pair that writes through and saves:
+Both are `@MainActor final class` singletons with `static let shared`, a `private var data: <PrivateStruct>` and one JSON file under `~/.appshow/` (`config.json` and `state.json`). Every public property is a get/set pair that writes through and saves:
 
 ```swift
-// Reframed/State/ConfigService.swift
+// AppShow/State/ConfigService.swift
   var fps: Int {
     get { data.fps }
     set { data.fps = newValue; save() }
@@ -530,21 +530,21 @@ The backing struct is `private` at file scope with inline defaults; new keys nee
     defaultsDict.merge(savedDict) { _, saved in saved }
     ...
 private struct ConfigData: Codable {
-  var outputFolder: String = "~/Movies/Reframed"
+  var outputFolder: String = "~/Movies/AppShow"
   var timerDelay: Int = 3
   var audioDeviceId: String? = nil
 ```
 
 `StateService` uses a plain `JSONDecoder().decode`, which works because every `StateData` field is optional or defaulted. Enum-typed settings are stored as `String` raw values in `ConfigData` (`captureQuality: String = "standard"`, `appearance: String = "system"`) and re-wrapped at the edges.
 
-**Inconsistency.** `AGENTS.md` says preferences live in `~/.reframed/config.json`; the code writes `reframed.json` (`docs/architecture.md` is correct). Trust the code.
+**Inconsistency.** `AGENTS.md` says preferences live in `~/.appshow/config.json`; the code writes `config.json` (`docs/architecture.md` is correct). Trust the code.
 
 ### 5.2 `RecordingOptions`
 
 `State/RecordingOptions.swift` is the `@Observable` façade the toolbar and settings bind to. Each property has a `didSet` that writes back to `ConfigService`, and `init` reads the initial values from it:
 
 ```swift
-// Reframed/State/RecordingOptions.swift
+// AppShow/State/RecordingOptions.swift
 @MainActor
 @Observable
 final class RecordingOptions {
@@ -559,7 +559,7 @@ final class RecordingOptions {
 Settings UI binds with explicit `Binding(get:set:)` because `options` is optional there:
 
 ```swift
-// Reframed/UI/SettingsRecordingTab.swift
+// AppShow/UI/SettingsRecordingTab.swift
       settingsToggle(
         "HDR Capture",
         isOn: Binding(
@@ -594,10 +594,10 @@ Settings UI binds with explicit `Binding(get:set:)` because `options` is optiona
 **Inconsistency.** `AGENTS.md` states `@unchecked Sendable` is "only for `ScreenCaptureSession`". There are 31 occurrences. The real rule in the code: use it for classes whose mutation is confined to one serial `DispatchQueue` (asserted with `dispatchPrecondition`) or whose members are all `let`.
 
 ```swift
-// Reframed/Recording/VideoTrackWriter.swift
+// AppShow/Recording/VideoTrackWriter.swift
 final class VideoTrackWriter: @unchecked Sendable {
   ...
-  let queue = DispatchQueue(label: "eu.jankuri.reframed.video-track-writer.queue", qos: .userInteractive)
+  let queue = DispatchQueue(label: "com.mattwebhub.appshow.video-track-writer.queue", qos: .userInteractive)
   ...
   func appendSampleBuffer(_ sampleBuffer: CMSampleBuffer) {
     dispatchPrecondition(condition: .onQueue(queue))
@@ -608,7 +608,7 @@ final class VideoTrackWriter: @unchecked Sendable {
 Actor callbacks are stored `@Sendable` closures set via `setXHandler` methods, never assigned from outside. The `@MainActor` side hops back with `Task { @MainActor in }`:
 
 ```swift
-// Reframed/State/SessionState+Recording.swift
+// AppShow/State/SessionState+Recording.swift
     let coordinator = RecordingCoordinator()
     await coordinator.setStreamErrorHandler { [weak self] _ in
       guard let self else { return }
@@ -619,7 +619,7 @@ Actor callbacks are stored `@Sendable` closures set via `setXHandler` methods, n
 Actors reach the main actor only for `ConfigService`-dependent helpers, via `MainActor.run` (4 uses in total):
 
 ```swift
-// Reframed/Recording/RecordingCoordinator+Lifecycle.swift
+// AppShow/Recording/RecordingCoordinator+Lifecycle.swift
     let destination = await MainActor.run { FileManager.default.defaultSaveURL(for: outputURL) }
 ```
 
@@ -636,7 +636,7 @@ Parallel shutdown uses `async let` on optional-chained calls:
 There are 9 continuation sites and **no** `AsyncStream`. Pattern: explicit continuation type annotation, store the continuation on the object's serial queue, resume from the delegate callback, and arm a timeout that resumes with a `CaptureError`:
 
 ```swift
-// Reframed/Recording/WebcamCapture.swift
+// AppShow/Recording/WebcamCapture.swift
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
       self.verifyQueue.async {
         self.firstFrameContinuation = continuation
@@ -659,7 +659,7 @@ There are 9 continuation sites and **no** `AsyncStream`. Pattern: explicit conti
 Writer `finish()` uses the non-throwing form and returns `URL?`, logging the failure instead of throwing:
 
 ```swift
-// Reframed/Recording/AudioTrackWriter.swift
+// AppShow/Recording/AudioTrackWriter.swift
   func finish() async -> URL? {
     return await withCheckedContinuation { continuation in
       queue.async { [self] in
@@ -677,7 +677,7 @@ Writer `finish()` uses the non-throwing form and returns `URL?`, logging the fai
 Observation-to-async bridging (waiting for an `@Observable` change) also uses a continuation:
 
 ```swift
-// Reframed/Editor/EditorWindow.swift
+// AppShow/Editor/EditorWindow.swift
         await withCheckedContinuation { continuation in
           withObservationTracking {
             _ = state.isExporting
@@ -692,13 +692,13 @@ Observation-to-async bridging (waiting for an `@Observable` change) also uses a 
 Used for (a) AppKit observer tokens and timers on `@MainActor` classes so `deinit` can release them, (b) pinning a non-Sendable AVFoundation object into a `@Sendable` closure, (c) static immutable dictionaries of `Any`:
 
 ```swift
-// Reframed/CaptureModes/CaptureWindow/WindowSelectionCoordinator.swift
+// AppShow/CaptureModes/CaptureWindow/WindowSelectionCoordinator.swift
   nonisolated(unsafe) private var eventMonitor: Any?
   nonisolated(unsafe) private var refreshTimer: Timer?
 ```
 
 ```swift
-// Reframed/Utilities/EncodingSettings.swift
+// AppShow/Utilities/EncodingSettings.swift
   nonisolated(unsafe) static let bt709ColorProperties: [String: Any] = [
 ```
 
@@ -710,7 +710,7 @@ Used for (a) AppKit observer tokens and timers on `@MainActor` classes so `deini
 - External cancellation: `withTaskCancellationHandler` with `nonisolated(unsafe)` capture:
 
 ```swift
-// Reframed/Compositor/VideoCompositor+ManualExport.swift
+// AppShow/Compositor/VideoCompositor+ManualExport.swift
     nonisolated(unsafe) let session = session
     try await withTaskCancellationHandler {
       try await session.export(to: url, as: fileType)
@@ -725,11 +725,11 @@ Long-lived tasks are stored as `Task<Void, Never>?` properties on the owning mod
 
 - **`throws` with `CaptureError`** is the only app error type. It lives in `State/CaptureState.swift`, is a `LocalizedError` enum with user-facing `errorDescription`, and is reused by the compositor (`CaptureError.recordingFailed("No video track in screen recording")`) rather than defining a compositor-specific error.
 - **`Result`** is not used as a return type (one local `@Sendable func finish(_ result: Result<Void, Error>)` helper in `VideoCompositor+ManualExport.swift`).
-- **Optional return** signals soft failure where a `nil` is recoverable: `finish() -> URL?`, `loadHistory() -> HistoryData?`, `ReframedProject.webcamVideoURL`.
+- **Optional return** signals soft failure where a `nil` is recoverable: `finish() -> URL?`, `loadHistory() -> HistoryData?`, `AppShowProject.webcamVideoURL`.
 - **`try?`** (96 sites) is the accepted form for best-effort file-system and persistence calls (`try? FileManager.default.removeItem`, `try? project.saveHistory(...)`).
 
 ```swift
-// Reframed/State/CaptureState.swift
+// AppShow/State/CaptureState.swift
 enum CaptureError: LocalizedError {
   case invalidTransition(from: String, to: String)
   case noSelectionStored
@@ -745,7 +745,7 @@ enum CaptureError: LocalizedError {
 Two surfaces. Recording/app-level failures go through `SessionState.showError`, a modal `NSAlert`, after logging and cleanup:
 
 ```swift
-// Reframed/State/SessionState+Recording.swift
+// AppShow/State/SessionState+Recording.swift
   func beginRecordingWithCountdown() {
     Task {
       do {
@@ -760,7 +760,7 @@ Two surfaces. Recording/app-level failures go through `SessionState.showError`, 
 ```
 
 ```swift
-// Reframed/State/SessionState+UI.swift
+// AppShow/State/SessionState+UI.swift
   func showError(_ message: String) {
     let alert = NSAlert()
     alert.messageText = "Recording Error"
@@ -771,7 +771,7 @@ Two surfaces. Recording/app-level failures go through `SessionState.showError`, 
 Editor/export failures stay inline: `ExportSheet` keeps `@State var errorMessage` and a `phase` enum and renders a `.failed` view:
 
 ```swift
-// Reframed/Compositor/ExportSheet+Phases.swift
+// AppShow/Compositor/ExportSheet+Phases.swift
   func startExport() {
     phase = .exporting
     exportTask = Task {
@@ -792,10 +792,10 @@ Editor/export failures stay inline: `ExportSheet` keeps `@State var errorMessage
 
 ## 7. Logging
 
-`swift-log` is bootstrapped once in `ReframedApp.init()` via `Logging/LogBootstrap.swift`: stdout in `DEBUG`, stdout plus `RotatingFileLogHandler` (`~/Library/Logs/Reframed/reframed.log`, 5 MB × 3 files) in release.
+`swift-log` is bootstrapped once in `AppShowApp.init()` via `Logging/LogBootstrap.swift`: stdout in `DEBUG`, stdout plus `RotatingFileLogHandler` (`~/Library/Logs/AppShow/appshow.log`, 5 MB × 3 files) in release.
 
 ```swift
-// Reframed/Logging/LogBootstrap.swift
+// AppShow/Logging/LogBootstrap.swift
 enum LogBootstrap {
   static func configure() {
     LoggingSystem.bootstrap { label in
@@ -811,13 +811,13 @@ enum LogBootstrap {
 
 Conventions observed across the 20 `Logger` instances:
 
-- **Naming:** `Logger(label: "eu.jankuri.reframed.<kebab-case-component>")`, one per type, held as `private let logger` (or `let logger` when extensions in other files need it, or `static let logger` on enum namespaces). `AudioTrackWriter` suffixes the track label: `"eu.jankuri.reframed.audio-track-writer.\(label)"`.
+- **Naming:** `Logger(label: "com.mattwebhub.appshow.<kebab-case-component>")`, one per type, held as `private let logger` (or `let logger` when extensions in other files need it, or `static let logger` on enum namespaces). `AudioTrackWriter` suffixes the track label: `"com.mattwebhub.appshow.audio-track-writer.\(label)"`.
 - **Levels:** only `info` (63), `error` (38), `warning` (10). No `debug`/`trace`; verbose per-frame data is rate-limited by hand (`ScreenCaptureSession.lastLogTime`).
 - **What is logged:** lifecycle transitions ("Recording paused", "Capture started"), device negotiation results, file paths on save/export, every caught error. Never per-frame or per-sample events.
 - **Metadata:** used sparingly for structured values:
 
 ```swift
-// Reframed/Recording/ScreenCaptureSession.swift
+// AppShow/Recording/ScreenCaptureSession.swift
     logger.info(
       "Capture started",
       metadata: [
@@ -830,9 +830,9 @@ Conventions observed across the 20 `Logger` instances:
 ```
 
 **Inconsistencies.**
-- Logger label prefix is `eu.jankuri.reframed`, while the bundle ID is `eu.jkuri.reframed` (`AGENTS.md`). Keep using the `eu.jankuri` prefix for consistency with existing log filters.
+- Logger label prefix is `com.mattwebhub.appshow`, while the bundle ID is `com.mattwebhub.appshow` (`AGENTS.md`). Keep using the `eu.jankuri` prefix for consistency with existing log filters.
 - `App/WindowController.swift:30` uses `print("Failed to fetch SCWindows: \(error)")` instead of a logger.
-- `VideoCompositor+ManualExport.swift:54` and `+ParallelExport.swift:413` create a local `let logger = Logger(label: "eu.jankuri.reframed.video-compositor")` inside a function although `VideoCompositor.logger` already exists as a static.
+- `VideoCompositor+ManualExport.swift:54` and `+ParallelExport.swift:413` create a local `let logger = Logger(label: "com.mattwebhub.appshow.video-compositor")` inside a function although `VideoCompositor.logger` already exists as a static.
 
 ---
 
@@ -843,7 +843,7 @@ Conventions observed across the 20 `Logger` instances:
 Export rendering is the `AVVideoCompositing` protocol. `CompositionInstruction` (`Compositor/CompositionInstruction.swift`) is an immutable, `let`-only `NSObject` subclass marked `@unchecked Sendable` with a ~70-parameter `init` in which everything after the track IDs has a default. It is the single bag of per-export parameters; nothing is looked up from `EditorState` at render time.
 
 ```swift
-// Reframed/Compositor/CompositionInstruction.swift
+// AppShow/Compositor/CompositionInstruction.swift
 final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProtocol, @unchecked Sendable {
   let timeRange: CMTimeRange
   let enablePostProcessing = false
@@ -859,7 +859,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
 The instruction is built in one place, `VideoCompositor+InstructionBuilder.buildCompositionInstruction`, which converts `ExportConfiguration` (canvas-space, percentages) into pixel-space values for the chosen render size:
 
 ```swift
-// Reframed/Compositor/VideoCompositor+InstructionBuilder.swift
+// AppShow/Compositor/VideoCompositor+InstructionBuilder.swift
     let scaleX = renderSize.width / canvasSize.width
     let scaleY = renderSize.height / canvasSize.height
     let paddingHPx = config.padding * screenNaturalSize.width * scaleX
@@ -869,7 +869,7 @@ The instruction is built in one place, `VideoCompositor+InstructionBuilder.build
 `FrameRenderer.startRequest` is thin: unwrap buffers, run person segmentation if needed, delegate to a **static** `renderFrame`, finish the request. All drawing functions are `static func` on `FrameRenderer` extensions so the parallel exporter can call them without an instance.
 
 ```swift
-// Reframed/Compositor/FrameRenderer.swift
+// AppShow/Compositor/FrameRenderer.swift
   func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
     guard let instruction = request.videoCompositionInstruction as? CompositionInstruction else {
       request.finish(with: NSError(domain: "FrameRenderer", code: -1))
@@ -888,7 +888,7 @@ Per-frame derived geometry is computed once into a value type (`FrameState` in `
 The SDR pipeline is pure CoreGraphics on a locked pixel buffer: 16-bit half-float RGBA (`kCVPixelFormatType_64RGBAHalf`), sRGB colour space, lock/unlock paired with `defer`, y-flip via `translateBy`/`scaleBy`, every stage bracketed by `saveGState`/`restoreGState`.
 
 ```swift
-// Reframed/Compositor/FrameRenderer.swift
+// AppShow/Compositor/FrameRenderer.swift
     CVPixelBufferLockBaseAddress(screenBuffer, .readOnly)
     CVPixelBufferLockBaseAddress(outputBuffer, [])
     if let wb = webcamBuffer {
@@ -900,7 +900,7 @@ The SDR pipeline is pure CoreGraphics on a locked pixel buffer: 16-bit half-floa
 ```
 
 ```swift
-// Reframed/Compositor/FrameRenderer+Cursor.swift
+// AppShow/Compositor/FrameRenderer+Cursor.swift
     context.saveGState()
     context.translateBy(x: 0, y: CGFloat(outputHeight))
     context.scaleBy(x: 1, y: -1)
@@ -918,7 +918,7 @@ Coordinates flowing from metadata are normalised 0–1 and converted to pixels a
 Shared, non-thread-safe processors are pooled with `NSCondition` rather than made actors, because the render callback is synchronous:
 
 ```swift
-// Reframed/Compositor/PersonSegmentationProcessor.swift
+// AppShow/Compositor/PersonSegmentationProcessor.swift
 final class SegmentationProcessorPool: @unchecked Sendable {
   private let condition = NSCondition()
   private var available: [PersonSegmentationProcessor] = []
@@ -934,7 +934,7 @@ final class SegmentationProcessorPool: @unchecked Sendable {
 The editor preview is an `NSViewRepresentable` (`Editor/VideoPreviewView.swift`) whose value-typed properties are a hand-maintained mirror of `CompositionInstruction`, applied to an `NSView` with `CALayer`s (`VideoPreviewContainer`, `CursorOverlayLayer`, `SpotlightOverlayLayer`). Region tuples are inlined as labelled tuples rather than reusing `RegionTransitionInfo`:
 
 ```swift
-// Reframed/Editor/VideoPreviewView.swift
+// AppShow/Editor/VideoPreviewView.swift
   var cameraFullscreenRegions:
     [(
       start: Double, end: Double,
@@ -954,7 +954,7 @@ Any visual property therefore has **two** render implementations to keep in sync
 Defined in `UI/PrimaryButton.swift`: `PrimaryButtonStyle` (filled), `SecondaryButtonStyle` (muted fill), `OutlineButtonStyle` (border), and `PlainCustomButtonStyle` (label only — the style for icon/tab/row buttons). All take `ButtonSize` (`.small`/`.medium`/`.large`) and optional `fullWidth`. Usage counts: `PlainCustomButtonStyle` 33, `OutlineButtonStyle` 20, `PrimaryButtonStyle` 8, `SecondaryButtonStyle` 3.
 
 ```swift
-// Reframed/UI/PrimaryButton.swift
+// AppShow/UI/PrimaryButton.swift
 struct OutlineButtonStyle: ButtonStyle {
   var size: ButtonSize = .small
   var fullWidth: Bool = false
@@ -965,11 +965,11 @@ struct OutlineButtonStyle: ButtonStyle {
     let _ = colorScheme
     configuration.label
       .font(.system(size: size.fontSize, weight: size.fontWeight))
-      .foregroundStyle(ReframedColors.primaryText)
+      .foregroundStyle(AppShowColors.primaryText)
 ```
 
 ```swift
-// Reframed/Editor/VideoRegionEditPopover.swift
+// AppShow/Editor/VideoRegionEditPopover.swift
         .buttonStyle(OutlineButtonStyle(size: .medium, fullWidth: true))
 ```
 
@@ -977,10 +977,10 @@ struct OutlineButtonStyle: ButtonStyle {
 
 ### 9.2 Design tokens and colours
 
-No literal font sizes, radii, or colours in views. Tokens are `enum` namespaces in `UI/Constants.swift` (`FontSize`, `Radius`, `Layout`, `Track`) and semantic colours in `UI/Colors.swift` (`ReframedColors.primaryText`, `.secondaryText`, `.tertiaryText`, `.border`, `.muted`, `.background`, `.backgroundCard`, `.backgroundPopover`, `.fieldBackground`, `.divider`, `.accent`, plus `NSColor` variants suffixed `NS`). Preset palettes are `TailwindColors.all: [ColorPreset]`.
+No literal font sizes, radii, or colours in views. Tokens are `enum` namespaces in `UI/Constants.swift` (`FontSize`, `Radius`, `Layout`, `Track`) and semantic colours in `UI/Colors.swift` (`AppShowColors.primaryText`, `.secondaryText`, `.tertiaryText`, `.border`, `.muted`, `.background`, `.backgroundCard`, `.backgroundPopover`, `.fieldBackground`, `.divider`, `.accent`, plus `NSColor` variants suffixed `NS`). Preset palettes are `TailwindColors.all: [ColorPreset]`.
 
 ```swift
-// Reframed/UI/Constants.swift
+// AppShow/UI/Constants.swift
 enum Layout {
   static let sectionSpacing: CGFloat = 32
   static let itemSpacing: CGFloat = 16
@@ -999,7 +999,7 @@ Check these before writing a new control: `SectionHeader` (icon+title or bare ti
 Component API shape: `let` inputs first, `@Binding` for the edited value, optional customisation as `var x: T? = nil` with defaults, trailing `action` closure last.
 
 ```swift
-// Reframed/UI/SliderRow.swift
+// AppShow/UI/SliderRow.swift
 struct SliderRow<V: BinaryFloatingPoint>: View where V.Stride: BinaryFloatingPoint {
   var label: String? = nil
   var labelWidth: CGFloat? = nil
@@ -1011,10 +1011,10 @@ struct SliderRow<V: BinaryFloatingPoint>: View where V.Stride: BinaryFloatingPoi
 
 ### 9.4 Popovers and sheets
 
-Popover content: `VStack(alignment: .leading, spacing: 0)`, a `SectionHeader(title:)` first, `CheckmarkRow`s or controls, `Divider().background(ReframedColors.divider).padding(.vertical, 4)` between groups, fixed `.frame(width: Layout.regionPopoverWidth)` for editor popovers, and `.popoverContainerStyle()` last. Presented with `.popover(isPresented:arrowEdge:)` plus `.presentationBackground(ReframedColors.backgroundPopover)` when the container style is not applied.
+Popover content: `VStack(alignment: .leading, spacing: 0)`, a `SectionHeader(title:)` first, `CheckmarkRow`s or controls, `Divider().background(AppShowColors.divider).padding(.vertical, 4)` between groups, fixed `.frame(width: Layout.regionPopoverWidth)` for editor popovers, and `.popoverContainerStyle()` last. Presented with `.popover(isPresented:arrowEdge:)` plus `.presentationBackground(AppShowColors.backgroundPopover)` when the container style is not applied.
 
 ```swift
-// Reframed/UI/OptionsPopover.swift
+// AppShow/UI/OptionsPopover.swift
     VStack(alignment: .leading, spacing: 0) {
       SectionHeader(title: "Timer")
       ForEach(TimerDelay.allCases, id: \.self) { delay in
@@ -1026,7 +1026,7 @@ Popover content: `VStack(alignment: .leading, spacing: 0)`, a `SectionHeader(tit
         }
       }
       Divider()
-        .background(ReframedColors.divider)
+        .background(AppShowColors.divider)
         .padding(.vertical, 4)
 ```
 
@@ -1037,7 +1037,7 @@ Multi-step sheets model their steps as a `phase` enum and switch in `body` (`Exp
 `Editor/EditorTab.swift` is a `String`-backed `CaseIterable, Identifiable` enum with `label` and `icon`. `PropertiesPanel.body` switches on `selectedTab` and lists `xSection` properties; each tab's sections live in `PropertiesPanel+<Tab>Tab.swift`. Sidebar buttons (`EditorView+Sidebar.swift`) compute `disabled` per tab from `EditorState` capabilities.
 
 ```swift
-// Reframed/Editor/PropertiesPanel.swift
+// AppShow/Editor/PropertiesPanel.swift
         switch selectedTab {
         case .general:
           projectSection
@@ -1059,7 +1059,7 @@ Section layout is always `VStack(alignment: .leading, spacing: Layout.itemSpacin
 - Editor shortcuts are matched in `EditorWindow.setupKeyboardMonitor()`; unbindable transport keys are hard-coded by `keyCode` (49 space, 36 return, 53 escape).
 
 ```swift
-// Reframed/Editor/EditorWindow.swift
+// AppShow/Editor/EditorWindow.swift
       let undoShortcut = ConfigService.shared.shortcut(for: .editorUndo)
       let redoShortcut = ConfigService.shared.shortcut(for: .editorRedo)
       if redoShortcut.matches(event) {
@@ -1081,7 +1081,7 @@ Text fields are protected by an early `firstResponder is NSTextView` check in bo
 - Enum namespaces for stateless function groups: `VideoCompositor`, `Permissions`, `LogBootstrap`, `EncodingSettings`, `GradientPresets`, `TailwindColors`, `Layout`, `FontSize`, `Radius`, `ZoomDetector`, `SubtitleExporter`, `CursorEffects`.
 
 ```swift
-// Reframed/App/Permissions.swift
+// AppShow/App/Permissions.swift
 enum Permissions {
   static var hasScreenRecordingPermission: Bool {
     CGPreflightScreenCaptureAccess()
@@ -1097,7 +1097,7 @@ enum Permissions {
 Every user-visible enum is `CaseIterable, Identifiable` with `var id: Self { self }` (or `rawValue` for `String`-backed), a `label`, and often `icon`/`description`. Single-expression `switch` bodies omit `return`:
 
 ```swift
-// Reframed/Compositor/ExportSettings.swift
+// AppShow/Compositor/ExportSettings.swift
 enum ExportResolution: Sendable, CaseIterable, Identifiable {
   case original
   case uhd4k
@@ -1127,11 +1127,11 @@ enum ExportResolution: Sendable, CaseIterable, Identifiable {
 
 ### 10.4 Access control
 
-`private` is the only modifier in real use (751 occurrences, 2 `fileprivate`, no `internal`/`public`/`open` as access modifiers; the word `open` only appears as a method name such as `ReframedProject.open(at:)`). `private(set)` guards read-only state (`History.entries`, `DeviceDiscovery.availableDevices`). Model classes intentionally leave properties internal so `+Concern` extensions can reach them.
+`private` is the only modifier in real use (751 occurrences, 2 `fileprivate`, no `internal`/`public`/`open` as access modifiers; the word `open` only appears as a method name such as `AppShowProject.open(at:)`). `private(set)` guards read-only state (`History.entries`, `DeviceDiscovery.availableDevices`). Model classes intentionally leave properties internal so `+Concern` extensions can reach them.
 
 ### 10.5 Formatting (from `.swift-format`)
 
-2-space indent, 140-column lines, trailing commas in multi-line collections, one argument per line when wrapped (`lineBreakBeforeEachArgument`), max one blank line, no semicolons except in the `set { data.x = newValue; save() }` one-liners, `UseEarlyExits` off (but `guard` is still used pervasively). Run `make format` (`swift format -i -r Reframed/`) before every commit.
+2-space indent, 140-column lines, trailing commas in multi-line collections, one argument per line when wrapped (`lineBreakBeforeEachArgument`), max one blank line, no semicolons except in the `set { data.x = newValue; save() }` one-liners, `UseEarlyExits` off (but `guard` is still used pervasively). Run `make format` (`swift format -i -r AppShow/`) before every commit.
 
 ### 10.6 The no-comments rule
 
@@ -1146,14 +1146,14 @@ enum ExportResolution: Sendable, CaseIterable, Identifiable {
 | Do not | Do instead | Where the good pattern lives |
 |---|---|---|
 | `.buttonStyle(.plain)`, `.borderless`, `.bordered`, `.link` | `PlainCustomButtonStyle()`, `OutlineButtonStyle(...)`, `PrimaryButtonStyle(...)`, `SecondaryButtonStyle(...)` | `UI/PrimaryButton.swift` |
-| Literal `Color(...)`, `.font(.system(size: 13))`, `cornerRadius: 7` | `ReframedColors.*`, `FontSize.*`, `Radius.*`, `Layout.*` | `UI/Colors.swift`, `UI/Constants.swift` |
+| Literal `Color(...)`, `.font(.system(size: 13))`, `cornerRadius: 7` | `AppShowColors.*`, `FontSize.*`, `Radius.*`, `Layout.*` | `UI/Colors.swift`, `UI/Constants.swift` |
 | A new time/size formatter inside a view | `formatDuration`, `formatPreciseDuration`, `formatCompactTime`, `formatRelativeTime` | `Utilities/TimeFormatting.swift` |
 | A second `Codable` colour/size wrapper | `CodableColor`, `CodableSize` | `Utilities/CodableColor.swift`, `Project/ProjectMetadata.swift` |
 | Inline `// explains why` comments | Rename the function/variable until it explains itself | rule in `AGENTS.md` |
 | Band-aids (`DispatchQueue.main.asyncAfter` to "wait for" state, catching and ignoring the real error) | Fix the state machine or propagate the `CaptureError` | `SessionState.transition(to:)`, `CaptureError` |
 | `ObservableObject` / `@Published` / `@StateObject` | `@Observable` + `@Bindable` | every model except `WindowController` |
 | Growing a view file past ~200 lines | Split into `View+Section.swift` extensions | `PropertiesPanel+*.swift`, `TimelineView+*.swift` |
-| `print(...)` | `logger.info/warning/error` with the `eu.jankuri.reframed.*` label | `Logging/LogBootstrap.swift` |
+| `print(...)` | `logger.info/warning/error` with the `com.mattwebhub.appshow.*` label | `Logging/LogBootstrap.swift` |
 | `MainActor.run` from AppKit delegate callbacks | `MainActor.assumeIsolated { }` | `SessionState+Project.swift`, `AppDelegate.swift` |
 | Unrelated new settings singletons | Add to `ConfigService` (persistent) or `StateService` (layout/session) | `State/ConfigService.swift` |
 
@@ -1163,7 +1163,7 @@ Two idioms in the tree look like workarounds but are the accepted pattern and sh
 
 ## 12. Stale documentation to be aware of
 
-- `AGENTS.md` names the config file `config.json`; it is `~/.reframed/reframed.json` (`State/ConfigService.swift:112`).
+- `AGENTS.md` names the config file `config.json`; it is `~/.appshow/config.json` (`State/ConfigService.swift:112`).
 - `AGENTS.md` says `@unchecked Sendable` is used only by `ScreenCaptureSession`; there are 31 uses (Section 6.1).
 - `AGENTS.md` calls `VideoTrackWriter` / `AudioTrackWriter` "actors"; both are `final class … @unchecked Sendable` guarded by a serial `DispatchQueue` (`Recording/VideoTrackWriter.swift:6`, `Recording/AudioTrackWriter.swift:5`). The only `actor` in the tree is `RecordingCoordinator`.
 - `docs/export.md` describes `VideoCompositor.export()` as taking "40+ parameters"; it now takes `RecordingResult`, `ExportConfiguration`, and a progress closure (`Compositor/VideoCompositor.swift:14-18`).
