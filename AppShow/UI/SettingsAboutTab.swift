@@ -40,10 +40,14 @@ extension SettingsView {
   }
 
   private var updateSection: some View {
-    Button("Check for Updates") {
-      SparkleUpdater.shared.checkForUpdates()
+    Group {
+      if SparkleUpdater.shared.isAvailable {
+        Button("Check for Updates") {
+          SparkleUpdater.shared.checkForUpdates()
+        }
+        .buttonStyle(OutlineButtonStyle(size: .small))
+      }
     }
-    .buttonStyle(OutlineButtonStyle(size: .small))
   }
 
   private var changelogSection: some View {

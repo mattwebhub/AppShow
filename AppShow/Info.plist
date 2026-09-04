@@ -18,8 +18,6 @@
 	<false/>
 	<key>SUFeedURL</key>
 	<string>https://github.com/mattwebhub/AppShow/releases/download/appcast/appcast.xml</string>
-	<key>SUPublicEDKey</key>
-	<string>fbTkPksA1K4eUhGRCvIscQ7QGdUy3tstkNtWy/NstdY=</string>
 	<key>SUEnableAutomaticChecks</key>
 	<false/>
 	<key>NSScreenCaptureUsageDescription</key>

@@ -109,5 +109,11 @@ struct AppShowPathsTests {
     #expect(exported.contains { $0["UTTypeIdentifier"] as? String == AppShowIdentity.projectTypeIdentifier })
     let imported = try #require(Bundle.main.object(forInfoDictionaryKey: "UTImportedTypeDeclarations") as? [[String: Any]])
     #expect(imported.contains { $0["UTTypeIdentifier"] as? String == AppShowIdentity.legacyProjectTypeIdentifier })
+    #expect(Bundle.main.object(forInfoDictionaryKey: "SUEnableAutomaticChecks") as? Bool == false)
+    #expect(Bundle.main.object(forInfoDictionaryKey: "SUPublicEDKey") == nil)
+    #expect(
+      Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") as? String
+        == "https://github.com/mattwebhub/AppShow/releases/download/appcast/appcast.xml"
+    )
   }
 }
