@@ -52,6 +52,10 @@
 		7E5700000000000000000037 /* EditorState+ExternalAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000036 /* EditorState+ExternalAudio.swift */; };
 		7E5700000000000000000039 /* AudioWaveformDownsampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000038 /* AudioWaveformDownsampler.swift */; };
 		7E570000000000000000003B /* ExternalAudioWaveformStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000003A /* ExternalAudioWaveformStore.swift */; };
+		7E570000000000000000004B /* FileDropModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000004A /* FileDropModifier.swift */; };
+		7E5700000000000000000049 /* ExternalAudioRegionEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000048 /* ExternalAudioRegionEditPopover.swift */; };
+		7E5700000000000000000047 /* TimelineView+ExternalAudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000046 /* TimelineView+ExternalAudioTrack.swift */; };
+		7E5700000000000000000045 /* ExternalAudioWaveformWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000044 /* ExternalAudioWaveformWindow.swift */; };
 		7E5700000000000000000043 /* PropertiesPanel+MusicSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000042 /* PropertiesPanel+MusicSection.swift */; };
 		7E5700000000000000000041 /* ExternalAudioSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000040 /* ExternalAudioSchedule.swift */; };
 		828909551C8795EF72269706 /* PropertiesPanel+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C03E11186EDDA74B1B6958 /* PropertiesPanel+Background.swift */; };
@@ -321,6 +325,10 @@
 		7E5700000000000000000036 /* EditorState+ExternalAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+ExternalAudio.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000038 /* AudioWaveformDownsampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveformDownsampler.swift; sourceTree = "<group>"; };
 		7E570000000000000000003A /* ExternalAudioWaveformStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioWaveformStore.swift; sourceTree = "<group>"; };
+		7E570000000000000000004A /* FileDropModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDropModifier.swift; sourceTree = "<group>"; };
+		7E5700000000000000000048 /* ExternalAudioRegionEditPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioRegionEditPopover.swift; sourceTree = "<group>"; };
+		7E5700000000000000000046 /* TimelineView+ExternalAudioTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+ExternalAudioTrack.swift"; sourceTree = "<group>"; };
+		7E5700000000000000000044 /* ExternalAudioWaveformWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioWaveformWindow.swift; sourceTree = "<group>"; };
 		7E5700000000000000000042 /* PropertiesPanel+MusicSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+MusicSection.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000040 /* ExternalAudioSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioSchedule.swift; sourceTree = "<group>"; };
 		815C681612F3844727C988EF /* CaptureToolbar+ModeSelection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CaptureToolbar+ModeSelection.swift"; sourceTree = "<group>"; };
@@ -773,6 +781,7 @@
 				F1874AA3B515AEFC58016EC5 /* MenuBarView+Projects.swift */,
 				815C681612F3844727C988EF /* CaptureToolbar+ModeSelection.swift */,
 				6B4535D89EAC6F65D82BC248 /* CaptureToolbar+Controls.swift */,
+				7E570000000000000000004A /* FileDropModifier.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -924,6 +933,9 @@
 				7E570000000000000000003A /* ExternalAudioWaveformStore.swift */,
 				7E5700000000000000000040 /* ExternalAudioSchedule.swift */,
 				7E5700000000000000000042 /* PropertiesPanel+MusicSection.swift */,
+				7E5700000000000000000044 /* ExternalAudioWaveformWindow.swift */,
+				7E5700000000000000000046 /* TimelineView+ExternalAudioTrack.swift */,
+				7E5700000000000000000048 /* ExternalAudioRegionEditPopover.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -1269,6 +1281,10 @@
 				7E5700000000000000000037 /* EditorState+ExternalAudio.swift in Sources */,
 				7E5700000000000000000039 /* AudioWaveformDownsampler.swift in Sources */,
 				7E570000000000000000003B /* ExternalAudioWaveformStore.swift in Sources */,
+				7E570000000000000000004B /* FileDropModifier.swift in Sources */,
+				7E5700000000000000000049 /* ExternalAudioRegionEditPopover.swift in Sources */,
+				7E5700000000000000000047 /* TimelineView+ExternalAudioTrack.swift in Sources */,
+				7E5700000000000000000045 /* ExternalAudioWaveformWindow.swift in Sources */,
 				7E5700000000000000000043 /* PropertiesPanel+MusicSection.swift in Sources */,
 				7E5700000000000000000041 /* ExternalAudioSchedule.swift in Sources */,
 				77030A22115111C9D1325490 /* EditorState+CameraLayout.swift in Sources */,
