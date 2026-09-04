@@ -113,21 +113,18 @@ extension AgentMessageData {
   }
 }
 
-struct AgentThreadData: Codable, Sendable, Equatable, Identifiable {
-  var id: UUID = UUID()
-  var title: String
+struct AgentConversationData: Codable, Sendable, Equatable {
   var provider: AgentProviderKind = .claudeCode
-  var sessionID: String? = nil
+  var resumeIDs: [AgentProviderKind: String] = [:]
   var createdAt: Date = AgentTimestamp.now()
   var lastActivityAt: Date = AgentTimestamp.now()
   var messages: [AgentMessageData] = []
 }
 
-extension AgentThreadData {
+extension AgentConversationData {
   private enum CodingKeys: String, CodingKey {
-    case id
-    case title
     case provider
+    case resumeIDs
     case sessionID
     case createdAt
     case lastActivityAt
@@ -136,12 +133,26 @@ extension AgentThreadData {
 
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    id = try container.decodeOrDefault(.id, UUID())
-    title = try container.decodeOrDefault(.title, "Untitled")
     provider = try container.decodeOrDefault(.provider, .claudeCode)
-    sessionID = try container.decodeIfPresent(String.self, forKey: .sessionID)
+    resumeIDs = try container.decodeOrDefault(.resumeIDs, [:])
+    if resumeIDs.isEmpty, let legacySessionID = try container.decodeIfPresent(String.self, forKey: .sessionID) {
+      resumeIDs[provider] = legacySessionID
+    }
     createdAt = try container.decodeOrDefault(.createdAt, AgentTimestamp.now())
     lastActivityAt = try container.decodeOrDefault(.lastActivityAt, createdAt)
     messages = try container.decodeOrDefault(.messages, [])
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(provider, forKey: .provider)
+    try container.encode(resumeIDs, forKey: .resumeIDs)
+    try container.encode(createdAt, forKey: .createdAt)
+    try container.encode(lastActivityAt, forKey: .lastActivityAt)
+    try container.encode(messages, forKey: .messages)
+  }
+
+  func resumeID(for provider: AgentProviderKind) -> String? {
+    resumeIDs[provider]
   }
 }

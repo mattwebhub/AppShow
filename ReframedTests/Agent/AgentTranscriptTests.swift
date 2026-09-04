@@ -7,47 +7,41 @@ import Testing
 @Suite(.serialized)
 struct AgentTranscriptTests {
   private func makeTranscript() -> AgentTranscript {
-    let transcript = AgentTranscript(store: nil)
-    transcript.createThread(title: "Test", provider: .claudeCode)
-    return transcript
+    AgentTranscript(store: nil)
   }
 
   private func streamingAssistant(_ transcript: AgentTranscript) -> AgentMessageData? {
     transcript.messages.last { $0.role == .assistant }
   }
 
-  @Test func newTranscriptWithoutStoreStartsEmpty() {
+  @Test func newTranscriptWithoutStoreStartsWithOneEmptyConversation() {
     let transcript = AgentTranscript(store: nil)
-    #expect(transcript.threads.isEmpty)
-    #expect(transcript.activeThreadID == nil)
     #expect(transcript.messages.isEmpty)
+    #expect(transcript.provider == .claudeCode)
+    #expect(transcript.resumeIDs.isEmpty)
     #expect(!transcript.isRunning)
     #expect(!transcript.isCancelled)
   }
 
-  @Test func createThreadBecomesActiveAndIsNewestFirst() {
+  @Test func providerChangesWithinTheSameConversation() {
     let transcript = AgentTranscript(store: nil)
-    let first = transcript.createThread(title: "One", provider: .claudeCode)
-    let second = transcript.createThread(title: "Two", provider: .codex)
-    #expect(transcript.threads.map(\.id) == [second.id, first.id])
-    #expect(transcript.activeThreadID == second.id)
-    #expect(transcript.activeThread?.provider == .codex)
-    transcript.selectThread(id: first.id)
-    #expect(transcript.activeThreadID == first.id)
+    transcript.appendUserMessage("Keep this")
+    transcript.setProvider(.codex)
+    #expect(transcript.provider == .codex)
+    #expect(transcript.messages.map(\.text) == ["Keep this"])
   }
 
-  @Test func renameAndDeleteUpdateThreadsAndActiveSelection() {
+  @Test func clearResetsTheOnlyConversationAndKeepsProvider() {
     let transcript = AgentTranscript(store: nil)
-    let first = transcript.createThread(title: "One", provider: .claudeCode)
-    let second = transcript.createThread(title: "Two", provider: .claudeCode)
-    transcript.renameThread(id: first.id, to: "Uno")
-    #expect(transcript.threads.first { $0.id == first.id }?.title == "Uno")
-    transcript.deleteThread(id: second.id)
-    #expect(transcript.threads.map(\.id) == [first.id])
-    #expect(transcript.activeThreadID == first.id)
-    transcript.deleteThread(id: first.id)
-    #expect(transcript.threads.isEmpty)
-    #expect(transcript.activeThreadID == nil)
+    transcript.setProvider(.codex)
+    transcript.appendUserMessage("Remove this")
+    transcript.beginAssistantMessage()
+    transcript.apply(.sessionStarted(id: "session"))
+    transcript.finishTurn(error: nil)
+    #expect(transcript.clear())
+    #expect(transcript.provider == .codex)
+    #expect(transcript.messages.isEmpty)
+    #expect(transcript.resumeIDs.isEmpty)
   }
 
   @Test func userMessageIsAppendedAsCompleted() {
@@ -171,12 +165,12 @@ struct AgentTranscriptTests {
     #expect(transcript.lastError == AgentError.processFailed(status: 1, stderrTail: "boom").errorDescription)
   }
 
-  @Test func sessionStartedStoresTheSessionIdOnTheActiveThread() {
+  @Test func sessionStartedStoresTheProviderResumeIdOnTheConversation() {
     let transcript = makeTranscript()
     transcript.beginAssistantMessage()
     transcript.apply(.sessionStarted(id: "sess-1"))
-    #expect(transcript.activeThread?.sessionID == "sess-1")
-    #expect(transcript.activeThread?.provider == .claudeCode)
+    #expect(transcript.resumeIDs[.claudeCode] == "sess-1")
+    #expect(transcript.provider == .claudeCode)
   }
 
   @Test func unknownEventsAreIgnored() {
@@ -218,12 +212,11 @@ struct AgentTranscriptTests {
     #expect(row.status == .completed)
     #expect(row.output == "1\treframed fixture note\n2\t")
     #expect(assistant.content[1] == .text("reframed fixture note"))
-    #expect(transcript.activeThread?.sessionID == "0e5ac684-a18e-4f1f-a028-e63b1d1b8e3b")
+    #expect(transcript.resumeIDs[.claudeCode] == "0e5ac684-a18e-4f1f-a028-e63b1d1b8e3b")
   }
 
   @Test func replayingTheRecordedCodexFixtureProducesTheExpectedTranscript() throws {
-    let transcript = AgentTranscript(store: nil)
-    transcript.createThread(title: "Codex", provider: .codex)
+    let transcript = AgentTranscript(store: nil, defaultProvider: .codex)
     transcript.beginAssistantMessage()
     for event in try AgentFixtures.events("codex-0.149.1-turn", provider: CodexProvider()) {
       transcript.apply(event)
@@ -242,7 +235,7 @@ struct AgentTranscriptTests {
     #expect(row.output == "reframed fixture note\n")
     #expect(row.status == .completed)
     #expect(assistant.content.last == .text("reframed fixture note"))
-    #expect(transcript.activeThread?.sessionID == "01a06bb4-ffda-70f1-be3c-332c4b2c7a74")
+    #expect(transcript.resumeIDs[.codex] == "01a06bb4-ffda-70f1-be3c-332c4b2c7a74")
   }
 
   @Test func codexItemIdsReusedAcrossTurnsDoNotCollide() {
@@ -269,10 +262,9 @@ struct AgentTranscriptTests {
     try FileManager.default.createDirectory(at: sources, withIntermediateDirectories: true)
     let result = try await ProjectFixtures.recordingResult(in: sources, webcam: false, systemAudio: false, microphone: false, cursor: false)
     let project = try ReframedProject.create(from: result, fps: result.fps, captureMode: .entireScreen, in: dir, cleanupTemp: false)
-    let store = AgentThreadStore(project: project)
-    let transcript = AgentTranscript(store: store)
-    #expect(transcript.threads.isEmpty)
-    let thread = transcript.createThread(title: "Persisted", provider: .codex)
+    let store = AgentConversationStore(project: project)
+    let transcript = AgentTranscript(store: store, defaultProvider: .codex)
+    #expect(transcript.messages.isEmpty)
     transcript.appendUserMessage("hello")
     transcript.beginAssistantMessage()
     transcript.apply(.sessionStarted(id: "019f"))
@@ -281,23 +273,19 @@ struct AgentTranscriptTests {
     transcript.apply(.toolCallFinished(id: "item_1", output: "a", isError: false))
     transcript.apply(.turnCompleted(AgentTurnResult()))
     transcript.finishTurn(error: nil)
-    let file = project.bundleURL.appendingPathComponent("agent/threads/\(thread.id.uuidString).json")
+    let file = project.bundleURL.appendingPathComponent("agent/conversation.json")
     #expect(FileManager.default.fileExists(atPath: file.path))
     let reloaded = AgentTranscript(store: store)
-    #expect(reloaded.threads.count == 1)
-    #expect(reloaded.activeThreadID == thread.id)
-    #expect(reloaded.activeThread?.title == "Persisted")
-    #expect(reloaded.activeThread?.provider == .codex)
-    #expect(reloaded.activeThread?.sessionID == "019f")
+    #expect(reloaded.provider == .codex)
+    #expect(reloaded.resumeIDs[.codex] == "019f")
     #expect(reloaded.messages == transcript.messages)
   }
 
   @Test func sendDrivesASessionAndPersistsTheResult() async throws {
     let dir = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(dir) }
-    let store = AgentThreadStore(directory: dir.appendingPathComponent("threads", isDirectory: true))
+    let store = AgentConversationStore(directory: dir.appendingPathComponent("agent", isDirectory: true))
     let transcript = AgentTranscript(store: store)
-    transcript.createThread(title: "Live", provider: .claudeCode)
     let fixture = try AgentFixtures.url("claude-2.1.260-turn")
     let session = AgentSession(
       provider: ScriptedProvider { _ in [fixture.path] },
@@ -314,9 +302,8 @@ struct AgentTranscriptTests {
     #expect(transcript.messages.first?.text == "Read the note")
     #expect(transcript.messages.last?.status == .completed)
     #expect(transcript.messages.last?.text == "reframed fixture note")
-    #expect(transcript.activeThread?.sessionID == "0e5ac684-a18e-4f1f-a028-e63b1d1b8e3b")
-    let reloaded = try store.list()
-    #expect(reloaded.first?.messages == transcript.messages)
+    #expect(transcript.resumeIDs[.claudeCode] == "0e5ac684-a18e-4f1f-a028-e63b1d1b8e3b")
+    #expect(try store.load()?.messages == transcript.messages)
   }
 
   @Test func cancelDuringSendMarksTheTurnCancelled() async throws {
@@ -341,7 +328,7 @@ struct AgentTranscriptTests {
     #expect(!transcript.isRunning)
     #expect(transcript.messages.last?.status == .cancelled)
     #expect(transcript.messages.last?.text == "working")
-    #expect(transcript.activeThread?.sessionID == "hang-session")
+    #expect(transcript.resumeIDs[.claudeCode] == "hang-session")
   }
 
   @Test func sendWhileRunningIsRefused() async throws {
