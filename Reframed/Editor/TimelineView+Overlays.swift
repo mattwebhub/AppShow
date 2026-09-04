@@ -56,16 +56,22 @@ extension TimelineView {
 
   func playheadOverlay(contentWidth: CGFloat, inset: CGFloat) -> some View {
     let frameWidth = contentWidth + inset * 2
-    let playheadFraction = CMTimeGetSeconds(editorState.currentTime) / totalSeconds
+    let playheadX = xPosition(forSource: CMTimeGetSeconds(editorState.currentTime), width: contentWidth)
 
     return SwiftUI.TimelineView(.animation(paused: !editorState.isPlaying)) { _ in
-      let fraction: Double =
+      let x: CGFloat =
         if editorState.isPlaying {
-          max(0, min(1, CMTimeGetSeconds(editorState.playerController.screenPlayer.currentTime()) / totalSeconds))
+          max(
+            0,
+            min(
+              contentWidth,
+              xPosition(forSource: CMTimeGetSeconds(editorState.playerController.screenPlayer.currentTime()), width: contentWidth)
+            )
+          )
         } else {
-          playheadFraction
+          playheadX
         }
-      let centerX = inset + contentWidth * fraction
+      let centerX = inset + x
       let lineHeight = timelineHeight - rulerHeight
 
       ZStack {
@@ -82,8 +88,7 @@ extension TimelineView {
           .gesture(
             DragGesture(minimumDistance: 0)
               .onChanged { value in
-                let fraction = max(0, min(1, (value.location.x - inset) / contentWidth))
-                let time = CMTime(seconds: fraction * totalSeconds, preferredTimescale: 600)
+                let time = CMTime(seconds: sourceTime(forX: value.location.x - inset, width: contentWidth), preferredTimescale: 600)
                 onScrub(time)
               }
           )

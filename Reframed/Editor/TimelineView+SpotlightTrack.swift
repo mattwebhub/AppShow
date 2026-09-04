@@ -30,11 +30,12 @@ extension TimelineView {
     .coordinateSpace(name: "spotlightRegion")
     .contentShape(Rectangle())
     .onTapGesture(count: 2) { location in
-      let time = (location.x / width) * totalSeconds
+      guard isTrackEditable else { return }
+      let time = sourceTime(forX: location.x, width: width)
       let hitRegion = regions.first { r in
         let eff = effectiveSpotlightRegion(r, width: width)
-        let startX = (eff.start / totalSeconds) * width
-        let endX = (eff.end / totalSeconds) * width
+        let startX = xPosition(forSource: eff.start, width: width)
+        let endX = xPosition(forSource: eff.end, width: width)
         return location.x >= startX && location.x <= endX
       }
       if hitRegion == nil {
@@ -50,8 +51,8 @@ extension TimelineView {
     height: CGFloat
   ) -> some View {
     let effective = effectiveSpotlightRegion(region, width: width)
-    let startX = max(0, CGFloat(effective.start / totalSeconds) * width)
-    let endX = min(width, CGFloat(effective.end / totalSeconds) * width)
+    let startX = max(0, xPosition(forSource: effective.start, width: width))
+    let endX = min(width, xPosition(forSource: effective.end, width: width))
     let regionWidth = max(4, endX - startX)
     let edgeThreshold = min(8.0, regionWidth * 0.2)
     let isPopoverShown = popoverSpotlightRegionId == region.id
@@ -79,13 +80,23 @@ extension TimelineView {
 
       RoundedRectangle(cornerRadius: Track.borderRadius)
         .strokeBorder(Track.borderColor, lineWidth: Track.borderWidth)
+
+      RegionCutMarkers(
+        geometry: geometry(width: width),
+        start: effective.start,
+        end: effective.end,
+        originX: startX,
+        height: height
+      )
     }
     .frame(width: regionWidth, height: height)
     .clipShape(RoundedRectangle(cornerRadius: Track.borderRadius))
     .contentShape(Rectangle())
     .overlay {
-      RightClickOverlay {
-        popoverSpotlightRegionId = region.id
+      if isTrackEditable {
+        RightClickOverlay {
+          popoverSpotlightRegionId = region.id
+        }
       }
     }
     .popover(
@@ -119,9 +130,10 @@ extension TimelineView {
     .gesture(
       DragGesture(minimumDistance: 3, coordinateSpace: .named("spotlightRegion"))
         .onChanged { value in
+          guard isTrackEditable else { return }
           if spotlightDragType == nil {
-            let origStartX = CGFloat(region.startSeconds / totalSeconds) * width
-            let origEndX = CGFloat(region.endSeconds / totalSeconds) * width
+            let origStartX = xPosition(forSource: region.startSeconds, width: width)
+            let origEndX = xPosition(forSource: region.endSeconds, width: width)
             let origWidth = origEndX - origStartX
             let relX = value.startLocation.x - origStartX
             let effectiveEdge = min(8.0, origWidth * 0.2)
@@ -147,7 +159,9 @@ extension TimelineView {
     .onContinuousHover { phase in
       switch phase {
       case .active(let location):
-        if location.x <= edgeThreshold || location.x >= regionWidth - edgeThreshold {
+        if !isTrackEditable {
+          NSCursor.arrow.set()
+        } else if location.x <= edgeThreshold || location.x >= regionWidth - edgeThreshold {
           NSCursor.resizeLeftRight.set()
         } else {
           NSCursor.openHand.set()
@@ -165,7 +179,7 @@ extension TimelineView {
     guard spotlightDragRegionId == region.id, let dt = spotlightDragType else {
       return (region.startSeconds, region.endSeconds)
     }
-    let timeDelta = (spotlightDragOffset / width) * totalSeconds
+    let timeDelta = (spotlightDragOffset / width) * visibleSeconds
     let regions = editorState.spotlightRegions
     guard let idx = regions.firstIndex(where: { $0.id == region.id }) else {
       return (region.startSeconds, region.endSeconds)
@@ -191,7 +205,7 @@ extension TimelineView {
   }
 
   func commitSpotlightDrag(region: SpotlightRegionData, width: CGFloat) {
-    let timeDelta = (spotlightDragOffset / width) * totalSeconds
+    let timeDelta = (spotlightDragOffset / width) * visibleSeconds
 
     switch spotlightDragType {
     case .move:
