@@ -50,12 +50,70 @@ enum AgentEditingToolCatalog {
     mutating: true
   )
 
+  static let setKeptSlices = AgentToolDefinition(
+    name: "set_kept_slices",
+    description: "Replace the source-time slices kept in the final video and return the normalized timeline.",
+    inputSchema: AgentToolSchema.object(
+      [
+        "slices": AgentToolSchema.array(
+          "Source-time ranges to keep",
+          items: AgentToolSchema.object(
+            [
+              "start": AgentToolSchema.number("Slice start in source seconds", minimum: 0),
+              "end": AgentToolSchema.number("Slice end in source seconds", minimum: 0),
+            ],
+            required: ["start", "end"]
+          ),
+          minimumItems: 1
+        ),
+        "label": AgentToolSchema.string("Short undo-history label"),
+      ],
+      required: ["slices"]
+    ),
+    mutating: true
+  )
+
+  static let removeTimeRange = AgentToolDefinition(
+    name: "remove_time_range",
+    description: "Remove an exact source-time range from the kept video and return the updated timeline.",
+    inputSchema: AgentToolSchema.object(
+      [
+        "start": AgentToolSchema.number("Removed range start in source seconds", minimum: 0),
+        "end": AgentToolSchema.number("Removed range end in source seconds", minimum: 0),
+        "label": AgentToolSchema.string("Short undo-history label"),
+      ],
+      required: ["start", "end"]
+    ),
+    mutating: true
+  )
+
+  static let beginBatch = AgentToolDefinition(
+    name: "begin_batch",
+    description: "Begin a labeled edit transaction whose mutations become one undo step.",
+    inputSchema: AgentToolSchema.object(
+      ["label": AgentToolSchema.string("Short undo-history label")],
+      required: ["label"]
+    ),
+    mutating: true
+  )
+
+  static let endBatch = AgentToolDefinition(
+    name: "end_batch",
+    description: "Commit the active edit transaction as one undo step.",
+    inputSchema: AgentToolSchema.object([:]),
+    mutating: true
+  )
+
   @MainActor
   static var handlers: [any AgentToolHandler] {
     [
       AgentSetTrimTool(),
       AgentAddZoomTool(),
       AgentAddSpotlightTool(),
+      AgentSetKeptSlicesTool(),
+      AgentRemoveTimeRangeTool(),
+      AgentBatchBoundaryTool(definition: beginBatch),
+      AgentBatchBoundaryTool(definition: endBatch),
     ]
   }
 }
@@ -139,5 +197,57 @@ private struct AgentAddSpotlightTool: AgentToolHandler {
     )
     state.spotlightRegions.sort { $0.startSeconds < $1.startSeconds }
     return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentSetKeptSlicesTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.setKeptSlices
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let duration = CMTimeGetSeconds(context.editorState.duration)
+    let slices = try (arguments["slices"]?.arrayValue ?? []).map { value -> VideoRegionData in
+      let start = min(value["start"]?.doubleValue ?? 0, duration)
+      let end = min(value["end"]?.doubleValue ?? duration, duration)
+      guard end - start >= CutTimeline.minSliceLength else {
+        throw AgentToolError.invalidArguments("every kept slice must be at least \(CutTimeline.minSliceLength) seconds")
+      }
+      return VideoRegionData(startSeconds: start, endSeconds: end)
+    }
+    let timeline = CutTimeline(slices: slices, duration: duration).normalized()
+    guard !timeline.slices.isEmpty else {
+      throw AgentToolError.invalidArguments("at least one kept slice must remain")
+    }
+    context.editorState.videoRegions = timeline.slices
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentRemoveTimeRangeTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.removeTimeRange
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let duration = CMTimeGetSeconds(context.editorState.duration)
+    let start = min(arguments["start"]?.doubleValue ?? 0, duration)
+    let end = min(arguments["end"]?.doubleValue ?? duration, duration)
+    guard end - start >= CutTimeline.minSliceLength else {
+      throw AgentToolError.invalidArguments("end must be at least \(CutTimeline.minSliceLength) seconds after start")
+    }
+    let timeline = context.editorState.cutTimeline.removing(start...end)
+    guard !timeline.slices.isEmpty else {
+      throw AgentToolError.invalidArguments("removing the entire video is not allowed")
+    }
+    context.editorState.videoRegions = timeline.slices
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentBatchBoundaryTool: AgentToolHandler {
+  let definition: AgentToolDefinition
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    context.timelineResult()
   }
 }

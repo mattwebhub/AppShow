@@ -91,6 +91,35 @@ struct AgentToolCatalogTests {
     #expect(failure([1, 2], timeline)?.contains("object") == true)
   }
 
+  @Test func schemaValidationRecursesIntoArrayItems() throws {
+    let schema = AgentToolSchema.object(
+      [
+        "slices": AgentToolSchema.array(
+          "Kept source-time slices",
+          items: AgentToolSchema.object(
+            [
+              "start": AgentToolSchema.number("Start", minimum: 0),
+              "end": AgentToolSchema.number("End", minimum: 0),
+            ],
+            required: ["start", "end"]
+          ),
+          minimumItems: 1
+        )
+      ],
+      required: ["slices"]
+    )
+
+    #expect(throws: AgentToolError.invalidArguments("slices must contain at least 1 item")) {
+      try AgentToolSchema.validate(["slices": []], against: schema)
+    }
+    #expect(throws: AgentToolError.invalidArguments("slices[0].end is below the minimum 0.0")) {
+      try AgentToolSchema.validate(["slices": [["start": 0, "end": -1]]], against: schema)
+    }
+    #expect(throws: AgentToolError.invalidArguments("slices[0] missing required key end")) {
+      try AgentToolSchema.validate(["slices": [["start": 0]]], against: schema)
+    }
+  }
+
   @Test func toolErrorsMapToJSONRPCCodes() {
     #expect(AgentToolError.unknownTool("x").jsonRPCError.code == JSONRPCError.methodNotFoundCode)
     #expect(AgentToolError.unknownTool("x").jsonRPCError.data?["code"] == "UNKNOWN_TOOL")
@@ -100,6 +129,8 @@ struct AgentToolCatalogTests {
     #expect(AgentToolError.unavailable(name: "x", reason: "r").jsonRPCError.code == -32004)
     #expect(AgentToolError.unavailable(name: "x", reason: "r").code == "TOOL_UNAVAILABLE")
     #expect(AgentToolError.timedOut("x").code == "TOOL_TIMEOUT")
+    #expect(AgentToolError.batchTimedOut.jsonRPCError.data?["code"] == "BATCH_TIMEOUT")
+    #expect(AgentToolError.userUndo.jsonRPCError.data?["code"] == "USER_UNDO")
     #expect(AgentToolError.failed("x").jsonRPCError.code == -32000)
     #expect(AgentToolError.failed("boom").message == "boom")
   }

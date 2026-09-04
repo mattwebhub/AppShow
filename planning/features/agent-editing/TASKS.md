@@ -2,8 +2,8 @@
 
 - [x] P0. Integrate the green chat and read-only tool branches; resolve the fixture-resource collision; run the combined suite.
 - [x] P1. Add labeled, deduplicated history and transactional `set_trim`, `add_zoom`, `add_spotlight` handlers behind explicit mutation opt-in.
-- [ ] P2. Add unambiguous keep-slice/cut operations and tests.
-- [ ] P3. Add begin/end batch with one undo entry, timeout, and user-undo cancellation.
+- [x] P2. Add unambiguous keep-slice/cut operations and tests.
+- [x] P3. Add begin/end batch with one undo entry, timeout, and user-undo cancellation.
 - [ ] P4. Add single-use confirmations for external files and export.
 - [ ] P5. Build and sign the stdio shim; wire the bridge lifecycle and live activity UI into the single project conversation.
 - [ ] P6. Add captions, background/canvas/cursor/camera/audio and confirmed export tools.
