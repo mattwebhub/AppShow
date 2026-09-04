@@ -260,4 +260,11 @@ struct InstructionBuilderTests {
 
     #expect(!needsCompositor(config, result: result(quality: .veryHigh)))
   }
+
+  @Test func textOverlayNeedsCompositor() {
+    var config = config()
+    config.textOverlays = [TextOverlayData(startSeconds: 0, endSeconds: 1)]
+
+    #expect(needsCompositor(config))
+  }
 }

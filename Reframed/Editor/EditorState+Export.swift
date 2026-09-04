@@ -186,6 +186,7 @@ extension EditorState {
       spotlightRadius: spotlightRadius,
       spotlightDimOpacity: spotlightDimOpacity,
       spotlightEdgeSoftness: spotlightEdgeSoftness,
+      textOverlays: textOverlays,
       clickSoundEnabled: clickSoundEnabled && showCursor,
       clickSoundVolume: clickSoundVolume,
       clickSoundStyle: clickSoundStyle

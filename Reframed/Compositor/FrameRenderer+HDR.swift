@@ -582,7 +582,8 @@ extension FrameRenderer {
     outputWidth: Int,
     outputHeight: Int
   ) -> CIImage {
-    guard instruction.captionsEnabled, !instruction.captionSegments.isEmpty else { return background }
+    let hasCaptions = instruction.captionsEnabled && !instruction.captionSegments.isEmpty
+    guard hasCaptions || !instruction.textOverlays.isEmpty else { return background }
 
     guard
       let ctx = CGContext(
@@ -598,6 +599,7 @@ extension FrameRenderer {
 
     ctx.clear(CGRect(x: 0, y: 0, width: outputWidth, height: outputHeight))
     let canvasRect = CGRect(x: 0, y: 0, width: outputWidth, height: outputHeight)
+    drawTextOverlays(in: ctx, canvasRect: canvasRect, instruction: instruction, compositionTime: compositionTime)
     drawCaptions(in: ctx, videoRect: videoRect, canvasRect: canvasRect, instruction: instruction, compositionTime: compositionTime)
 
     guard let overlayImage = ctx.makeImage() else { return background }
