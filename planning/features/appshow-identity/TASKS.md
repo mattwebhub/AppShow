@@ -7,5 +7,6 @@
 - [x] Update document registration and user-visible strings.
 - [x] Update runtime labels and environment variables.
 - [x] Update packaging, CI, repository links, and active docs.
-- [ ] Validate residual legacy references.
-- [ ] Record full verification and open the stacked PR.
+- [x] Validate residual legacy references.
+- [x] Record full local verification.
+- [ ] Open the stacked PR and verify CI.
