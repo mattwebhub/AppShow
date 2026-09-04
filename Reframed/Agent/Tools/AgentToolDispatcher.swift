@@ -192,7 +192,7 @@ final class AgentToolDispatcher {
       case "add_zoom": "zoom"
       case "add_spotlight": "spotlight"
       case "add_text", "update_text", "remove_text", "add_image", "update_image", "remove_image", "add_blur",
-        "update_blur", "remove_blur":
+        "update_blur", "remove_blur", "set_transition":
         "overlays"
       default: name.split(separator: "_").first.map(String.init) ?? name
       }

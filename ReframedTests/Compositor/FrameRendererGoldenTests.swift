@@ -302,6 +302,16 @@ struct FrameRendererGoldenTests {
     expectBackground(try pixel(output, x: 1, y: 1))
   }
 
+  @Test func textOverlayFadeAtHalfProgressBlendsWithScreen() throws {
+    let overlay = bluePillOverlay()
+    let start = try pixel(try render(instruction(textOverlays: [overlay]), at: 0), x: Self.width / 2, y: Self.height / 2)
+    let midpoint = try pixel(try render(instruction(textOverlays: [overlay]), at: 0.5), x: Self.width / 2, y: Self.height / 2)
+    let end = try pixel(try render(instruction(textOverlays: [overlay]), at: 1), x: Self.width / 2, y: Self.height / 2)
+
+    #expect(midpoint.b > start.b && midpoint.b < end.b)
+    #expect(midpoint.g < start.g && midpoint.g > end.g)
+  }
+
   @Test func textOverlayIsAbsentOutsideItsRange() throws {
     let output = try render(instruction(textOverlays: [bluePillOverlay(start: 0.5, end: 1.0)]), at: 1.5)
 
@@ -319,6 +329,16 @@ struct FrameRendererGoldenTests {
     let output = try render(instruction(imageOverlays: [blueImageOverlay()]), at: 0)
 
     expectScreen(try pixel(output, x: Self.width / 2, y: Self.height / 2))
+  }
+
+  @Test func imageOverlayFadeAtHalfProgressBlendsWithScreen() throws {
+    let overlay = try blueImageOverlay()
+    let start = try pixel(try render(instruction(imageOverlays: [overlay]), at: 0), x: Self.width / 2, y: Self.height / 2)
+    let midpoint = try pixel(try render(instruction(imageOverlays: [overlay]), at: 0.5), x: Self.width / 2, y: Self.height / 2)
+    let end = try pixel(try render(instruction(imageOverlays: [overlay]), at: 1), x: Self.width / 2, y: Self.height / 2)
+
+    #expect(midpoint.b > start.b && midpoint.b < end.b)
+    #expect(midpoint.g < start.g && midpoint.g > end.g)
   }
 
   @Test func imageOverlayIsAbsentOutsideItsRange() throws {

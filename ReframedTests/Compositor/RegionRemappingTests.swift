@@ -341,6 +341,10 @@ struct RegionRemappingTests {
     var config = config(trim: range(0, 10))
     var original = TextOverlayData(startSeconds: 1, endSeconds: 6, text: "Split")
     original.position = .topLeft
+    original.entryTransition = .scale
+    original.entryTransitionDuration = 0.7
+    original.exitTransition = .slide
+    original.exitTransitionDuration = 0.8
     config.textOverlays = [original, TextOverlayData(startSeconds: 3, endSeconds: 4, text: "Gone")]
 
     let remapped = remapWithCuts(config)
@@ -357,6 +361,10 @@ struct RegionRemappingTests {
     #expect(first.id != second.id)
     #expect(second.text == "Split")
     #expect(second.position == .topLeft)
+    #expect(second.entryTransition == .scale)
+    #expect(second.entryTransitionDuration == 0.7)
+    #expect(second.exitTransition == .slide)
+    #expect(second.exitTransitionDuration == 0.8)
   }
 
   @Test func imageOverlayIsClippedAndShiftedByTrimStart() throws {
@@ -379,6 +387,10 @@ struct RegionRemappingTests {
     var config = config(trim: range(0, 10))
     var original = ImageOverlayData(startSeconds: 1, endSeconds: 6, filename: "split.png")
     original.position = .topLeft
+    original.entryTransition = .scale
+    original.entryTransitionDuration = 0.7
+    original.exitTransition = .slide
+    original.exitTransitionDuration = 0.8
     config.imageOverlays = [original, ImageOverlayData(startSeconds: 3, endSeconds: 4, filename: "gone.png")]
 
     let remapped = remapWithCuts(config)
@@ -395,6 +407,10 @@ struct RegionRemappingTests {
     #expect(first.id != second.id)
     #expect(second.filename == "split.png")
     #expect(second.position == .topLeft)
+    #expect(second.entryTransition == .scale)
+    #expect(second.entryTransitionDuration == 0.7)
+    #expect(second.exitTransition == .slide)
+    #expect(second.exitTransitionDuration == 0.8)
   }
 
   @Test func blurRegionIsClippedAndShiftedByTrimStart() throws {

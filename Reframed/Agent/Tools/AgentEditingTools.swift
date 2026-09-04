@@ -295,6 +295,23 @@ enum AgentEditingToolCatalog {
     mutating: true
   )
 
+  static let setTransition = AgentToolDefinition(
+    name: "set_transition",
+    description: "Set entry and exit transitions on a kept slice, text overlay, or image overlay by UUID.",
+    inputSchema: AgentToolSchema.object(
+      [
+        "targetId": AgentToolSchema.string("Kept slice, text overlay, or image overlay UUID"),
+        "entryTransition": AgentToolSchema.string("Entry transition", enum: RegionTransitionType.allCases.map(\.rawValue)),
+        "entryDuration": AgentToolSchema.number("Entry duration in seconds", minimum: 0.05, maximum: 1),
+        "exitTransition": AgentToolSchema.string("Exit transition", enum: RegionTransitionType.allCases.map(\.rawValue)),
+        "exitDuration": AgentToolSchema.number("Exit duration in seconds", minimum: 0.05, maximum: 1),
+        "label": AgentToolSchema.string("Short undo-history label"),
+      ],
+      required: ["targetId"]
+    ),
+    mutating: true
+  )
+
   static let beginBatch = AgentToolDefinition(
     name: "begin_batch",
     description: "Begin a labeled edit transaction whose mutations become one undo step.",
@@ -337,6 +354,7 @@ enum AgentEditingToolCatalog {
       AgentAddBlurTool(),
       AgentUpdateBlurTool(),
       AgentRemoveBlurTool(),
+      AgentSetTransitionTool(),
       AgentBatchBoundaryTool(definition: beginBatch),
       AgentBatchBoundaryTool(definition: endBatch),
     ]
@@ -925,6 +943,55 @@ private struct AgentRemoveBlurTool: AgentToolHandler {
       throw AgentToolError.invalidArguments("blur region does not exist")
     }
     context.editorState.removeBlurRegion(id: id)
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentSetTransitionTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.setTransition
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    guard let value = arguments["targetId"]?.stringValue, let id = UUID(uuidString: value) else {
+      throw AgentToolError.invalidArguments("targetId must be a UUID")
+    }
+    guard
+      arguments["entryTransition"] != nil || arguments["entryDuration"] != nil
+        || arguments["exitTransition"] != nil || arguments["exitDuration"] != nil
+    else {
+      throw AgentToolError.invalidArguments("at least one transition setting is required")
+    }
+    let entry = arguments["entryTransition"]?.stringValue.flatMap(RegionTransitionType.init(rawValue:))
+    let exit = arguments["exitTransition"]?.stringValue.flatMap(RegionTransitionType.init(rawValue:))
+    let entryDuration = arguments["entryDuration"]?.doubleValue
+    let exitDuration = arguments["exitDuration"]?.doubleValue
+    let state = context.editorState
+
+    if state.textOverlays.contains(where: { $0.id == id }) {
+      state.updateTextOverlay(id: id) {
+        if let entry { $0.entryTransition = entry }
+        if let entryDuration { $0.entryTransitionDuration = entryDuration }
+        if let exit { $0.exitTransition = exit }
+        if let exitDuration { $0.exitTransitionDuration = exitDuration }
+      }
+    } else if state.imageOverlays.contains(where: { $0.id == id }) {
+      state.updateImageOverlay(id: id) {
+        if let entry { $0.entryTransition = entry }
+        if let entryDuration { $0.entryTransitionDuration = entryDuration }
+        if let exit { $0.exitTransition = exit }
+        if let exitDuration { $0.exitTransitionDuration = exitDuration }
+      }
+    } else if state.videoRegions.contains(where: { $0.id == id }) {
+      state.updateVideoRegionTransition(
+        regionId: id,
+        entryTransition: entry,
+        entryDuration: entryDuration,
+        exitTransition: exit,
+        exitDuration: exitDuration
+      )
+    } else {
+      throw AgentToolError.invalidArguments("transition target does not exist")
+    }
     return context.timelineResult()
   }
 }
