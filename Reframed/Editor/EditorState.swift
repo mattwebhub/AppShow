@@ -15,6 +15,7 @@ final class EditorState {
   var trimEnd: CMTime = .zero
   var systemAudioRegions: [AudioRegionData] = []
   var micAudioRegions: [AudioRegionData] = []
+  var externalAudioTracks: [ExternalAudioTrackData] = []
   var cameraRegions: [CameraRegionData] = []
   var videoRegions: [VideoRegionData] = []
   var isExporting = false
@@ -292,6 +293,9 @@ final class EditorState {
       }
       if let savedMicRegions = saved.micAudioRegions, !savedMicRegions.isEmpty {
         micAudioRegions = savedMicRegions
+      }
+      if let savedTracks = saved.externalAudioTracks, !savedTracks.isEmpty {
+        externalAudioTracks = savedTracks
       }
       if let savedCameraRegions = saved.cameraRegions, !savedCameraRegions.isEmpty {
         cameraRegions = savedCameraRegions

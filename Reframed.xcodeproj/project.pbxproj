@@ -46,6 +46,8 @@
 		7E5700000000000000000021 /* TimelineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000020 /* TimelineGeometry.swift */; };
 		7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000022 /* TimelineView+Geometry.swift */; };
 		7E5700000000000000000025 /* RegionCutMarkers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000024 /* RegionCutMarkers.swift */; };
+		7E5700000000000000000031 /* ExternalAudioTrackData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000030 /* ExternalAudioTrackData.swift */; };
+		7E5700000000000000000033 /* ExternalAudioTrackMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000032 /* ExternalAudioTrackMath.swift */; };
 		828909551C8795EF72269706 /* PropertiesPanel+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C03E11186EDDA74B1B6958 /* PropertiesPanel+Background.swift */; };
 		86BD45F487E80051EC653B68 /* CursorRenderer+Shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC84C35E4DD49FCEA9DE6CBB /* CursorRenderer+Shapes.swift */; };
 		922F814E886E4D2B242E4541 /* VideoPreviewContainer+Cursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17A303B9C60827322EAE0A9 /* VideoPreviewContainer+Cursor.swift */; };
@@ -307,6 +309,8 @@
 		7E5700000000000000000020 /* TimelineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineGeometry.swift; sourceTree = "<group>"; };
 		7E5700000000000000000022 /* TimelineView+Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+Geometry.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000024 /* RegionCutMarkers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionCutMarkers.swift; sourceTree = "<group>"; };
+		7E5700000000000000000030 /* ExternalAudioTrackData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioTrackData.swift; sourceTree = "<group>"; };
+		7E5700000000000000000032 /* ExternalAudioTrackMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioTrackMath.swift; sourceTree = "<group>"; };
 		815C681612F3844727C988EF /* CaptureToolbar+ModeSelection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CaptureToolbar+ModeSelection.swift"; sourceTree = "<group>"; };
 		8BF80E50CD7B9915C3047A7C /* EditorState+Playback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+Playback.swift"; sourceTree = "<group>"; };
 		93CAA4A89B98885B510AB739 /* TimelineView+Shared.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "TimelineView+Shared.swift"; sourceTree = "<group>"; };
@@ -902,6 +906,7 @@
 				EFF5D8C3FCEE6DC1F9BB700A /* ZoomKeyframeEditor+Logic.swift */,
 				15FC8EFFF8F25B538B770019 /* ZoomKeyframeEditor+RegionView.swift */,
 				EB80B289E404CFF82DC2A109 /* History+ChangeRules.swift */,
+				7E5700000000000000000032 /* ExternalAudioTrackMath.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -911,6 +916,7 @@
 			children = (
 				B3000000000000000000001B /* ReframedProject.swift */,
 				B3000000000000000000001C /* ProjectMetadata.swift */,
+				7E5700000000000000000030 /* ExternalAudioTrackData.swift */,
 			);
 			path = Project;
 			sourceTree = "<group>";
@@ -1239,6 +1245,8 @@
 				7E5700000000000000000021 /* TimelineGeometry.swift in Sources */,
 				7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */,
 				7E5700000000000000000025 /* RegionCutMarkers.swift in Sources */,
+				7E5700000000000000000031 /* ExternalAudioTrackData.swift in Sources */,
+				7E5700000000000000000033 /* ExternalAudioTrackMath.swift in Sources */,
 				77030A22115111C9D1325490 /* EditorState+CameraLayout.swift in Sources */,
 				D231D2CA1110B032A7D42474 /* EditorState+Zoom.swift in Sources */,
 				3FD352F00D9D9EE89C9A34AB /* EditorState+Cursor.swift in Sources */,

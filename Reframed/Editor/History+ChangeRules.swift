@@ -244,6 +244,36 @@ extension History {
       removed: "Mic audio region removed",
       adjusted: "Mic audio region adjusted"
     ),
+    { old, new in
+      let o = old.externalAudioTracks ?? []
+      let n = new.externalAudioTracks ?? []
+      guard o != n else { return [] }
+      if n.count > o.count { return ["Audio track added"] }
+      if n.count < o.count { return ["Audio track removed"] }
+      var results: [String] = []
+      for track in n {
+        guard let previous = o.first(where: { $0.id == track.id }), previous != track else { continue }
+        if previous.muted != track.muted {
+          results.append(track.muted ? "Audio track muted" : "Audio track unmuted")
+        } else if previous.volume != track.volume {
+          results.append("Audio track volume set to \(Int((track.volume * 100).rounded()))%")
+        }
+        if previous.fadeInSeconds != track.fadeInSeconds {
+          results.append("Audio track fade in set to \(String(format: "%.1f", track.fadeInSeconds))s")
+        }
+        if previous.fadeOutSeconds != track.fadeOutSeconds {
+          results.append("Audio track fade out set to \(String(format: "%.1f", track.fadeOutSeconds))s")
+        }
+        let placementChanged =
+          previous.timelineStartSeconds != track.timelineStartSeconds
+          || previous.fileInSeconds != track.fileInSeconds
+          || previous.fileOutSeconds != track.fileOutSeconds
+        if placementChanged {
+          results.append("Audio track adjusted")
+        }
+      }
+      return results.isEmpty ? ["Audio track adjusted"] : results
+    },
     regions(
       \.cameraFullscreenRegions,
       added: "Camera fullscreen region added",
