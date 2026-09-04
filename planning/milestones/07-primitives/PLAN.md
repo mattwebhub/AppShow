@@ -8,7 +8,7 @@ Depends on: milestone 02 (keep-slices and the Cuts track) for silence removal; m
 
 Silence removal mirrors `planning/features/silence-removal/TASKS.md`; tick both.
 
-- [ ] T1. Silence removal, pure detector. Proof: `ReframedTests/Editor/SilenceDetectorTests.swift` green.
+- [x] T1. Silence removal, pure detector. Proof: `ReframedTests/Editor/SilenceDetectorTests.swift` green.
 - [ ] T2. Silence removal, PCM analysis of a real file. Proof: `ReframedTests/Editor/SilenceAnalysisTests.swift` green on generated tones.
 - [ ] T3. Silence removal, editor wiring and labelled history entry. Proof: `ReframedTests/Editor/EditorStateSilenceRemovalTests.swift` and the `HistoryTests` label round trip green.
 - [ ] T4. Silence removal, Silences section in the Video tab. Proof: `make build` warning-free, manual rows in `VERIFY.md`.
