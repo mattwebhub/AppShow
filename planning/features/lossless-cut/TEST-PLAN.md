@@ -11,7 +11,7 @@ Layers from `planning/tdd-strategy.md`. Full assertions in `docs/features/01-los
 | 7 | `HistoryChangeRulesTests` cut added/removed/adjusted, exactly one string | unit T1 @MainActor | `ReframedTests/Editor/HistoryChangeRulesTests.swift` | none | red |
 | 7 | `EditorStateVideoRegionsTests` normalize on restore, undo after split, previewElapsedTime characterization, split keeps currentTime | EditorState T2 | `ReframedTests/Editor/EditorStateVideoRegionsTests.swift` | generated 2 s movie | red |
 | 2 | `CutTimelineTests` showCutTrack gate | unit T1 | same as row 1 | none | green |
-| 4 | `SyncedPlayerControllerTests` gapSkipDecision, observer skips gap in edit mode | T1 + T2 | `ReframedTests/Editor/SyncedPlayerControllerTests.swift` | generated 2 s movie | red |
+| 4 | `SyncedPlayerControllerTests` gapSkipDecision, observer skips gap in edit mode | T1 + T2 | `ReframedTests/Editor/SyncedPlayerControllerTests.swift` | generated 2 s movie | T1 green (4), T2 pending fixture |
 | 4 | `EditorStatePlaybackTests` togglePlayPause from gap | T2 | `ReframedTests/Editor/EditorStatePlaybackTests.swift` | generated 2 s movie | red |
 | 6 | `TimelineGeometryTests` compressed x↔source, region pieces, ruler | unit T1 | `ReframedTests/Editor/TimelineGeometryTests.swift` | none | red |
 | 5 | `EditorStateExportTests` exportVideoRegions decision | unit T1 | `ReframedTests/Editor/EditorStateExportTests.swift` | none | red |

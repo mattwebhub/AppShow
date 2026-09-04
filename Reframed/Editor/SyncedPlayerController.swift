@@ -3,6 +3,12 @@ import Combine
 import Foundation
 import Logging
 
+enum GapSkipDecision: Equatable, Sendable {
+  case none
+  case seek(Double)
+  case pause
+}
+
 @MainActor
 @Observable
 final class SyncedPlayerController {
@@ -20,6 +26,7 @@ final class SyncedPlayerController {
   var micAudioRegions: [(start: CMTime, end: CMTime)] = []
   var videoRegions: [(start: Double, end: Double)] = []
   var previewMode = false
+  var skipsGaps = false
 
   private var micAudioEngine: AVAudioEngine?
   private var micPlayerNode: AVAudioPlayerNode?
@@ -180,29 +187,58 @@ final class SyncedPlayerController {
         if self.trimEnd.isValid && CMTimeCompare(time, self.trimEnd) >= 0 {
           self.pause()
         }
-        if self.previewMode && self.isPlaying {
-          self.handlePreviewGapSkip(at: CMTimeGetSeconds(time))
+        if (self.previewMode || self.skipsGaps) && self.isPlaying {
+          self.applyGapSkip(at: CMTimeGetSeconds(time))
         }
         self.updateAudioMuting(at: time)
       }
     }
   }
 
-  private func handlePreviewGapSkip(at time: Double) {
-    let regions = videoRegions
-    guard !regions.isEmpty else { return }
-    let inRegion = regions.contains { time >= $0.start && time < $0.end }
-    if !inRegion {
-      if let next = regions.first(where: { $0.start > time }) {
-        let seekTime = CMTime(seconds: next.start, preferredTimescale: 600)
-        seek(to: seekTime)
-        screenPlayer.play()
-        webcamPlayer?.rate = Float(webcamDriftRatio)
-        systemAudioPlayer?.rate = Float(systemAudioDriftRatio)
-        scheduleMicPlayback(from: seekTime)
-      } else {
-        pause()
+  nonisolated static func gapSkipDecision(
+    at time: Double,
+    slices: [(start: Double, end: Double)]
+  ) -> GapSkipDecision {
+    guard !slices.isEmpty else { return .none }
+    if slices.contains(where: { time >= $0.start && time < $0.end }) {
+      return .none
+    }
+    if let next = slices.first(where: { $0.start > time }) {
+      return .seek(next.start)
+    }
+    return .pause
+  }
+
+  func installBoundaryObserver() {
+    if let obs = boundaryObserver {
+      screenPlayer.removeTimeObserver(obs)
+      boundaryObserver = nil
+    }
+    let times = videoRegions.dropLast().map {
+      NSValue(time: CMTime(seconds: $0.end, preferredTimescale: 600))
+    }
+    guard !times.isEmpty else { return }
+    boundaryObserver = screenPlayer.addBoundaryTimeObserver(forTimes: times, queue: .main) { [weak self] in
+      MainActor.assumeIsolated {
+        guard let self, (self.previewMode || self.skipsGaps) && self.isPlaying else { return }
+        self.applyGapSkip(at: CMTimeGetSeconds(self.screenPlayer.currentTime()))
       }
+    }
+  }
+
+  private func applyGapSkip(at time: Double) {
+    switch Self.gapSkipDecision(at: time, slices: videoRegions) {
+    case .none:
+      break
+    case .seek(let target):
+      let seekTime = CMTime(seconds: target, preferredTimescale: 600)
+      seek(to: seekTime)
+      screenPlayer.play()
+      webcamPlayer?.rate = Float(webcamDriftRatio)
+      systemAudioPlayer?.rate = Float(systemAudioDriftRatio)
+      scheduleMicPlayback(from: seekTime)
+    case .pause:
+      pause()
     }
   }
 
@@ -270,6 +306,10 @@ final class SyncedPlayerController {
     if let obs = timeObserver {
       screenPlayer.removeTimeObserver(obs)
       timeObserver = nil
+    }
+    if let obs = boundaryObserver {
+      screenPlayer.removeTimeObserver(obs)
+      boundaryObserver = nil
     }
     screenPlayer.pause()
     webcamPlayer?.pause()
