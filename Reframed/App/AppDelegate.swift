@@ -98,7 +98,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
   }
 
   func application(_ application: NSApplication, open urls: [URL]) {
-    for url in urls where url.pathExtension == "frm" {
+    for url in urls where AppShowIdentity.supportedProjectExtensions.contains(url.pathExtension.lowercased()) {
       session.openProject(at: url)
     }
   }
