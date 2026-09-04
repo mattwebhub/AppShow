@@ -124,7 +124,8 @@ extension EditorState {
       captionSettings: captionSettings,
       captionSegments: captionSegments.isEmpty ? nil : captionSegments,
       spotlightRegions: spotlightRegions.isEmpty ? nil : spotlightRegions,
-      textOverlays: textOverlays.isEmpty ? nil : textOverlays
+      textOverlays: textOverlays.isEmpty ? nil : textOverlays,
+      imageOverlays: imageOverlays.isEmpty ? nil : imageOverlays
     )
   }
 
@@ -255,6 +256,7 @@ extension EditorState {
       spotlightRegions = []
     }
     textOverlays = data.textOverlays ?? []
+    imageOverlays = availableImageOverlays(data.imageOverlays ?? [])
 
     if case .image(let filename) = data.backgroundStyle, let bundleURL = project?.bundleURL {
       let url = bundleURL.appendingPathComponent(filename)
@@ -382,6 +384,7 @@ extension EditorState {
       _ = self.spotlightEdgeSoftness
       _ = self.spotlightRegions
       _ = self.textOverlays
+      _ = self.imageOverlays
       _ = self.clickSoundEnabled
       _ = self.clickSoundVolume
       _ = self.clickSoundStyle

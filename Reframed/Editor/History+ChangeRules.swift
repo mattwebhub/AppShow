@@ -274,6 +274,12 @@ extension History {
       removed: "Text overlay removed",
       adjusted: "Text overlay adjusted"
     ),
+    regions(
+      \.imageOverlays,
+      added: "Image overlay added",
+      removed: "Image overlay removed",
+      adjusted: "Image overlay adjusted"
+    ),
 
     { old, new in
       guard old.captionSettings != new.captionSettings || old.captionSegments != new.captionSegments
