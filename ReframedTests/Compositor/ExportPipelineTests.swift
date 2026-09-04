@@ -110,4 +110,33 @@ struct ExportPipelineTests {
     #expect(loud > -20)
     #expect(silent < -60)
   }
+
+  @Test func exactDestinationIsUsedOnceAndNeverOverwritten() async throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let result = try await ProjectFixtures.recordingResult(
+      in: dir,
+      webcam: false,
+      systemAudio: false,
+      microphone: false,
+      cursor: false
+    )
+    let destination = dir.appendingPathComponent("Presentation.mp4")
+    let duration = CMTime(seconds: 2, preferredTimescale: 600)
+    let config = ExportConfiguration(
+      cameraLayout: CameraLayout(),
+      trimRange: CMTimeRange(start: .zero, end: duration),
+      outputURL: destination
+    )
+
+    let url = try await VideoCompositor.export(result: result, config: config)
+    #expect(url == destination)
+    #expect(FileManager.default.fileExists(atPath: destination.path))
+    let originalSize = try Data(contentsOf: destination).count
+
+    await #expect(throws: (any Error).self) {
+      try await VideoCompositor.export(result: result, config: config)
+    }
+    #expect(try Data(contentsOf: destination).count == originalSize)
+  }
 }

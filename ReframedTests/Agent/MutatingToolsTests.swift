@@ -60,14 +60,14 @@ struct MutatingToolsTests {
     }
   }
 
-  private func makeState(in directory: URL) async throws -> EditorState {
+  private func makeState(in directory: URL, withAudio: Bool = false) async throws -> EditorState {
     let sources = directory.appendingPathComponent("sources", isDirectory: true)
     try FileManager.default.createDirectory(at: sources, withIntermediateDirectories: true)
     let result = try await ProjectFixtures.recordingResult(
       in: sources,
       webcam: false,
-      systemAudio: false,
-      microphone: false,
+      systemAudio: withAudio,
+      microphone: withAudio,
       cursor: true
     )
     let project = try ReframedProject.create(
@@ -453,5 +453,117 @@ struct MutatingToolsTests {
     let trim = try #require(definitions.first { $0.name == "set_trim" })
     #expect(trim.mcpValue["annotations"]?["readOnlyHint"] == false)
     #expect(trim.mcpValue["annotations"]?["destructiveHint"] == true)
+  }
+
+  @Test func presentationSettingsToolsApplyExistingEditorStateAndUndo() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory, withAudio: true)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+
+    _ = try await dispatcher.call(
+      "set_canvas",
+      arguments: [
+        "aspect": "ratio16x9", "padding": 0.12, "cornerRadius": 18, "shadow": 0.4,
+        "background": "solid", "red": 0.1, "green": 0.2, "blue": 0.3,
+      ]
+    )
+    #expect(state.canvasAspect == .ratio16x9)
+    #expect(state.padding == 0.12)
+    #expect(state.videoCornerRadius == 18)
+    #expect(state.backgroundStyle == .solidColor(CodableColor(r: 0.1, g: 0.2, b: 0.3)))
+
+    _ = try await dispatcher.call(
+      "set_captions",
+      arguments: [
+        "enabled": true, "fontSize": 56, "weight": "semibold", "positionX": 0.4,
+        "positionY": 0.8, "maxWordsPerLine": 4,
+      ]
+    )
+    #expect(state.captionsEnabled)
+    #expect(state.captionFontSize == 56)
+    #expect(state.captionFontWeight == .semibold)
+    #expect(state.captionPosition == CaptionPosition(relativeX: 0.4, relativeY: 0.8))
+    #expect(state.captionMaxWordsPerLine == 4)
+
+    _ = try await dispatcher.call(
+      "replace_captions",
+      arguments: [
+        "segments": [
+          ["start": 0.2, "end": 0.8, "text": "Welcome"],
+          ["start": 1.0, "end": 1.6, "text": "Let us begin"],
+        ]
+      ]
+    )
+    #expect(state.captionSegments.map(\.text) == ["Welcome", "Let us begin"])
+
+    _ = try await dispatcher.call(
+      "set_cursor",
+      arguments: ["visible": true, "style": 4, "size": 32, "clickHighlights": true]
+    )
+    #expect(state.showCursor)
+    #expect(state.cursorStyle == .centerDot)
+    #expect(state.cursorSize == 32)
+    #expect(state.showClickHighlights)
+
+    _ = try await dispatcher.call(
+      "set_camera",
+      arguments: [
+        "enabled": false, "x": 0.7, "y": 0.05, "width": 0.2, "aspect": "ratio1x1",
+        "cornerRadius": 20, "mirrored": true,
+      ]
+    )
+    #expect(!state.webcamEnabled)
+    #expect(state.cameraLayout == CameraLayout(relativeX: 0.7, relativeY: 0.05, relativeWidth: 0.2))
+    #expect(state.cameraAspect == .ratio1x1)
+    #expect(state.cameraCornerRadius == 20)
+    #expect(state.cameraMirrored)
+
+    _ = try await dispatcher.call(
+      "set_audio",
+      arguments: ["systemVolume": 0.25, "microphoneVolume": 1.25, "systemMuted": true]
+    )
+    #expect(state.systemAudioVolume == 0.25)
+    #expect(state.micAudioVolume == 1.25)
+    #expect(state.systemAudioMuted)
+    state.undo()
+    #expect(state.systemAudioVolume == 1)
+    #expect(state.micAudioVolume == 1)
+    #expect(!state.systemAudioMuted)
+  }
+
+  @Test func exportRequiresApprovalBoundToAnExactNewDestination() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+    let destination = directory.appendingPathComponent("Presentation.mp4")
+
+    await #expect(throws: AgentToolError.self) {
+      try await dispatcher.call(
+        "export_video",
+        arguments: ["destination": .string(destination.path), "format": "mp4"]
+      )
+    }
+    let request = try #require(state.agentConfirmations.pending.first)
+    #expect(request.operation.kind == "export_video")
+    #expect(request.operation.arguments["destination"] == .string(destination.path))
+    #expect(request.operation.arguments["format"] == "mp4")
+    #expect(state.history.entries.count == 1)
+
+    try Data().write(to: destination)
+    await #expect(throws: AgentToolError.self) {
+      try await dispatcher.call(
+        "export_video",
+        arguments: [
+          "destination": .string(destination.path),
+          "format": "mp4",
+          "confirmationId": .string(request.id.uuidString),
+        ]
+      )
+    }
+    #expect(state.agentConfirmations.pending.map(\.id) == [request.id])
   }
 }

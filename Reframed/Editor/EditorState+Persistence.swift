@@ -76,23 +76,20 @@ extension EditorState {
         cachedNoiseReductionIntensity: cachedIntensity
       )
     }
-    var captionSettings: CaptionSettingsData?
-    if !captionSegments.isEmpty {
-      captionSettings = CaptionSettingsData(
-        enabled: captionsEnabled,
-        fontSize: captionFontSize,
-        fontWeight: captionFontWeight,
-        textColor: captionTextColor,
-        backgroundColor: captionBackgroundColor,
-        backgroundOpacity: captionBackgroundOpacity,
-        showBackground: captionShowBackground,
-        position: captionPosition,
-        maxWordsPerLine: captionMaxWordsPerLine,
-        model: captionModel,
-        language: captionLanguage,
-        audioSource: captionAudioSource
-      )
-    }
+    let captionSettings = CaptionSettingsData(
+      enabled: captionsEnabled,
+      fontSize: captionFontSize,
+      fontWeight: captionFontWeight,
+      textColor: captionTextColor,
+      backgroundColor: captionBackgroundColor,
+      backgroundOpacity: captionBackgroundOpacity,
+      showBackground: captionShowBackground,
+      position: captionPosition,
+      maxWordsPerLine: captionMaxWordsPerLine,
+      model: captionModel,
+      language: captionLanguage,
+      audioSource: captionAudioSource
+    )
     return EditorStateData(
       trimStartSeconds: CMTimeGetSeconds(trimStart),
       trimEndSeconds: CMTimeGetSeconds(trimEnd),

@@ -3,7 +3,7 @@ import CoreMedia
 import Foundation
 
 extension EditorState {
-  func export(settings: ExportSettings) async throws -> URL {
+  func export(settings: ExportSettings, outputURL: URL? = nil) async throws -> URL {
     isExporting = true
     exportProgress = 0
     exportETA = nil
@@ -136,6 +136,7 @@ extension EditorState {
       cameraHiddenRegions: camHiddenRegions.isEmpty ? nil : camHiddenRegions,
       cameraCustomRegions: camCustomRegions.isEmpty ? nil : camCustomRegions,
       videoRegions: vidRegions.isEmpty ? nil : vidRegions,
+      outputURL: outputURL,
       backgroundStyle: backgroundStyle,
       backgroundImageURL: backgroundImageURL(),
       backgroundImageFillMode: backgroundImageFillMode,

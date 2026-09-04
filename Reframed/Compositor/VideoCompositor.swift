@@ -12,11 +12,36 @@ enum VideoCompositor {
     let volume: Float
   }
 
+  private static func destination(
+    for temporaryURL: URL,
+    extension fileExtension: String,
+    config: ExportConfiguration
+  ) async -> URL {
+    if let outputURL = config.outputURL { return outputURL }
+    if let directory = config.outputDirectory {
+      return FileManager.default.saveURL(for: temporaryURL, extension: fileExtension, in: directory)
+    }
+    return await MainActor.run {
+      FileManager.default.defaultSaveURL(for: temporaryURL, extension: fileExtension)
+    }
+  }
+
+  private static func finishExport(from temporaryURL: URL, to destination: URL, exact: Bool) throws {
+    if exact {
+      try FileManager.default.moveItem(at: temporaryURL, to: destination)
+    } else {
+      try FileManager.default.moveToFinal(from: temporaryURL, to: destination)
+    }
+  }
+
   static func export(
     result: RecordingResult,
     config: ExportConfiguration,
     progressHandler: (@MainActor @Sendable (Double, Double?) -> Void)? = nil
   ) async throws -> URL {
+    if let outputURL = config.outputURL, FileManager.default.fileExists(atPath: outputURL.path) {
+      throw CaptureError.recordingFailed("Export destination already exists")
+    }
     let composition = AVMutableComposition()
     let screenAsset = AVURLAsset(url: result.screenVideoURL)
 
@@ -159,13 +184,8 @@ enum VideoCompositor {
           progressHandler: progressHandler
         )
 
-        let destination: URL =
-          if let dir = config.outputDirectory {
-            FileManager.default.saveURL(for: outputURL, extension: "gif", in: dir)
-          } else {
-            await MainActor.run { FileManager.default.defaultSaveURL(for: outputURL, extension: "gif") }
-          }
-        try FileManager.default.moveToFinal(from: outputURL, to: destination)
+        let destination = await destination(for: outputURL, extension: "gif", config: config)
+        try finishExport(from: outputURL, to: destination, exact: config.outputURL != nil)
 
         logger.info("GIF export saved: \(destination.path)")
         return destination
@@ -229,13 +249,8 @@ enum VideoCompositor {
       }
 
       let ext = config.exportSettings.format.fileExtension
-      let destination: URL =
-        if let dir = config.outputDirectory {
-          FileManager.default.saveURL(for: outputURL, extension: ext, in: dir)
-        } else {
-          await MainActor.run { FileManager.default.defaultSaveURL(for: outputURL, extension: ext) }
-        }
-      try FileManager.default.moveToFinal(from: outputURL, to: destination)
+      let destination = await destination(for: outputURL, extension: ext, config: config)
+      try finishExport(from: outputURL, to: destination, exact: config.outputURL != nil)
 
       logger.info("Composited export saved: \(destination.path)")
       return destination
@@ -268,13 +283,12 @@ enum VideoCompositor {
       progressHandler: progressHandler
     )
 
-    let destination = await MainActor.run {
-      FileManager.default.defaultSaveURL(
-        for: outputURL,
-        extension: config.exportSettings.format.fileExtension
-      )
-    }
-    try FileManager.default.moveToFinal(from: outputURL, to: destination)
+    let destination = await destination(
+      for: outputURL,
+      extension: config.exportSettings.format.fileExtension,
+      config: config
+    )
+    try finishExport(from: outputURL, to: destination, exact: config.outputURL != nil)
 
     logger.info("Passthrough export saved: \(destination.path)")
     return destination
