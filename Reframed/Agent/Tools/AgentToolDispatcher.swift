@@ -191,7 +191,9 @@ final class AgentToolDispatcher {
       case "set_trim", "set_kept_slices", "remove_time_range", "remove_silences": "screen"
       case "add_zoom": "zoom"
       case "add_spotlight": "spotlight"
-      case "add_text", "update_text", "remove_text", "add_image", "update_image", "remove_image": "overlays"
+      case "add_text", "update_text", "remove_text", "add_image", "update_image", "remove_image", "add_blur",
+        "update_blur", "remove_blur":
+        "overlays"
       default: name.split(separator: "_").first.map(String.init) ?? name
       }
     return AgentTimelineChange(

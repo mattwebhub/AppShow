@@ -138,6 +138,7 @@ extension EditorView {
           isHDR: editorState.result.isHDR,
           textOverlays: editorState.textOverlays,
           imageOverlays: editorState.imageOverlays,
+          blurRegions: editorState.blurRegions,
           imageOverlayDirectory: editorState.project?.bundleURL
         )
 

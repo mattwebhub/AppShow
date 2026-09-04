@@ -271,6 +271,30 @@ enum AgentEditingToolCatalog {
     mutating: true
   )
 
+  static let addBlur = AgentToolDefinition(
+    name: "add_blur",
+    description: "Blur a normalized source-video rectangle over an exact source-time range.",
+    inputSchema: blurRegionSchema(requireIdentity: false, requireRangeAndRect: true),
+    mutating: true
+  )
+
+  static let updateBlur = AgentToolDefinition(
+    name: "update_blur",
+    description: "Update an existing blur region by id.",
+    inputSchema: blurRegionSchema(requireIdentity: true, requireRangeAndRect: false),
+    mutating: true
+  )
+
+  static let removeBlur = AgentToolDefinition(
+    name: "remove_blur",
+    description: "Remove a blur region by id.",
+    inputSchema: AgentToolSchema.object(
+      ["id": AgentToolSchema.string("Blur region UUID"), "label": AgentToolSchema.string("Short undo-history label")],
+      required: ["id"]
+    ),
+    mutating: true
+  )
+
   static let beginBatch = AgentToolDefinition(
     name: "begin_batch",
     description: "Begin a labeled edit transaction whose mutations become one undo step.",
@@ -310,6 +334,9 @@ enum AgentEditingToolCatalog {
       AgentAddImageTool(),
       AgentUpdateImageTool(),
       AgentRemoveImageTool(),
+      AgentAddBlurTool(),
+      AgentUpdateBlurTool(),
+      AgentRemoveBlurTool(),
       AgentBatchBoundaryTool(definition: beginBatch),
       AgentBatchBoundaryTool(definition: endBatch),
     ]
@@ -344,6 +371,32 @@ enum AgentEditingToolCatalog {
     var required: [String] = []
     if requirePath { required.append(contentsOf: ["path", "start", "end"]) }
     if requireIdentity { required.append("id") }
+    return AgentToolSchema.object(properties, required: required)
+  }
+
+  private static func blurRegionSchema(
+    requireIdentity: Bool,
+    requireRangeAndRect: Bool
+  ) -> JSONValue {
+    let properties: [String: JSONValue] = [
+      "id": AgentToolSchema.string("Blur region UUID"),
+      "start": AgentToolSchema.number("Start in source seconds", minimum: 0),
+      "end": AgentToolSchema.number("End in source seconds", minimum: 0),
+      "rect": AgentToolSchema.object(
+        [
+          "x": AgentToolSchema.number("Left edge from 0 to 1", minimum: 0, maximum: 1),
+          "y": AgentToolSchema.number("Top edge from 0 to 1", minimum: 0, maximum: 1),
+          "width": AgentToolSchema.number("Width from 0.01 to 1", minimum: 0.01, maximum: 1),
+          "height": AgentToolSchema.number("Height from 0.01 to 1", minimum: 0.01, maximum: 1),
+        ],
+        required: ["x", "y", "width", "height"]
+      ),
+      "radius": AgentToolSchema.number("Source-pixel blur radius", minimum: 0, maximum: 100),
+      "label": AgentToolSchema.string("Short undo-history label"),
+    ]
+    var required: [String] = []
+    if requireIdentity { required.append("id") }
+    if requireRangeAndRect { required.append(contentsOf: ["start", "end", "rect"]) }
     return AgentToolSchema.object(properties, required: required)
   }
 
@@ -830,6 +883,52 @@ private struct AgentRemoveImageTool: AgentToolHandler {
   }
 }
 
+@MainActor
+private struct AgentAddBlurTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.addBlur
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let range = try agentOverlayRange(arguments, duration: CMTimeGetSeconds(context.editorState.duration))
+    let rect = try agentBlurRect(arguments)
+    let region = context.editorState.addBlurRegion(atTime: range.lowerBound, rect: rect)
+    try updateBlurRegion(region.id, arguments: arguments, range: range, state: context.editorState)
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentUpdateBlurTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.updateBlur
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let id = try agentOverlayID(arguments)
+    guard let region = context.editorState.blurRegions.first(where: { $0.id == id }) else {
+      throw AgentToolError.invalidArguments("blur region does not exist")
+    }
+    let range = try agentOverlayRange(
+      arguments,
+      duration: CMTimeGetSeconds(context.editorState.duration),
+      fallback: region.startSeconds...region.endSeconds
+    )
+    try updateBlurRegion(id, arguments: arguments, range: range, state: context.editorState)
+    return context.timelineResult()
+  }
+}
+
+@MainActor
+private struct AgentRemoveBlurTool: AgentToolHandler {
+  let definition = AgentEditingToolCatalog.removeBlur
+
+  func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let id = try agentOverlayID(arguments)
+    guard context.editorState.blurRegions.contains(where: { $0.id == id }) else {
+      throw AgentToolError.invalidArguments("blur region does not exist")
+    }
+    context.editorState.removeBlurRegion(id: id)
+    return context.timelineResult()
+  }
+}
+
 private func agentOverlayID(_ arguments: JSONValue) throws -> UUID {
   guard let value = arguments["id"]?.stringValue, let id = UUID(uuidString: value) else {
     throw AgentToolError.invalidArguments("id must be a UUID")
@@ -859,6 +958,22 @@ private func agentOverlayRange(
     throw AgentToolError.invalidArguments("overlay range must fit inside the recording")
   }
   return start...end
+}
+
+private func agentBlurRect(
+  _ arguments: JSONValue,
+  fallback: CGRect = CGRect(x: 0.3, y: 0.4, width: 0.4, height: 0.2)
+) throws -> CGRect {
+  guard let value = arguments["rect"] else { return fallback }
+  guard
+    let x = value["x"]?.doubleValue,
+    let y = value["y"]?.doubleValue,
+    let width = value["width"]?.doubleValue,
+    let height = value["height"]?.doubleValue
+  else {
+    throw AgentToolError.invalidArguments("rect requires x, y, width, and height")
+  }
+  return CGRect(x: x, y: y, width: width, height: height)
 }
 
 @MainActor
@@ -908,6 +1023,29 @@ private func updateImageOverlay(
   overlay.endSeconds = range.upperBound
   state.imageOverlays[index] = overlay
   state.imageOverlays.sort { $0.startSeconds < $1.startSeconds }
+}
+
+@MainActor
+private func updateBlurRegion(
+  _ id: UUID,
+  arguments: JSONValue,
+  range: ClosedRange<Double>,
+  state: EditorState
+) throws {
+  guard let index = state.blurRegions.firstIndex(where: { $0.id == id }) else {
+    throw AgentToolError.invalidArguments("blur region does not exist")
+  }
+  var region = state.blurRegions[index]
+  let rect = try agentBlurRect(arguments, fallback: region.rect)
+  region.x = rect.origin.x
+  region.y = rect.origin.y
+  region.width = rect.width
+  region.height = rect.height
+  if let radius = arguments["radius"]?.doubleValue { region.radius = radius }
+  region.startSeconds = range.lowerBound
+  region.endSeconds = range.upperBound
+  state.blurRegions[index] = region.normalized()
+  state.blurRegions.sort { $0.startSeconds < $1.startSeconds }
 }
 
 private func applyOverlayValues(_ arguments: JSONValue, to overlay: inout TextOverlayData) {

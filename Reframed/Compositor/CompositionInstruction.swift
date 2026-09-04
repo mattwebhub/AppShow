@@ -50,6 +50,12 @@ struct ImageOverlayInstruction: @unchecked Sendable {
   var timeRange: CMTimeRange { transition.timeRange }
 }
 
+struct BlurRegionInstruction: Sendable {
+  let timeRange: CMTimeRange
+  let rect: CGRect
+  let radius: CGFloat
+}
+
 struct VideoSegmentMapping: Sendable {
   let compositionStart: Double
   let sourceStart: Double
@@ -130,6 +136,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
   let spotlightEdgeSoftness: CGFloat
   let textOverlays: [TextOverlayInstruction]
   let imageOverlays: [ImageOverlayInstruction]
+  let blurRegions: [BlurRegionInstruction]
   let isHDR: Bool
 
   init(
@@ -197,6 +204,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
     spotlightEdgeSoftness: CGFloat = 50,
     textOverlays: [TextOverlayInstruction] = [],
     imageOverlays: [ImageOverlayInstruction] = [],
+    blurRegions: [BlurRegionInstruction] = [],
     isHDR: Bool = false
   ) {
     self.timeRange = timeRange
@@ -263,6 +271,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
     self.spotlightEdgeSoftness = spotlightEdgeSoftness
     self.textOverlays = textOverlays
     self.imageOverlays = imageOverlays
+    self.blurRegions = blurRegions
     self.isHDR = isHDR
     var trackIDs: [NSValue] = [NSNumber(value: screenTrackID)]
     if let wid = webcamTrackID {

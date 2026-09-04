@@ -310,6 +310,12 @@ extension History {
       removed: "Image overlay removed",
       adjusted: "Image overlay adjusted"
     ),
+    regions(
+      \.blurRegions,
+      added: "Blur region added",
+      removed: "Blur region removed",
+      adjusted: "Blur region adjusted"
+    ),
 
     { old, new in
       guard old.captionSettings != new.captionSettings || old.captionSegments != new.captionSegments

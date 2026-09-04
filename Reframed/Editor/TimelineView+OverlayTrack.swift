@@ -5,7 +5,8 @@ extension TimelineView {
     let h = trackHeight
     let overlays = OverlayChip.timeline(
       text: editorState.textOverlays,
-      images: editorState.imageOverlays
+      images: editorState.imageOverlays,
+      blurs: editorState.blurRegions
     )
 
     return ZStack(alignment: .leading) {

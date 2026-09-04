@@ -11,6 +11,11 @@ extension FrameRenderer {
     outputHeight: Int,
     isTransitioning: Bool = false
   ) {
+    let screenImage = applyingBlurRegions(
+      to: screenImage,
+      instruction: instruction,
+      compositionTime: compositionTime
+    )
     if instruction.videoShadow > 0 && !isTransitioning {
       drawRoundedShadow(in: context, rect: videoRect, cornerRadius: instruction.videoCornerRadius, shadow: instruction.videoShadow)
     }
