@@ -203,7 +203,7 @@ enum ClickSoundGenerator {
   private static func decodeSamples(style: ClickSoundStyle, sampleRate: Double) -> [Float] {
     guard let data = Data(base64Encoded: style.base64Data) else { return [] }
     let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(
-      "reframed-click-\(UUID().uuidString).mp3"
+      "appshow-click-\(UUID().uuidString).mp3"
     )
     defer { try? FileManager.default.removeItem(at: tempURL) }
     do {

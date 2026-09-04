@@ -138,15 +138,15 @@ struct AgentWorkspaceTests {
       claude["mcpServers"]?["appshow"]?["command"]
         == "/Applications/AppShow.app/Contents/Helpers/appshow-mcp"
     )
-    #expect(claude["mcpServers"]?["appshow"]?["env"]?["REFRAMED_AGENT_SOCKET"] == .string(workspace.socketURL.path))
-    #expect(claude["mcpServers"]?["appshow"]?["env"]?["REFRAMED_AGENT_TOKEN"] == .string(workspace.token))
+    #expect(claude["mcpServers"]?["appshow"]?["env"]?["APPSHOW_AGENT_SOCKET"] == .string(workspace.socketURL.path))
+    #expect(claude["mcpServers"]?["appshow"]?["env"]?["APPSHOW_AGENT_TOKEN"] == .string(workspace.token))
 
     let codex = config.codexArguments
     #expect(Array(codex.prefix(2)) == ["-c", "mcp_servers={}"])
     #expect(codex.contains("mcp_servers.appshow.command=\"/Applications/AppShow.app/Contents/Helpers/appshow-mcp\""))
     #expect(codex.contains("mcp_servers.appshow.tool_timeout_sec=600"))
     #expect(codex.contains("mcp_servers.appshow.default_tools_approval_mode=\"approve\""))
-    #expect(codex.contains { $0.contains("REFRAMED_AGENT_SOCKET") && $0.contains("REFRAMED_AGENT_TOKEN") })
+    #expect(codex.contains { $0.contains("APPSHOW_AGENT_SOCKET") && $0.contains("APPSHOW_AGENT_TOKEN") })
   }
 
   @Test func sessionConfigWritesPrivateClaudeConfig() throws {

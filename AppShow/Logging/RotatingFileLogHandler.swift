@@ -11,7 +11,7 @@ struct RotatingFileLogHandler: LogHandler {
   }
 
   private let label: String
-  private static let queue = DispatchQueue(label: "eu.jankuri.reframed.log-writer")
+  private static let queue = DispatchQueue(label: "com.mattwebhub.appshow.log-writer")
   private static let maxFileSize: UInt64 = 5 * 1024 * 1024  // 5 MB
   private static let maxFiles = 3
 
@@ -21,7 +21,7 @@ struct RotatingFileLogHandler: LogHandler {
   }
 
   private static var logFile: URL {
-    logDirectory.appendingPathComponent("reframed.log")
+    logDirectory.appendingPathComponent("appshow.log")
   }
 
   init(label: String) {

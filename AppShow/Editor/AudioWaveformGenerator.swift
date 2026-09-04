@@ -9,7 +9,7 @@ final class AudioWaveformGenerator {
   private(set) var samples: [Float] = []
   private(set) var isGenerating = false
   private(set) var progress: Double = 0
-  nonisolated private static let logger = Logger(label: "eu.jankuri.reframed.waveform-generator")
+  nonisolated private static let logger = Logger(label: "com.mattwebhub.appshow.waveform-generator")
 
   func generate(from url: URL, count: Int = 200) async {
     isGenerating = true

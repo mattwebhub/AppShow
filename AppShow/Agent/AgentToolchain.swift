@@ -2,7 +2,7 @@ import Foundation
 import Logging
 
 actor AgentToolchain {
-  private let logger = Logger(label: "eu.jankuri.reframed.agent-toolchain")
+  private let logger = Logger(label: "com.mattwebhub.appshow.agent-toolchain")
   private let pathDirectories: [URL]
   private let extraDirectories: [URL]
   private let loginShell: URL?

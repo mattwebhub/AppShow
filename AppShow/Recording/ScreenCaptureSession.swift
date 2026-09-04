@@ -7,7 +7,7 @@ import Logging
 final class ScreenCaptureSession: NSObject, SCStreamDelegate, SCStreamOutput, @unchecked Sendable {
   private var stream: SCStream?
   private let videoWriter: VideoTrackWriter
-  private let logger = Logger(label: "eu.jankuri.reframed.capture-session")
+  private let logger = Logger(label: "com.mattwebhub.appshow.capture-session")
   private var totalCallbacks = 0
   private var completeFrames = 0
   private var idleFrames = 0

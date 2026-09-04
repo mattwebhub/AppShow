@@ -51,7 +51,7 @@ extension VideoCompositor {
     isHDR: Bool = false,
     progressHandler: (@MainActor @Sendable (Double, Double?) -> Void)?
   ) async throws {
-    let logger = Logger(label: "eu.jankuri.reframed.video-compositor")
+    let logger = Logger(label: "com.mattwebhub.appshow.video-compositor")
 
     let reader = try AVAssetReader(asset: composition)
     reader.timeRange = CMTimeRange(start: .zero, duration: trimDuration)
@@ -216,7 +216,7 @@ extension VideoCompositor {
             nonisolated(unsafe) let safeAudioOutput = aOut
             nonisolated(unsafe) let safeAudioInput = aIn
             audioGroup.enter()
-            let audioQueue = DispatchQueue(label: "eu.jankuri.reframed.manual-audio", qos: .userInitiated)
+            let audioQueue = DispatchQueue(label: "com.mattwebhub.appshow.manual-audio", qos: .userInitiated)
             safeAudioInput.requestMediaDataWhenReady(on: audioQueue) {
               while safeAudioInput.isReadyForMoreMediaData {
                 if cancelled.pointee {

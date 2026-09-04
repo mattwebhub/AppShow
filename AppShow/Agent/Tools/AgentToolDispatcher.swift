@@ -17,7 +17,7 @@ final class AgentToolDispatcher {
   private var mutationBatch: MutationBatch?
   private var batchTimeoutTask: Task<Void, Never>?
   private var batchTerminationError: AgentToolError?
-  private let logger = Logger(label: "eu.jankuri.reframed.agent-tools")
+  private let logger = Logger(label: "com.mattwebhub.appshow.agent-tools")
 
   init(
     editorState: EditorState,

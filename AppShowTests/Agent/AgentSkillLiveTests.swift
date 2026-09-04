@@ -4,7 +4,7 @@ import Testing
 @testable import AppShow
 
 @MainActor
-@Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["REFRAMED_RUN_AGENT_SKILL_E2E"] == "1"))
+@Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["APPSHOW_RUN_AGENT_SKILL_E2E"] == "1"))
 struct AgentSkillLiveTests {
   private struct ClaudeModelOverrideProvider: AgentProvider {
     let model: String
@@ -105,7 +105,7 @@ struct AgentSkillLiveTests {
   private func provider(for kind: AgentProviderKind) -> any AgentProvider {
     guard
       kind == .claudeCode,
-      let model = ProcessInfo.processInfo.environment["REFRAMED_AGENT_CLAUDE_MODEL"],
+      let model = ProcessInfo.processInfo.environment["APPSHOW_AGENT_CLAUDE_MODEL"],
       !model.isEmpty
     else { return kind.makeProvider() }
     return ClaudeModelOverrideProvider(model: model)

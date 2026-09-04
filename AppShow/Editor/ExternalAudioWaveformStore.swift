@@ -11,7 +11,7 @@ final class ExternalAudioWaveformStore {
   private(set) var samples: [UUID: [Float]] = [:]
   private var generating: Set<UUID> = []
   private var tasks: [UUID: Task<[Float], Never>] = [:]
-  nonisolated private static let logger = Logger(label: "eu.jankuri.reframed.external-audio-waveform-store")
+  nonisolated private static let logger = Logger(label: "com.mattwebhub.appshow.external-audio-waveform-store")
 
   func isGenerating(_ id: UUID) -> Bool {
     generating.contains(id)

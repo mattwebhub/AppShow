@@ -5,7 +5,7 @@ import Testing
 @testable import AppShow
 
 struct EditorStateExportConfigTests {
-  private let bundleURL = URL(fileURLWithPath: "/tmp/reframed-tests/example.frm", isDirectory: true)
+  private let bundleURL = URL(fileURLWithPath: "/tmp/appshow-tests/example.frm", isDirectory: true)
 
   private func track(_ n: Int, muted: Bool = false, volume: Float = 1) -> ExternalAudioTrackData {
     ExternalAudioTrackData(

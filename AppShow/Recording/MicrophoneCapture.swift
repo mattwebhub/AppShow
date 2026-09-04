@@ -10,9 +10,9 @@ struct MicrophoneFormat: Sendable {
 final class MicrophoneCapture: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate, @unchecked Sendable {
   private var captureSession: AVCaptureSession?
   private var audioWriter: AudioTrackWriter?
-  private let logger = Logger(label: "eu.jankuri.reframed.microphone-capture")
+  private let logger = Logger(label: "com.mattwebhub.appshow.microphone-capture")
   private var isPaused = false
-  private let verifyQueue = DispatchQueue(label: "eu.jankuri.reframed.mic-verify", qos: .userInteractive)
+  private let verifyQueue = DispatchQueue(label: "com.mattwebhub.appshow.mic-verify", qos: .userInteractive)
   private var firstSampleContinuation: CheckedContinuation<Void, any Error>?
   var onDisconnected: (@Sendable () -> Void)?
 

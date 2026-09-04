@@ -9,6 +9,6 @@ struct LaunchEnvironmentTests {
   }
 
   @Test func schemeSetsExplicitTestHostFlag() {
-    #expect(ProcessInfo.processInfo.environment["REFRAMED_TEST_HOST"] == "1")
+    #expect(ProcessInfo.processInfo.environment["APPSHOW_TEST_HOST"] == "1")
   }
 }

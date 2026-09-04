@@ -12,9 +12,9 @@ struct VerifiedCamera: Sendable {
 final class WebcamCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, @unchecked Sendable {
   private(set) var captureSession: AVCaptureSession?
   private var videoWriter: VideoTrackWriter?
-  private let logger = Logger(label: "eu.jankuri.reframed.webcam-capture")
+  private let logger = Logger(label: "com.mattwebhub.appshow.webcam-capture")
   private var isPaused = false
-  private let verifyQueue = DispatchQueue(label: "eu.jankuri.reframed.webcam-verify", qos: .userInteractive)
+  private let verifyQueue = DispatchQueue(label: "com.mattwebhub.appshow.webcam-verify", qos: .userInteractive)
   private var firstFrameContinuation: CheckedContinuation<Void, any Error>?
   private var selectedDims: (width: Int, height: Int) = (1280, 720)
   var onDisconnected: (@Sendable () -> Void)?
@@ -104,7 +104,7 @@ final class WebcamCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
     }
 
     nonisolated(unsafe) let unsafeSession = session
-    let startQueue = DispatchQueue(label: "eu.jankuri.reframed.webcam-start")
+    let startQueue = DispatchQueue(label: "com.mattwebhub.appshow.webcam-start")
     startQueue.async {
       unsafeSession.startRunning()
     }

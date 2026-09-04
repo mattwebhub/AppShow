@@ -20,9 +20,11 @@ enum AppShowPaths {
   }
 
   static var temp: URL {
-    if let override = ProcessInfo.processInfo.environment["APPSHOW_TMP"]
-      ?? ProcessInfo.processInfo.environment["REFRAMED_TMP"]
-    {
+    resolveTemp(environment: ProcessInfo.processInfo.environment)
+  }
+
+  static func resolveTemp(environment: [String: String]) -> URL {
+    if let override = environment["APPSHOW_TMP"] ?? environment["REFRAMED_TMP"] {
       return URL(fileURLWithPath: override, isDirectory: true)
     }
     return URL(fileURLWithPath: "/tmp/AppShow", isDirectory: true)

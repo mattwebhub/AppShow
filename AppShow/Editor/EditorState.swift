@@ -97,7 +97,7 @@ final class EditorState {
   var agentMutationBatchActive = false
   var pendingUndoTask: Task<Void, Never>?
 
-  let logger = Logger(label: "eu.jankuri.reframed.editor-state")
+  let logger = Logger(label: "com.mattwebhub.appshow.editor-state")
   var pendingSaveTask: Task<Void, Never>?
 
   var systemAudioVolume: Float = 1.0

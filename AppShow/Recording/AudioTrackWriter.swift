@@ -31,8 +31,8 @@ final class AudioTrackWriter: @unchecked Sendable {
   init(outputURL: URL, label: String, sampleRate: Double, channelCount: Int, clock: SharedRecordingClock) throws {
     self.outputURL = outputURL
     self.clock = clock
-    self.logger = Logger(label: "eu.jankuri.reframed.audio-track-writer.\(label)")
-    self.queue = DispatchQueue(label: "eu.jankuri.reframed.audio-track-writer.\(label).queue", qos: .userInteractive)
+    self.logger = Logger(label: "com.mattwebhub.appshow.audio-track-writer.\(label)")
+    self.queue = DispatchQueue(label: "com.mattwebhub.appshow.audio-track-writer.\(label).queue", qos: .userInteractive)
     self.outputSettings = [
       AVFormatIDKey: kAudioFormatAppleLossless,
       AVSampleRateKey: sampleRate,

@@ -19,7 +19,7 @@ extension VideoCompositor {
     }
 
     let tempURL = FileManager.default.temporaryDirectory
-      .appendingPathComponent("reframed-nr-\(UUID().uuidString).m4a")
+      .appendingPathComponent("appshow-nr-\(UUID().uuidString).m4a")
     try await RNNoiseProcessor.processFile(
       inputURL: micURL,
       outputURL: tempURL,
@@ -67,7 +67,7 @@ extension VideoCompositor {
     guard !clicks.isEmpty else { return nil }
 
     let tempURL = FileManager.default.temporaryDirectory
-      .appendingPathComponent("reframed-clicks-\(UUID().uuidString).m4a")
+      .appendingPathComponent("appshow-clicks-\(UUID().uuidString).m4a")
     try ClickSoundGenerator.generateClickAudioFile(
       at: tempURL,
       clickTimes: clicks,

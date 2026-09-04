@@ -4,7 +4,7 @@ import Testing
 @testable import AppShow
 
 @MainActor
-@Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["REFRAMED_RUN_SHIM_TESTS"] == "1"))
+@Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["APPSHOW_RUN_SHIM_TESTS"] == "1"))
 struct AgentShimTests {
   @Test func bundledShimInjectsAuthenticationAndListsEditingTools() async throws {
     let dir = try TestPaths.makeTemporaryDirectory()

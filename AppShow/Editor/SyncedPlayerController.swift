@@ -12,7 +12,7 @@ enum GapSkipDecision: Equatable, Sendable {
 @MainActor
 @Observable
 final class SyncedPlayerController {
-  private let logger = Logger(label: "eu.jankuri.reframed.synced-player")
+  private let logger = Logger(label: "com.mattwebhub.appshow.synced-player")
   let screenPlayer: AVPlayer
   let webcamPlayer: AVPlayer?
   private let systemAudioPlayer: AVPlayer?

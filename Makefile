@@ -30,19 +30,19 @@ test:
 	@set -o pipefail; xcodebuild -project AppShow.xcodeproj -scheme $(SCHEME) -configuration Debug test -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)' -parallel-testing-enabled NO $(TEST_FILTER) 2>&1 | grep -E '$(TEST_OUTPUT_FILTER)'
 
 test-shim:
-	@TEST_RUNNER_REFRAMED_RUN_SHIM_TESTS=1 $(MAKE) test T=AgentShimTests
+	@TEST_RUNNER_APPSHOW_RUN_SHIM_TESTS=1 $(MAKE) test T=AgentShimTests
 
 test-agent-skills:
-	@TEST_RUNNER_REFRAMED_RUN_AGENT_SKILL_E2E=1 TEST_RUNNER_REFRAMED_AGENT_CLAUDE_MODEL="$(CLAUDE_MODEL)" $(MAKE) test T=AgentSkillLiveTests
+	@TEST_RUNNER_APPSHOW_RUN_AGENT_SKILL_E2E=1 TEST_RUNNER_APPSHOW_AGENT_CLAUDE_MODEL="$(CLAUDE_MODEL)" $(MAKE) test T=AgentSkillLiveTests
 
 test-scenario:
-	@TEST_RUNNER_REFRAMED_RUN_SCENARIO_TESTS=1 TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 $(MAKE) test T=PresentationScenarioTests
+	@TEST_RUNNER_APPSHOW_RUN_SCENARIO_TESTS=1 TEST_RUNNER_APPSHOW_RUN_EXPORT_TESTS=1 $(MAKE) test T=PresentationScenarioTests
 
 dmg: release
 	@./scripts/create-dmg.sh
 
 dmg-release: release
-	@./scripts/create-dmg.sh --sign "$(REFRAMED_SIGNING_IDENTITY)" --notarize
+	@./scripts/create-dmg.sh --sign "$(APPSHOW_SIGNING_IDENTITY)" --notarize
 
 install: uninstall release
 	@cp -rf $(RELEASE_DIR)/$(APP_NAME).app /Applications/

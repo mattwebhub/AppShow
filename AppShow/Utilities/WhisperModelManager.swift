@@ -51,8 +51,7 @@ final class WhisperModelManager {
   private let modelsDirectory: URL
 
   private init() {
-    let base = FileManager.default.homeDirectoryForCurrentUser
-      .appendingPathComponent(".reframed")
+    let base = AppShowPaths.home
     self.modelsDirectory = base
     try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
     scanDownloadedModels()

@@ -14,7 +14,7 @@ final class AgentBridgeController {
   private(set) var status: AgentBridgeStatus = .stopped
   private(set) var configuration: AgentSessionConfig?
   private var server: AgentBridgeServer?
-  private let logger = Logger(label: "eu.jankuri.reframed.agent-bridge-controller")
+  private let logger = Logger(label: "com.mattwebhub.appshow.agent-bridge-controller")
 
   static var bundledHelperURL: URL {
     Bundle.main.bundleURL.appendingPathComponent("Contents/Helpers/appshow-mcp")

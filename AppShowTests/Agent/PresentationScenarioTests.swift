@@ -5,7 +5,7 @@ import Testing
 @testable import AppShow
 
 @MainActor
-@Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["REFRAMED_RUN_SCENARIO_TESTS"] == "1"))
+@Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["APPSHOW_RUN_SCENARIO_TESTS"] == "1"))
 struct PresentationScenarioTests {
   private struct Harness {
     let directory: URL
@@ -48,7 +48,7 @@ struct PresentationScenarioTests {
     #expect(harness.state.createSnapshot() == harness.initialSnapshot)
   }
 
-  @Test(.enabled(if: ProcessInfo.processInfo.environment["REFRAMED_RUN_EXPORT_TESTS"] == "1"))
+  @Test(.enabled(if: ProcessInfo.processInfo.environment["APPSHOW_RUN_EXPORT_TESTS"] == "1"))
   func exportDraftOfScenarioHasExpectedDurationAndSize() async throws {
     let harness = try await makeHarness()
     defer { harness.tearDown() }

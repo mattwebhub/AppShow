@@ -9,8 +9,8 @@ final class VideoTrackWriter: @unchecked Sendable {
   private var isStarted = false
   private let outputURL: URL
   private let clock: SharedRecordingClock
-  private let logger = Logger(label: "eu.jankuri.reframed.video-track-writer")
-  let queue = DispatchQueue(label: "eu.jankuri.reframed.video-track-writer.queue", qos: .userInteractive)
+  private let logger = Logger(label: "com.mattwebhub.appshow.video-track-writer")
+  let queue = DispatchQueue(label: "com.mattwebhub.appshow.video-track-writer.queue", qos: .userInteractive)
   var writtenFrames = 0
   var droppedFrames = 0
   private(set) var firstSamplePTS: CMTime = .invalid

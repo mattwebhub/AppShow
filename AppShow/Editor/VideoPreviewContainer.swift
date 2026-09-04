@@ -81,7 +81,7 @@ final class VideoPreviewContainer: NSView {
   var webcamOutput: AVPlayerItemVideoOutput?
   let processedWebcamLayer = CALayer()
   let segmentationProcessor = PersonSegmentationProcessor(quality: .balanced)
-  let segmentationQueue = DispatchQueue(label: "eu.jkuri.reframed.segmentation", qos: .userInteractive)
+  let segmentationQueue = DispatchQueue(label: "com.mattwebhub.appshow.segmentation", qos: .userInteractive)
   var isProcessingWebcamFrame = false
   var lastProcessedWebcamTime: Double = -1
 

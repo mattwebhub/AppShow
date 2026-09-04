@@ -44,18 +44,18 @@
       </Testables>
       <EnvironmentVariables>
          <EnvironmentVariable
-            key = "REFRAMED_TEST_HOST"
+            key = "APPSHOW_TEST_HOST"
             value = "1"
             isEnabled = "YES">
          </EnvironmentVariable>
          <EnvironmentVariable
-            key = "REFRAMED_HOME"
-            value = "/tmp/reframed-tests/home"
+            key = "APPSHOW_HOME"
+            value = "/tmp/appshow-tests/home"
             isEnabled = "YES">
          </EnvironmentVariable>
          <EnvironmentVariable
-            key = "REFRAMED_TMP"
-            value = "/tmp/reframed-tests/tmp"
+            key = "APPSHOW_TMP"
+            value = "/tmp/appshow-tests/tmp"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>
