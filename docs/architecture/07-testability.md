@@ -224,7 +224,7 @@ plus, in `ConfigService` and `StateService`, an internal `init(fileURL: URL)` th
 
 ### S7 — `private static` helpers that are the actual logic
 
-> Landed 2026-09-04 for `TranscriptionService.mergeShortSegments` and `stripSpecialTokens`. The rest stay private until a test needs them.
+> Landed 2026-09-04 for `TranscriptionService.mergeShortSegments` and `stripSpecialTokens`; milestone 02 extracted `SyncedPlayerController.gapSkipDecision`, `EditorState.exportVideoRegions`/`exportTrimRange`, and `TimelineGeometry.rulerInterval` as internal pure functions. The rest stay private until a test needs them.
 
 `TranscriptionService.mergeShortSegments/stripSpecialTokens` (`Reframed/Utilities/TranscriptionService.swift`), `EditorState.filterNonSpeechSegments` (`Reframed/Editor/EditorState+Captions.swift`), `AudioWaveformGenerator.downsample` (`Reframed/Editor/AudioWaveformGenerator.swift`), `MediaFileInfo.formatBitrate`, `SubtitleExporter.srtTimestamp/vttTimestamp`, `ReframedProject.projectPrefix`, `CursorSmoothing.buildTypingIntervals`. **Fix:** drop `private` (internal is enough for `@testable`). Do it lazily, one function per test that needs it, and list each in `planning/upstream-sync.md`.
 

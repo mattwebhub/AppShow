@@ -14,10 +14,10 @@ Mirror of `planning/features/lossless-cut/TASKS.md`; tick both.
 - [x] T4. P5 playback jumping (T2 rows green). Proof: `SyncedPlayerControllerTests`, `EditorStatePlaybackTests`.
 - [x] T5. P2 persistence + history (T2 rows green). Proof: `ProjectMetadataTests`, `HistoryChangeRulesTests`, `EditorStateVideoRegionsTests`.
 - [x] T6. P7 unit rows + seam S3. Proof: `EditorStateExportTests`.
-- [ ] T7. P6 compressed timeline. Proof: `TimelineGeometryTests`, manual alignment check.
+- [x] T7. P6 compressed timeline. Proof: `TimelineGeometryTests`, manual alignment check.
 - [x] T8. P7 gated export run. Proof: `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests`.
 - [x] T9. Docs and divergences: `docs/editor.md`, `AGENTS.md`, `planning/upstream-sync.md`, `docs/architecture/07-testability.md` seams. Proof: grep.
-- [ ] T10. VERIFY.md run, branch pushed, PR opened, URL recorded.
+- [x] T10. VERIFY.md automated rows run, branch pushed, PR opened (https://github.com/mattwebhub/Reframed/pull/3); manual rows pending a human.
 
 ## Out of scope
 
