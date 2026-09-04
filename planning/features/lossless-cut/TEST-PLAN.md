@@ -13,7 +13,7 @@ Layers from `planning/tdd-strategy.md`. Full assertions in `docs/features/01-los
 | 2 | `CutTimelineTests` showCutTrack gate | unit T1 | same as row 1 | none | green |
 | 4 | `SyncedPlayerControllerTests` gapSkipDecision, observer skips gap in edit mode | T1 + T2 | `ReframedTests/Editor/SyncedPlayerControllerTests.swift` | generated 2 s movie | T1 green (4); the periodic-observer T2 row is covered by the boundary observer design and the manual playback check, not automated (no sleeps rule) |
 | 4 | `EditorStatePlaybackTests` togglePlayPause from gap, skipsGaps sync | T2 | `ReframedTests/Editor/EditorStatePlaybackTests.swift` | generated 2 s movie | green (2) |
-| 6 | `TimelineGeometryTests` compressed x↔source, region pieces, ruler | unit T1 | `ReframedTests/Editor/TimelineGeometryTests.swift` | none | red |
+| 6 | `TimelineGeometryTests` compressed x↔source, region pieces, ruler | unit T1 | `ReframedTests/Editor/TimelineGeometryTests.swift` | none | green (13) |
 | 5 | `EditorStateExportTests` exportVideoRegions decision | unit T1 | `ReframedTests/Editor/EditorStateExportTests.swift` | none | green (4) |
 | 5 | `ExportPipelineTests` two-slice duration, full-slice duration | gated T2 | `ReframedTests/Compositor/ExportPipelineTests.swift` | generated movies | green (2, `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1`); camera-per-segment pixel check deferred |
 
