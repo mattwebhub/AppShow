@@ -294,9 +294,7 @@ final class EditorState {
       if let savedMicRegions = saved.micAudioRegions, !savedMicRegions.isEmpty {
         micAudioRegions = savedMicRegions
       }
-      if let savedTracks = saved.externalAudioTracks, !savedTracks.isEmpty {
-        externalAudioTracks = savedTracks
-      }
+      restoreExternalAudioTracks(saved.externalAudioTracks ?? [])
       if let savedCameraRegions = saved.cameraRegions, !savedCameraRegions.isEmpty {
         cameraRegions = savedCameraRegions
       } else if let legacyRegions = saved.cameraFullscreenRegions, !legacyRegions.isEmpty {

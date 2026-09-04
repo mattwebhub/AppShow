@@ -46,6 +46,10 @@ struct ReframedProject: Sendable {
     return FileManager.default.fileExists(atPath: url.path) ? url : nil
   }
 
+  func externalAudioURL(fileName: String) -> URL {
+    bundleURL.appendingPathComponent(fileName)
+  }
+
   var recordingResult: RecordingResult {
     RecordingResult(
       screenVideoURL: screenVideoURL,

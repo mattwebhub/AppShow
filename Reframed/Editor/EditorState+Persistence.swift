@@ -289,6 +289,9 @@ extension EditorState {
     if regionsChanged {
       syncAudioRegionsToPlayer()
     }
+    if prev.externalAudioTracks != data.externalAudioTracks {
+      syncExternalAudioToPlayer()
+    }
 
     let noiseChanged =
       prev.audioSettings?.micNoiseReductionEnabled
