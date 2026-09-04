@@ -4,15 +4,18 @@ enum OverlayChip: Identifiable {
   enum ID: Hashable {
     case text(UUID)
     case image(UUID)
+    case blur(UUID)
   }
 
   case text(TextOverlayData)
   case image(ImageOverlayData)
+  case blur(BlurRegionData)
 
   var id: ID {
     switch self {
     case .text(let overlay): .text(overlay.id)
     case .image(let overlay): .image(overlay.id)
+    case .blur(let region): .blur(region.id)
     }
   }
 
@@ -20,6 +23,7 @@ enum OverlayChip: Identifiable {
     switch self {
     case .text(let overlay): overlay.startSeconds
     case .image(let overlay): overlay.startSeconds
+    case .blur(let region): region.startSeconds
     }
   }
 
@@ -27,11 +31,16 @@ enum OverlayChip: Identifiable {
     switch self {
     case .text(let overlay): overlay.endSeconds
     case .image(let overlay): overlay.endSeconds
+    case .blur(let region): region.endSeconds
     }
   }
 
-  static func timeline(text: [TextOverlayData], images: [ImageOverlayData]) -> [OverlayChip] {
-    let chips = text.map(OverlayChip.text) + images.map(OverlayChip.image)
+  static func timeline(
+    text: [TextOverlayData],
+    images: [ImageOverlayData],
+    blurs: [BlurRegionData] = []
+  ) -> [OverlayChip] {
+    let chips = text.map(OverlayChip.text) + images.map(OverlayChip.image) + blurs.map(OverlayChip.blur)
     return chips.enumerated().sorted {
       if $0.element.startSeconds != $1.element.startSeconds {
         return $0.element.startSeconds < $1.element.startSeconds
@@ -49,6 +58,8 @@ extension TimelineView {
       textOverlayChipView(overlay: overlay, width: width, height: height)
     case .image(let overlay):
       imageOverlayChipView(overlay: overlay, width: width, height: height)
+    case .blur(let region):
+      blurRegionChipView(region: region, width: width, height: height)
     }
   }
 

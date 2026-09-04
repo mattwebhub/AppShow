@@ -57,6 +57,12 @@
 		7E57000000000000000000A9 /* ImageOverlayLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000A8 /* ImageOverlayLayout.swift */; };
 		7E57000000000000000000AB /* FrameRenderer+ImageOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000AA /* FrameRenderer+ImageOverlays.swift */; };
 		7E57000000000000000000AD /* VideoPreviewContainer+ImageOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000AC /* VideoPreviewContainer+ImageOverlays.swift */; };
+		7E5D000000000000000000D2 /* BlurRegionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D1 /* BlurRegionData.swift */; };
+		7E5D000000000000000000D4 /* EditorState+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D3 /* EditorState+BlurRegions.swift */; };
+		7E5D000000000000000000D6 /* FrameRenderer+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D5 /* FrameRenderer+BlurRegions.swift */; };
+		7E5D000000000000000000D8 /* VideoPreviewContainer+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D7 /* VideoPreviewContainer+BlurRegions.swift */; };
+		7E5D000000000000000000DA /* TimelineView+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D9 /* TimelineView+BlurRegions.swift */; };
+		7E5D000000000000000000DC /* BlurRegionEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000DB /* BlurRegionEditPopover.swift */; };
 		7E57000000000000000000AF /* TimelineView+OverlayChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000AE /* TimelineView+OverlayChip.swift */; };
 		7E57000000000000000000B1 /* ImageOverlayEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000B0 /* ImageOverlayEditPopover.swift */; };
 		7E57000000000000000000B3 /* OverlayPositionControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000B2 /* OverlayPositionControls.swift */; };
@@ -340,6 +346,12 @@
 		7E57000000000000000000A8 /* ImageOverlayLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayLayout.swift; sourceTree = "<group>"; };
 		7E57000000000000000000AA /* FrameRenderer+ImageOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FrameRenderer+ImageOverlays.swift"; sourceTree = "<group>"; };
 		7E57000000000000000000AC /* VideoPreviewContainer+ImageOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewContainer+ImageOverlays.swift"; sourceTree = "<group>"; };
+		7E5D000000000000000000D1 /* BlurRegionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurRegionData.swift; sourceTree = "<group>"; };
+		7E5D000000000000000000D3 /* EditorState+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+BlurRegions.swift"; sourceTree = "<group>"; };
+		7E5D000000000000000000D5 /* FrameRenderer+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FrameRenderer+BlurRegions.swift"; sourceTree = "<group>"; };
+		7E5D000000000000000000D7 /* VideoPreviewContainer+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewContainer+BlurRegions.swift"; sourceTree = "<group>"; };
+		7E5D000000000000000000D9 /* TimelineView+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+BlurRegions.swift"; sourceTree = "<group>"; };
+		7E5D000000000000000000DB /* BlurRegionEditPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurRegionEditPopover.swift; sourceTree = "<group>"; };
 		7E57000000000000000000AE /* TimelineView+OverlayChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+OverlayChip.swift"; sourceTree = "<group>"; };
 		7E57000000000000000000B0 /* ImageOverlayEditPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayEditPopover.swift; sourceTree = "<group>"; };
 		7E57000000000000000000B2 /* OverlayPositionControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPositionControls.swift; sourceTree = "<group>"; };
@@ -919,6 +931,10 @@
 				7E5700000000000000000092 /* EditorState+TextOverlays.swift */,
 				7E57000000000000000000A6 /* EditorState+ImageOverlays.swift */,
 				7E57000000000000000000AC /* VideoPreviewContainer+ImageOverlays.swift */,
+				7E5D000000000000000000D3 /* EditorState+BlurRegions.swift */,
+				7E5D000000000000000000D7 /* VideoPreviewContainer+BlurRegions.swift */,
+				7E5D000000000000000000D9 /* TimelineView+BlurRegions.swift */,
+				7E5D000000000000000000DB /* BlurRegionEditPopover.swift */,
 				E8596CD61869ECC16EAECA92 /* EditorState+CameraLayout.swift */,
 				B2354223AAA382DB82EF31D5 /* EditorState+Zoom.swift */,
 				3596F81A6E600975B1EB8104 /* EditorState+Cursor.swift */,
@@ -973,6 +989,7 @@
 				7E5700000000000000000090 /* TextOverlayData.swift */,
 				7E57000000000000000000A2 /* ImageOverlayData.swift */,
 				7E57000000000000000000A4 /* ImageOverlayImporter.swift */,
+				7E5D000000000000000000D1 /* BlurRegionData.swift */,
 			);
 			path = Project;
 			sourceTree = "<group>";
@@ -982,6 +999,7 @@
 			children = (
 				7E57000000000000000000A8 /* ImageOverlayLayout.swift */,
 				7E57000000000000000000AA /* FrameRenderer+ImageOverlays.swift */,
+				7E5D000000000000000000D5 /* FrameRenderer+BlurRegions.swift */,
 				B20000000000000000000013 /* BackgroundStyle.swift */,
 				B20000000000000000000004 /* CameraLayout.swift */,
 				B2000000000000000000000F /* FrameRenderer.swift */,
@@ -1317,6 +1335,12 @@
 				7E57000000000000000000A9 /* ImageOverlayLayout.swift in Sources */,
 				7E57000000000000000000AB /* FrameRenderer+ImageOverlays.swift in Sources */,
 				7E57000000000000000000AD /* VideoPreviewContainer+ImageOverlays.swift in Sources */,
+				7E5D000000000000000000D2 /* BlurRegionData.swift in Sources */,
+				7E5D000000000000000000D4 /* EditorState+BlurRegions.swift in Sources */,
+				7E5D000000000000000000D6 /* FrameRenderer+BlurRegions.swift in Sources */,
+				7E5D000000000000000000D8 /* VideoPreviewContainer+BlurRegions.swift in Sources */,
+				7E5D000000000000000000DA /* TimelineView+BlurRegions.swift in Sources */,
+				7E5D000000000000000000DC /* BlurRegionEditPopover.swift in Sources */,
 				7E57000000000000000000AF /* TimelineView+OverlayChip.swift in Sources */,
 				7E57000000000000000000B1 /* ImageOverlayEditPopover.swift in Sources */,
 				7E570000000000000000009F /* TextOverlayEditPopover+Style.swift in Sources */,

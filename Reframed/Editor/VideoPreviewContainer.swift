@@ -10,6 +10,7 @@ final class VideoPreviewContainer: NSView {
   let spotlightOverlay = SpotlightOverlayLayer()
   let textOverlayLayer = CALayer()
   let imageOverlayLayer = CALayer()
+  let blurOverlayLayer = CALayer()
   let screenContainerLayer = CALayer()
   var coordinator: VideoPreviewView.Coordinator?
   var isCameraHidden = false
@@ -73,6 +74,8 @@ final class VideoPreviewContainer: NSView {
   var lastImageOverlayTime: Double = 0
   var imageOverlayDirectory: URL?
   var imageOverlayImages: [String: CGImage] = [:]
+  var lastBlurRegions: [BlurRegionData] = []
+  var lastBlurRegionTime: Double = 0
   var currentCameraBackgroundStyle: CameraBackgroundStyle = .none
   var currentCameraBackgroundImage: NSImage?
   var webcamOutput: AVPlayerItemVideoOutput?
@@ -98,6 +101,10 @@ final class VideoPreviewContainer: NSView {
 
     screenPlayerLayer.videoGravity = .resizeAspectFill
     screenContainerLayer.addSublayer(screenPlayerLayer)
+
+    blurOverlayLayer.zPosition = 6
+    blurOverlayLayer.masksToBounds = true
+    screenContainerLayer.addSublayer(blurOverlayLayer)
 
     spotlightOverlay.zPosition = 8
     screenContainerLayer.addSublayer(spotlightOverlay)
@@ -150,6 +157,9 @@ final class VideoPreviewContainer: NSView {
     }
     if !lastImageOverlays.isEmpty {
       applyImageOverlays()
+    }
+    if !lastBlurRegions.isEmpty {
+      applyBlurRegions()
     }
   }
 }

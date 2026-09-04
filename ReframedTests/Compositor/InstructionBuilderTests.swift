@@ -274,4 +274,11 @@ struct InstructionBuilderTests {
 
     #expect(needsCompositor(config))
   }
+
+  @Test func blurRegionNeedsCompositor() {
+    var config = config()
+    config.blurRegions = [BlurRegionData(startSeconds: 0, endSeconds: 1)]
+
+    #expect(needsCompositor(config))
+  }
 }

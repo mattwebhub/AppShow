@@ -17,6 +17,7 @@ extension VideoCompositor {
     let spotlight: [SpotlightRegionData]
     let textOverlays: [TextOverlayData]
     let imageOverlays: [ImageOverlayData]
+    let blurRegions: [BlurRegionData]
   }
 
   static func remapAllRegions(
@@ -76,8 +77,45 @@ extension VideoCompositor {
           videoSegments: videoSegments,
           effectiveTrim: effectiveTrim
         )
+      },
+      blurRegions: config.blurRegions.flatMap {
+        remapBlurRegion(
+          $0,
+          hasVideoRegions: hasVideoRegions,
+          videoSegments: videoSegments,
+          effectiveTrim: effectiveTrim
+        )
       }
     )
+  }
+
+  private static func remapBlurRegion(
+    _ region: BlurRegionData,
+    hasVideoRegions: Bool,
+    videoSegments: [VideoSegment],
+    effectiveTrim: CMTimeRange
+  ) -> [BlurRegionData] {
+    if hasVideoRegions {
+      return videoSegments.compactMap { segment in
+        let sourceStart = CMTimeGetSeconds(segment.sourceRange.start)
+        let overlapStart = max(region.startSeconds, sourceStart)
+        let overlapEnd = min(region.endSeconds, CMTimeGetSeconds(segment.sourceRange.end))
+        guard overlapEnd > overlapStart else { return nil }
+        var mapped = region
+        mapped.id = UUID()
+        mapped.startSeconds = CMTimeGetSeconds(segment.compositionStart) + overlapStart - sourceStart
+        mapped.endSeconds = CMTimeGetSeconds(segment.compositionStart) + overlapEnd - sourceStart
+        return mapped
+      }
+    }
+    let trimStart = CMTimeGetSeconds(effectiveTrim.start)
+    let overlapStart = max(region.startSeconds, trimStart)
+    let overlapEnd = min(region.endSeconds, CMTimeGetSeconds(effectiveTrim.end))
+    guard overlapEnd > overlapStart else { return [] }
+    var mapped = region
+    mapped.startSeconds = overlapStart - trimStart
+    mapped.endSeconds = overlapEnd - trimStart
+    return [mapped]
   }
 
   private static func remapImageOverlay(

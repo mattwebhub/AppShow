@@ -63,6 +63,7 @@ final class EditorState {
   var spotlightRegions: [SpotlightRegionData] = []
   var textOverlays: [TextOverlayData] = []
   var imageOverlays: [ImageOverlayData] = []
+  var blurRegions: [BlurRegionData] = []
 
   var clickSoundEnabled: Bool = false
   var clickSoundVolume: Float = 0.5
@@ -315,6 +316,7 @@ final class EditorState {
         textOverlays = savedTextOverlays
       }
       imageOverlays = availableImageOverlays(saved.imageOverlays ?? [])
+      blurRegions = (saved.blurRegions ?? []).map { $0.normalized() }
       if let audioSettings = saved.audioSettings {
         systemAudioVolume = audioSettings.systemAudioVolume
         micAudioVolume = audioSettings.micAudioVolume
