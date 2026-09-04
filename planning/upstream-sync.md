@@ -46,6 +46,7 @@ Keep this list current. Each entry links the ADR that justifies it.
 - Test seams (milestone 01): `Reframed/Project/ReframedProject.swift` `create(..., cleanupTemp: Bool = true)` (S4); `Reframed/Utilities/TranscriptionService.swift` `mergeShortSegments` and `stripSpecialTokens` widened from `private static` to `static` (S7): `docs/architecture/07-testability.md`
 - Lint fix in `Reframed/State/SessionState+WindowInfo.swift` (labeled closure argument) so `make lint` is clean
 - `AGENTS.md` canonical, `CLAUDE.md` symlink; assistant-neutral wording: `decisions/0007-assistant-agnostic-docs.md`
+- Read-only agent tool bridge (milestone 05): new `Reframed/Agent/Tools/` module with JSON-RPC framing, MCP-shaped catalog and results, main-actor dispatcher, preview-frame renderer, authenticated Unix socket server, and sibling `.agent/` workspace; source registration only in `Reframed.xcodeproj/project.pbxproj`: `planning/milestones/05-agent-tools-readonly/PLAN.md`
 
 ## Cadence
 
