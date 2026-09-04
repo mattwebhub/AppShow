@@ -81,6 +81,7 @@ struct VideoPreviewView: NSViewRepresentable {
   var cameraBackgroundStyle: CameraBackgroundStyle = .none
   var cameraBackgroundImage: NSImage?
   var isHDR: Bool = false
+  var textOverlays: [TextOverlayData] = []
 
   func makeNSView(context: Context) -> VideoPreviewContainer {
     let container = VideoPreviewContainer()
@@ -123,6 +124,7 @@ struct VideoPreviewView: NSViewRepresentable {
     updateLayout(nsView)
     updateZoom(nsView)
     updateOverlays(nsView)
+    updateTextOverlays(nsView)
     updateClickSound(context.coordinator)
   }
 
