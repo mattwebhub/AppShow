@@ -50,6 +50,7 @@ Reframed is a macOS screen recording app with a menu bar interface, floating cap
 
 ```
 Reframed/
+├── Agent/            Claude Code/Codex providers, process/session actors, one persisted project conversation, chat panel
 ├── App/              AppDelegate, Permissions, WindowController
 ├── CaptureModes/     Area/Screen/Window/Device selection + Common overlay components
 ├── Compositor/       Video composition & export (VideoCompositor, FrameRenderer, ExportSettings, BackgroundStyle, CameraLayout, GradientPresets)
@@ -103,6 +104,7 @@ After selection, ScreenCaptureKit captures the chosen target. CVPixelBuffers flo
 Built-in editor with:
 - Timeline trimming (independent trim ranges for video, system audio, mic audio)
 - Keep-slices (`CutTimeline`): the transport-bar cut button splits at the playhead, a Cuts track appears under Screen, playback jumps over gaps, export concatenates kept slices
+- Assistant panel: collapsible project chat using Claude Code or Codex, one persisted conversation per `.frm`, fresh process per turn with provider-specific session resumption
 - Audio regions (per-track independent audio trimming with volume and mute controls)
 - Background styles (none, solid color, gradient presets, background image with fill modes)
 - Canvas aspect ratios (original, 16:9, 1:1, 4:3, 9:16)
@@ -145,6 +147,8 @@ recording-YYYY-MM-DD-HHmmss.frm/
 ```
 
 Projects can be reopened and re-edited. Editor state is persisted in `project.json` including: trim ranges, background style, canvas aspect, camera layout/regions with transitions, cursor settings, zoom keyframes, animation settings, audio settings (volume/mute/noise reduction), and audio regions.
+
+Each project may also contain `agent/conversation.json`, the single persisted assistant conversation and provider-specific resume ids. Ephemeral agent sockets, tokens, and preview frames live beside the bundle in `.agent/<project-name>/`.
 
 ### Coordinate system
 
