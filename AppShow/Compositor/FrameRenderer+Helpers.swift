@@ -43,8 +43,9 @@ extension FrameRenderer {
     region: RegionTransitionInfo
   ) -> CGFloat {
     let t = CMTimeGetSeconds(compositionTime)
-    let start = CMTimeGetSeconds(region.timeRange.start)
-    let end = CMTimeGetSeconds(region.timeRange.end)
+    let transitionRange = region.transitionTimeRange ?? region.timeRange
+    let start = CMTimeGetSeconds(transitionRange.start)
+    let end = CMTimeGetSeconds(transitionRange.end)
     let elapsed = t - start
     let remaining = end - t
     if region.entryTransition != .none && elapsed < region.entryDuration {
@@ -61,8 +62,9 @@ extension FrameRenderer {
     region: RegionTransitionInfo
   ) -> RegionTransitionType {
     let t = CMTimeGetSeconds(compositionTime)
-    let start = CMTimeGetSeconds(region.timeRange.start)
-    let end = CMTimeGetSeconds(region.timeRange.end)
+    let transitionRange = region.transitionTimeRange ?? region.timeRange
+    let start = CMTimeGetSeconds(transitionRange.start)
+    let end = CMTimeGetSeconds(transitionRange.end)
     let elapsed = t - start
     let remaining = end - t
     if region.entryTransition != .none && elapsed < region.entryDuration {

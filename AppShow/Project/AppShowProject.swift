@@ -65,7 +65,8 @@ struct AppShowProject: Sendable {
       webcamSize: metadata.webcamSize?.cgSize,
       fps: metadata.fps,
       captureQuality: CaptureQuality(rawValue: metadata.captureQuality ?? "standard") ?? .standard,
-      isHDR: metadata.isHDR
+      isHDR: metadata.isHDR,
+      webcamPresentation: metadata.webcamPresentation
     )
   }
 
@@ -123,7 +124,8 @@ struct AppShowProject: Sendable {
       hasWebcam: result.webcamVideoURL != nil,
       captureMode: captureMode,
       captureQuality: result.captureQuality.rawValue,
-      isHDR: result.isHDR
+      isHDR: result.isHDR,
+      webcamPresentation: result.webcamPresentation
     )
 
     let encoder = JSONEncoder()

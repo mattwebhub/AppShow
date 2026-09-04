@@ -347,6 +347,13 @@
 		3AA6100EC0EFCD68EA336A4F /* TimelineView+CutInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0A027037B17DB353691112 /* TimelineView+CutInteraction.swift */; };
 		D4268CA99D45E24749DFB574 /* TimelineView+Tracks.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4373EF756D0D00897285113 /* TimelineView+Tracks.swift */; };
 		BB967BC7D7AA71DFED15E967 /* EditorView+PreviewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21AF098EF27738AA63BD47F6 /* EditorView+PreviewProgress.swift */; };
+		6103BA147E834BA897084E10 /* AgentCameraTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818D42682C67412089224280 /* AgentCameraTools.swift */; };
+		71A20EA87B914AF88E205EDB /* WebcamPresentationControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFBB879028A4DF787BDEA64 /* WebcamPresentationControls.swift */; };
+		37B364DE8A7A47F68FAAD9EA /* TimeRangeControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C5B7F3292A4795A3E6E7F0 /* TimeRangeControls.swift */; };
+		D55187EB538D4391B28EE3A7 /* TimelineView+CameraRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA79ECF103AD48BAA913BA74 /* TimelineView+CameraRegion.swift */; };
+		99ACD07FB1A14321A1282774 /* TimelineView+CameraInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F71CE458C34C11A441D4D2 /* TimelineView+CameraInteraction.swift */; };
+		22EE076F80324BFB9544EEDD /* CameraRegionEditPopover+Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13CDBA66EA84BE1B369B3F6 /* CameraRegionEditPopover+Controls.swift */; };
+		2F9BD6843E4548A8BB54DC90 /* PropertiesPanel+CameraBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67CE7059FD694BEF8DA4F931 /* PropertiesPanel+CameraBackground.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -721,6 +728,13 @@
 		8A0A027037B17DB353691112 /* TimelineView+CutInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CutInteraction.swift"; sourceTree = "<group>"; };
 		D4373EF756D0D00897285113 /* TimelineView+Tracks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+Tracks.swift"; sourceTree = "<group>"; };
 		21AF098EF27738AA63BD47F6 /* EditorView+PreviewProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorView+PreviewProgress.swift"; sourceTree = "<group>"; };
+		818D42682C67412089224280 /* AgentCameraTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentCameraTools.swift"; sourceTree = "<group>"; };
+		AAFBB879028A4DF787BDEA64 /* WebcamPresentationControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebcamPresentationControls.swift"; sourceTree = "<group>"; };
+		C9C5B7F3292A4795A3E6E7F0 /* TimeRangeControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeRangeControls.swift"; sourceTree = "<group>"; };
+		CA79ECF103AD48BAA913BA74 /* TimelineView+CameraRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CameraRegion.swift"; sourceTree = "<group>"; };
+		10F71CE458C34C11A441D4D2 /* TimelineView+CameraInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CameraInteraction.swift"; sourceTree = "<group>"; };
+		B13CDBA66EA84BE1B369B3F6 /* CameraRegionEditPopover+Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CameraRegionEditPopover+Controls.swift"; sourceTree = "<group>"; };
+		67CE7059FD694BEF8DA4F931 /* PropertiesPanel+CameraBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+CameraBackground.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -940,6 +954,8 @@
 				B10000000000000000000022 /* SectionHeader.swift */,
 				B10000000000000000000023 /* CheckmarkRow.swift */,
 				B10000000000000000000024 /* OptionsPopover.swift */,
+				C9C5B7F3292A4795A3E6E7F0 /* TimeRangeControls.swift */,
+				AAFBB879028A4DF787BDEA64 /* WebcamPresentationControls.swift */,
 				B10000000000000000000026 /* ModeButton.swift */,
 				B10000000000000000000027 /* CaptureToolbar.swift */,
 				B10000000000000000000028 /* CaptureToolbarWindow.swift */,
@@ -1103,13 +1119,17 @@
 				B90000000000000000000009 /* ZoomRegion.swift */,
 				B9000000000000000000000A /* RegionEditPopover.swift */,
 				B9000000000000000000000D /* CameraRegionEditPopover.swift */,
+				B13CDBA66EA84BE1B369B3F6 /* CameraRegionEditPopover+Controls.swift */,
 				B9000000000000000000000B /* RightClickOverlay.swift */,
 				B2000000000000000000001B /* TimelineView+AudioTrack.swift */,
 				B2000000000000000000001C /* TimelineView+CameraTrack.swift */,
+				10F71CE458C34C11A441D4D2 /* TimelineView+CameraInteraction.swift */,
+				CA79ECF103AD48BAA913BA74 /* TimelineView+CameraRegion.swift */,
 				B2000000000000000000002D /* TimelineView+ScreenTrack.swift */,
 				B9000000000000000000000E /* VideoRegionEditPopover.swift */,
 				B2000000000000000000001D /* PropertiesPanel+VideoTab.swift */,
 				B2000000000000000000001E /* PropertiesPanel+CameraTab.swift */,
+				67CE7059FD694BEF8DA4F931 /* PropertiesPanel+CameraBackground.swift */,
 				B2000000000000000000001F /* PropertiesPanel+CursorZoomTab.swift */,
 				B9000000000000000000000C /* CursorSmoothing.swift */,
 				B9000000000000000000000F /* CursorEffects.swift */,
@@ -1211,6 +1231,7 @@
 				7E57000000000000000000BF /* AgentToolPreviewFrame.swift */,
 				7E57000000000000000000C1 /* AgentToolDispatcher.swift */,
 				7E5900000000000000000001 /* AgentEditingTools.swift */,
+				818D42682C67412089224280 /* AgentCameraTools.swift */,
 				7E5A00000000000000000001 /* AgentConfirmations.swift */,
 				7E57000000000000000000C3 /* AgentRPCSession.swift */,
 				7E57000000000000000000C5 /* AgentBridgeServer.swift */,
@@ -1468,6 +1489,8 @@
 				A10000000000000000000022 /* SectionHeader.swift in Sources */,
 				A10000000000000000000023 /* CheckmarkRow.swift in Sources */,
 				A10000000000000000000024 /* OptionsPopover.swift in Sources */,
+				37B364DE8A7A47F68FAAD9EA /* TimeRangeControls.swift in Sources */,
+				71A20EA87B914AF88E205EDB /* WebcamPresentationControls.swift in Sources */,
 				A10000000000000000000025 /* CaptureMode.swift in Sources */,
 				A10000000000000000000030 /* ConfigService.swift in Sources */,
 				A10000000000000000000031 /* StateService.swift in Sources */,
@@ -1542,13 +1565,17 @@
 				A80000000000000000000002 /* HoverEffect.swift in Sources */,
 				A2000000000000000000001B /* TimelineView+AudioTrack.swift in Sources */,
 				A2000000000000000000001C /* TimelineView+CameraTrack.swift in Sources */,
+				99ACD07FB1A14321A1282774 /* TimelineView+CameraInteraction.swift in Sources */,
+				D55187EB538D4391B28EE3A7 /* TimelineView+CameraRegion.swift in Sources */,
 				A2000000000000000000001D /* PropertiesPanel+VideoTab.swift in Sources */,
 				A2000000000000000000001E /* PropertiesPanel+CameraTab.swift in Sources */,
+				2F9BD6843E4548A8BB54DC90 /* PropertiesPanel+CameraBackground.swift in Sources */,
 				A2000000000000000000001F /* PropertiesPanel+CursorZoomTab.swift in Sources */,
 				FA20000000000000000000B1 /* PropertiesPanel+EffectsTab.swift in Sources */,
 				A90000000000000000000009 /* ZoomRegion.swift in Sources */,
 				A9000000000000000000000A /* RegionEditPopover.swift in Sources */,
 				A9000000000000000000000D /* CameraRegionEditPopover.swift in Sources */,
+				22EE076F80324BFB9544EEDD /* CameraRegionEditPopover+Controls.swift in Sources */,
 				A2000000000000000000002D /* TimelineView+ScreenTrack.swift in Sources */,
 				A9000000000000000000000E /* VideoRegionEditPopover.swift in Sources */,
 				A9000000000000000000000B /* RightClickOverlay.swift in Sources */,
@@ -1648,6 +1675,7 @@
 				7E57000000000000000000C4 /* AgentRPCSession.swift in Sources */,
 				7E57000000000000000000C2 /* AgentToolDispatcher.swift in Sources */,
 				7E5900000000000000000002 /* AgentEditingTools.swift in Sources */,
+				6103BA147E834BA897084E10 /* AgentCameraTools.swift in Sources */,
 				7E5A00000000000000000002 /* AgentConfirmations.swift in Sources */,
 				7E5A00000000000000000004 /* AgentConfirmationView.swift in Sources */,
 				7E5A00000000000000000006 /* AgentSessionConfig.swift in Sources */,

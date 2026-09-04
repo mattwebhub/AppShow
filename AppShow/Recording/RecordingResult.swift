@@ -12,4 +12,5 @@ struct RecordingResult: Sendable {
   let fps: Int
   let captureQuality: CaptureQuality
   let isHDR: Bool
+  var webcamPresentation: WebcamPresentation? = nil
 }

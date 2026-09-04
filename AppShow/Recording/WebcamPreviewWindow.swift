@@ -6,15 +6,31 @@ final class WebcamPreviewWindow {
   private var panel: NSPanel?
   private var previewLayer: AVCaptureVideoPreviewLayer?
   private var loadingView: NSView?
-  nonisolated(unsafe) private var moveObserver: NSObjectProtocol?
   private var appearanceObserver: NSKeyValueObservation?
 
-  private let videoWidth: CGFloat = 270
-  private let videoHeight: CGFloat = 202
-  private let cornerRadius: CGFloat = 60
+  private var presentation = WebcamPresentation()
+  private var videoWidth: CGFloat = 240
+  private var videoHeight: CGFloat { videoWidth }
+  private var cornerRadius: CGFloat { videoWidth / 2 }
 
   private var totalWidth: CGFloat { videoWidth }
   private var totalHeight: CGFloat { videoHeight }
+
+  func updatePresentation(_ value: WebcamPresentation) {
+    presentation = value.normalized
+    let screen = panel?.screen ?? NSScreen.main
+    let canvas = screen?.visibleFrame.size ?? CGSize(width: 1200, height: 800)
+    videoWidth = presentation.layout(canvasSize: canvas).relativeWidth * canvas.width
+    guard let panel else { return }
+    panel.setFrame(NSRect(origin: defaultOrigin(), size: NSSize(width: videoWidth, height: videoHeight)), display: true)
+    guard let content = panel.contentView else { return }
+    content.layer?.cornerRadius = cornerRadius
+    for view in content.subviews {
+      view.frame = content.bounds
+      view.layer?.cornerRadius = cornerRadius
+    }
+    previewLayer?.frame = content.bounds
+  }
 
   func showLoading() {
     if panel == nil {
@@ -131,11 +147,6 @@ final class WebcamPreviewWindow {
   }
 
   func close() {
-    savePosition()
-    if let observer = moveObserver {
-      NotificationCenter.default.removeObserver(observer)
-      moveObserver = nil
-    }
     appearanceObserver?.invalidate()
     appearanceObserver = nil
     previewLayer?.removeFromSuperlayer()
@@ -173,16 +184,6 @@ final class WebcamPreviewWindow {
     panel.contentView = contentView
     self.panel = panel
 
-    moveObserver = NotificationCenter.default.addObserver(
-      forName: NSWindow.didMoveNotification,
-      object: panel,
-      queue: .main
-    ) { [weak self] _ in
-      MainActor.assumeIsolated {
-        self?.savePosition()
-      }
-    }
-
     appearanceObserver = NSApp.observe(\.effectiveAppearance) { [weak self] _, _ in
       MainActor.assumeIsolated {
         self?.updateColors()
@@ -205,29 +206,14 @@ final class WebcamPreviewWindow {
   }
 
   private func resolvedOrigin() -> CGPoint {
-    if let saved = StateService.shared.webcamPreviewPosition {
-      let panelRect = NSRect(origin: saved, size: NSSize(width: totalWidth, height: totalHeight))
-      for screen in NSScreen.screens {
-        if screen.visibleFrame.intersects(panelRect) {
-          return saved
-        }
-      }
-    }
-
-    return defaultOrigin()
+    defaultOrigin()
   }
 
   private func defaultOrigin() -> CGPoint {
-    guard let screen = NSScreen.main else { return .zero }
-    let screenFrame = screen.visibleFrame
-    return CGPoint(
-      x: screenFrame.maxX - totalWidth - 20,
-      y: screenFrame.minY + 20
-    )
+    guard let screen = panel?.screen ?? NSScreen.main else { return .zero }
+    let frame = screen.visibleFrame
+    let layout = presentation.layout(canvasSize: frame.size)
+    return CGPoint(x: frame.minX + frame.width * layout.relativeX, y: frame.maxY - frame.height * layout.relativeY - videoHeight)
   }
 
-  private func savePosition() {
-    guard let frame = panel?.frame else { return }
-    StateService.shared.webcamPreviewPosition = frame.origin
-  }
 }

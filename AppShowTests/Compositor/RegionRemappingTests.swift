@@ -185,6 +185,23 @@ struct RegionRemappingTests {
     )
   }
 
+  @Test func webcamFocusDoesNotRestartItsAnimationAtACut() throws {
+    var config = config(trim: range(0, 10))
+    let original = RegionTransitionInfo(
+      timeRange: range(1, 6),
+      entryTransition: .scale,
+      entryDuration: 0.4,
+      exitTransition: .scale,
+      exitDuration: 0.4
+    )
+    config.cameraFullscreenRegions = [original]
+    let remapped = remapWithCuts(config)
+    let afterCut = try #require(remapped.cameraFullscreen.last)
+    #expect(FrameRenderer.computeRegionTransition(compositionTime: seconds(2), region: afterCut) == 1)
+    let beforeCut = try #require(remapped.cameraFullscreen.first)
+    #expect(FrameRenderer.computeRegionTransition(compositionTime: seconds(1.9), region: beforeCut) == 1)
+  }
+
   @Test func cameraRegionSpanningTwoSegmentsIsSplitPerSegment() throws {
     var config = config(trim: range(0, 10))
     config.cameraFullscreenRegions = [region(1, 6)]

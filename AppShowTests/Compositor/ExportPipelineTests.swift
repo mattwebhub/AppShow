@@ -13,6 +13,50 @@ struct ExportPipelineTests {
     ]
   }
 
+  @Test(arguments: [false, true])
+  func webcamFocusExportsAcrossCuts(isHDR: Bool) async throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let result = try await ProjectFixtures.recordingResult(
+      in: dir,
+      webcam: true,
+      systemAudio: false,
+      microphone: false,
+      cursor: false,
+      isHDR: isHDR
+    )
+    let duration = CMTime(seconds: 2, preferredTimescale: 600)
+    var config = ExportConfiguration(
+      cameraLayout: WebcamPresentation().layout(canvasSize: result.screenSize),
+      trimRange: CMTimeRange(start: .zero, duration: duration),
+      outputURL: dir.appendingPathComponent("webcam-focus.mp4")
+    )
+    config.cameraAspect = .ratio1x1
+    config.cameraCornerRadius = 50
+    config.cameraFullscreenFillMode = .fill
+    config.cameraFullscreenRegions = [
+      RegionTransitionInfo(
+        timeRange: CMTimeRange(start: CMTime(seconds: 0.25, preferredTimescale: 600), end: CMTime(seconds: 1.75, preferredTimescale: 600)),
+        entryTransition: .scale,
+        entryDuration: 0.4,
+        exitTransition: .scale,
+        exitDuration: 0.4
+      )
+    ]
+    config.videoRegions = EditorState.exportVideoRegions(
+      from: [VideoRegionData(startSeconds: 0, endSeconds: 0.75), VideoRegionData(startSeconds: 1.25, endSeconds: 2)],
+      trimStart: 0,
+      trimEnd: 2
+    )
+    let url = try await VideoCompositor.export(result: result, config: config)
+    let asset = AVURLAsset(url: url)
+    #expect(abs(try await asset.load(.duration).seconds - 1.5) < 0.05)
+    #expect(try await asset.loadTracks(withMediaType: .video).count == 1)
+    let generator = AVAssetImageGenerator(asset: asset)
+    let frame = try await generator.image(at: CMTime(seconds: 0.75, preferredTimescale: 600))
+    #expect(frame.image.width > 0 && frame.image.height > 0)
+  }
+
   @Test func twoSliceExportHasKeptDuration() async throws {
     let dir = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(dir) }

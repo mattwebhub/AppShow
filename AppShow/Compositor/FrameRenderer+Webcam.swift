@@ -155,12 +155,7 @@ extension FrameRenderer {
     let pipFlippedY = CGFloat(outputHeight) - pipCam.rect.origin.y - pipCam.rect.height
     let pipRect = CGRect(x: pipCam.rect.origin.x, y: pipFlippedY, width: pipCam.rect.width, height: pipCam.rect.height)
 
-    let interpRect = CGRect(
-      x: pipRect.origin.x + (fullRect.origin.x - pipRect.origin.x) * p,
-      y: pipRect.origin.y + (fullRect.origin.y - pipRect.origin.y) * p,
-      width: pipRect.width + (fullRect.width - pipRect.width) * p,
-      height: pipRect.height + (fullRect.height - pipRect.height) * p
-    )
+    let interpRect = CameraLayout.interpolatedRect(from: pipRect, to: fullRect, progress: p)
     let interpRadius = pipCam.cornerRadius * (1.0 - p)
     let interpBorder = pipCam.borderWidth * (1.0 - p)
 
@@ -311,7 +306,8 @@ extension FrameRenderer {
     }
     let webcamSize = CGSize(width: webcamImage.width, height: webcamImage.height)
     if instruction.cameraFullscreenAspect == .original {
-      context.draw(webcamImage, in: drawRect)
+      let imageRect = instruction.cameraFullscreenFillMode == .fill ? aspectFillRect(imageSize: webcamSize, in: fullRect) : drawRect
+      context.draw(webcamImage, in: imageRect)
     } else {
       context.clip(to: drawRect)
       let imgRect: CGRect

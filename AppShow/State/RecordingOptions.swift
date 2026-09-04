@@ -92,8 +92,20 @@ final class RecordingOptions {
     didSet { ConfigService.shared.hdrCapture = hdrCapture }
   }
 
+  var webcamPresentation: WebcamPresentation {
+    didSet {
+      ConfigService.shared.webcamPresentation = webcamPresentation
+      onWebcamPresentationChange?(webcamPresentation)
+    }
+  }
+  var onWebcamPresentationChange: ((WebcamPresentation) -> Void)?
+  var onCameraDeviceChange: (() -> Void)?
+
   var selectedCamera: CaptureDevice? {
-    didSet { ConfigService.shared.cameraDeviceId = selectedCamera?.id }
+    didSet {
+      ConfigService.shared.cameraDeviceId = selectedCamera?.id
+      if selectedCamera != oldValue { onCameraDeviceChange?() }
+    }
   }
 
   var availableCameras: [CaptureDevice] {
@@ -118,6 +130,7 @@ final class RecordingOptions {
 
   init() {
     let config = ConfigService.shared
+    webcamPresentation = config.webcamPresentation
     timerDelay = TimerDelay(rawValue: config.timerDelay) ?? .none
     rememberLastSelection = config.rememberLastSelection
     fps = config.fps

@@ -45,6 +45,12 @@ extension SettingsView {
         }
       }
 
+      if let options {
+        settingsRow(label: "Webcam defaults") {
+          WebcamPresentationControls(presentation: Binding(get: { options.webcamPresentation }, set: { options.webcamPresentation = $0 }))
+        }
+      }
+
       settingsRow(label: "Maximum Camera Resolution") {
         SegmentPicker(
           items: ["720p", "1080p", "4K"],

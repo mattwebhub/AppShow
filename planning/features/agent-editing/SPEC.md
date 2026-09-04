@@ -10,7 +10,7 @@ Milestone: 06
 3. Each successful call produces at most one history entry named `Agent: <label>`. Identical snapshots are not added. The editor's delayed snapshot cannot create a duplicate.
 4. A failed call restores its pre-call snapshot and adds no history entry.
 5. Each response returns the compact current timeline, allowing the agent and UI to observe the result immediately.
-6. The catalog covers trim and cuts, zoom, spotlight, presentation settings, captions, captured audio, confirmed external-music import and editing, workspace-only draft export, confirmed full export, silence removal, text/image/blur overlay CRUD, and entry/exit transitions by target UUID. Structural additions remain separate phases so each can be verified and reverted independently.
+6. The catalog covers trim and cuts, zoom, spotlight, presentation settings, timed webcam region CRUD, captions, captured audio, confirmed external-music import and editing, workspace-only draft export, confirmed full export, silence removal, text/image/blur overlay CRUD, and entry/exit transitions by target UUID. Structural additions remain separate phases so each can be verified and reverted independently.
 7. The bridge advertises mutations only after the editor explicitly creates an editing dispatcher. The CLI shim and chat wiring must never silently downgrade the existing authentication boundary.
 
 ## Safety
@@ -27,3 +27,7 @@ Milestone: 06
 - Unbounded shell access.
 - Silent overwriting of export destinations.
 - More than one conversation per project.
+
+## Webcam region tools
+
+`add_camera_region` requires start/end source seconds and defaults to fullscreen with scale entry/exit. `update_camera_region` and `remove_camera_region` require an existing UUID. Type is fullscreen, hidden or custom; transition names and durations are optional. Bounds, minimum duration, media presence and non-overlap are validated before mutation. `set_camera` also supports circle/roundedRectangle shape, corner presets and fullscreen fill/aspect. Inspection returns layout and region transition durations.

@@ -31,7 +31,7 @@ extension TimelineView {
         }
 
         if editorState.hasWebcam && editorState.webcamEnabled {
-          trackSidebar(label: "Camera", icon: "web.camera")
+          trackSidebar(label: "Webcam", icon: "web.camera")
             .frame(height: trackHeight)
             .transition(.trackTransition)
         }

@@ -7,6 +7,7 @@ struct RegionTransitionInfo: Sendable {
   let entryDuration: Double
   let exitTransition: RegionTransitionType
   let exitDuration: Double
+  var transitionTimeRange: CMTimeRange? = nil
 }
 
 struct CameraCustomRegion: Sendable {

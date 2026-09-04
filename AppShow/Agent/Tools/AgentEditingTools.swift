@@ -166,6 +166,13 @@ enum AgentEditingToolCatalog {
     description: "Configure camera visibility, layout, aspect, and styling.",
     inputSchema: AgentToolSchema.object([
       "enabled": AgentToolSchema.boolean("Whether the camera is visible"),
+      "shape": AgentToolSchema.string("Webcam shape preset", enum: ["circle", "roundedRectangle"]),
+      "fullscreenFillMode": AgentToolSchema.string(
+        "Fill crops to cover the fullscreen canvas; fit preserves the whole camera frame",
+        enum: CameraFullscreenFillMode.allCases.map(\.rawValue)
+      ),
+      "fullscreenAspect": AgentToolSchema.string("Fullscreen camera aspect", enum: CameraFullscreenAspect.allCases.map(\.rawValue)),
+      "corner": AgentToolSchema.string("Webcam corner preset", enum: CameraCorner.allCases.map(\.rawValue)),
       "x": AgentToolSchema.number("Horizontal position from 0 to 1", minimum: 0, maximum: 1),
       "y": AgentToolSchema.number("Vertical position from 0 to 1", minimum: 0, maximum: 1),
       "width": AgentToolSchema.number("Relative width from 0.05 to 1", minimum: 0.05, maximum: 1),
@@ -385,7 +392,7 @@ enum AgentEditingToolCatalog {
       AgentRemoveMusicTool(),
       AgentBatchBoundaryTool(definition: beginBatch),
       AgentBatchBoundaryTool(definition: endBatch),
-    ]
+    ] + AgentCameraToolCatalog.handlers
   }
 
   private static func textOverlaySchema(
@@ -735,6 +742,22 @@ private struct AgentSetCameraTool: AgentToolHandler {
     if let value = arguments["borderWidth"]?.doubleValue { state.cameraBorderWidth = value }
     if let value = arguments["shadow"]?.doubleValue { state.cameraShadow = value }
     if let value = arguments["mirrored"]?.boolValue { state.cameraMirrored = value }
+    if let mode = arguments["fullscreenFillMode"]?.stringValue.flatMap(CameraFullscreenFillMode.init(rawValue:)) {
+      state.cameraFullscreenFillMode = mode
+    }
+    if let aspect = arguments["fullscreenAspect"]?.stringValue.flatMap(CameraFullscreenAspect.init(rawValue:)) {
+      state.cameraFullscreenAspect = aspect
+    }
+    if let shape = arguments["shape"]?.stringValue {
+      if shape == "circle" {
+        state.cameraAspect = .ratio1x1
+        state.cameraCornerRadius = 50
+      } else {
+        state.cameraCornerRadius = 8
+      }
+    }
+    state.clampCameraPosition()
+    if let corner = arguments["corner"]?.stringValue.flatMap(CameraCorner.init(rawValue:)) { state.setCameraCorner(corner) }
     return context.timelineResult()
   }
 }

@@ -19,6 +19,7 @@ struct ProjectMetadata: Codable, Sendable {
   var captureQuality: String? = nil
   var isHDR: Bool = false
   var editorState: EditorStateData?
+  var webcamPresentation: WebcamPresentation?
 }
 
 struct CursorSettingsData: Codable, Sendable, Equatable {
@@ -531,6 +532,7 @@ extension ProjectMetadata {
     hasMicrophoneAudio = try c.decode(Bool.self, forKey: .hasMicrophoneAudio)
     hasCursorMetadata = try c.decodeOrDefault(.hasCursorMetadata, false)
     hasWebcam = try c.decodeOrDefault(.hasWebcam, false)
+    webcamPresentation = try c.decodeIfPresent(WebcamPresentation.self, forKey: .webcamPresentation)
     captureMode = try c.decodeIfPresent(CaptureMode.self, forKey: .captureMode)
     captureQuality = try c.decodeIfPresent(String.self, forKey: .captureQuality)
     isHDR = try c.decodeOrDefault(.isHDR, false)

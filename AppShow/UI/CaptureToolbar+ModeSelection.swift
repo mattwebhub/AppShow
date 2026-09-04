@@ -75,10 +75,10 @@ extension CaptureToolbar {
           ToolbarToggleButton(
             icon: "web.camera",
             activeIcon: "web.camera.fill",
-            label: "Camera",
+            label: "Webcam",
             isOn: session.isCameraOn,
             isAvailable: true,
-            tooltip: "Camera",
+            tooltip: "Include webcam in the recording",
             action: {
               if session.options.selectedCamera != nil {
                 session.toggleCamera()
@@ -99,7 +99,7 @@ extension CaptureToolbar {
               onSelect: { device in
                 session.options.selectedCamera = CaptureDevice(id: device.id, name: device.name)
                 showCameraPicker = false
-                session.toggleCamera()
+                session.setWebcamIncluded(true)
               }
             )
             .presentationBackground(AppShowColors.backgroundPopover)
@@ -169,7 +169,7 @@ extension CaptureToolbar {
         .buttonStyle(PlainCustomButtonStyle())
         .hoverEffect(id: "btn.options")
         .popover(isPresented: $showOptions, arrowEdge: .bottom) {
-          OptionsPopover(options: session.options)
+          OptionsPopover(options: session.options, session: session)
             .presentationBackground(AppShowColors.backgroundPopover)
         }
 
