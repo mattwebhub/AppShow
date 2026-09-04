@@ -6,12 +6,12 @@ Depends on: milestone 03 (external audio tracks in the timeline summary); milest
 
 ## Tasks
 
-- [ ] T1. JSON value and JSON-RPC codec. Proof: `ReframedTests/Agent/JSONValueTests.swift`, `JSONRPCCodecTests.swift`.
-- [ ] T2. Tool catalog as data with schemas and MCP `tools/list`. Proof: `AgentToolCatalogTests.swift`.
-- [ ] T3. Read-only summaries (timeline, transcript, cursor activity, history) as pure builders. Proof: `AgentToolResultTests.swift`.
-- [ ] T4. Dispatcher with argument validation, mutation refusal, preview frame. Proof: `AgentToolDispatcherTests.swift`.
-- [ ] T5. Socket transport with token auth and per-call timeout; workspace folder with `session.json`. Proof: `AgentBridgeServerTests.swift`, `AgentWorkspaceTests.swift`.
-- [ ] T6. Planning docs, `upstream-sync.md` line, `STATE.md`. Proof: grep.
+- [x] T1. JSON value and JSON-RPC codec. Proof: `ReframedTests/Agent/JSONValueTests.swift`, `JSONRPCCodecTests.swift`.
+- [x] T2. Tool catalog as data with schemas and MCP `tools/list`. Proof: `AgentToolCatalogTests.swift`.
+- [x] T3. Read-only summaries (timeline, transcript, cursor activity, history) as pure builders. Proof: `AgentToolResultTests.swift`.
+- [x] T4. Dispatcher with argument validation, mutation refusal, preview frame. Proof: `AgentToolDispatcherTests.swift`.
+- [x] T5. Socket transport with token auth and per-call timeout; workspace folder with `session.json`. Proof: `AgentBridgeServerTests.swift`, `AgentWorkspaceTests.swift`.
+- [x] T6. Planning docs, `upstream-sync.md` line, `STATE.md`. Proof: grep.
 - [ ] T7. VERIFY.md run, branch pushed, PR opened.
 
 ## Out of scope
