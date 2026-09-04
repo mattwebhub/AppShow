@@ -36,6 +36,20 @@ extension EditorState {
     history.pushSnapshot(createSnapshot())
   }
 
+  func importExternalAudioFiles(_ urls: [URL]) {
+    guard !urls.isEmpty else { return }
+    Task { @MainActor [weak self] in
+      for url in urls {
+        guard let self else { return }
+        do {
+          try await self.importExternalAudio(from: url)
+        } catch {
+          self.logger.error("Failed to add audio file \(url.lastPathComponent): \(error)")
+        }
+      }
+    }
+  }
+
   func removeExternalAudioTrack(id: UUID) {
     externalAudioTracks.removeAll { $0.id == id }
     syncExternalAudioToPlayer()
