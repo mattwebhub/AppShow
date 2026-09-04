@@ -155,7 +155,7 @@ struct TimelineView: View {
           }
 
           if editorState.showOverlayTrack {
-            trackSidebar(label: "Overlays", icon: "textformat")
+            trackSidebar(label: "Overlays", icon: "square.on.square")
               .frame(height: trackHeight)
               .transition(.trackTransition)
           }

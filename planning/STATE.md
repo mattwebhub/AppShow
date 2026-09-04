@@ -4,27 +4,29 @@ Last updated: 2026-09-04
 
 ## Position
 
-- Milestone 00 closed except the product-identity decision: PR #1 https://github.com/mattwebhub/Reframed/pull/1 (CI green).
-- Milestone 01 test-foundation complete: 218 tests, PR #2 https://github.com/mattwebhub/Reframed/pull/2 (stacked on fork-setup).
-- Milestone 02 lossless-cut complete on the code side: 272 tests in 27 suites plus 2 gated export tests, PR #3 https://github.com/mattwebhub/Reframed/pull/3. Manual checks in its VERIFY.md need a human with the app.
-- Milestone 03 music-tracks on branch `milestone-03-music-tracks`: phases 0 to 3 in progress by a delegated worktree.
-- Milestone 07 primitives started early with its first task group, silence removal, on a worktree branch stacked on milestone 02: T1 to T4 green (`planning/features/silence-removal/`), 305 tests in 30 suites. Manual rows in `planning/milestones/07-primitives/VERIFY.md` need a human with the app. T5 to T9 (text, image, blur, transitions, docs) not started.
+- Milestones 00 and 01 are merged into `main`: PR #1 fork setup and PR #2 test foundation.
+- Milestone 02 lossless cut is code-complete on PR #3; its manual checks remain.
+- Milestone 03 music tracks is code-complete on PR #5; its manual checks remain.
+- Milestone 04 agent chat is code-complete on PR #6 with one persisted, clearable conversation per project and provider-specific session resumption; its manual checks remain.
+- Milestone 05 read-only agent bridge is code-complete on PR #7.
+- Milestone 07 PR #4 contains silence removal, text overlays and image overlays. T1 to T6 are code-complete; blur regions and broader transition work remain. Its manual checks remain.
 
 ## Verified on this machine
 
-- `make build`, `make lint`, `make test` green on the silence-removal worktree (305 tests, 30 suites).
+- `make format`, `make lint`, `make build`, and `make test` green after image overlays (366 tests, 37 suites).
 - `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` green on `milestone-02-lossless-cut`.
 
 ## Notes for the next session
 
-- Disk filled up once during parallel worktree builds (each worktree build is about 1 GB); keep an eye on `df -h /` before spawning parallel builds.
-- Silence removal keeps its settings in the panel only; `HistoryEntry.label` is the hook feature 04 planned for "one labelled snapshot per tool call".
+- Product name: AppShow. Keep inherited Reframed identifiers until the pre-release rename (ADR 0005).
+- Agent conversation contract: exactly one per project, stored inside `.frm`; explicit clear; ephemeral socket/token/frame workspace in sibling `.agent`; fresh process each turn with provider-specific logical-session resumption.
+- Silence removal keeps its settings in the panel only; `HistoryEntry.label` is the hook for one labelled snapshot per tool call.
 - Upstream quirks pinned by characterization tests, candidates for fixes: audio-mix index pairing with click sounds, custom camera region border unscaled on the trim path, colour-matched solid backgrounds in the 8-bit render path, unclamped zoom hold keyframe, `FrameRenderer.visibleText` crash/loop edge cases.
 
 ## Next
 
-1. Merge the music-tracks phases 0 to 3 worktree, then phases 4 to 8.
-2. Human runs the manual rows of milestone 02's VERIFY.md and the silence rows of milestone 07's VERIFY.md.
-3. Merge the silence-removal worktree into a `milestone-07-primitives` branch once milestone 02 lands on `main`.
-4. Milestone 04 agent chat waits on ADR 0009 (owner authorization to copy Toone code).
-5. Owner decisions still open: ADR 0005 identity, ADR 0009 Toone provenance, the 27 feature questions (assumptions in force).
+1. Advance PR #4 to the image-overlay head and verify CI.
+2. Human runs the manual rows for milestones 02, 03, 04 and 07.
+3. Continue milestone 06 editing tools after the agent-chat stack lands.
+4. Implement blur regions and the remaining transition work in milestone 07.
+5. Add the dedicated AppShow identity migration before the first public release.

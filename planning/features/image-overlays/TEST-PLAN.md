@@ -2,6 +2,8 @@
 
 Written before the production code. Layers from `planning/tdd-strategy.md`.
 
+Automated result: all rows are green on 2026-09-04. The `red` values in the table preserve the initial TDD state in which this plan was written; the completed implementation is recorded in `TASKS.md` and the milestone verification file.
+
 | Spec # | Test name | Layer | File | Fixture | Status |
 |--------|-----------|-------|------|---------|--------|
 | 10 | `defaultsFillEveryOptionalField` (JSON with start, end and filename decodes with the declared defaults) | unit T1 | `ReframedTests/Project/ImageOverlayDataTests.swift` | none | red |

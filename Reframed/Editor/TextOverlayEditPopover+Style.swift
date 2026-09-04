@@ -43,46 +43,12 @@ extension TextOverlayEditPopover {
   }
 
   var positionControls: some View {
-    VStack(alignment: .leading, spacing: Layout.itemSpacing) {
-      SectionHeader(icon: "arrow.up.left.and.down.right", title: "Position")
-
-      VStack(spacing: Layout.compactSpacing) {
-        SegmentPicker(
-          items: [TextOverlayPosition.topLeft, .top, .topRight],
-          label: { $0.label },
-          selection: $local.position
-        )
-        SegmentPicker(
-          items: [TextOverlayPosition.center],
-          label: { $0.label },
-          selection: $local.position
-        )
-        SegmentPicker(
-          items: [TextOverlayPosition.bottomLeft, .bottom, .bottomRight],
-          label: { $0.label },
-          selection: $local.position
-        )
-      }
-
-      SliderRow(
-        label: "Offset X",
-        labelWidth: labelWidth,
-        value: $local.offsetX,
-        range: -0.5...0.5,
-        step: 0.01,
-        formattedValue: "\(Int((local.offsetX * 100).rounded()))%",
-        valueWidth: valueWidth
-      )
-
-      SliderRow(
-        label: "Offset Y",
-        labelWidth: labelWidth,
-        value: $local.offsetY,
-        range: -0.5...0.5,
-        step: 0.01,
-        formattedValue: "\(Int((local.offsetY * 100).rounded()))%",
-        valueWidth: valueWidth
-      )
-    }
+    OverlayPositionControls(
+      position: $local.position,
+      offsetX: $local.offsetX,
+      offsetY: $local.offsetY,
+      labelWidth: labelWidth,
+      valueWidth: valueWidth
+    )
   }
 }

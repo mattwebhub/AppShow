@@ -105,4 +105,24 @@ struct ImageOverlayDataTests {
     #expect(overlays[0].startSeconds == 0.25)
     #expect(overlays[0].endSeconds == 1.5)
   }
+
+  @Test func overlayChipsCombineBothKindsInTimelineOrder() {
+    let text = TextOverlayData(
+      id: ProjectFixtures.fixedUUID(1),
+      startSeconds: 2,
+      endSeconds: 3
+    )
+    let image = ImageOverlayData(
+      id: ProjectFixtures.fixedUUID(2),
+      startSeconds: 1,
+      endSeconds: 4,
+      filename: "image-deadbeef.png"
+    )
+
+    let chips = OverlayChip.timeline(text: [text], images: [image])
+
+    #expect(chips.map(\.id) == [.image(image.id), .text(text.id)])
+    #expect(chips.map(\.startSeconds) == [1, 2])
+    #expect(chips.map(\.endSeconds) == [4, 3])
+  }
 }
