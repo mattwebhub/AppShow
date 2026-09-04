@@ -37,4 +37,27 @@ struct HistoryChangeRulesTests {
     resized.endSeconds = 8
     #expect(History.describeChanges(from: data([region]), to: data([resized])) == ["Cut adjusted"])
   }
+
+  private func overlayData(_ overlays: [TextOverlayData]?) -> EditorStateData {
+    EditorStateData(
+      trimStartSeconds: 0,
+      trimEndSeconds: 10,
+      backgroundStyle: .none,
+      padding: 0,
+      videoCornerRadius: 0,
+      cameraCornerRadius: 0,
+      cameraBorderWidth: 0,
+      cameraLayout: CameraLayout(),
+      textOverlays: overlays
+    )
+  }
+
+  @Test func overlayChangesAreDescribedAsAddedRemovedAdjusted() {
+    let overlay = TextOverlayData(startSeconds: 1, endSeconds: 4)
+    var edited = overlay
+    edited.text = "Edited"
+    #expect(History.describeChanges(from: overlayData(nil), to: overlayData([overlay])) == ["Text overlay added"])
+    #expect(History.describeChanges(from: overlayData([overlay]), to: overlayData(nil)) == ["Text overlay removed"])
+    #expect(History.describeChanges(from: overlayData([overlay]), to: overlayData([edited])) == ["Text overlay adjusted"])
+  }
 }

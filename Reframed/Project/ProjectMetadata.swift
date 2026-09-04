@@ -492,6 +492,7 @@ struct EditorStateData: Codable, Sendable {
   var captionSettings: CaptionSettingsData?
   var captionSegments: [CaptionSegment]?
   var spotlightRegions: [SpotlightRegionData]?
+  var textOverlays: [TextOverlayData]?
 }
 
 struct CodableSize: Codable, Sendable {

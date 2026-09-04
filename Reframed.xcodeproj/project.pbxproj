@@ -50,6 +50,8 @@
 		7E5700000000000000000085 /* EditorState+SilenceRemoval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000084 /* EditorState+SilenceRemoval.swift */; };
 		7E5700000000000000000083 /* SilenceAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000082 /* SilenceAnalysis.swift */; };
 		7E5700000000000000000081 /* SilenceDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000080 /* SilenceDetector.swift */; };
+		7E5700000000000000000093 /* EditorState+TextOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000092 /* EditorState+TextOverlays.swift */; };
+		7E5700000000000000000091 /* TextOverlayData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000090 /* TextOverlayData.swift */; };
 		828909551C8795EF72269706 /* PropertiesPanel+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C03E11186EDDA74B1B6958 /* PropertiesPanel+Background.swift */; };
 		86BD45F487E80051EC653B68 /* CursorRenderer+Shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC84C35E4DD49FCEA9DE6CBB /* CursorRenderer+Shapes.swift */; };
 		922F814E886E4D2B242E4541 /* VideoPreviewContainer+Cursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17A303B9C60827322EAE0A9 /* VideoPreviewContainer+Cursor.swift */; };
@@ -315,6 +317,8 @@
 		7E5700000000000000000084 /* EditorState+SilenceRemoval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+SilenceRemoval.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000082 /* SilenceAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilenceAnalysis.swift; sourceTree = "<group>"; };
 		7E5700000000000000000080 /* SilenceDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilenceDetector.swift; sourceTree = "<group>"; };
+		7E5700000000000000000092 /* EditorState+TextOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+TextOverlays.swift"; sourceTree = "<group>"; };
+		7E5700000000000000000090 /* TextOverlayData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayData.swift; sourceTree = "<group>"; };
 		815C681612F3844727C988EF /* CaptureToolbar+ModeSelection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CaptureToolbar+ModeSelection.swift"; sourceTree = "<group>"; };
 		8BF80E50CD7B9915C3047A7C /* EditorState+Playback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+Playback.swift"; sourceTree = "<group>"; };
 		93CAA4A89B98885B510AB739 /* TimelineView+Shared.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "TimelineView+Shared.swift"; sourceTree = "<group>"; };
@@ -878,6 +882,7 @@
 				7E5700000000000000000084 /* EditorState+SilenceRemoval.swift */,
 				7E5700000000000000000082 /* SilenceAnalysis.swift */,
 				7E5700000000000000000080 /* SilenceDetector.swift */,
+				7E5700000000000000000092 /* EditorState+TextOverlays.swift */,
 				E8596CD61869ECC16EAECA92 /* EditorState+CameraLayout.swift */,
 				B2354223AAA382DB82EF31D5 /* EditorState+Zoom.swift */,
 				3596F81A6E600975B1EB8104 /* EditorState+Cursor.swift */,
@@ -923,6 +928,7 @@
 			children = (
 				B3000000000000000000001B /* ReframedProject.swift */,
 				B3000000000000000000001C /* ProjectMetadata.swift */,
+				7E5700000000000000000090 /* TextOverlayData.swift */,
 			);
 			path = Project;
 			sourceTree = "<group>";
@@ -1255,6 +1261,8 @@
 				7E5700000000000000000085 /* EditorState+SilenceRemoval.swift in Sources */,
 				7E5700000000000000000083 /* SilenceAnalysis.swift in Sources */,
 				7E5700000000000000000081 /* SilenceDetector.swift in Sources */,
+				7E5700000000000000000093 /* EditorState+TextOverlays.swift in Sources */,
+				7E5700000000000000000091 /* TextOverlayData.swift in Sources */,
 				77030A22115111C9D1325490 /* EditorState+CameraLayout.swift in Sources */,
 				D231D2CA1110B032A7D42474 /* EditorState+Zoom.swift in Sources */,
 				3FD352F00D9D9EE89C9A34AB /* EditorState+Cursor.swift in Sources */,
