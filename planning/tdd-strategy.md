@@ -39,7 +39,7 @@ Run before a release and after any change under `Reframed/Recording/`, `Reframed
 
 ## Fixtures
 
-As landed in milestone 01: nothing binary is committed. `ReframedTests/Support/VideoFixtures.swift` generates the movies at test time with `AVAssetWriter` (grey-ramp frame index, about 10 KB for 2 s), `AudioFixtures` generates tones with `AVAudioFile`, and `ProjectFixtures` builds the legacy document, cursor metadata, and a `RecordingResult` in a temp directory. The table below is the original spec.
+As landed in milestone 01: nothing binary is committed except, from milestone 03, `ReframedTests/Fixtures/sine-1s.mp3` (8 KB, provenance in `ReframedTests/Fixtures/README.md`, loaded through `BundledFixtures`), because AVFoundation cannot encode MP3. `ReframedTests/Support/VideoFixtures.swift` generates the movies at test time with `AVAssetWriter` (grey-ramp frame index, about 10 KB for 2 s), `AudioFixtures` generates tones with `AVAudioFile`, and `ProjectFixtures` builds the legacy document, cursor metadata, and a `RecordingResult` in a temp directory. The table below is the original spec.
 
 Location `ReframedTests/Fixtures/`, loaded with `Bundle(for: FixtureAnchor.self).url(forResource:withExtension:subdirectory: "Fixtures")` (`FixtureAnchor` is an empty `final class` in `ReframedTests/Support/Fixtures.swift`).
 
