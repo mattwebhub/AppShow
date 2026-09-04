@@ -81,3 +81,8 @@ Projects are saved to the configured project folder (default: `~/Reframed`). The
 ## Reopening projects
 
 Double-clicking a .frm bundle (or opening from the menu bar's recent projects list) loads the project metadata, reconstructs EditorState from the saved snapshot, loads cursor metadata if present, and opens the editor window. The recording files are read directly from the bundle during preview and export.
+
+## Fork additions
+
+- `audio-<hash8>.<ext>`: an imported external audio file, named by the first eight hex digits of its SHA-256 so identical imports dedupe; referenced from `editorState.externalAudioTracks[].fileName`.
+- `audio-<hash8>.waveform.json`: sidecar cache of 200 peak samples for the timeline; regenerated when missing or stale.

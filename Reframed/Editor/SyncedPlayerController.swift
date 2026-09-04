@@ -27,6 +27,7 @@ final class SyncedPlayerController {
   var videoRegions: [(start: Double, end: Double)] = []
   var previewMode = false
   var skipsGaps = false
+  let externalAudio = ExternalAudioPreviewEngine()
 
   private var micAudioEngine: AVAudioEngine?
   private var micPlayerNode: AVAudioPlayerNode?
@@ -191,6 +192,7 @@ final class SyncedPlayerController {
           self.applyGapSkip(at: CMTimeGetSeconds(time))
         }
         self.updateAudioMuting(at: time)
+        self.externalAudio.tick(at: CMTimeGetSeconds(time))
       }
     }
   }
@@ -267,6 +269,7 @@ final class SyncedPlayerController {
     webcamPlayer?.rate = Float(webcamDriftRatio)
     systemAudioPlayer?.rate = Float(systemAudioDriftRatio)
     scheduleMicPlayback(from: currentTime)
+    externalAudio.start(at: CMTimeGetSeconds(currentTime))
     isPlaying = true
   }
 
@@ -275,6 +278,7 @@ final class SyncedPlayerController {
     webcamPlayer?.pause()
     systemAudioPlayer?.pause()
     micPlayerNode?.stop()
+    externalAudio.stop()
     isPlaying = false
     syncAuxPlayers()
   }
@@ -288,7 +292,18 @@ final class SyncedPlayerController {
     let sysTime = CMTimeMultiplyByFloat64(time, multiplier: systemAudioDriftRatio)
     systemAudioPlayer?.seek(to: sysTime, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
     micPlayerNode?.stop()
+    externalAudio.stop()
     currentTime = time
+    if isPlaying {
+      externalAudio.start(at: CMTimeGetSeconds(time))
+    }
+  }
+
+  func setExternalAudioTracks(_ tracks: [ExternalAudioTrackData], urls: [UUID: URL]) {
+    externalAudio.setTracks(tracks, urls: urls, currentTime: CMTimeGetSeconds(currentTime))
+    if !tracks.isEmpty {
+      screenPlayer.isMuted = true
+    }
   }
 
   func setSystemAudioVolume(_ volume: Float) {
@@ -323,6 +338,7 @@ final class SyncedPlayerController {
     micPlayerNode = nil
     micAudioEngine = nil
     micAudioFile = nil
+    externalAudio.teardown()
   }
 
   private func scheduleMicPlayback(from time: CMTime) {

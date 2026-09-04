@@ -75,6 +75,7 @@ struct PropertiesPanel: View {
           if editorState.hasSystemAudio || editorState.hasMicAudio {
             audioSection
           }
+          musicSection
           clickSoundSection
         case .cursor:
           cursorSection

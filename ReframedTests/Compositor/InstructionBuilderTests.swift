@@ -210,6 +210,22 @@ struct InstructionBuilderTests {
     #expect(needsCompositor(config(), clickSoundURL: URL(fileURLWithPath: "/dev/null/click.m4a")))
   }
 
+  @Test func needsCompositorWhenExternalTracksExist() {
+    var config = config()
+    config.externalAudioTracks = [
+      ExternalAudioExportTrack(
+        url: URL(fileURLWithPath: "/dev/null/audio-0badf00d.mp3"),
+        timelineRange: CMTimeRange(start: .zero, duration: CMTime(seconds: 1, preferredTimescale: 600)),
+        fileStart: .zero,
+        volume: 1,
+        fadeIn: .zero,
+        fadeOut: .zero
+      )
+    ]
+
+    #expect(needsCompositor(config))
+  }
+
   @Test func videoCutsNeedCompositor() {
     #expect(needsCompositor(config(), hasVideoRegions: true))
   }

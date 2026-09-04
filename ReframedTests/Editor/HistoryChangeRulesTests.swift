@@ -37,4 +37,52 @@ struct HistoryChangeRulesTests {
     resized.endSeconds = 8
     #expect(History.describeChanges(from: data([region]), to: data([resized])) == ["Cut adjusted"])
   }
+
+  private func audioData(_ tracks: [ExternalAudioTrackData]?) -> EditorStateData {
+    var state = data([])
+    state.videoRegions = nil
+    state.externalAudioTracks = tracks
+    return state
+  }
+
+  private func audioTrack() -> ExternalAudioTrackData {
+    ExternalAudioTrackData(
+      id: ProjectFixtures.fixedUUID(1),
+      fileName: "audio-0badf00d.wav",
+      displayName: "Loop",
+      sourceDurationSeconds: 12,
+      timelineStartSeconds: 3,
+      fileOutSeconds: 4
+    )
+  }
+
+  @Test func describesExternalAudioTrackAddedRemovedAdjusted() {
+    let track = audioTrack()
+    #expect(History.describeChanges(from: audioData(nil), to: audioData([track])) == ["Audio track added"])
+    #expect(History.describeChanges(from: audioData([track]), to: audioData(nil)) == ["Audio track removed"])
+    var moved = track
+    moved.timelineStartSeconds = 5
+    #expect(History.describeChanges(from: audioData([track]), to: audioData([moved])) == ["Audio track adjusted"])
+    var trimmed = track
+    trimmed.fileInSeconds = 1
+    trimmed.fileOutSeconds = 3
+    #expect(History.describeChanges(from: audioData([track]), to: audioData([trimmed])) == ["Audio track adjusted"])
+  }
+
+  @Test func describesExternalAudioTrackVolumeMuteAndFades() {
+    let track = audioTrack()
+    var quieter = track
+    quieter.volume = 0.8
+    #expect(History.describeChanges(from: audioData([track]), to: audioData([quieter])) == ["Audio track volume set to 80%"])
+    var muted = track
+    muted.muted = true
+    #expect(History.describeChanges(from: audioData([track]), to: audioData([muted])) == ["Audio track muted"])
+    #expect(History.describeChanges(from: audioData([muted]), to: audioData([track])) == ["Audio track unmuted"])
+    var fadeIn = track
+    fadeIn.fadeInSeconds = 1
+    #expect(History.describeChanges(from: audioData([track]), to: audioData([fadeIn])) == ["Audio track fade in set to 1.0s"])
+    var fadeOut = track
+    fadeOut.fadeOutSeconds = 2.5
+    #expect(History.describeChanges(from: audioData([track]), to: audioData([fadeOut])) == ["Audio track fade out set to 2.5s"])
+  }
 }

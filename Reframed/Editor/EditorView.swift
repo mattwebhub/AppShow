@@ -5,6 +5,7 @@ struct EditorView: View {
   @Bindable var editorState: EditorState
   @State private var systemWaveformGenerator = AudioWaveformGenerator()
   @State private var micWaveformGenerator = AudioWaveformGenerator()
+  @State private var externalWaveformStore = ExternalAudioWaveformStore()
   @State var selectedTab: EditorTab = .general
   @State private var micWaveformTask: Task<Void, Never>?
   @State private var didFinishSetup = false
@@ -24,6 +25,7 @@ struct EditorView: View {
     if editorState.zoomEnabled { h |= 8 }
     if editorState.spotlightEnabled { h |= 16 }
     if editorState.showCutTrack { h |= 32 }
+    h |= editorState.externalAudioTracks.count << 6
     return h
   }
 
@@ -95,9 +97,14 @@ struct EditorView: View {
       if editorState.result.microphoneAudioURL != nil {
         regenerateMicWaveform()
       }
+      syncExternalWaveforms()
       if let url = editorState.result.systemAudioURL {
         await systemWaveformGenerator.generate(from: url)
       }
+    }
+    .onChange(of: editorState.externalAudioTracks.map(\.id)) { _, _ in
+      guard didFinishSetup else { return }
+      syncExternalWaveforms()
     }
     .onChange(of: editorState.micNoiseReductionEnabled) { _, _ in
       guard didFinishSetup else { return }
@@ -143,6 +150,7 @@ struct EditorView: View {
       editorState: editorState,
       systemAudioSamples: systemWaveformGenerator.samples,
       micAudioSamples: micWaveformGenerator.samples,
+      externalAudioSamples: externalWaveformStore.samples,
       systemAudioProgress: systemWaveformGenerator.isGenerating ? systemWaveformGenerator.progress : nil,
       micAudioProgress: editorState.isMicProcessing
         ? editorState.micProcessingProgress * 0.5
@@ -160,6 +168,21 @@ struct EditorView: View {
       baseZoom: $baseZoom,
       displayMode: $timelineDisplayMode
     )
+  }
+
+  private func syncExternalWaveforms() {
+    let tracks = editorState.externalAudioTracks
+    let ids = Set(tracks.map(\.id))
+    for id in externalWaveformStore.samples.keys where !ids.contains(id) {
+      externalWaveformStore.remove(id)
+    }
+    for track in tracks where externalWaveformStore.samples[track.id] == nil && !externalWaveformStore.isGenerating(track.id) {
+      guard let url = editorState.externalAudioURL(for: track) else { continue }
+      let store = externalWaveformStore
+      Task {
+        await store.generate(for: track.id, url: url)
+      }
+    }
   }
 
   private func regenerateMicWaveform() {

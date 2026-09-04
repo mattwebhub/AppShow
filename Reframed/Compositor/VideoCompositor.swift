@@ -183,7 +183,16 @@ enum VideoCompositor {
         videoTrimRange: effectiveTrim,
         videoSegments: audioSegInfo
       )
-      let audioMix = buildAudioMix(for: composition, sources: audioSources)
+      let externalTracks = try await addExternalAudioTracks(
+        to: composition,
+        tracks: config.externalAudioTracks,
+        trim: effectiveTrim,
+        segments: audioSegInfo
+      )
+      let audioMix = Self.audioMix(
+        base: buildAudioMix(for: composition, sources: audioSources),
+        adding: externalMixParameters(for: externalTracks)
+      )
 
       let outputURL = FileManager.default.tempRecordingURL()
 
