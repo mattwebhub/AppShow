@@ -10,7 +10,8 @@ final class AgentTranscript {
   private(set) var streamingMessageID: UUID?
   private(set) var lastError: String?
 
-  let store: AgentConversationStore?
+  private(set) var store: AgentConversationStore?
+  var onTurnEnd: (@MainActor () async -> Void)?
   private let logger = Logger(label: "com.mattwebhub.appshow.agent-transcript")
   private var turnTask: Task<Void, Never>?
   private var session: AgentSession?
@@ -18,6 +19,11 @@ final class AgentTranscript {
   init(store: AgentConversationStore?, defaultProvider: AgentProviderKind = .claudeCode) {
     self.store = store
     conversation = store.flatMap { try? $0.load() } ?? AgentConversationData(provider: defaultProvider)
+  }
+
+  func relocate(to store: AgentConversationStore) {
+    self.store = store
+    persist()
   }
 
   var messages: [AgentMessageData] {
@@ -185,10 +191,13 @@ final class AgentTranscript {
         for try await event in await session.send(prompt) {
           self?.apply(event)
         }
-        self?.finishTurn(error: nil)
+        await self?.onTurnEnd?()
+        if Task.isCancelled { self?.markCancelled() } else { self?.finishTurn(error: nil) }
       } catch AgentError.cancelled {
+        await self?.onTurnEnd?()
         self?.markCancelled()
       } catch {
+        await self?.onTurnEnd?()
         self?.finishTurn(error: error)
       }
     }
@@ -196,6 +205,7 @@ final class AgentTranscript {
 
   func cancel() {
     guard isRunning, let session else { return }
+    turnTask?.cancel()
     Task {
       await session.cancel()
     }

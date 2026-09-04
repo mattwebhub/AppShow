@@ -507,6 +507,17 @@ private struct AgentSetTrimTool: AgentToolHandler {
     guard end > start else {
       throw AgentToolError.invalidArguments("end must be greater than start")
     }
+    let slices = context.editorState.videoRegions.compactMap { region -> VideoRegionData? in
+      var clipped = region
+      clipped.startSeconds = max(start, region.startSeconds)
+      clipped.endSeconds = min(end, region.endSeconds)
+      return clipped.endSeconds > clipped.startSeconds ? clipped : nil
+    }
+    guard !slices.isEmpty else {
+      throw AgentToolError.invalidArguments("The trim must include some kept video")
+    }
+    context.editorState.videoRegions = slices
+    context.editorState.syncVideoRegionsToPlayer()
     context.editorState.updateTrimStart(CMTime(seconds: start, preferredTimescale: 600))
     context.editorState.updateTrimEnd(CMTime(seconds: end, preferredTimescale: 600))
     return context.timelineResult()
@@ -816,6 +827,7 @@ private struct AgentRemoveSilencesTool: AgentToolHandler {
       padding: arguments["padding"]?.doubleValue ?? 0.15
     )
     let preview = await context.editorState.previewSilenceRemoval(config: config, source: source)
+    try Task.checkCancellation()
     if let error = preview.errorDescription { throw AgentToolError.failed(error) }
     guard preview.canApply else { return context.timelineResult() }
     let keptDuration = context.editorState.cutTimeline.totalDuration
@@ -833,7 +845,7 @@ private struct AgentRemoveSilencesTool: AgentToolHandler {
         operation: operation,
         confirmationID: try agentConfirmationID(arguments),
         title: "Remove extensive silence",
-        detail: "Remove (Int((preview.totalRemoved / keptDuration * 100).rounded()))% of the kept video"
+        detail: "Remove \(Int((preview.totalRemoved / keptDuration * 100).rounded()))% of the kept video"
       )
     }
     context.editorState.videoRegions = preview.slices
@@ -903,7 +915,7 @@ private struct AgentAddImageTool: AgentToolHandler {
       operation: .externalFile(kind: definition.name, url: source),
       confirmationID: try agentConfirmationID(arguments),
       title: "Import image",
-      detail: "Copy (source.lastPathComponent) into this project"
+      detail: "Copy \(source.lastPathComponent) into this project"
     )
     let range = try agentOverlayRange(arguments, duration: CMTimeGetSeconds(context.editorState.duration))
     guard let overlay = context.editorState.addImageOverlay(from: source, atTime: range.lowerBound) else {

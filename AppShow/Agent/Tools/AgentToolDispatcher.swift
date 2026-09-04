@@ -64,6 +64,7 @@ final class AgentToolDispatcher {
   }
 
   func call(_ name: String, arguments: JSONValue?) async throws -> JSONValue {
+    try Task.checkCancellation()
     if let error = batchTerminationError {
       batchTerminationError = nil
       throw error
@@ -97,6 +98,7 @@ final class AgentToolDispatcher {
     let before = definition.mutating ? context.editorState.createSnapshot() : nil
     do {
       let value = try await handler.call(arguments: validated, context: context)
+      try Task.checkCancellation()
       if before != nil {
         context.editorState.pendingUndoTask?.cancel()
         if mutationBatch == nil {
@@ -116,6 +118,12 @@ final class AgentToolDispatcher {
       logger.error("Agent tool \(name) failed: \(error)")
       throw AgentToolError.failed(error.localizedDescription)
     }
+  }
+
+  func cancelBatch() {
+    if let batch = mutationBatch { restoreBatch(batch) }
+    batchTerminationError = nil
+    context.editorState.agentConfirmations.clear()
   }
 
   private func restore(_ snapshot: EditorStateData?) {

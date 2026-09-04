@@ -233,6 +233,44 @@ struct AgentBridgeServerTests {
     )
   }
 
+  private final class RequestRecorder {
+    var started = false
+    var completed = 0
+  }
+
+  private struct DelayedHandler: AgentToolHandler {
+    let recorder: RequestRecorder
+    let definition = AgentToolDefinition(
+      name: "delayed_test",
+      description: "Delayed operation",
+      inputSchema: AgentToolSchema.object([:]),
+      mutating: false
+    )
+    func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+      recorder.started = true
+      try await Task.sleep(for: .milliseconds(300))
+      recorder.completed += 1
+      return [:]
+    }
+  }
+
+  @Test func disconnectCancelsInFlightAndQueuedRequests() async throws {
+    let harness = try await makeHarness()
+    let recorder = RequestRecorder()
+    harness.dispatcher.register(DelayedHandler(recorder: recorder))
+    let client = try await client(harness)
+    _ = try await initialize(client)
+    for id in 2...3 {
+      try await client.send(JSONRPCRequest(id: .number(id), method: "tools/call", params: ["name": "delayed_test"]))
+    }
+    for _ in 0..<100 where !recorder.started { try await Task.sleep(for: .milliseconds(10)) }
+    #expect(recorder.started)
+    await client.cancel()
+    try await Task.sleep(for: .milliseconds(800))
+    #expect(recorder.completed == 0)
+    await harness.tearDown()
+  }
+
   @Test func wrongTokenIsRejectedAndTheConnectionCloses() async throws {
     let harness = try await makeHarness()
     let client = try await client(harness)
@@ -271,8 +309,18 @@ struct AgentBridgeServerTests {
     #expect(names.contains("set_trim"))
     #expect(names.contains("set_kept_slices"))
 
-    await client.cancel()
+    _ = try await client.request(
+      JSONRPCRequest(id: .number(3), method: "tools/call", params: ["name": "begin_batch", "arguments": ["label": "unfinished"]])
+    )
+    _ = try await client.request(
+      JSONRPCRequest(id: .number(4), method: "tools/call", params: ["name": "set_trim", "arguments": ["start": 0.25, "end": 1.5]])
+    )
+    #expect(harness.state.agentMutationBatchActive)
     await controller.stop()
+    #expect(!harness.state.agentMutationBatchActive)
+    #expect(harness.state.trimStart.seconds == 0)
+    #expect(harness.state.videoRegions.first?.startSeconds == 0)
+    await client.cancel()
     #expect(controller.status == .stopped)
     #expect(FileManager.default.fileExists(atPath: configuration.workspace.sessionFileURL.path) == false)
     #expect(FileManager.default.fileExists(atPath: configuration.workspace.socketURL.path) == false)

@@ -168,6 +168,51 @@ struct MutatingToolsTests {
     #expect(CMTimeGetSeconds(state.trimStart) == 0)
   }
 
+  @Test func trimConstrainsKeptSlicesAndExportWithoutRestoringDeletedFootage() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    state.videoRegions = [VideoRegionData(startSeconds: 0, endSeconds: 0.75), VideoRegionData(startSeconds: 1, endSeconds: 2)]
+    let tools = dispatcher(state, in: directory)
+    _ = try await tools.call("set_trim", arguments: ["start": 0.25, "end": 1.5])
+    #expect(state.videoRegions.map(\.startSeconds) == [0.25, 1])
+    #expect(state.videoRegions.map(\.endSeconds) == [0.75, 1.5])
+    let exported = EditorState.exportVideoRegions(from: state.videoRegions, trimStart: 0.25, trimEnd: 1.5)
+    #expect(exported.reduce(0) { $0 + $1.timeRange.duration.seconds } == 1)
+  }
+
+  @Test func savedTrimSurvivesReopeningTheProject() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    _ = try await dispatcher(state, in: directory).call("set_trim", arguments: ["start": 0.25, "end": 1.5])
+    state.saveState()
+    let reopened = EditorState(project: try AppShowProject.open(at: #require(state.project?.bundleURL)))
+    defer { reopened.teardown() }
+    await reopened.setup()
+    #expect(reopened.trimStart.seconds == 0.25)
+    #expect(reopened.trimEnd.seconds == 1.5)
+  }
+
+  @Test func renamedProjectKeepsAndClearsSubsequentConversationMessages() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let oldURL = try #require(state.project?.bundleURL)
+    state.agentTranscript.appendUserMessage("Before rename")
+    state.renameProject("Renamed recording")
+    let project = try #require(state.project)
+    state.agentTranscript.appendUserMessage("After rename")
+    let store = AgentConversationStore(project: project)
+    #expect(try store.load()?.messages.map(\.text) == ["Before rename", "After rename"])
+    #expect(!FileManager.default.fileExists(atPath: oldURL.path))
+    #expect(state.agentTranscript.clear())
+    #expect(try store.load() == nil)
+  }
+
   @Test func zoomAndSpotlightToolsApplyExistingEditorPrimitives() async throws {
     let directory = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(directory) }
@@ -661,6 +706,8 @@ struct MutatingToolsTests {
     }
     let request = try #require(state.agentConfirmations.pending.first)
     #expect(request.operation.kind == "remove_silences")
+    #expect(request.detail.contains("%"))
+    #expect(!request.detail.contains("Int("))
     #expect(request.operation.arguments["padding"] == 0.05)
     #expect(state.videoRegions.count == 1)
     #expect(state.agentConfirmations.approve(request.id))
@@ -691,6 +738,7 @@ struct MutatingToolsTests {
     }
     let request = try #require(state.agentConfirmations.pending.first)
     #expect(request.operation == AgentConfirmationOperation.externalFile(kind: "add_image", url: source))
+    #expect(request.detail == "Copy \(source.lastPathComponent) into this project")
     #expect(state.agentConfirmations.approve(request.id))
 
     let added = try await dispatcher.call(
