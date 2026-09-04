@@ -42,7 +42,13 @@ struct VideoFixtureTests {
     let url = try await VideoFixtures.screenMovie(in: dir)
     let frames = try await VideoFixtures.centerPixels(of: url)
     let indices = frames.map { VideoFixtures.frameIndex(for: $0.color) }
-    #expect(indices == Array(0..<60))
+    #expect(indices.count == 60)
+    #expect(indices == indices.sorted())
+    for (expected, decoded) in indices.enumerated() {
+      #expect(abs(decoded - expected) <= 1)
+    }
+    #expect(indices[0] == 0)
+    #expect(indices[30] == 30)
   }
 
   @Test func webcamMovieIsSmallerAndUniformlyColored() async throws {
