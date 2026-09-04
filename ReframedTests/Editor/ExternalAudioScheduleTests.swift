@@ -89,4 +89,11 @@ struct ExternalAudioScheduleTests {
     #expect(ExternalAudioSchedule.nextAudibleTime(after: 8, in: regions) == nil)
     #expect(ExternalAudioSchedule.nextAudibleTime(after: 3, in: []) == 3)
   }
+
+  @Test func resyncIsRequestedAboveFortyMillisecondsOfDrift() {
+    #expect(!ExternalAudioSchedule.exceedsDriftTolerance(anchorTime: 10, playedSeconds: 2, timelineTime: 12.03))
+    #expect(!ExternalAudioSchedule.exceedsDriftTolerance(anchorTime: 10, playedSeconds: 2, timelineTime: 11.97))
+    #expect(ExternalAudioSchedule.exceedsDriftTolerance(anchorTime: 10, playedSeconds: 2, timelineTime: 12.05))
+    #expect(ExternalAudioSchedule.exceedsDriftTolerance(anchorTime: 10, playedSeconds: 2, timelineTime: 11.9))
+  }
 }
