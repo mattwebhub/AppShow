@@ -261,7 +261,7 @@ struct AppShowProjectTests {
     #expect(!FileManager.default.fileExists(atPath: project.bundleURL.path))
   }
 
-  @Test(.enabled(if: ProcessInfo.processInfo.environment["REFRAMED_TMP"] != nil))
+  @Test(.enabled(if: ProcessInfo.processInfo.environment["APPSHOW_TMP"] != nil))
   func createWithCleanupDisabledLeavesSharedTempDirUntouched() async throws {
     let dir = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(dir) }
@@ -274,7 +274,7 @@ struct AppShowProjectTests {
     #expect(FileManager.default.fileExists(atPath: sentinel.path))
   }
 
-  @Test(.enabled(if: ProcessInfo.processInfo.environment["REFRAMED_TMP"] != nil))
+  @Test(.enabled(if: ProcessInfo.processInfo.environment["APPSHOW_TMP"] != nil))
   func createWithDefaultCleanupWipesSharedTempDir() async throws {
     let dir = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(dir) }

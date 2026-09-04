@@ -161,7 +161,7 @@ extension EditorState {
       guard !Task.isCancelled else { return }
 
       let tempURL = FileManager.default.temporaryDirectory
-        .appendingPathComponent("reframed-nr-preview-\(UUID().uuidString).m4a")
+        .appendingPathComponent("appshow-nr-preview-\(UUID().uuidString).m4a")
 
       do {
         try await RNNoiseProcessor.processFile(

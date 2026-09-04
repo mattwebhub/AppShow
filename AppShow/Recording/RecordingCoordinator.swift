@@ -18,7 +18,7 @@ actor RecordingCoordinator {
   var micAudioWriter: AudioTrackWriter?
   var recordingClock: SharedRecordingClock?
   var cursorMetadataRecorder: CursorMetadataRecorder?
-  let logger = Logger(label: "eu.jankuri.reframed.recording-coordinator")
+  let logger = Logger(label: "com.mattwebhub.appshow.recording-coordinator")
   var onStreamError: (@Sendable (any Error) -> Void)?
   var onDeviceLost: (@Sendable (String) -> Void)?
   var pauseStartTime: CMTime = .invalid

@@ -4,7 +4,7 @@ import Foundation
 import Logging
 
 enum VideoCompositor {
-  static let logger = Logger(label: "eu.jankuri.reframed.video-compositor")
+  static let logger = Logger(label: "com.mattwebhub.appshow.video-compositor")
 
   struct AudioSource {
     let url: URL

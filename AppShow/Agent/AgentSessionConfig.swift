@@ -13,8 +13,8 @@ struct AgentSessionConfig: Sendable, Equatable {
 
   var processEnvironment: [String: String] {
     [
-      "REFRAMED_AGENT_SOCKET": workspace.socketURL.path,
-      "REFRAMED_AGENT_TOKEN": workspace.token,
+      "APPSHOW_AGENT_SOCKET": workspace.socketURL.path,
+      "APPSHOW_AGENT_TOKEN": workspace.token,
     ]
   }
 
@@ -34,8 +34,8 @@ struct AgentSessionConfig: Sendable, Equatable {
       "-c", "mcp_servers={}",
       "-c", "mcp_servers.\(Self.serverName).command=\(command)",
       "-c",
-      "mcp_servers.\(Self.serverName).env={REFRAMED_AGENT_SOCKET=\(socket),REFRAMED_AGENT_TOKEN=\(token)}",
-      "-c", "mcp_servers.\(Self.serverName).env_vars=[\"REFRAMED_AGENT_SOCKET\",\"REFRAMED_AGENT_TOKEN\"]",
+      "mcp_servers.\(Self.serverName).env={APPSHOW_AGENT_SOCKET=\(socket),APPSHOW_AGENT_TOKEN=\(token)}",
+      "-c", "mcp_servers.\(Self.serverName).env_vars=[\"APPSHOW_AGENT_SOCKET\",\"APPSHOW_AGENT_TOKEN\"]",
       "-c", "mcp_servers.\(Self.serverName).tool_timeout_sec=600",
       "-c", "mcp_servers.\(Self.serverName).default_tools_approval_mode=\"approve\"",
     ]

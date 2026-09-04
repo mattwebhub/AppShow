@@ -4,7 +4,7 @@ import Testing
 
 @testable import AppShow
 
-@Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["REFRAMED_RUN_EXPORT_TESTS"] == "1"))
+@Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["APPSHOW_RUN_EXPORT_TESTS"] == "1"))
 struct ExportPipelineTests {
   private func slices() -> [VideoRegionData] {
     [

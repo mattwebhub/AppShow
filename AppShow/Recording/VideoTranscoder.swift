@@ -3,7 +3,7 @@ import CoreMedia
 import Logging
 
 enum VideoTranscoder {
-  private static let logger = Logger(label: "eu.jankuri.reframed.video-transcoder")
+  private static let logger = Logger(label: "com.mattwebhub.appshow.video-transcoder")
 
   static func merge(
     videoFile: URL,

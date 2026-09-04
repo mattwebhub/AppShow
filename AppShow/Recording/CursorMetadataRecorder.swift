@@ -5,7 +5,7 @@ import Foundation
 final class CursorMetadataRecorder: @unchecked Sendable {
   private let lock = NSLock()
   private var timer: DispatchSourceTimer?
-  private let queue = DispatchQueue(label: "eu.jankuri.reframed.cursor-metadata", qos: .userInteractive)
+  private let queue = DispatchQueue(label: "com.mattwebhub.appshow.cursor-metadata", qos: .userInteractive)
 
   private var captureOriginX: Double = 0
   private var captureOriginY: Double = 0

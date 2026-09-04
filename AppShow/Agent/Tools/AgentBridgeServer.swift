@@ -7,8 +7,8 @@ actor AgentBridgeServer {
   private let token: String
   private let dispatcher: AgentToolDispatcher
   private let timeouts: AgentRPCTimeouts
-  private let queue = DispatchQueue(label: "eu.jankuri.reframed.agent-bridge")
-  private let logger = Logger(label: "eu.jankuri.reframed.agent-bridge")
+  private let queue = DispatchQueue(label: "com.mattwebhub.appshow.agent-bridge")
+  private let logger = Logger(label: "com.mattwebhub.appshow.agent-bridge")
   private var listener: NWListener?
   private var connections: [Int: AgentBridgeConnection] = [:]
   private var nextConnectionID = 0

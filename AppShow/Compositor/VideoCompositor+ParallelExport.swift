@@ -298,7 +298,7 @@ extension VideoCompositor {
 
     func start() {
       input.requestMediaDataWhenReady(
-        on: DispatchQueue(label: "eu.jankuri.reframed.video-writer", qos: .userInitiated)
+        on: DispatchQueue(label: "com.mattwebhub.appshow.video-writer", qos: .userInitiated)
       ) { [weak self] in
         self?.drain()
       }
@@ -410,7 +410,7 @@ extension VideoCompositor {
     isHDR: Bool = false,
     progressHandler: (@MainActor @Sendable (Double, Double?) -> Void)?
   ) async throws {
-    let logger = Logger(label: "eu.jankuri.reframed.video-compositor")
+    let logger = Logger(label: "com.mattwebhub.appshow.video-compositor")
 
     let reader = try AVAssetReader(asset: composition)
     reader.timeRange = CMTimeRange(start: .zero, duration: trimDuration)
@@ -571,7 +571,7 @@ extension VideoCompositor {
             nonisolated(unsafe) let safeAudioOutput = aOut
             nonisolated(unsafe) let safeAudioInput = aIn
             audioGroup.enter()
-            let audioQueue = DispatchQueue(label: "eu.jankuri.reframed.audio", qos: .userInitiated)
+            let audioQueue = DispatchQueue(label: "com.mattwebhub.appshow.audio", qos: .userInitiated)
             safeAudioInput.requestMediaDataWhenReady(on: audioQueue) {
               while safeAudioInput.isReadyForMoreMediaData {
                 audioState.lock.lock()
@@ -623,7 +623,7 @@ extension VideoCompositor {
           let jobs = FrameJobQueue(initialCapacity: max(256, maxInFlight * 4))
           let renderGroup = DispatchGroup()
           let renderQueue = DispatchQueue(
-            label: "eu.jankuri.reframed.render-workers",
+            label: "com.mattwebhub.appshow.render-workers",
             qos: .userInitiated,
             attributes: .concurrent
           )

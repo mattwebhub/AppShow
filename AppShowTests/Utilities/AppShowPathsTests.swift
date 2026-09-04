@@ -21,8 +21,8 @@ struct AppShowPathsTests {
 
   @Test func overridesComeFromEnvironment() {
     let env = ProcessInfo.processInfo.environment
-    #expect(env["REFRAMED_HOME"].map { URL(fileURLWithPath: $0, isDirectory: true).path } == AppShowPaths.home.path)
-    #expect(env["REFRAMED_TMP"].map { URL(fileURLWithPath: $0, isDirectory: true).path } == AppShowPaths.temp.path)
+    #expect(env["APPSHOW_HOME"].map { URL(fileURLWithPath: $0, isDirectory: true).path } == AppShowPaths.home.path)
+    #expect(env["APPSHOW_TMP"].map { URL(fileURLWithPath: $0, isDirectory: true).path } == AppShowPaths.temp.path)
   }
 
   @Test func appShowIdentityHasStablePublicValues() {
@@ -50,6 +50,18 @@ struct AppShowPathsTests {
       homeDirectory: URL(fileURLWithPath: "/tmp/home", isDirectory: true)
     )
     #expect(home.path == "/tmp/appshow-legacy")
+  }
+
+  @Test func appShowTempOverrideTakesPrecedenceOverLegacyOverride() {
+    let temp = AppShowPaths.resolveTemp(
+      environment: ["APPSHOW_TMP": "/tmp/appshow-new", "REFRAMED_TMP": "/tmp/appshow-legacy"]
+    )
+    #expect(temp.path == "/tmp/appshow-new")
+  }
+
+  @Test func legacyTempOverrideRemainsACompatibilityFallback() {
+    let temp = AppShowPaths.resolveTemp(environment: ["REFRAMED_TMP": "/tmp/appshow-legacy"])
+    #expect(temp.path == "/tmp/appshow-legacy")
   }
 
   @Test func legacyHomeMovesWhenAppShowHomeDoesNotExist() throws {

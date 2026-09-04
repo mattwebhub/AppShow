@@ -43,7 +43,7 @@ enum AgentEnvironment {
 }
 
 actor AgentProcessRunner {
-  private let logger = Logger(label: "eu.jankuri.reframed.agent-process-runner")
+  private let logger = Logger(label: "com.mattwebhub.appshow.agent-process-runner")
   private let maximumLineLength: Int
   private let stderrTailLength = 4096
   private var process: Process?

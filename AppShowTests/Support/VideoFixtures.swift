@@ -166,7 +166,7 @@ private final class MovieWriter: @unchecked Sendable {
   private let fps: Int
   private let frameCount: Int
   private let color: @Sendable (Int) -> VideoFixtures.RGB
-  private let queue = DispatchQueue(label: "reframed-tests.video-fixture")
+  private let queue = DispatchQueue(label: "appshow-tests.video-fixture")
   private var nextFrame = 0
   private var finished = false
 

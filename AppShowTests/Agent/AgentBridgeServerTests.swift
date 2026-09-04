@@ -195,7 +195,7 @@ struct AgentBridgeServerTests {
     await state.setup()
     let dispatcher = AgentToolDispatcher(editorState: state, framesDirectory: dir.appendingPathComponent("frames"), workspaceDirectory: dir)
     let socketDir = FileManager.default.temporaryDirectory
-      .appendingPathComponent("reframed-tests", isDirectory: true)
+      .appendingPathComponent("appshow-tests", isDirectory: true)
       .appendingPathComponent(String(UUID().uuidString.prefix(8)), isDirectory: true)
     try FileManager.default.createDirectory(at: socketDir, withIntermediateDirectories: true)
     let socketURL = socketDir.appendingPathComponent("bridge.sock")

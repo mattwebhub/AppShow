@@ -6,7 +6,7 @@ final class SharedRecordingClock: @unchecked Sendable {
   private var _referenceTime: CMTime = .invalid
   private var firstPTSValues: [CMTime] = []
   private let streamCount: Int
-  private let logger = Logger(label: "eu.jankuri.reframed.recording-clock")
+  private let logger = Logger(label: "com.mattwebhub.appshow.recording-clock")
 
   init(streamCount: Int) {
     self.streamCount = streamCount

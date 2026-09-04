@@ -4,7 +4,7 @@ import Testing
 @testable import AppShow
 
 @MainActor
-@Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["REFRAMED_RUN_AUDIO_ENGINE_TESTS"] == "1"))
+@Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["APPSHOW_RUN_AUDIO_ENGINE_TESTS"] == "1"))
 struct ExternalAudioPreviewEngineTests {
   private func track(id: UUID, fileName: String) -> ExternalAudioTrackData {
     ExternalAudioTrackData(

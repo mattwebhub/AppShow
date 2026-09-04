@@ -5,7 +5,7 @@ import Logging
 final class StateService {
   static let shared = StateService()
 
-  private let logger = Logger(label: "eu.jankuri.reframed.state-service")
+  private let logger = Logger(label: "com.mattwebhub.appshow.state-service")
   private let fileURL: URL
   private var data: StateData
 

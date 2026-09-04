@@ -11,7 +11,7 @@ final class ExternalAudioPreviewEngine {
     var anchorTime: Double?
   }
 
-  private let logger = Logger(label: "eu.jankuri.reframed.external-audio-preview")
+  private let logger = Logger(label: "com.mattwebhub.appshow.external-audio-preview")
   private var engine: AVAudioEngine?
   private var players: [UUID: Player] = [:]
   private var order: [UUID] = []

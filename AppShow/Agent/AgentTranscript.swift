@@ -11,7 +11,7 @@ final class AgentTranscript {
   private(set) var lastError: String?
 
   let store: AgentConversationStore?
-  private let logger = Logger(label: "eu.jankuri.reframed.agent-transcript")
+  private let logger = Logger(label: "com.mattwebhub.appshow.agent-transcript")
   private var turnTask: Task<Void, Never>?
   private var session: AgentSession?
 

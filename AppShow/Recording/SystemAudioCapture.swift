@@ -5,8 +5,8 @@ import Logging
 final class SystemAudioCapture: NSObject, SCStreamDelegate, SCStreamOutput, @unchecked Sendable {
   private var stream: SCStream?
   private let audioWriter: AudioTrackWriter
-  private let logger = Logger(label: "eu.jankuri.reframed.system-audio-capture")
-  private let discardQueue = DispatchQueue(label: "eu.jankuri.reframed.system-audio-capture.discard", qos: .background)
+  private let logger = Logger(label: "com.mattwebhub.appshow.system-audio-capture")
+  private let discardQueue = DispatchQueue(label: "com.mattwebhub.appshow.system-audio-capture.discard", qos: .background)
   private var isPaused = false
 
   init(audioWriter: AudioTrackWriter) {

@@ -34,7 +34,7 @@ final class SessionState {
     }
   }
 
-  let logger = Logger(label: "eu.jankuri.reframed.session")
+  let logger = Logger(label: "com.mattwebhub.appshow.session")
   var selectionCoordinator: SelectionCoordinator?
   var windowSelectionCoordinator: WindowSelectionCoordinator?
   var recordingCoordinator: RecordingCoordinator?

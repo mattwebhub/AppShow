@@ -3,7 +3,7 @@ import Logging
 
 actor AgentSession {
   let provider: any AgentProvider
-  private let logger = Logger(label: "eu.jankuri.reframed.agent-session")
+  private let logger = Logger(label: "com.mattwebhub.appshow.agent-session")
   private let executable: URL
   private let workingDirectory: URL
   private let environment: [String: String]

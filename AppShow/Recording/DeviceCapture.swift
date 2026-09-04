@@ -14,11 +14,11 @@ final class DeviceCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
   private(set) var captureSession: AVCaptureSession?
   private var videoWriter: VideoTrackWriter?
   private var audioWriter: AudioTrackWriter?
-  private let logger = Logger(label: "eu.jankuri.reframed.device-capture")
+  private let logger = Logger(label: "com.mattwebhub.appshow.device-capture")
   var onPreviewFrame: (@Sendable (CMSampleBuffer) -> Void)?
   private var isPaused = false
-  private let verifyQueue = DispatchQueue(label: "eu.jankuri.reframed.device-verify", qos: .userInteractive)
-  private let audioQueue = DispatchQueue(label: "eu.jankuri.reframed.device-audio", qos: .userInteractive)
+  private let verifyQueue = DispatchQueue(label: "com.mattwebhub.appshow.device-verify", qos: .userInteractive)
+  private let audioQueue = DispatchQueue(label: "com.mattwebhub.appshow.device-audio", qos: .userInteractive)
   private var firstFrameContinuation: CheckedContinuation<Void, any Error>?
   private var verifiedDims: (width: Int, height: Int) = (0, 0)
 
@@ -62,7 +62,7 @@ final class DeviceCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
     }
 
     nonisolated(unsafe) let unsafeSession = session
-    let startQueue = DispatchQueue(label: "eu.jankuri.reframed.device-start")
+    let startQueue = DispatchQueue(label: "com.mattwebhub.appshow.device-start")
     startQueue.async {
       unsafeSession.startRunning()
     }

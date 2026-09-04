@@ -1,7 +1,7 @@
 import Foundation
 
 extension FileManager {
-  private func reframedTempDir() -> URL {
+  private func appShowTempDir() -> URL {
     let tempDir = AppShowPaths.temp
     try? createDirectory(at: tempDir, withIntermediateDirectories: true)
     return tempDir
@@ -12,24 +12,24 @@ extension FileManager {
   }
 
   func tempRecordingURL() -> URL {
-    reframedTempDir().appendingPathComponent("reframed-\(timestamp()).mp4")
+    appShowTempDir().appendingPathComponent("appshow-\(timestamp()).mp4")
   }
 
   func tempVideoURL(captureQuality: CaptureQuality = .standard) -> URL {
     let ext = captureQuality.isProRes ? "mov" : "mp4"
-    return reframedTempDir().appendingPathComponent("video-\(timestamp()).\(ext)")
+    return appShowTempDir().appendingPathComponent("video-\(timestamp()).\(ext)")
   }
 
   func tempWebcamURL() -> URL {
-    reframedTempDir().appendingPathComponent("webcam-\(timestamp()).mp4")
+    appShowTempDir().appendingPathComponent("webcam-\(timestamp()).mp4")
   }
 
   func tempAudioURL(label: String) -> URL {
-    reframedTempDir().appendingPathComponent("\(label)-\(timestamp()).m4a")
+    appShowTempDir().appendingPathComponent("\(label)-\(timestamp()).m4a")
   }
 
   func tempGIFURL() -> URL {
-    reframedTempDir().appendingPathComponent("reframed-\(timestamp()).gif")
+    appShowTempDir().appendingPathComponent("appshow-\(timestamp()).gif")
   }
 
   @MainActor

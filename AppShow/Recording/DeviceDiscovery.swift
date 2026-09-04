@@ -14,7 +14,7 @@ final class DeviceDiscovery {
   static let shared = DeviceDiscovery()
 
   private(set) var availableDevices: [ExternalDevice] = []
-  private let logger = Logger(label: "eu.jankuri.reframed.device-discovery")
+  private let logger = Logger(label: "com.mattwebhub.appshow.device-discovery")
   @ObservationIgnored nonisolated(unsafe) private var connectObserver: NSObjectProtocol?
   @ObservationIgnored nonisolated(unsafe) private var disconnectObserver: NSObjectProtocol?
 

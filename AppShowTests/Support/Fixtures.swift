@@ -6,7 +6,7 @@ final class FixtureAnchor {}
 enum TestPaths {
   static func makeTemporaryDirectory(_ name: String = #function) throws -> URL {
     let base = FileManager.default.temporaryDirectory
-      .appendingPathComponent("reframed-tests", isDirectory: true)
+      .appendingPathComponent("appshow-tests", isDirectory: true)
       .appendingPathComponent(UUID().uuidString, isDirectory: true)
     try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
     return base

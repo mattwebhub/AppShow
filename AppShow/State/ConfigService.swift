@@ -6,7 +6,7 @@ import Logging
 final class ConfigService {
   static let shared = ConfigService()
 
-  private let logger = Logger(label: "eu.jankuri.reframed.config")
+  private let logger = Logger(label: "com.mattwebhub.appshow.config")
   private let fileURL: URL
   private var data: ConfigData
 

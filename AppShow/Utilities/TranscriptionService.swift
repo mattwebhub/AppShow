@@ -20,8 +20,7 @@ enum TranscriptionService {
 
     await onProgress?(0.05)
 
-    let modelsBase = FileManager.default.homeDirectoryForCurrentUser
-      .appendingPathComponent(".reframed")
+    let modelsBase = AppShowPaths.home
     let computeOptions = ModelComputeOptions(
       melCompute: .cpuAndGPU,
       audioEncoderCompute: .cpuAndGPU,
