@@ -6,8 +6,11 @@ BUILD_DIR = .build
 VERSION = $(shell grep MARKETING_VERSION Config.xcconfig | cut -d'=' -f2 | tr -d ' ')
 RELEASE_DIR = $(BUILD_DIR)/Build/Products/Release
 DEBUG_DIR = $(BUILD_DIR)/Build/Products/Debug
+TEST_TARGET = ReframedTests
+TEST_FILTER = $(if $(T),-only-testing:'$(TEST_TARGET)/$(T)',-only-testing:$(TEST_TARGET))
+TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning:|failed
 
-.PHONY: build release run dev dmg dmg-release format clean help install uninstall changelog tag appcast publish
+.PHONY: build release run dev test dmg dmg-release format lint clean help install uninstall changelog tag appcast publish
 
 all: help
 
@@ -22,6 +25,9 @@ run: release
 
 dev: build
 	@open $(DEBUG_DIR)/$(APP_NAME).app
+
+test:
+	@set -o pipefail; xcodebuild -project Reframed.xcodeproj -scheme $(SCHEME) -configuration Debug test -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)' -parallel-testing-enabled NO $(TEST_FILTER) 2>&1 | grep -E '$(TEST_OUTPUT_FILTER)'
 
 dmg: release
 	@./scripts/create-dmg.sh
@@ -53,7 +59,10 @@ publish: tag dmg-release appcast
 	@./scripts/publish-release.sh
 
 format:
-	@swift format -i -r Reframed/
+	@swift format -i -r Reframed/ $(wildcard ReframedTests)
+
+lint:
+	@swift format lint -r -s Reframed/ $(wildcard ReframedTests)
 
 clean:
 	@rm -rf $(BUILD_DIR) dist
@@ -72,6 +81,7 @@ help:
 	@echo "  uninstall - Remove from /Applications"
 	@echo "  run       - Build release and run"
 	@echo "  dev       - Build debug and run"
+	@echo "  test      - Run unit tests (make test T=SuiteName for one suite)"
 	@echo "  format    - Format Swift source files"
 	@echo "  clean     - Clean build artifacts"
 	@echo "  tag       - Create git tag from Config.xcconfig version and generate changelog"

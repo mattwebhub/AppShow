@@ -56,9 +56,9 @@ extension SettingsView {
         .background(ReframedColors.divider)
 
       HStack(spacing: 16) {
-        linkButton("GitHub", icon: "arrow.up.right.square", url: "https://github.com/jkuri/Reframed")
-        linkButton("Issues", icon: "ladybug", url: "https://github.com/jkuri/Reframed/issues")
-        linkButton("Releases", icon: "shippingbox", url: "https://github.com/jkuri/Reframed/releases")
+        linkButton("GitHub", icon: "arrow.up.right.square", url: "https://github.com/mattwebhub/Reframed")
+        linkButton("Issues", icon: "ladybug", url: "https://github.com/mattwebhub/Reframed/issues")
+        linkButton("Releases", icon: "shippingbox", url: "https://github.com/mattwebhub/Reframed/releases")
       }
       .padding(.top, 4)
     }

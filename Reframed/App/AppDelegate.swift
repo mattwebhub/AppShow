@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
   private var eventMonitor: Any?
 
   func applicationDidFinishLaunching(_ notification: Notification) {
+    guard !LaunchEnvironment.isTestHost else { return }
     _ = SparkleUpdater.shared
     ConfigService.shared.applyAppearance()
 
