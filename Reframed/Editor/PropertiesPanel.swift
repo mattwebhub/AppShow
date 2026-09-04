@@ -87,6 +87,7 @@ struct PropertiesPanel: View {
         case .zoom:
           zoomSection
         case .effects:
+          overlaysSection
           spotlightSection
         case .captions:
           captionsSection

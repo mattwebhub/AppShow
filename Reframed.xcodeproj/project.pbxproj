@@ -50,6 +50,10 @@
 		7E5700000000000000000085 /* EditorState+SilenceRemoval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000084 /* EditorState+SilenceRemoval.swift */; };
 		7E5700000000000000000083 /* SilenceAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000082 /* SilenceAnalysis.swift */; };
 		7E5700000000000000000081 /* SilenceDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000080 /* SilenceDetector.swift */; };
+		7E57000000000000000000A1 /* PropertiesPanel+OverlaysSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000A0 /* PropertiesPanel+OverlaysSection.swift */; };
+		7E570000000000000000009F /* TextOverlayEditPopover+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000009E /* TextOverlayEditPopover+Style.swift */; };
+		7E570000000000000000009D /* TextOverlayEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000009C /* TextOverlayEditPopover.swift */; };
+		7E570000000000000000009B /* TimelineView+OverlayTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000009A /* TimelineView+OverlayTrack.swift */; };
 		7E5700000000000000000099 /* VideoPreviewContainer+TextOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000098 /* VideoPreviewContainer+TextOverlays.swift */; };
 		7E5700000000000000000097 /* FrameRenderer+TextOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000096 /* FrameRenderer+TextOverlays.swift */; };
 		7E5700000000000000000095 /* TextOverlayLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000094 /* TextOverlayLayout.swift */; };
@@ -320,6 +324,10 @@
 		7E5700000000000000000084 /* EditorState+SilenceRemoval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+SilenceRemoval.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000082 /* SilenceAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilenceAnalysis.swift; sourceTree = "<group>"; };
 		7E5700000000000000000080 /* SilenceDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilenceDetector.swift; sourceTree = "<group>"; };
+		7E57000000000000000000A0 /* PropertiesPanel+OverlaysSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+OverlaysSection.swift"; sourceTree = "<group>"; };
+		7E570000000000000000009E /* TextOverlayEditPopover+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextOverlayEditPopover+Style.swift"; sourceTree = "<group>"; };
+		7E570000000000000000009C /* TextOverlayEditPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayEditPopover.swift; sourceTree = "<group>"; };
+		7E570000000000000000009A /* TimelineView+OverlayTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+OverlayTrack.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000098 /* VideoPreviewContainer+TextOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewContainer+TextOverlays.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000096 /* FrameRenderer+TextOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FrameRenderer+TextOverlays.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000094 /* TextOverlayLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayLayout.swift; sourceTree = "<group>"; };
@@ -885,6 +893,7 @@
 				7E5700000000000000000020 /* TimelineGeometry.swift */,
 				7E5700000000000000000022 /* TimelineView+Geometry.swift */,
 				7E5700000000000000000086 /* PropertiesPanel+SilencesSection.swift */,
+				7E57000000000000000000A0 /* PropertiesPanel+OverlaysSection.swift */,
 				7E5700000000000000000084 /* EditorState+SilenceRemoval.swift */,
 				7E5700000000000000000082 /* SilenceAnalysis.swift */,
 				7E5700000000000000000080 /* SilenceDetector.swift */,
@@ -908,7 +917,10 @@
 				FB10000000000000000000A7 /* ClickSoundPlayer.swift */,
 				FB10000000000000000000C1 /* EditorState+SpotlightRegions.swift */,
 				FB10000000000000000000C2 /* TimelineView+SpotlightTrack.swift */,
+				7E570000000000000000009A /* TimelineView+OverlayTrack.swift */,
 				FB10000000000000000000C3 /* SpotlightRegionEditPopover.swift */,
+				7E570000000000000000009C /* TextOverlayEditPopover.swift */,
+				7E570000000000000000009E /* TextOverlayEditPopover+Style.swift */,
 				34448E948FE88A1C6C011585 /* VideoPreviewContainer.swift */,
 				AFB8530E54B2C3F5B4C5C547 /* VideoPreviewContainer+Webcam.swift */,
 				2A4372FBF544C917CA59B98B /* WebcamCameraView.swift */,
@@ -1270,6 +1282,10 @@
 				7E5700000000000000000085 /* EditorState+SilenceRemoval.swift in Sources */,
 				7E5700000000000000000083 /* SilenceAnalysis.swift in Sources */,
 				7E5700000000000000000081 /* SilenceDetector.swift in Sources */,
+				7E57000000000000000000A1 /* PropertiesPanel+OverlaysSection.swift in Sources */,
+				7E570000000000000000009F /* TextOverlayEditPopover+Style.swift in Sources */,
+				7E570000000000000000009D /* TextOverlayEditPopover.swift in Sources */,
+				7E570000000000000000009B /* TimelineView+OverlayTrack.swift in Sources */,
 				7E5700000000000000000099 /* VideoPreviewContainer+TextOverlays.swift in Sources */,
 				7E5700000000000000000097 /* FrameRenderer+TextOverlays.swift in Sources */,
 				7E5700000000000000000095 /* TextOverlayLayout.swift in Sources */,

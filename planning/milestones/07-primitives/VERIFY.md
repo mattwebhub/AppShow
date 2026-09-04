@@ -13,6 +13,11 @@ Run on a clean clone before closing the milestone. Record the date and commit.
 | Silences, apply | press Apply | Cuts track appears with the kept slices, playback jumps over the pauses | |
 | Silences, undo | ⌘Z once | previous slices restored; History popover row reads "Silences removed" | |
 | Silences, existing cut | cut once by hand, remove one slice, then Apply | the removed slice stays removed, silences cut only inside kept slices | |
+| Text overlay, add | open any `.frm`, Effects tab, Add Text | Overlays track animates in with a "Title" chip of 3 s at the playhead; the preview shows a white title on a black pill in the centre | |
+| Text overlay, edit | right-click the chip, change the text, size, position, colours, transitions | preview updates live; the chip text truncates with the chip width; the row in the Effects tab seeks to the overlay | |
+| Text overlay, drag | drag the chip and its edges; switch the timeline to compressed mode | chip moves and resizes within the recording; read-only in compressed mode like the other tracks | |
+| Text overlay, export | export MP4 with one overlay that fades in and slides out | the exported frame matches the preview at the same time; fade and slide play at the same moments | |
+| Text overlay, undo | ⌘Z after adding | overlay disappears; History popover row reads "Text overlay added" | |
 | Manual smoke | record 5 s of screen, open editor, export MP4 | file plays | |
 
-Silence rows and the manual smoke need a human with the app; the automated rows above were run on the silence-removal worktree before T5.
+Silence rows, text overlay rows and the manual smoke need a human with the app; the automated rows above were run on the silence-removal worktree before T5 and again on the text-overlays worktree after T5 (331 tests in 33 suites).
