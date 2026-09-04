@@ -123,7 +123,8 @@ extension EditorState {
       cameraBackgroundStyle: cameraBackgroundStyle == .none ? nil : cameraBackgroundStyle,
       captionSettings: captionSettings,
       captionSegments: captionSegments.isEmpty ? nil : captionSegments,
-      spotlightRegions: spotlightRegions.isEmpty ? nil : spotlightRegions
+      spotlightRegions: spotlightRegions.isEmpty ? nil : spotlightRegions,
+      externalAudioTracks: externalAudioTracks.isEmpty ? nil : externalAudioTracks
     )
   }
 
@@ -203,6 +204,7 @@ extension EditorState {
     if let savedMicRegions = data.micAudioRegions, !savedMicRegions.isEmpty {
       micAudioRegions = savedMicRegions
     }
+    externalAudioTracks = data.externalAudioTracks ?? []
     if let savedCameraRegions = data.cameraRegions, !savedCameraRegions.isEmpty {
       cameraRegions = savedCameraRegions
     } else if let legacyRegions = data.cameraFullscreenRegions, !legacyRegions.isEmpty {
@@ -399,6 +401,7 @@ extension EditorState {
       _ = self.trimEnd
       _ = self.systemAudioRegions
       _ = self.micAudioRegions
+      _ = self.externalAudioTracks
       _ = self.cameraRegions
       _ = self.videoRegions
       _ = self.systemAudioVolume
