@@ -191,11 +191,11 @@ private final class MovieWriter: @unchecked Sendable {
       AVVideoWidthKey: width,
       AVVideoHeightKey: height,
       AVVideoCompressionPropertiesKey: [
-        AVVideoAverageBitRateKey: 1_500_000,
+        AVVideoAverageBitRateKey: 20_000_000,
         AVVideoMaxKeyFrameIntervalKey: 1,
         AVVideoAllowFrameReorderingKey: false,
         AVVideoExpectedSourceFrameRateKey: fps,
-        AVVideoProfileLevelKey: AVVideoProfileLevelH264MainAutoLevel,
+        AVVideoProfileLevelKey: AVVideoProfileLevelH264HighAutoLevel,
       ],
     ]
     input = AVAssetWriterInput(mediaType: .video, outputSettings: settings)
