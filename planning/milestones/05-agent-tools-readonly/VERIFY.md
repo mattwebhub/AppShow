@@ -9,4 +9,4 @@
 | Frame smoke | `make test T=AgentToolDispatcherTests` | green, PNG decodes at the requested width | pass (2026-09-04) |
 | No upstream source edits | compare with `milestone-03-music-tracks` | production changes confined to `Reframed/Agent/Tools/` plus source registration in `project.pbxproj` | pass (2026-09-04) |
 
-Closed on: pending.
+Closed on: 2026-09-04, `a461b48`, PR #7.

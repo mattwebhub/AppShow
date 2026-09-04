@@ -12,7 +12,7 @@ Depends on: milestone 03 (external audio tracks in the timeline summary); milest
 - [x] T4. Dispatcher with argument validation, mutation refusal, preview frame. Proof: `AgentToolDispatcherTests.swift`.
 - [x] T5. Socket transport with token auth and per-call timeout; workspace folder with `session.json`. Proof: `AgentBridgeServerTests.swift`, `AgentWorkspaceTests.swift`.
 - [x] T6. Planning docs, `upstream-sync.md` line, `STATE.md`. Proof: grep.
-- [ ] T7. VERIFY.md run, branch pushed, PR opened.
+- [x] T7. VERIFY.md run, branch pushed, PR opened. Proof: https://github.com/mattwebhub/Reframed/pull/7.
 
 ## Out of scope
 
