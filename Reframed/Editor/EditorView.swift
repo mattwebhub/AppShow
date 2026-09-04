@@ -24,6 +24,7 @@ struct EditorView: View {
     if editorState.zoomEnabled { h |= 8 }
     if editorState.spotlightEnabled { h |= 16 }
     if editorState.showCutTrack { h |= 32 }
+    if editorState.showOverlayTrack { h |= 64 }
     return h
   }
 

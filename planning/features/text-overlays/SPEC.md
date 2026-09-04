@@ -1,6 +1,6 @@
 # Feature: Text overlays
 
-Status: building
+Status: done (manual rows pending in `planning/milestones/07-primitives/VERIFY.md`)
 Milestone: 07
 
 ## Problem
