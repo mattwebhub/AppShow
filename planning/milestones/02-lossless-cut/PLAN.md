@@ -13,7 +13,7 @@ Mirror of `planning/features/lossless-cut/TASKS.md`; tick both.
 - [x] T3. P3 Cuts track. Proof: `showCutTrack`/`gaps` tests; manual animation check.
 - [x] T4. P5 playback jumping (T2 rows wait for the milestone 01 fixture). Proof: `SyncedPlayerControllerTests`, `EditorStatePlaybackTests`.
 - [x] T5. P2 persistence + history (T2 rows wait for the milestone 01 fixture). Proof: `ProjectMetadataTests`, `HistoryChangeRulesTests`, `EditorStateVideoRegionsTests`.
-- [ ] T6. P7 unit rows + seam S3. Proof: `EditorStateExportTests`.
+- [x] T6. P7 unit rows + seam S3. Proof: `EditorStateExportTests`.
 - [ ] T7. P6 compressed timeline. Proof: `TimelineGeometryTests`, manual alignment check.
 - [ ] T8. P7 gated export run. Proof: `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests`.
 - [ ] T9. Docs and divergences: `docs/editor.md`, `AGENTS.md`, `planning/upstream-sync.md`, `docs/architecture/07-testability.md` seams. Proof: grep.
