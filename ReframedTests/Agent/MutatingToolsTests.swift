@@ -494,7 +494,7 @@ struct MutatingToolsTests {
         of: [
           "set_trim", "add_zoom", "add_spotlight", "set_kept_slices", "remove_time_range", "remove_silences",
           "add_text", "update_text", "remove_text", "add_image", "update_image", "remove_image", "begin_batch", "end_batch",
-          "add_blur", "update_blur", "remove_blur", "set_transition",
+          "add_blur", "update_blur", "remove_blur", "set_transition", "add_music", "set_music", "remove_music",
         ]
       )
     )
@@ -832,6 +832,63 @@ struct MutatingToolsTests {
 
     #expect(state.createSnapshot() == before)
     #expect(state.history.entries.count == historyCount)
+  }
+
+  @Test func musicToolsConfirmImportThenPlaceEditRemoveAndUndo() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+    let source = try AudioFixtures.sineWave(frequency: 220, duration: 1, in: directory, name: "Theme")
+    let initialHistoryCount = state.history.entries.count
+
+    await #expect(throws: AgentToolError.self) {
+      try await dispatcher.call(
+        "add_music",
+        arguments: [
+          "path": .string(source.path), "start": 0.25, "volume": 0.35, "fadeIn": 0.2, "fadeOut": 0.3,
+          "label": "music bed",
+        ]
+      )
+    }
+    let request = try #require(state.agentConfirmations.pending.first)
+    #expect(request.operation == .externalFile(kind: "add_music", url: source))
+    #expect(state.agentConfirmations.approve(request.id))
+
+    let added = try await dispatcher.call(
+      "add_music",
+      arguments: [
+        "path": .string(source.path), "start": 0.25, "volume": 0.35, "fadeIn": 0.2, "fadeOut": 0.3,
+        "confirmationId": .string(request.id.uuidString), "label": "music bed",
+      ]
+    )
+    let track = try #require(state.externalAudioTracks.first)
+    #expect(track.timelineStartSeconds == 0.25)
+    #expect(track.volume == 0.35)
+    #expect(track.fadeInSeconds == 0.2)
+    #expect(track.fadeOutSeconds == 0.3)
+    #expect(added["audio"]?["external"]?[0]?["id"] == .string(track.id.uuidString))
+    #expect(state.history.entries.count == initialHistoryCount + 1)
+    #expect(state.history.entries.last?.label == "Agent: music bed")
+
+    _ = try await dispatcher.call(
+      "set_music",
+      arguments: [
+        "id": .string(track.id.uuidString), "start": 0.5, "volume": 0.6, "muted": true,
+        "fadeIn": 0.1, "fadeOut": 0.15,
+      ]
+    )
+    #expect(state.externalAudioTracks.first?.timelineStartSeconds == 0.5)
+    #expect(state.externalAudioTracks.first?.volume == 0.6)
+    #expect(state.externalAudioTracks.first?.muted == true)
+    #expect(state.externalAudioTracks.first?.fadeInSeconds == 0.1)
+    #expect(state.externalAudioTracks.first?.fadeOutSeconds == 0.15)
+
+    _ = try await dispatcher.call("remove_music", arguments: ["id": .string(track.id.uuidString)])
+    #expect(state.externalAudioTracks.isEmpty)
+    state.undo()
+    #expect(state.externalAudioTracks.first?.id == track.id)
   }
 
   @Test func exportRequiresApprovalBoundToAnExactNewDestination() async throws {

@@ -12,6 +12,7 @@
 | P7 primitives | silence preview/removal, text CRUD, confirmed image import and CRUD, blur CRUD, compact overlay results | green |
 | P8 runtime E2E | both providers call a read and mutation through the shim | green |
 | P9 transitions | text/image/slice targets update and undo; remapping preserves settings; golden midpoint frames | green |
-| P10 music tools | confirmed import, update/remove/undo, fades, compact timeline result | planned |
+| P10 music tools | confirmed import, update/remove/undo, fades, compact timeline result | green |
+| P11 skills | valid provider skill trees, catalog-only tool references, idempotent workspace materialization | green; runtime discovery manual |
 
 Manual verification belongs in `planning/milestones/06-agent-tools-editing/VERIFY.md`.

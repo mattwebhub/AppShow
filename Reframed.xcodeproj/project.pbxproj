@@ -114,6 +114,9 @@
 		7E5D000000000000000000D8 /* VideoPreviewContainer+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D7 /* VideoPreviewContainer+BlurRegions.swift */; };
 		7E5D000000000000000000DA /* TimelineView+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D9 /* TimelineView+BlurRegions.swift */; };
 		7E5D000000000000000000DC /* BlurRegionEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000DB /* BlurRegionEditPopover.swift */; };
+		7E5E00000000000000000001 /* AgentSkillBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5E00000000000000000002 /* AgentSkillBundle.swift */; };
+		7E5E00000000000000000003 /* skills in Resources */ = {isa = PBXBuildFile; fileRef = 7E5E00000000000000000004 /* skills */; };
+		7E5E00000000000000000005 /* AgentWorkspaceGuidance.md in Resources */ = {isa = PBXBuildFile; fileRef = 7E5E00000000000000000006 /* AgentWorkspaceGuidance.md */; };
 		7E5C00000000000000000000AF /* TimelineView+OverlayChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000AE /* TimelineView+OverlayChip.swift */; };
 		7E5C00000000000000000000B1 /* ImageOverlayEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000B0 /* ImageOverlayEditPopover.swift */; };
 		7E5C00000000000000000000B3 /* OverlayPositionControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000B2 /* OverlayPositionControls.swift */; };
@@ -450,6 +453,9 @@
 		7E5A00000000000000000003 /* AgentConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfirmationView.swift; sourceTree = "<group>"; };
 		7E5A00000000000000000005 /* AgentSessionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSessionConfig.swift; sourceTree = "<group>"; };
 		7E5A00000000000000000007 /* AgentBridgeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBridgeController.swift; sourceTree = "<group>"; };
+		7E5E00000000000000000002 /* AgentSkillBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSkillBundle.swift; sourceTree = "<group>"; };
+		7E5E00000000000000000004 /* skills */ = {isa = PBXFileReference; lastKnownFileType = folder; name = skills; path = Skills; sourceTree = "<group>"; };
+		7E5E00000000000000000006 /* AgentWorkspaceGuidance.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = AgentWorkspaceGuidance.md; sourceTree = "<group>"; };
 		7E57000000000000000000BF /* AgentToolPreviewFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolPreviewFrame.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BD /* AgentToolHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolHandlers.swift; sourceTree = "<group>"; };
 		7E57000000000000000000BB /* AgentToolCursorActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolCursorActivity.swift; sourceTree = "<group>"; };
@@ -1046,6 +1052,9 @@
 				7E5700000000000000000081 /* AgentMarkdownView.swift */,
 				7E5A00000000000000000003 /* AgentConfirmationView.swift */,
 				7E5A00000000000000000005 /* AgentSessionConfig.swift */,
+				7E5E00000000000000000002 /* AgentSkillBundle.swift */,
+				7E5E00000000000000000004 /* skills */,
+				7E5E00000000000000000006 /* AgentWorkspaceGuidance.md */,
 			);
 			path = Agent;
 			sourceTree = "<group>";
@@ -1378,6 +1387,8 @@
 			files = (
 				3DCA03E12F3B511C003FE309 /* Assets.xcassets in Resources */,
 				AA0000000000000000000001 /* Credits.html in Resources */,
+				7E5E00000000000000000003 /* skills in Resources */,
+				7E5E00000000000000000005 /* AgentWorkspaceGuidance.md in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -1574,6 +1585,7 @@
 				7E570000000000000000006C /* AgentError.swift in Sources */,
 				7E570000000000000000006E /* AgentProcessRunner.swift in Sources */,
 				7E5700000000000000000070 /* AgentToolchain.swift in Sources */,
+				7E5E00000000000000000001 /* AgentSkillBundle.swift in Sources */,
 				7E5700000000000000000072 /* AgentConversationData.swift in Sources */,
 				7E5700000000000000000074 /* AgentConversationStore.swift in Sources */,
 				7E5700000000000000000076 /* AgentSession.swift in Sources */,

@@ -10,4 +10,5 @@
 - [x] P7. Merge primitive-backed silence/text/image/blur tools after the Xcode object-id ranges are reconciled.
 - [x] P8. Verify Claude Code and Codex end to end, update architecture and upstream-sync documentation, and open the milestone PR.
 - [x] P9. Add `set_transition` for text overlays, image overlays, and kept slices with remapping and midpoint-render proofs.
-- [ ] P10. Add confirmed external-music import plus update/remove tools over the milestone 03 model.
+- [x] P10. Add confirmed external-music import plus update/remove tools over the milestone 03 model.
+- [x] P11. Materialize the five initial skills for both providers and prove every referenced tool exists.

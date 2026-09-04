@@ -185,11 +185,15 @@ Tests: `transitionResolversApplyToOverlays()` in `TextOverlayRenderTests` (scale
 
 ## Phase 10 — Music tools · size S · milestone 07 · depends on spike 02
 
+Status: complete on milestone 06. Import is confirmation-bound; automatic ducking remains out of scope for v1.
+
 Tests: `addMusicCopiesFileAndCreatesTrackWithFades()` and `duckUnderSpeechLowersVolumeInsideWordRanges()` in `MutatingToolsTests` (the second asserts the automation envelope the music model exposes, whatever spike 02 names it). Production: `add_music/set_music/remove_music` handlers over spike 02's `EditorState` API; gated when `path` is outside the workspace. Manual check: "lay a quiet music bed" → Music track appears, preview plays it under the narration.
 
 ---
 
 ## Phase 11 — Skills folder and shipping · size M · milestone 05 (folder) + 07 (all five skills)
+
+Status: code complete on milestone 06; real-provider discovery remains a manual check.
 
 **Failing tests first**
 
