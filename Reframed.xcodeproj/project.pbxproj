@@ -51,6 +51,9 @@
 		7E5700000000000000000083 /* SilenceAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000082 /* SilenceAnalysis.swift */; };
 		7E5700000000000000000081 /* SilenceDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000080 /* SilenceDetector.swift */; };
 		7E57000000000000000000A1 /* PropertiesPanel+OverlaysSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000A0 /* PropertiesPanel+OverlaysSection.swift */; };
+		7E57000000000000000000A3 /* ImageOverlayData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000A2 /* ImageOverlayData.swift */; };
+		7E57000000000000000000A5 /* ImageOverlayImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000A4 /* ImageOverlayImporter.swift */; };
+		7E57000000000000000000A7 /* EditorState+ImageOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E57000000000000000000A6 /* EditorState+ImageOverlays.swift */; };
 		7E570000000000000000009F /* TextOverlayEditPopover+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000009E /* TextOverlayEditPopover+Style.swift */; };
 		7E570000000000000000009D /* TextOverlayEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000009C /* TextOverlayEditPopover.swift */; };
 		7E570000000000000000009B /* TimelineView+OverlayTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000009A /* TimelineView+OverlayTrack.swift */; };
@@ -325,6 +328,9 @@
 		7E5700000000000000000082 /* SilenceAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilenceAnalysis.swift; sourceTree = "<group>"; };
 		7E5700000000000000000080 /* SilenceDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilenceDetector.swift; sourceTree = "<group>"; };
 		7E57000000000000000000A0 /* PropertiesPanel+OverlaysSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+OverlaysSection.swift"; sourceTree = "<group>"; };
+		7E57000000000000000000A2 /* ImageOverlayData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayData.swift; sourceTree = "<group>"; };
+		7E57000000000000000000A4 /* ImageOverlayImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOverlayImporter.swift; sourceTree = "<group>"; };
+		7E57000000000000000000A6 /* EditorState+ImageOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+ImageOverlays.swift"; sourceTree = "<group>"; };
 		7E570000000000000000009E /* TextOverlayEditPopover+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextOverlayEditPopover+Style.swift"; sourceTree = "<group>"; };
 		7E570000000000000000009C /* TextOverlayEditPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayEditPopover.swift; sourceTree = "<group>"; };
 		7E570000000000000000009A /* TimelineView+OverlayTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+OverlayTrack.swift"; sourceTree = "<group>"; };
@@ -898,6 +904,7 @@
 				7E5700000000000000000082 /* SilenceAnalysis.swift */,
 				7E5700000000000000000080 /* SilenceDetector.swift */,
 				7E5700000000000000000092 /* EditorState+TextOverlays.swift */,
+				7E57000000000000000000A6 /* EditorState+ImageOverlays.swift */,
 				E8596CD61869ECC16EAECA92 /* EditorState+CameraLayout.swift */,
 				B2354223AAA382DB82EF31D5 /* EditorState+Zoom.swift */,
 				3596F81A6E600975B1EB8104 /* EditorState+Cursor.swift */,
@@ -948,6 +955,8 @@
 				B3000000000000000000001B /* ReframedProject.swift */,
 				B3000000000000000000001C /* ProjectMetadata.swift */,
 				7E5700000000000000000090 /* TextOverlayData.swift */,
+				7E57000000000000000000A2 /* ImageOverlayData.swift */,
+				7E57000000000000000000A4 /* ImageOverlayImporter.swift */,
 			);
 			path = Project;
 			sourceTree = "<group>";
@@ -1283,6 +1292,9 @@
 				7E5700000000000000000083 /* SilenceAnalysis.swift in Sources */,
 				7E5700000000000000000081 /* SilenceDetector.swift in Sources */,
 				7E57000000000000000000A1 /* PropertiesPanel+OverlaysSection.swift in Sources */,
+				7E57000000000000000000A3 /* ImageOverlayData.swift in Sources */,
+				7E57000000000000000000A5 /* ImageOverlayImporter.swift in Sources */,
+				7E57000000000000000000A7 /* EditorState+ImageOverlays.swift in Sources */,
 				7E570000000000000000009F /* TextOverlayEditPopover+Style.swift in Sources */,
 				7E570000000000000000009D /* TextOverlayEditPopover.swift in Sources */,
 				7E570000000000000000009B /* TimelineView+OverlayTrack.swift in Sources */,

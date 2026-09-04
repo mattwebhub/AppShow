@@ -2,7 +2,7 @@ import CoreMedia
 import Foundation
 
 extension EditorState {
-  var showOverlayTrack: Bool { !textOverlays.isEmpty }
+  var showOverlayTrack: Bool { !textOverlays.isEmpty || !imageOverlays.isEmpty }
 
   func activeTextOverlays(at time: Double) -> [TextOverlayData] {
     textOverlays.filter { time >= $0.startSeconds && time <= $0.endSeconds }

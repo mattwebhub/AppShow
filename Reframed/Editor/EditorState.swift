@@ -62,6 +62,7 @@ final class EditorState {
   var spotlightEdgeSoftness: CGFloat = 50
   var spotlightRegions: [SpotlightRegionData] = []
   var textOverlays: [TextOverlayData] = []
+  var imageOverlays: [ImageOverlayData] = []
 
   var clickSoundEnabled: Bool = false
   var clickSoundVolume: Float = 0.5
@@ -313,6 +314,7 @@ final class EditorState {
       if let savedTextOverlays = saved.textOverlays, !savedTextOverlays.isEmpty {
         textOverlays = savedTextOverlays
       }
+      imageOverlays = availableImageOverlays(saved.imageOverlays ?? [])
       if let audioSettings = saved.audioSettings {
         systemAudioVolume = audioSettings.systemAudioVolume
         micAudioVolume = audioSettings.micAudioVolume
