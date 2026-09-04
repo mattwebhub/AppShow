@@ -3,8 +3,8 @@
 Phases from the attack plan. Each phase is one or more commits; every commit has its tests red first.
 
 - [x] P1 Model + remap (S): `CutTimeline` pure type, `splitVideoRegion(atTime:)`, `clearVideoCuts()`, `EditorState` delegations, `showCutTrack`.
-- [ ] P4 Transport button (S): `IconButton` with `hand.point.up.left`, enabled by `canCut(at:)`.
-- [ ] P3 Cuts track (M): `TimelineView+CutTrack.swift`, Screen track plain bar, sidebar entry, height signature.
+- [x] P4 Transport button (S): `IconButton` with `hand.point.up.left`, enabled by `canCut(at:)`.
+- [x] P3 Cuts track (M): `TimelineView+CutTrack.swift`, Screen track plain bar, sidebar entry, height signature.
 - [ ] P5 Playback jumping (M): `gapSkipDecision`, `skipsGaps`, boundary observer, edit-mode gap handling, hidden screen in gaps.
 - [ ] P2 Persistence + history (S): change-rule strings, normalize on restore, round-trip tests.
 - [ ] P7 Export verification, unit rows (M): `exportVideoRegions` extraction, seam S3 `outputDirectory`.

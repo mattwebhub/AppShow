@@ -88,6 +88,7 @@ struct TimelineView: View {
 
   private var visibleTrackCount: Int {
     var count = 1
+    if editorState.showCutTrack { count += 1 }
     if editorState.hasWebcam && editorState.webcamEnabled { count += 1 }
     if showSystemAudioTrack { count += 1 }
     if showMicAudioTrack { count += 1 }
@@ -109,6 +110,12 @@ struct TimelineView: View {
         VStack(spacing: 10) {
           trackSidebar(label: "Screen", icon: "display")
             .frame(height: trackHeight)
+
+          if editorState.showCutTrack {
+            trackSidebar(label: "Cuts", icon: "hand.point.up.left")
+              .frame(height: trackHeight)
+              .transition(.trackTransition)
+          }
 
           if editorState.hasWebcam && editorState.webcamEnabled {
             trackSidebar(label: "Camera", icon: "web.camera")
@@ -155,6 +162,11 @@ struct TimelineView: View {
 
               VStack(spacing: 10) {
                 screenTrackContent(width: cw)
+
+                if editorState.showCutTrack {
+                  cutTrackContent(width: cw)
+                    .transition(.trackTransition)
+                }
 
                 if editorState.hasWebcam && editorState.webcamEnabled {
                   cameraTrackContent(width: cw)
