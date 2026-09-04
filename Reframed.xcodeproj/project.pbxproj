@@ -47,6 +47,9 @@
 		7E5700000000000000000066 /* AgentJSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000065 /* AgentJSONValue.swift */; };
 		7E5700000000000000000068 /* ClaudeCodeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000067 /* ClaudeCodeProvider.swift */; };
 		7E570000000000000000006A /* CodexProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000069 /* CodexProvider.swift */; };
+		7E570000000000000000006C /* AgentError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000006B /* AgentError.swift */; };
+		7E570000000000000000006E /* AgentProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000006D /* AgentProcessRunner.swift */; };
+		7E5700000000000000000070 /* AgentToolchain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000006F /* AgentToolchain.swift */; };
 		7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000001C /* TimelineView+CutTrack.swift */; };
 		7E5700000000000000000021 /* TimelineGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000020 /* TimelineGeometry.swift */; };
 		7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000022 /* TimelineView+Geometry.swift */; };
@@ -313,6 +316,9 @@
 		7E5700000000000000000065 /* AgentJSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentJSONValue.swift; sourceTree = "<group>"; };
 		7E5700000000000000000067 /* ClaudeCodeProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeCodeProvider.swift; sourceTree = "<group>"; };
 		7E5700000000000000000069 /* CodexProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexProvider.swift; sourceTree = "<group>"; };
+		7E570000000000000000006B /* AgentError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentError.swift; sourceTree = "<group>"; };
+		7E570000000000000000006D /* AgentProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentProcessRunner.swift; sourceTree = "<group>"; };
+		7E570000000000000000006F /* AgentToolchain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentToolchain.swift; sourceTree = "<group>"; };
 		7E570000000000000000001C /* TimelineView+CutTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CutTrack.swift"; sourceTree = "<group>"; };
 		7E5700000000000000000020 /* TimelineGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineGeometry.swift; sourceTree = "<group>"; };
 		7E5700000000000000000022 /* TimelineView+Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+Geometry.swift"; sourceTree = "<group>"; };
@@ -835,6 +841,9 @@
 				7E5700000000000000000065 /* AgentJSONValue.swift */,
 				7E5700000000000000000067 /* ClaudeCodeProvider.swift */,
 				7E5700000000000000000069 /* CodexProvider.swift */,
+				7E570000000000000000006B /* AgentError.swift */,
+				7E570000000000000000006D /* AgentProcessRunner.swift */,
+				7E570000000000000000006F /* AgentToolchain.swift */,
 			);
 			path = Agent;
 			sourceTree = "<group>";
@@ -1263,6 +1272,9 @@
 				7E5700000000000000000066 /* AgentJSONValue.swift in Sources */,
 				7E5700000000000000000068 /* ClaudeCodeProvider.swift in Sources */,
 				7E570000000000000000006A /* CodexProvider.swift in Sources */,
+				7E570000000000000000006C /* AgentError.swift in Sources */,
+				7E570000000000000000006E /* AgentProcessRunner.swift in Sources */,
+				7E5700000000000000000070 /* AgentToolchain.swift in Sources */,
 				7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */,
 				7E5700000000000000000021 /* TimelineGeometry.swift in Sources */,
 				7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */,
