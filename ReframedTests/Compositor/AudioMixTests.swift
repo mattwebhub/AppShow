@@ -29,6 +29,10 @@ struct AudioMixTests {
     track.segments.first?.sourceURL
   }
 
+  private func seconds(_ value: Double) -> CMTime {
+    CMTime(seconds: value, preferredTimescale: 600)
+  }
+
   @Test func mixIsNilWhenAllVolumesAreUnity() async throws {
     let dir = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(dir) }
@@ -90,5 +94,27 @@ struct AudioMixTests {
     #expect(mix.inputParameters.map(\.trackID) == [tracks[0].trackID, tracks[1].trackID])
     #expect(mix.inputParameters.map(volume(of:)) == [0.5, 0.25])
     #expect(!mix.inputParameters.contains { $0.trackID == tracks[2].trackID })
+  }
+
+  @Test func addAudioTracksInsertsOnlyRegionOverlapWithSegments() async throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let music = try AudioFixtures.sineWave(frequency: 440, in: dir, name: "music")
+    let composition = AVMutableComposition()
+    let region = CMTimeRange(start: seconds(0.5), end: seconds(2))
+    let sources = [VideoCompositor.AudioSource(url: music, regions: [region], volume: 1)]
+    let segments = [
+      VideoCompositor.VideoSegmentInfo(sourceRange: CMTimeRange(start: .zero, end: seconds(1)), compositionStart: .zero),
+      VideoCompositor.VideoSegmentInfo(sourceRange: CMTimeRange(start: seconds(1.5), end: seconds(2)), compositionStart: seconds(1)),
+    ]
+    try await VideoCompositor.addAudioTracks(to: composition, sources: sources, videoTrimRange: trim, videoSegments: segments)
+
+    let track = try #require(composition.tracks(withMediaType: .audio).first)
+    let inserted = track.segments.filter { !$0.isEmpty }.map(\.timeMapping)
+    #expect(inserted.count == 2)
+    #expect(inserted.map { $0.source.start.seconds } == [0.5, 1.5])
+    #expect(inserted.map { $0.source.end.seconds } == [1.0, 2.0])
+    #expect(inserted.map { $0.target.start.seconds } == [0.5, 1.0])
+    #expect(inserted.map { $0.target.end.seconds } == [1.0, 1.5])
   }
 }
