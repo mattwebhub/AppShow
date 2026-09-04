@@ -3,14 +3,18 @@ import SwiftUI
 @MainActor
 struct AgentChatPanel: View {
   @Bindable var transcript: AgentTranscript
+  let project: ReframedProject?
+  let isExporting: Bool
   @State private var collapsed: Bool
   @State private var expandedWidth: CGFloat
   @State private var dragStartWidth: CGFloat?
   @State private var showClearConfirmation = false
   @Environment(\.colorScheme) private var colorScheme
 
-  init(transcript: AgentTranscript) {
+  init(transcript: AgentTranscript, project: ReframedProject?, isExporting: Bool) {
     self.transcript = transcript
+    self.project = project
+    self.isExporting = isExporting
     let state = StateService.shared
     _collapsed = State(initialValue: state.agentPanelCollapsed)
     _expandedWidth = State(initialValue: state.agentPanelWidth)
@@ -107,19 +111,11 @@ struct AgentChatPanel: View {
   }
 
   private var content: some View {
-    VStack(spacing: Layout.compactSpacing) {
-      Spacer()
-      Image(systemName: "wand.and.stars")
-        .font(.system(size: FontSize.xxl))
-        .foregroundStyle(ReframedColors.tertiaryText)
-      Text(transcript.messages.isEmpty ? "Describe the presentation you want to create." : "Conversation ready")
-        .font(.system(size: FontSize.xs))
-        .foregroundStyle(ReframedColors.secondaryText)
-        .multilineTextAlignment(.center)
-        .padding(.horizontal, 24)
-      Spacer()
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    AgentConversationView(
+      transcript: transcript,
+      project: project,
+      isExporting: isExporting
+    )
   }
 
   private var resizeHandle: some View {
