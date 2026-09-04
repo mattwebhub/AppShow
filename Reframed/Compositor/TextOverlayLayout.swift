@@ -102,17 +102,33 @@ enum TextOverlayLayout {
   ) -> CGRect {
     let width = textSize.width + 2 * fontPixelSize * paddingHRatio
     let height = textSize.height + 2 * fontPixelSize * paddingVRatio
+    return anchoredRect(
+      size: CGSize(width: width, height: height),
+      canvasSize: canvasSize,
+      position: position,
+      offsetX: offsetX,
+      offsetY: offsetY
+    )
+  }
+
+  static func anchoredRect(
+    size: CGSize,
+    canvasSize: CGSize,
+    position: TextOverlayPosition,
+    offsetX: CGFloat,
+    offsetY: CGFloat
+  ) -> CGRect {
     let margin = canvasSize.height * marginRatio
-    let freeWidth = max(0, canvasSize.width - 2 * margin - width)
-    let freeHeight = max(0, canvasSize.height - 2 * margin - height)
+    let freeWidth = max(0, canvasSize.width - 2 * margin - size.width)
+    let freeHeight = max(0, canvasSize.height - 2 * margin - size.height)
     let x = margin + position.anchorX * freeWidth + offsetX * canvasSize.width
     let yFromTop = margin + position.anchorY * freeHeight + offsetY * canvasSize.height
-    let y = canvasSize.height - yFromTop - height
+    let y = canvasSize.height - yFromTop - size.height
     return CGRect(
-      x: max(0, min(canvasSize.width - width, x)),
-      y: max(0, min(canvasSize.height - height, y)),
-      width: width,
-      height: height
+      x: max(0, min(canvasSize.width - size.width, x)),
+      y: max(0, min(canvasSize.height - size.height, y)),
+      width: size.width,
+      height: size.height
     )
   }
 
