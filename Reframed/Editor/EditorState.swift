@@ -24,6 +24,7 @@ final class EditorState {
   var exportTask: Task<Void, Never>?
   var exportStatusMessage: String?
   var isPreviewMode = false
+  var agentTranscript: AgentTranscript
 
   var backgroundStyle: BackgroundStyle = .solidColor(CodableColor(r: 0, g: 0, b: 0))
   var backgroundImage: NSImage?
@@ -159,6 +160,10 @@ final class EditorState {
     self.result = project.recordingResult
     self.playerController = SyncedPlayerController(result: project.recordingResult)
     self.projectName = project.name
+    self.agentTranscript = AgentTranscript(
+      store: AgentConversationStore(project: project),
+      defaultProvider: ConfigService.shared.agentProvider
+    )
 
     if let saved = project.metadata.editorState {
       self.backgroundStyle = saved.backgroundStyle
@@ -216,6 +221,7 @@ final class EditorState {
     self.result = result
     self.playerController = SyncedPlayerController(result: result)
     self.projectName = result.screenVideoURL.deletingPathExtension().lastPathComponent
+    self.agentTranscript = AgentTranscript(store: nil, defaultProvider: ConfigService.shared.agentProvider)
   }
 
   func setup() async {

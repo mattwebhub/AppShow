@@ -6,6 +6,20 @@ Reminder: **these folders are not Swift modules.** Everything compiles into the 
 
 ---
 
+## `Agent/`
+
+**Responsibility.** Provider-neutral assistant runtime, one persisted conversation per project, provider discovery/readiness, streamed transcript rendering, and the editor's collapsible chat panel.
+
+| Cluster | Key types | Notes |
+| --- | --- | --- |
+| Provider protocol | `AgentProvider`, `ClaudeCodeProvider`, `CodexProvider`, `AgentEvent` | Builds safe read-only arguments and reduces versioned NDJSON into typed events. Unknown events are tolerated. |
+| Process boundary | `AgentProcessRunner`, `AgentSession` | Actors. One fresh child process per turn; cancellation terminates it. `AgentSession` maps process lines to events and accepts saved provider resume ids. |
+| Discovery | `AgentToolchain`, `AgentProbe`, `AgentReadiness` | Actors resolve executables and run bounded version/authentication probes without invoking a real CLI in tests. |
+| Persistence | `AgentConversationData`, `AgentConversationStore`, `AgentTranscript` | Exactly one `agent/conversation.json` inside each `.frm`; provider resume ids are stored independently. `AgentTranscript` is `@MainActor @Observable`. |
+| UI | `AgentChatPanel`, `AgentConversationView`, `AgentMarkdownView` | Persisted collapse/width, provider picker, explicit clear, streamed Markdown and expandable tool rows. |
+
+The portable conversation lives inside the project bundle. Ephemeral runtime state lives in the sibling `.agent/<project-name>/` workspace. `Agent/` depends on `Project`, `State`, and reusable `UI` tokens; only `EditorState` and `EditorView` depend on it.
+
 ## `Reframed/ReframedApp.swift` (29 LOC)
 
 `@main struct ReframedApp: App`. Bootstraps logging (`LogBootstrap.configure()` in `init`), declares the single `MenuBarExtra(.window)` scene, and wires `MenuBarExtraAccess` so `SessionState.statusItemButton` gets the `NSStatusBarButton`. Delegates everything else to `AppDelegate` via `@NSApplicationDelegateAdaptor`.
