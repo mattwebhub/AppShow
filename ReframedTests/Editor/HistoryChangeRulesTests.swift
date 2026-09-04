@@ -85,4 +85,50 @@ struct HistoryChangeRulesTests {
     fadeOut.fadeOutSeconds = 2.5
     #expect(History.describeChanges(from: audioData([track]), to: audioData([fadeOut])) == ["Audio track fade out set to 2.5s"])
   }
+
+  private func overlayData(_ overlays: [TextOverlayData]?) -> EditorStateData {
+    EditorStateData(
+      trimStartSeconds: 0,
+      trimEndSeconds: 10,
+      backgroundStyle: .none,
+      padding: 0,
+      videoCornerRadius: 0,
+      cameraCornerRadius: 0,
+      cameraBorderWidth: 0,
+      cameraLayout: CameraLayout(),
+      textOverlays: overlays
+    )
+  }
+
+  @Test func overlayChangesAreDescribedAsAddedRemovedAdjusted() {
+    let overlay = TextOverlayData(startSeconds: 1, endSeconds: 4)
+    var edited = overlay
+    edited.text = "Edited"
+    #expect(History.describeChanges(from: overlayData(nil), to: overlayData([overlay])) == ["Text overlay added"])
+    #expect(History.describeChanges(from: overlayData([overlay]), to: overlayData(nil)) == ["Text overlay removed"])
+    #expect(History.describeChanges(from: overlayData([overlay]), to: overlayData([edited])) == ["Text overlay adjusted"])
+  }
+
+  private func imageOverlayData(_ overlays: [ImageOverlayData]?) -> EditorStateData {
+    EditorStateData(
+      trimStartSeconds: 0,
+      trimEndSeconds: 10,
+      backgroundStyle: .none,
+      padding: 0,
+      videoCornerRadius: 0,
+      cameraCornerRadius: 0,
+      cameraBorderWidth: 0,
+      cameraLayout: CameraLayout(),
+      imageOverlays: overlays
+    )
+  }
+
+  @Test func imageOverlayChangesAreDescribedAsAddedRemovedAdjusted() {
+    let overlay = ImageOverlayData(startSeconds: 1, endSeconds: 4, filename: "image-00000000.png")
+    var edited = overlay
+    edited.width = 0.5
+    #expect(History.describeChanges(from: imageOverlayData(nil), to: imageOverlayData([overlay])) == ["Image overlay added"])
+    #expect(History.describeChanges(from: imageOverlayData([overlay]), to: imageOverlayData(nil)) == ["Image overlay removed"])
+    #expect(History.describeChanges(from: imageOverlayData([overlay]), to: imageOverlayData([edited])) == ["Image overlay adjusted"])
+  }
 }

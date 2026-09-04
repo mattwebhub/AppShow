@@ -77,7 +77,9 @@ struct FrameRendererGoldenTests {
 
   private func instruction(
     videoCornerRadius: CGFloat = 0,
-    videoRegions: [RegionTransitionInfo] = []
+    videoRegions: [RegionTransitionInfo] = [],
+    textOverlays: [TextOverlayInstruction] = [],
+    imageOverlays: [ImageOverlayInstruction] = []
   ) -> CompositionInstruction {
     CompositionInstruction(
       timeRange: CMTimeRange(start: .zero, duration: CMTime(seconds: 2, preferredTimescale: 600)),
@@ -90,7 +92,44 @@ struct FrameRendererGoldenTests {
       paddingH: 8,
       paddingV: 8,
       videoCornerRadius: videoCornerRadius,
-      videoRegions: videoRegions
+      videoRegions: videoRegions,
+      textOverlays: textOverlays,
+      imageOverlays: imageOverlays
+    )
+  }
+
+  private func bluePillOverlay(start: Double = 0, end: Double = 2) -> TextOverlayInstruction {
+    let blue = CodableColor(r: 0, g: 0, b: 1)
+    var overlay = TextOverlayData(startSeconds: start, endSeconds: end, text: "Hi", fontSize: 0.3)
+    overlay.textColor = blue
+    overlay.backgroundColor = blue
+    overlay.backgroundOpacity = 1
+    overlay.cornerRadius = 0
+    overlay.entryTransition = .fade
+    overlay.entryTransitionDuration = 1
+    overlay.exitTransition = .none
+    return TextOverlayLayout.resolve(overlay, canvasSize: CGSize(width: Self.width, height: Self.height))
+  }
+
+  private func expectPill(_ pixel: Pixel, sourceLocation: SourceLocation = #_sourceLocation) {
+    #expect(pixel.b >= 200 && pixel.r <= 80 && pixel.g <= 80, "actual \(pixel)", sourceLocation: sourceLocation)
+  }
+
+  private func blueImageOverlay(start: Double = 0, end: Double = 2) throws -> ImageOverlayInstruction {
+    var overlay = ImageOverlayData(
+      startSeconds: start,
+      endSeconds: end,
+      filename: "blue.png",
+      aspectRatio: 1,
+      width: 0.5
+    )
+    overlay.entryTransition = .fade
+    overlay.entryTransitionDuration = 1
+    overlay.exitTransition = .none
+    return ImageOverlayLayout.resolve(
+      overlay,
+      image: try ImageFixtures.solidImage(width: 8, height: 8),
+      canvasSize: CGSize(width: Self.width, height: Self.height)
     )
   }
 
@@ -179,5 +218,44 @@ struct FrameRendererGoldenTests {
 
     expectClose(try pixel(output, x: Self.width / 2, y: Self.height / 2), expected)
     expectClose(try pixel(output, x: 1, y: 1), background)
+  }
+
+  @Test func textOverlayPillCoversTheCentre() throws {
+    let output = try render(instruction(textOverlays: [bluePillOverlay()]), at: 1.5)
+
+    expectPill(try pixel(output, x: Self.width / 2, y: Self.height / 2))
+    expectBackground(try pixel(output, x: 1, y: 1))
+  }
+
+  @Test func textOverlayIsAbsentAtTransitionProgressZero() throws {
+    let output = try render(instruction(textOverlays: [bluePillOverlay()]), at: 0)
+
+    expectScreen(try pixel(output, x: Self.width / 2, y: Self.height / 2))
+    expectBackground(try pixel(output, x: 1, y: 1))
+  }
+
+  @Test func textOverlayIsAbsentOutsideItsRange() throws {
+    let output = try render(instruction(textOverlays: [bluePillOverlay(start: 0.5, end: 1.0)]), at: 1.5)
+
+    expectScreen(try pixel(output, x: Self.width / 2, y: Self.height / 2))
+  }
+
+  @Test func imageOverlayCoversTheCentre() throws {
+    let output = try render(instruction(imageOverlays: [blueImageOverlay()]), at: 1.5)
+
+    expectPill(try pixel(output, x: Self.width / 2, y: Self.height / 2))
+    expectBackground(try pixel(output, x: 1, y: 1))
+  }
+
+  @Test func imageOverlayIsAbsentAtTransitionProgressZero() throws {
+    let output = try render(instruction(imageOverlays: [blueImageOverlay()]), at: 0)
+
+    expectScreen(try pixel(output, x: Self.width / 2, y: Self.height / 2))
+  }
+
+  @Test func imageOverlayIsAbsentOutsideItsRange() throws {
+    let output = try render(instruction(imageOverlays: [blueImageOverlay(start: 0.5, end: 1)]), at: 1.5)
+
+    expectScreen(try pixel(output, x: Self.width / 2, y: Self.height / 2))
   }
 }

@@ -15,6 +15,8 @@ extension VideoCompositor {
     let video: [RegionTransitionInfo]
     let captions: [CaptionSegment]
     let spotlight: [SpotlightRegionData]
+    let textOverlays: [TextOverlayData]
+    let imageOverlays: [ImageOverlayData]
   }
 
   static func remapAllRegions(
@@ -58,8 +60,87 @@ extension VideoCompositor {
           videoSegments: videoSegments,
           effectiveTrim: effectiveTrim
         )
+      },
+      textOverlays: config.textOverlays.flatMap {
+        remapTextOverlay(
+          $0,
+          hasVideoRegions: hasVideoRegions,
+          videoSegments: videoSegments,
+          effectiveTrim: effectiveTrim
+        )
+      },
+      imageOverlays: config.imageOverlays.flatMap {
+        remapImageOverlay(
+          $0,
+          hasVideoRegions: hasVideoRegions,
+          videoSegments: videoSegments,
+          effectiveTrim: effectiveTrim
+        )
       }
     )
+  }
+
+  private static func remapImageOverlay(
+    _ overlay: ImageOverlayData,
+    hasVideoRegions: Bool,
+    videoSegments: [VideoSegment],
+    effectiveTrim: CMTimeRange
+  ) -> [ImageOverlayData] {
+    if hasVideoRegions {
+      var results: [ImageOverlayData] = []
+      for segment in videoSegments {
+        let overlapStart = max(overlay.startSeconds, CMTimeGetSeconds(segment.sourceRange.start))
+        let overlapEnd = min(overlay.endSeconds, CMTimeGetSeconds(segment.sourceRange.end))
+        guard overlapEnd > overlapStart else { continue }
+        var mapped = overlay
+        mapped.id = UUID()
+        mapped.startSeconds = CMTimeGetSeconds(segment.compositionStart) + overlapStart - CMTimeGetSeconds(segment.sourceRange.start)
+        mapped.endSeconds = CMTimeGetSeconds(segment.compositionStart) + overlapEnd - CMTimeGetSeconds(segment.sourceRange.start)
+        results.append(mapped)
+      }
+      return results
+    }
+    let trimStart = CMTimeGetSeconds(effectiveTrim.start)
+    let overlapStart = max(overlay.startSeconds, trimStart)
+    let overlapEnd = min(overlay.endSeconds, CMTimeGetSeconds(effectiveTrim.end))
+    guard overlapEnd > overlapStart else { return [] }
+    var mapped = overlay
+    mapped.startSeconds = overlapStart - trimStart
+    mapped.endSeconds = overlapEnd - trimStart
+    return [mapped]
+  }
+
+  private static func remapTextOverlay(
+    _ overlay: TextOverlayData,
+    hasVideoRegions: Bool,
+    videoSegments: [VideoSegment],
+    effectiveTrim: CMTimeRange
+  ) -> [TextOverlayData] {
+    if hasVideoRegions {
+      var results: [TextOverlayData] = []
+      for seg in videoSegments {
+        let overlapStart = max(overlay.startSeconds, CMTimeGetSeconds(seg.sourceRange.start))
+        let overlapEnd = min(overlay.endSeconds, CMTimeGetSeconds(seg.sourceRange.end))
+        guard overlapEnd > overlapStart else { continue }
+        let segStart = CMTimeGetSeconds(seg.sourceRange.start)
+        let compStart = CMTimeGetSeconds(seg.compositionStart)
+        var mapped = overlay
+        mapped.id = UUID()
+        mapped.startSeconds = compStart + (overlapStart - segStart)
+        mapped.endSeconds = compStart + (overlapEnd - segStart)
+        results.append(mapped)
+      }
+      return results
+    }
+    let trimStart = CMTimeGetSeconds(effectiveTrim.start)
+    let trimEnd = CMTimeGetSeconds(effectiveTrim.end)
+    let overlapStart = max(overlay.startSeconds, trimStart)
+    let overlapEnd = min(overlay.endSeconds, trimEnd)
+    guard overlapEnd > overlapStart else { return [] }
+    var mapped = overlay
+    mapped.startSeconds = overlapStart - trimStart
+    mapped.endSeconds = overlapEnd - trimStart
+    return [mapped]
   }
 
   private static func remapRegion(

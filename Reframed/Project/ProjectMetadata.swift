@@ -493,6 +493,8 @@ struct EditorStateData: Codable, Sendable, Equatable {
   var captionSegments: [CaptionSegment]?
   var spotlightRegions: [SpotlightRegionData]?
   var externalAudioTracks: [ExternalAudioTrackData]?
+  var textOverlays: [TextOverlayData]?
+  var imageOverlays: [ImageOverlayData]?
 }
 
 struct CodableSize: Codable, Sendable {

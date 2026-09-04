@@ -8,6 +8,8 @@ final class VideoPreviewContainer: NSView {
   let webcamView = WebcamCameraView()
   let cursorOverlay = CursorOverlayLayer()
   let spotlightOverlay = SpotlightOverlayLayer()
+  let textOverlayLayer = CALayer()
+  let imageOverlayLayer = CALayer()
   let screenContainerLayer = CALayer()
   var coordinator: VideoPreviewView.Coordinator?
   var isCameraHidden = false
@@ -65,6 +67,12 @@ final class VideoPreviewContainer: NSView {
   var lastSpotlightDimOpacity: CGFloat = 0.6
   var lastSpotlightEdgeSoftness: CGFloat = 50
   var lastSpotlightVisible = false
+  var lastTextOverlays: [TextOverlayData] = []
+  var lastTextOverlayTime: Double = 0
+  var lastImageOverlays: [ImageOverlayData] = []
+  var lastImageOverlayTime: Double = 0
+  var imageOverlayDirectory: URL?
+  var imageOverlayImages: [String: CGImage] = [:]
   var currentCameraBackgroundStyle: CameraBackgroundStyle = .none
   var currentCameraBackgroundImage: NSImage?
   var webcamOutput: AVPlayerItemVideoOutput?
@@ -116,6 +124,14 @@ final class VideoPreviewContainer: NSView {
 
     webcamWrapper.addSubview(webcamView)
     addSubview(webcamWrapper)
+
+    textOverlayLayer.zPosition = 30
+    textOverlayLayer.masksToBounds = false
+    layer?.addSublayer(textOverlayLayer)
+
+    imageOverlayLayer.zPosition = 31
+    imageOverlayLayer.masksToBounds = false
+    layer?.addSublayer(imageOverlayLayer)
   }
 
   required init?(coder: NSCoder) { nil }
@@ -128,6 +144,12 @@ final class VideoPreviewContainer: NSView {
     }
     if lastSpotlightVisible {
       applySpotlightOverlay()
+    }
+    if !lastTextOverlays.isEmpty {
+      applyTextOverlays()
+    }
+    if !lastImageOverlays.isEmpty {
+      applyImageOverlays()
     }
   }
 }
