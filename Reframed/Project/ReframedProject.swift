@@ -66,7 +66,8 @@ struct ReframedProject: Sendable {
     fps: Int,
     captureMode: CaptureMode,
     sourceName: String? = nil,
-    in directory: URL
+    in directory: URL,
+    cleanupTemp: Bool = true
   ) throws
     -> ReframedProject
   {
@@ -96,7 +97,9 @@ struct ReframedProject: Sendable {
       try fm.moveItem(at: cursorURL, to: bundleURL.appendingPathComponent("cursor-metadata.json"))
     }
 
-    fm.cleanupTempDir()
+    if cleanupTemp {
+      fm.cleanupTempDir()
+    }
 
     let projectName = "\(prefix)-\(ts)"
 
