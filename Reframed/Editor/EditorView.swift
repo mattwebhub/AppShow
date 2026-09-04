@@ -25,7 +25,8 @@ struct EditorView: View {
     if editorState.zoomEnabled { h |= 8 }
     if editorState.spotlightEnabled { h |= 16 }
     if editorState.showCutTrack { h |= 32 }
-    h |= editorState.externalAudioTracks.count << 6
+    if editorState.showOverlayTrack { h |= 64 }
+    h |= editorState.externalAudioTracks.count << 7
     return h
   }
 

@@ -67,6 +67,51 @@ enum AudioFixtures {
     in directory: URL,
     name: String = "tone"
   ) throws -> URL {
+    try writeTone(
+      frequency: frequency,
+      duration: duration,
+      sampleRate: sampleRate,
+      channels: channels,
+      container: container,
+      in: directory,
+      name: name,
+      gap: nil
+    )
+  }
+
+  @discardableResult
+  static func toneWithGap(
+    frequency: Double = 440,
+    duration: Double = 3,
+    gap: ClosedRange<Double>,
+    sampleRate: Double = 48_000,
+    channels: UInt32 = 1,
+    container: Container = .wav,
+    in directory: URL,
+    name: String = "tone-gap"
+  ) throws -> URL {
+    try writeTone(
+      frequency: frequency,
+      duration: duration,
+      sampleRate: sampleRate,
+      channels: channels,
+      container: container,
+      in: directory,
+      name: name,
+      gap: gap
+    )
+  }
+
+  private static func writeTone(
+    frequency: Double,
+    duration: Double,
+    sampleRate: Double,
+    channels: UInt32,
+    container: Container,
+    in directory: URL,
+    name: String,
+    gap: ClosedRange<Double>?
+  ) throws -> URL {
     let url = directory.appendingPathComponent("\(name).\(container.fileExtension)")
     var settings = container.settings
     settings[AVSampleRateKey] = sampleRate
@@ -79,7 +124,12 @@ enum AudioFixtures {
     for channel in 0..<Int(channels) {
       let samples = buffer.floatChannelData![channel]
       for frame in 0..<Int(frameCount) {
-        samples[frame] = Float(sin(2 * .pi * frequency * Double(frame) / sampleRate)) * 0.5
+        let time = Double(frame) / sampleRate
+        if let gap, gap.contains(time) {
+          samples[frame] = 0
+        } else {
+          samples[frame] = Float(sin(2 * .pi * frequency * time)) * 0.5
+        }
       }
     }
     try file.write(from: buffer)
