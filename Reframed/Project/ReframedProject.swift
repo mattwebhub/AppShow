@@ -46,6 +46,10 @@ struct ReframedProject: Sendable {
     return FileManager.default.fileExists(atPath: url.path) ? url : nil
   }
 
+  var agentDirectory: URL {
+    bundleURL.appendingPathComponent("agent", isDirectory: true)
+  }
+
   var recordingResult: RecordingResult {
     RecordingResult(
       screenVideoURL: screenVideoURL,
