@@ -31,4 +31,4 @@ Run on a clean clone before closing the milestone. Record the date and commit.
 | Agent transition | ask either provider to fade a title and slide a logo; Undo each call | timeline and preview update immediately; each call creates one labelled History row | |
 | Manual smoke | record 5 s of screen, open editor, export MP4 | file plays | |
 
-Silence, text-overlay, image-overlay, blur, agent-transition and manual-smoke rows need a human with the app. The primitive branch gate was rerun after T7 (379 tests in 39 suites plus 3 gated export tests); transition automation passes in the milestone 06 integration suite (665 tests in 74 suites).
+Silence, text-overlay, image-overlay, blur, agent-transition and manual-smoke rows need a human with the app. The primitive branch gate was rerun after T7 (379 tests in 39 suites plus 3 gated export tests); transition automation passes in the milestone 06 integration suite (669 tests in 76 suites).

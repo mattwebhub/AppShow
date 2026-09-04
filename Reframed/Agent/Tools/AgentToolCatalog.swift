@@ -85,8 +85,19 @@ enum AgentToolCatalog {
     slow: true
   )
 
+  static let exportDraft = AgentToolDefinition(
+    name: "export_draft",
+    description: "Export a small MP4 preview into the private project workspace without changing the project.",
+    inputSchema: AgentToolSchema.object([
+      "maxWidth": AgentToolSchema.integer("Maximum output width from 320 to 640 pixels, default 640", minimum: 320, maximum: 640),
+      "fps": AgentToolSchema.integer("Output frame rate from 10 to 30, default 15", minimum: 10, maximum: 30),
+    ]),
+    mutating: false,
+    slow: true
+  )
+
   static let all: [AgentToolDefinition] = [
-    getProjectSummary, getTimeline, getTranscript, getCursorActivity, getHistory, renderPreviewFrame, getSilences,
+    getProjectSummary, getTimeline, getTranscript, getCursorActivity, getHistory, renderPreviewFrame, getSilences, exportDraft,
   ]
 
   static var available: [AgentToolDefinition] {
@@ -111,6 +122,7 @@ enum AgentToolCatalog {
       AgentToolHistoryHandler(),
       AgentToolPreviewFrameHandler(),
       AgentToolSilencesHandler(),
+      AgentToolExportDraftHandler(),
     ]
   }
 }

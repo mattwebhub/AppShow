@@ -9,7 +9,7 @@ Last updated: 2026-09-04
 - Milestone 03 music tracks is code-complete on green PR #5; its manual checks remain.
 - Milestone 04 agent chat is code-complete on green PR #6: one persisted conversation per project, fresh provider process per turn with resume ids, collapsible streamed UI, Markdown/code/tool rendering, and readiness guidance. Its manual checks remain.
 - Milestone 05 read-only agent tools is code-complete on green PR #7: JSON-RPC codec, MCP-shaped catalog and results, dispatcher, preview frames, authenticated Unix socket, and sibling `.agent/` workspace.
-- Milestone 06 is code-complete on PR #8; it integrates milestones 03–05 and milestone 07's completed primitives. Labeled history, rollback, exact cuts, grouped transactions, single-use confirmations, provider-scoped MCP configuration, the signed stdio shim, bridge lifecycle, live activity UI, presentation settings, timed captions, exact-path export, silence removal, external music, transitions, text/image/blur tools, and five dual-provider skills are implemented test-first. Both providers pass the live MCP read/mutate/undo path; manual UI and skill-discovery checks remain.
+- Milestone 06 is code-complete on PR #8; it integrates milestones 03–05 and milestone 07's completed primitives. Labeled history, rollback, exact cuts, grouped transactions, single-use confirmations, provider-scoped MCP configuration, the signed stdio shim, bridge lifecycle, live activity UI, presentation settings, timed captions, workspace-only draft export, confirmed exact-path full export, silence removal, external music, transitions, text/image/blur tools, and five dual-provider skills are implemented test-first. Both providers pass the live MCP read/mutate/undo path and discover and invoke the bundled title skill; manual UI checks remain.
 - Milestone 07 PR #4 contains silence removal, text overlays, image overlays, source-space blur regions, and entry/exit transitions on overlays and kept slices. T1 to T9 are code-complete; its manual checks remain.
 
 ## Verified on this machine
@@ -17,8 +17,10 @@ Last updated: 2026-09-04
 - Agent chat: format, lint, build, and 403 tests in 40 suites pass on `milestone-04-agent-chat`; PR #6 is green.
 - Read-only agent tools: build, lint, and 385 tests in 46 suites pass on `milestone-05-agent-tools`; PR #7 is green.
 - Image overlays: format, lint, build, and 366 tests in 37 suites pass on `milestone-07-primitives`; PR #4 is green.
-- Milestone 06 integrated editing surface: format, lint, build, and 665 tests in 74 suites pass; 5 gated export tests and the gated real-process shim test pass.
+- Milestone 06 integrated editing surface: format, lint, build, and 669 tests in 76 suites pass; 5 gated export tests, 2 gated presentation-scenario tests, the gated real-process shim test, and both gated live-provider skill cases pass.
 - Provider E2E: Codex 0.149.1 passed with its configured model; Claude Code 2.1.260 passed with `sonnet` because the configured Fable quota was exhausted. The first Claude attempt exposed and led to a fix for missing `USER`/`LOGNAME` in the scrubbed child environment.
+- Skill E2E: Codex expanded `$add-title-cards`; Claude listed and invoked `/add-title-cards`; both called the signed AppShow bridge and left exactly one requested title overlay in a fresh project. The gated command is `make test-agent-skills CLAUDE_MODEL=sonnet`.
+- Presentation scenario: `make test-scenario` replays a checked-in multi-tool batch, proves persistence and one-step Undo, and exports a private 640 px/15 fps draft with the 12-second kept duration.
 - Blur-region format, lint, build, 379 tests in 39 suites, and 3 gated export tests pass on `milestone-07-primitives`.
 - `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` is green on `milestone-02-lossless-cut`.
 
@@ -40,6 +42,6 @@ Last updated: 2026-09-04
 
 1. Run the remaining human UI rows for milestone 06 and review its stacked PR.
 2. Human runs the manual rows for milestones 02, 03, 04, and 07.
-3. Run the end-to-end presentation flow through each provider and close any gaps it exposes.
+3. Run the full checked-in presentation scenario and its draft export.
 4. Run the upstream-sync milestone after the stacked feature branches are integrated.
 5. Perform the AppShow identity migration before the first public release.

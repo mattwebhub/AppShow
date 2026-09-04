@@ -1,0 +1,109 @@
+[
+  {
+    "name": "begin_batch",
+    "arguments": {
+      "label": "presentation scenario"
+    }
+  },
+  {
+    "name": "set_kept_slices",
+    "arguments": {
+      "slices": [
+        { "start": 0, "end": 4 },
+        { "start": 6, "end": 10 },
+        { "start": 12, "end": 16 }
+      ]
+    }
+  },
+  {
+    "name": "set_canvas",
+    "arguments": {
+      "aspect": "ratio16x9",
+      "padding": 0.06,
+      "cornerRadius": 18,
+      "shadow": 0.25,
+      "background": "gradient",
+      "gradient": 0
+    }
+  },
+  {
+    "name": "replace_captions",
+    "arguments": {
+      "segments": [
+        { "start": 0.4, "end": 2.5, "text": "Open the project and choose a recording" },
+        { "start": 6.4, "end": 8.8, "text": "Focus the important interaction" },
+        { "start": 12.4, "end": 15.2, "text": "Review the finished presentation" }
+      ]
+    }
+  },
+  {
+    "name": "set_captions",
+    "arguments": {
+      "enabled": true,
+      "fontSize": 42,
+      "weight": "semibold",
+      "maxWordsPerLine": 5,
+      "showBackground": true,
+      "backgroundOpacity": 0.55
+    }
+  },
+  {
+    "name": "add_text",
+    "arguments": {
+      "text": "Build an AppShow presentation",
+      "start": 0.2,
+      "end": 2.8,
+      "position": "top",
+      "fontSize": 0.075,
+      "weight": "bold",
+      "showBackground": true,
+      "backgroundOpacity": 0.6
+    }
+  },
+  {
+    "name": "add_spotlight",
+    "arguments": {
+      "start": 1,
+      "end": 2.4,
+      "radius": 120,
+      "dimOpacity": 0.55,
+      "edgeSoftness": 30,
+      "fadeDuration": 0.2
+    }
+  },
+  {
+    "name": "add_spotlight",
+    "arguments": {
+      "start": 7,
+      "end": 8.4,
+      "radius": 140,
+      "dimOpacity": 0.6,
+      "edgeSoftness": 35,
+      "fadeDuration": 0.2
+    }
+  },
+  {
+    "name": "add_zoom",
+    "arguments": {
+      "at": 7.5,
+      "centerX": 0.45,
+      "centerY": 0.55,
+      "level": 2.2
+    }
+  },
+  {
+    "name": "add_music",
+    "arguments": {
+      "path": "$MUSIC_PATH",
+      "confirmationId": "$MUSIC_CONFIRMATION",
+      "start": 0,
+      "volume": 0.2,
+      "fadeIn": 0.4,
+      "fadeOut": 0.6
+    }
+  },
+  {
+    "name": "end_batch",
+    "arguments": {}
+  }
+]

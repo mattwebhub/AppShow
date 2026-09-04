@@ -9,4 +9,4 @@ Inspect the recording with `get_project_summary`, `get_timeline`, `get_transcrip
 
 Apply the plan inside one `begin_batch` / `end_batch` transaction. Use `set_kept_slices` for the narrative cut, then add restrained `add_zoom`, `add_spotlight`, and `add_text` edits. Use `set_transition` for title-card entry and exit, and `set_canvas` only when it improves consistency.
 
-Before finishing, call `get_timeline` again and use `render_preview_frame` at the opening, each chapter title, and the result. Keep chapters at least three seconds where the source permits, do not place zoom changes on cut boundaries, and report the kept duration and the edits made.
+Before finishing, call `get_timeline` again, use `render_preview_frame` at the opening, each chapter title, and the result, then create a private low-resolution review with `export_draft`. Keep chapters at least three seconds where the source permits, do not place zoom changes on cut boundaries, and report the kept duration, draft path, and edits made.

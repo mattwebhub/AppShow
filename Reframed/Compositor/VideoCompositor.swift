@@ -153,9 +153,10 @@ enum VideoCompositor {
     )
     let renderSize = computeRenderSize(
       canvasSize: canvasSize,
-      resolution: config.exportSettings.resolution
+      resolution: config.exportSettings.resolution,
+      maximumWidth: config.exportSettings.maximumWidth
     )
-    let exportFPS = config.exportSettings.fps.value(fallback: result.fps)
+    let exportFPS = config.exportSettings.frameRateOverride ?? config.exportSettings.fps.value(fallback: result.fps)
 
     if needsCompositor {
       let instruction = try await buildCompositionInstruction(

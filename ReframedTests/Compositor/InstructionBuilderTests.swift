@@ -65,6 +65,22 @@ struct InstructionBuilderTests {
     #expect(size == CGSize(width: 1280, height: 426))
   }
 
+  @Test func maximumWidthCapsWithoutUpscaling() {
+    let capped = VideoCompositor.computeRenderSize(
+      canvasSize: CGSize(width: 1920, height: 1080),
+      resolution: .original,
+      maximumWidth: 640
+    )
+    let alreadySmall = VideoCompositor.computeRenderSize(
+      canvasSize: CGSize(width: 320, height: 180),
+      resolution: .original,
+      maximumWidth: 640
+    )
+
+    #expect(capped == CGSize(width: 640, height: 360))
+    #expect(alreadySmall == CGSize(width: 320, height: 180))
+  }
+
   private func result(
     webcam: Bool = false,
     quality: CaptureQuality = .standard

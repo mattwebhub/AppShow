@@ -193,7 +193,7 @@ Tests: `addMusicCopiesFileAndCreatesTrackWithFades()` and `duckUnderSpeechLowers
 
 ## Phase 11 — Skills folder and shipping · size M · milestone 05 (folder) + 07 (all five skills)
 
-Status: code complete on milestone 06; real-provider discovery remains a manual check.
+Status: complete on milestone 06. Codex 0.149.1 and Claude Code 2.1.260 discovered `add-title-cards` through their native project skill locations and each completed an exact live mutation through the signed bridge. Claude used `sonnet` because the configured Fable quota was exhausted.
 
 **Failing tests first**
 
@@ -212,6 +212,8 @@ Status: code complete on milestone 06; real-provider discovery remains a manual 
 
 ## Phase 12 — End-to-end "presentation" demo · size M · milestone 07 · depends on everything above
 
+Status: automated scenario complete on milestone 06; the two-minute human acceptance recording remains manual.
+
 **Failing tests first**
 
 | Test | File | Assertion | Tier |
@@ -219,7 +221,7 @@ Status: code complete on milestone 06; real-provider discovery remains a manual 
 | `presentationScriptProducesExpectedTimeline()` | `ReframedTests/Agent/PresentationScenarioTests.swift`, `.enabled(if: env["REFRAMED_RUN_SCENARIO_TESTS"] == "1")` | replay a checked-in JSON list of tool calls (the calls `presentation-cut` is written to make) against a 20 s fixture with clicks and speech: kept duration between 8 and 14 s, ≥ 2 spotlights, ≥ 1 title card, 1 music track, exactly one history entry (batch), `undo` returns to the untouched snapshot, `project.json` and `history.json` decode | T2, gated |
 | `exportDraftOfScenarioHasExpectedDurationAndSize()` | same | `export_draft` → MP4 duration ≈ kept duration, width ≤ 640 | T2, gated (`REFRAMED_RUN_EXPORT_TESTS`) |
 
-**Production** — nothing new beyond fixes the scenario surfaces; `make test-scenario` target.
+**Production** — the scenario surfaced and completed `export_draft`: workspace-only MP4 output, internal maximum-width and frame-rate overrides, and the `make test-scenario` target. `ReframedTests/Fixtures/presentation-scenario.json` is the checked-in tool-call script.
 
 **Manual check (the acceptance demo)** — record a 2-minute product flow with narration; open the editor; type "make an awesome presentation of this"; watch: badge on, silences removed, spotlights and zooms on click clusters, three title cards, music bed, blur on any password field the agent spots in the transcript; ⌘Z once reverts the batch; press Export by hand.
 
