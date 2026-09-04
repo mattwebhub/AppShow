@@ -14,7 +14,7 @@ Layers from `planning/tdd-strategy.md`. Full assertions in `docs/features/01-los
 | 4 | `SyncedPlayerControllerTests` gapSkipDecision, observer skips gap in edit mode | T1 + T2 | `ReframedTests/Editor/SyncedPlayerControllerTests.swift` | generated 2 s movie | T1 green (4), T2 pending fixture |
 | 4 | `EditorStatePlaybackTests` togglePlayPause from gap | T2 | `ReframedTests/Editor/EditorStatePlaybackTests.swift` | generated 2 s movie | red |
 | 6 | `TimelineGeometryTests` compressed x↔source, region pieces, ruler | unit T1 | `ReframedTests/Editor/TimelineGeometryTests.swift` | none | red |
-| 5 | `EditorStateExportTests` exportVideoRegions decision | unit T1 | `ReframedTests/Editor/EditorStateExportTests.swift` | none | red |
+| 5 | `EditorStateExportTests` exportVideoRegions decision | unit T1 | `ReframedTests/Editor/EditorStateExportTests.swift` | none | green (4) |
 | 5 | `ExportPipelineTests` two-slice duration, camera region per segment | gated T2 | `ReframedTests/Compositor/ExportPipelineTests.swift` | generated movies | red |
 
 ## Manual checks

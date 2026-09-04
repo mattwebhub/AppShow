@@ -13,6 +13,7 @@ struct ExportConfiguration: Sendable {
   var cameraHiddenRegions: [RegionTransitionInfo]? = nil
   var cameraCustomRegions: [CameraCustomRegion]? = nil
   var videoRegions: [RegionTransitionInfo]? = nil
+  var outputDirectory: URL? = nil
   var backgroundStyle: BackgroundStyle = .none
   var backgroundImageURL: URL? = nil
   var backgroundImageFillMode: BackgroundImageFillMode = .fill

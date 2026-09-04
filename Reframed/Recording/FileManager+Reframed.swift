@@ -52,11 +52,15 @@ extension FileManager {
 
   @MainActor
   func defaultSaveURL(for tempURL: URL, extension ext: String? = nil) -> URL {
+    saveURL(for: tempURL, extension: ext, in: defaultSaveDirectory())
+  }
+
+  nonisolated func saveURL(for tempURL: URL, extension ext: String?, in directory: URL) -> URL {
     if let ext {
       let baseName = tempURL.deletingPathExtension().lastPathComponent
-      return defaultSaveDirectory().appendingPathComponent("\(baseName).\(ext)")
+      return directory.appendingPathComponent("\(baseName).\(ext)")
     }
-    return defaultSaveDirectory().appendingPathComponent(tempURL.lastPathComponent)
+    return directory.appendingPathComponent(tempURL.lastPathComponent)
   }
 
   func moveToFinal(from source: URL, to destination: URL) throws {

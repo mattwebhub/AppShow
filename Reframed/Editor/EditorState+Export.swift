@@ -97,30 +97,11 @@ extension EditorState {
         )
       }
 
-    let trimStartSec = CMTimeGetSeconds(trimStart)
-    let trimEndSec = CMTimeGetSeconds(trimEnd)
-    let isSingleFullRange =
-      videoRegions.count == 1
-      && abs(videoRegions[0].startSeconds - trimStartSec) < 0.01
-      && abs(videoRegions[0].endSeconds - trimEndSec) < 0.01
-      && (videoRegions[0].entryTransition ?? RegionTransitionType.none) == RegionTransitionType.none
-      && (videoRegions[0].exitTransition ?? RegionTransitionType.none) == RegionTransitionType.none
-
-    let vidRegions: [RegionTransitionInfo] =
-      isSingleFullRange
-      ? []
-      : videoRegions.map {
-        RegionTransitionInfo(
-          timeRange: CMTimeRange(
-            start: CMTime(seconds: $0.startSeconds, preferredTimescale: 600),
-            end: CMTime(seconds: $0.endSeconds, preferredTimescale: 600)
-          ),
-          entryTransition: $0.entryTransition ?? .none,
-          entryDuration: $0.entryTransitionDuration ?? 0.3,
-          exitTransition: $0.exitTransition ?? .none,
-          exitDuration: $0.exitTransitionDuration ?? 0.3
-        )
-      }
+    let vidRegions = Self.exportVideoRegions(
+      from: videoRegions,
+      trimStart: CMTimeGetSeconds(trimStart),
+      trimEnd: CMTimeGetSeconds(trimEnd)
+    )
 
     let exportResult: RecordingResult
     if webcamEnabled {
@@ -143,9 +124,12 @@ extension EditorState {
     let exportConfig = ExportConfiguration(
       cameraLayout: cameraLayout,
       cameraAspect: cameraAspect,
-      trimRange: vidRegions.isEmpty
-        ? CMTimeRange(start: trimStart, end: trimEnd)
-        : CMTimeRange(start: .zero, end: duration),
+      trimRange: Self.exportTrimRange(
+        videoRegions: vidRegions,
+        trimStart: trimStart,
+        trimEnd: trimEnd,
+        duration: duration
+      ),
       systemAudioRegions: sysRegions.isEmpty ? nil : sysRegions,
       micAudioRegions: micRegions.isEmpty ? nil : micRegions,
       cameraFullscreenRegions: camFsRegions.isEmpty ? nil : camFsRegions,
@@ -236,5 +220,42 @@ extension EditorState {
   func cancelExport() {
     exportTask?.cancel()
     exportTask = nil
+  }
+
+  nonisolated static func exportVideoRegions(
+    from videoRegions: [VideoRegionData],
+    trimStart: Double,
+    trimEnd: Double
+  ) -> [RegionTransitionInfo] {
+    let isSingleFullRange =
+      videoRegions.count == 1
+      && abs(videoRegions[0].startSeconds - trimStart) < 0.01
+      && abs(videoRegions[0].endSeconds - trimEnd) < 0.01
+      && (videoRegions[0].entryTransition ?? RegionTransitionType.none) == RegionTransitionType.none
+      && (videoRegions[0].exitTransition ?? RegionTransitionType.none) == RegionTransitionType.none
+    guard !isSingleFullRange else { return [] }
+    return videoRegions.map {
+      RegionTransitionInfo(
+        timeRange: CMTimeRange(
+          start: CMTime(seconds: $0.startSeconds, preferredTimescale: 600),
+          end: CMTime(seconds: $0.endSeconds, preferredTimescale: 600)
+        ),
+        entryTransition: $0.entryTransition ?? .none,
+        entryDuration: $0.entryTransitionDuration ?? 0.3,
+        exitTransition: $0.exitTransition ?? .none,
+        exitDuration: $0.exitTransitionDuration ?? 0.3
+      )
+    }
+  }
+
+  nonisolated static func exportTrimRange(
+    videoRegions: [RegionTransitionInfo],
+    trimStart: CMTime,
+    trimEnd: CMTime,
+    duration: CMTime
+  ) -> CMTimeRange {
+    videoRegions.isEmpty
+      ? CMTimeRange(start: trimStart, end: trimEnd)
+      : CMTimeRange(start: .zero, end: duration)
   }
 }
