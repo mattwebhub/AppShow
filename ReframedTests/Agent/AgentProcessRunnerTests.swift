@@ -101,7 +101,7 @@ struct AgentProcessRunnerTests {
     )
     let lines = try await collect(await runner.run(launch))
     let keys = Set(lines.compactMap { $0.split(separator: "=", maxSplits: 1).first.map(String.init) })
-    #expect(keys == ["PATH", "HOME", "LANG", "TERM"])
+    #expect(keys == ["PATH", "HOME", "LANG", "TERM", "USER", "LOGNAME"])
     #expect(lines.contains("HOME=\(dir.path)"))
     #expect(!keys.contains("REFRAMED_HOME"))
     #expect(!keys.contains("REFRAMED_TMP"))
@@ -227,12 +227,12 @@ struct AgentProcessRunnerTests {
       path: "/opt/homebrew/bin:/usr/bin",
       home: "/Users/example",
       forwarding: ["PATH", "SHELL"],
-      source: ["SHELL": "/bin/zsh", "REFRAMED_HOME": "/tmp/x", "LANG": "pt_BR.UTF-8"]
+      source: ["SHELL": "/bin/zsh", "REFRAMED_HOME": "/tmp/x", "LANG": "pt_BR.UTF-8", "USER": "runner"]
     )
     #expect(
       environment == [
         "PATH": "/opt/homebrew/bin:/usr/bin", "HOME": "/Users/example", "LANG": "pt_BR.UTF-8", "TERM": "xterm-256color",
-        "SHELL": "/bin/zsh",
+        "USER": "runner", "LOGNAME": "runner", "SHELL": "/bin/zsh",
       ]
     )
   }
