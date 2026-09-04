@@ -116,3 +116,7 @@ Operations: push (truncates redo stack), undo, redo, jump to specific entry. His
 ## Auto-save
 
 EditorState debounces saves with a 1-second delay. Every change schedules a save, but only the last one within any 1-second window actually writes to disk. The full editor state (including history) goes into `project.json` inside the .frm bundle.
+
+## Music tracks (fork)
+
+External audio files can be added from the Audio tab or by dropping them on the timeline. Each becomes an `ExternalAudioTrackData` entry with a bundle-relative file name (`audio-<hash8>.<ext>`), a timeline start, in/out points inside the file, volume, mute, and linear fades, shown as its own "Audio" row under Mic. Preview playback runs through `ExternalAudioPreviewEngine` on an `AVAudioEngine`, resynced on play, seek, and gap skips; export inserts each track into the composition and applies `trackID`-keyed volume ramps (`VideoCompositor+ExternalAudio`). Fades are timeline-based and are clipped by trims and cuts.

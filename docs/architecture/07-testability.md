@@ -466,6 +466,10 @@ XCTest classes use `ReframedTests/ClassName/testMethod` without parentheses.
 
 ---
 
+## Gated suites
+
+`ExportPipelineTests` runs only with `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1`; `ExternalAudioPreviewEngineTests` only with `TEST_RUNNER_REFRAMED_RUN_AUDIO_ENGINE_TESTS=1`. Both need no permissions but take seconds and touch real AVFoundation encoders and the audio engine.
+
 ## 5. First fifteen tests
 
 > All fifteen landed 2026-09-04 (milestone 01) plus the audio-mix pairing characterization. Where the code disagreed with the rows below, the tests pin the code: the legacy document cannot both lack `captionSettings` and carry `captionPosition` (both variants are tested); `rename` sanitizes with `CharacterSet.alphanumerics`, not ASCII; row 6's `scaleX` border scaling holds only on the cut path (the trim path leaves `borderWidth` unscaled, a likely upstream bug); row 14's solid red background renders colour-matched as `(255, 38, 0)` through the 8-bit Generic RGB path, so golden tests assert dominance and derive blends from the measured background; row 9's equal-time keyframes resolve to the first at the very first time; row 10's hold keyframe is not clamped to the duration; row 13's "nil once the next segment has started" branch is unreachable. `FrameRenderer.visibleText` crashes for `time < segment.startSeconds` with more than two lines and loops forever for `maxWordsPerLine <= 0`; both are unreachable from `drawCaptions` today and are left untested.
