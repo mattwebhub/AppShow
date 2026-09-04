@@ -19,6 +19,7 @@
 | Package metadata | bundle and document identifiers are owned by AppShow | pass: `com.mattwebhub.appshow`, `.appshow` export, legacy `.frm` import |
 | Clean checkout | build and compatibility tests do not depend on local untracked state | pass at `675c9bd`: lint, build, 11 path tests, and 17 project tests |
 | Residual identity | remaining Reframed references are compatibility, upstream history, provenance, or recorded fixtures | pass |
+| GitHub CI | fresh macOS runner resolves packages, builds, lints, and tests | pass on PR #10 in 7m03s after replacing the non-portable package cache |
 
 ## Distribution boundary
 

@@ -11,7 +11,7 @@
 | 06 | agent-tools-editing | Feature 04 part 2: mutating tools for existing editor features with live feedback and undo | code complete; PR #8; manual checks remain |
 | 07 | primitives | Text overlay, image overlay, blur, silence detection, transitions, each shipped with its tool | code complete; PR #4; manual checks remain |
 | 08 | upstream-sync-1 | First upstream comparison after divergence, exercising `upstream-sync.md` | complete; upstream still at fork base |
-| 09 | appshow-identity | Rename the app, identifiers, paths, release metadata, and user-facing copy to AppShow before public release (ADR 0005) | implementation and local verification complete; CI PR pending |
+| 09 | appshow-identity | Rename the app, identifiers, paths, release metadata, and user-facing copy to AppShow before public release (ADR 0005) | complete; green PR #10 |
 
 The overall feature plan is `docs/features/00-overall-plan.md`. The AppShow identity migration is tracked in milestone 09 and ADR 0005.
 
