@@ -8,7 +8,7 @@ Depends on: milestone 01 (fixtures, region-remap tests, `CompositionInstruction`
 
 Mirror of `planning/features/lossless-cut/TASKS.md`; tick both.
 
-- [ ] T1. P1 model + remap. Proof: `CutTimelineTests` green, `EditorState` delegations compile with no behavior change (`previewElapsedTime` characterization).
+- [x] T1. P1 model + remap. Proof: `CutTimelineTests` green, `EditorState` delegations compile with no behavior change (`previewElapsedTime` characterization).
 - [ ] T2. P4 transport button. Proof: `canCut` tests, manual check of enabled state.
 - [ ] T3. P3 Cuts track. Proof: `showCutTrack`/`gaps` tests; manual animation check.
 - [ ] T4. P5 playback jumping. Proof: `SyncedPlayerControllerTests`, `EditorStatePlaybackTests`.

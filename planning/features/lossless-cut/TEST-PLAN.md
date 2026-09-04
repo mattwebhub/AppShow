@@ -4,13 +4,13 @@ Layers from `planning/tdd-strategy.md`. Full assertions in `docs/features/01-los
 
 | Spec # | Test | Layer | File | Fixture | Status |
 |--------|------|-------|------|---------|--------|
-| 1, 2 | `CutTimelineTests` split, no-op, min length, boundary, totals, flags, elapsed↔source, next slice, normalized, gaps, canCut, boundaryTimes | unit T1 | `ReframedTests/Editor/CutTimelineTests.swift` | none | red |
+| 1, 2 | `CutTimelineTests` split, no-op, min length, boundary, totals, flags, elapsed↔source, next slice, normalized, gaps, canCut, boundaryTimes | unit T1 | `ReframedTests/Editor/CutTimelineTests.swift` | none | green (21) |
 | 5 | `RegionRemappingTests` video-cut path (camera split, 10 ms match, captions, spotlight, border scale) | unit T1 | `ReframedTests/Compositor/RegionRemappingTests.swift` | none | milestone 01 |
 | 5 | `CompositionInstructionTests` sourceTime inside/outside mappings | unit T1 | `ReframedTests/Compositor/CompositionInstructionTests.swift` | none | milestone 01 |
 | 7 | `ProjectMetadataTests` video regions round trip, legacy → nil | unit T1 | `ReframedTests/Project/ProjectMetadataTests.swift` | none | red |
 | 7 | `HistoryChangeRulesTests` cut added/removed/adjusted, exactly one string | unit T1 @MainActor | `ReframedTests/Editor/HistoryChangeRulesTests.swift` | none | red |
 | 7 | `EditorStateVideoRegionsTests` normalize on restore, undo after split, previewElapsedTime characterization, split keeps currentTime | EditorState T2 | `ReframedTests/Editor/EditorStateVideoRegionsTests.swift` | generated 2 s movie | red |
-| 2 | `CutTimelineTests` showCutTrack gate | unit T1 | same as row 1 | none | red |
+| 2 | `CutTimelineTests` showCutTrack gate | unit T1 | same as row 1 | none | green |
 | 4 | `SyncedPlayerControllerTests` gapSkipDecision, observer skips gap in edit mode | T1 + T2 | `ReframedTests/Editor/SyncedPlayerControllerTests.swift` | generated 2 s movie | red |
 | 4 | `EditorStatePlaybackTests` togglePlayPause from gap | T2 | `ReframedTests/Editor/EditorStatePlaybackTests.swift` | generated 2 s movie | red |
 | 6 | `TimelineGeometryTests` compressed x↔source, region pieces, ruler | unit T1 | `ReframedTests/Editor/TimelineGeometryTests.swift` | none | red |

@@ -135,45 +135,22 @@ final class EditorState {
   var duration: CMTime { playerController.duration }
   var hasWebcam: Bool { result.webcamVideoURL != nil }
 
-  var videoRegionsTotalDuration: Double {
-    videoRegions.reduce(0) { $0 + ($1.endSeconds - $1.startSeconds) }
+  var cutTimeline: CutTimeline {
+    CutTimeline(slices: videoRegions, duration: CMTimeGetSeconds(duration))
   }
 
-  var hasVideoRegionCuts: Bool {
-    let dur = CMTimeGetSeconds(duration)
-    guard !videoRegions.isEmpty else { return false }
-    return abs(videoRegionsTotalDuration - dur) > 0.01
-  }
+  var showCutTrack: Bool { cutTimeline.showsTrack }
+
+  var videoRegionsTotalDuration: Double { cutTimeline.totalDuration }
+
+  var hasVideoRegionCuts: Bool { cutTimeline.hasCuts }
 
   var previewElapsedTime: Double {
-    let t = CMTimeGetSeconds(currentTime)
-    var elapsed = 0.0
-    for region in videoRegions {
-      if t >= region.endSeconds {
-        elapsed += region.endSeconds - region.startSeconds
-      } else if t >= region.startSeconds {
-        elapsed += t - region.startSeconds
-        break
-      } else {
-        break
-      }
-    }
-    return elapsed
+    cutTimeline.elapsed(forSource: CMTimeGetSeconds(currentTime))
   }
 
   func sourceTimeForPreviewElapsed(_ elapsed: Double) -> Double {
-    var remaining = elapsed
-    for region in videoRegions {
-      let regionDur = region.endSeconds - region.startSeconds
-      if remaining <= regionDur {
-        return region.startSeconds + remaining
-      }
-      remaining -= regionDur
-    }
-    if let last = videoRegions.last {
-      return last.endSeconds
-    }
-    return 0
+    cutTimeline.source(forElapsed: elapsed)
   }
 
   init(project: ReframedProject) {
