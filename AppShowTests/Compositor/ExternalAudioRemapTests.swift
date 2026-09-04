@@ -43,6 +43,20 @@ struct ExternalAudioRemapTests {
     abs(a - b) < 0.001
   }
 
+  @Test func gainResetsAfterACutSkipsTheRestOfAFade() throws {
+    let music = track(1, 6, fadeIn: 2)
+    let insertions = VideoCompositor.insertions(for: music, trim: range(0, 7), segments: [segment(0, 2, at: 0), segment(5, 7, at: 2)])
+    let parameters = try #require(
+      VideoCompositor.externalMixParameters(for: [.init(trackID: 42, track: music, insertions: insertions)]).first
+    )
+    var start: Float = 0
+    var end: Float = 0
+    var timeRange = CMTimeRange.zero
+    #expect(parameters.getVolumeRamp(for: seconds(2.5), startVolume: &start, endVolume: &end, timeRange: &timeRange))
+    #expect(near(start, 1))
+    #expect(near(end, 1))
+  }
+
   @Test func insertionWithoutCutsIsClippedToTrimAndOffsetIntoFile() throws {
     let insertions = VideoCompositor.insertions(for: track(3, 8, fileIn: 1), trim: range(5, 10), segments: nil)
     let insertion = try #require(insertions.first)

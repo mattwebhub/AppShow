@@ -34,6 +34,10 @@ The interactive testing fixes add cut-slice selection and Delete/Backspace/toolb
 
 Verification: `make format`, `make lint`, `make build`, 690 tests in 76 suites, and 5 gated export tests pass. Human drag/selection and fresh-chat appearance checks remain pending on the updated app. These fixes are committed locally; they have not been pushed.
 
+## Publication review
+
+The focused review at `planning/reviews/2026-09-04-publication-review.md` patches trim/export consistency, saved trim reopening, renamed conversation persistence and bridge relocation, canceled request queues and unfinished batches, music gain after cuts, confirmation text, and export progress cleanup. The 694-test full suite, additional saved-trim regression, 8 bridge tests, 5 gated exports, format, lint and warning-free Debug build pass. Changes are committed locally, with no GitHub publication.
+
 ## Accepted product decisions
 
 - Final product name: AppShow. Keep inherited names and identifiers during feature development, then perform one pre-release identity migration (ADR 0005).

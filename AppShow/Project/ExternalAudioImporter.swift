@@ -27,6 +27,7 @@ enum ExternalAudioImporter {
     guard duration.isFinite, duration > 0 else {
       throw CaptureError.recordingFailed("\(sourceURL.lastPathComponent) has no playable duration")
     }
+    try Task.checkCancellation()
     let hash = try contentHash(of: sourceURL)
     let fileName = "audio-\(hash.prefix(8)).\(sourceURL.pathExtension.lowercased())"
     let destination = bundleURL.appendingPathComponent(fileName)
@@ -45,6 +46,7 @@ enum ExternalAudioImporter {
     defer { try? handle.close() }
     var hasher = SHA256()
     while let chunk = try handle.read(upToCount: 1 << 20), !chunk.isEmpty {
+      try Task.checkCancellation()
       hasher.update(data: chunk)
     }
     return hasher.finalize().map { String(format: "%02x", $0) }.joined()

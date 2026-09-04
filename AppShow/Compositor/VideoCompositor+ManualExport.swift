@@ -28,13 +28,13 @@ extension VideoCompositor {
     } else {
       progressTask = nil
     }
+    defer { progressTask?.cancel() }
     nonisolated(unsafe) let session = session
     try await withTaskCancellationHandler {
       try await session.export(to: url, as: fileType)
     } onCancel: {
       session.cancelExport()
     }
-    progressTask?.cancel()
   }
 
   static func runManualExport(

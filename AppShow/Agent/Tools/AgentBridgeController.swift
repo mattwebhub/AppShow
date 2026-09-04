@@ -14,6 +14,7 @@ final class AgentBridgeController {
   private(set) var status: AgentBridgeStatus = .stopped
   private(set) var configuration: AgentSessionConfig?
   private var server: AgentBridgeServer?
+  private var relocationTask: Task<Void, Never>?
   private let logger = Logger(label: "com.mattwebhub.appshow.agent-bridge-controller")
 
   static var bundledHelperURL: URL {
@@ -42,6 +43,9 @@ final class AgentBridgeController {
       server = bridge
       self.configuration = configuration
       status = .ready
+      editorState.agentTranscript.onTurnEnd = { [weak self] in
+        await self?.server?.cancelRequests()
+      }
     } catch {
       await bridge.stop()
       workspace.close()
@@ -52,7 +56,29 @@ final class AgentBridgeController {
     }
   }
 
+  func relocate(editorState: EditorState) {
+    guard let helperURL = configuration?.helperURL else { return }
+    status = .starting
+    editorState.agentTranscript.cancel()
+    relocationTask?.cancel()
+    relocationTask = Task { [weak self, weak editorState] in
+      guard let self, let editorState else { return }
+      await editorState.agentTranscript.waitForTurn()
+      guard !Task.isCancelled else { return }
+      await self.stopServer()
+      guard !Task.isCancelled else { return }
+      try? await self.start(editorState: editorState, helperURL: helperURL)
+    }
+  }
+
   func stop() async {
+    relocationTask?.cancel()
+    relocationTask = nil
+    await stopServer()
+  }
+
+  private func stopServer() async {
+
     let bridge = server
     let workspace = configuration?.workspace
     server = nil

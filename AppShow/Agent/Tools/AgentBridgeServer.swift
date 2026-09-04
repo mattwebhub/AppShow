@@ -54,20 +54,23 @@ actor AgentBridgeServer {
     logger.info("Agent bridge listening", metadata: ["socket": "\(socketURL.path)"])
   }
 
-  func stop() {
+  func stop() async {
     listener?.stateUpdateHandler = nil
     listener?.cancel()
     listener = nil
-    let open = Array(connections.values)
-    connections.removeAll()
-    Task {
-      for connection in open {
-        await connection.cancel()
-      }
-    }
+    await cancelRequests()
     isListening = false
     try? FileManager.default.removeItem(at: socketURL)
     logger.info("Agent bridge stopped")
+  }
+
+  func cancelRequests() async {
+    let open = Array(connections.values)
+    connections.removeAll()
+    for connection in open {
+      await connection.cancel()
+    }
+    await dispatcher.cancelBatch()
   }
 
   private func listenerEnded() {
@@ -117,6 +120,7 @@ actor AgentBridgeConnection {
   private var buffer = JSONRPCLineBuffer()
   private var pending: [Data] = []
   private var processing = false
+  private var drainTask: Task<Void, Never>?
   private var closed = false
 
   init(connection: NWConnection, session: AgentRPCSession, queue: DispatchQueue, onClose: @escaping @Sendable () -> Void) {
@@ -139,8 +143,11 @@ actor AgentBridgeConnection {
     receive()
   }
 
-  func cancel() {
+  func cancel() async {
+    let task = drainTask
+    finish()
     connection.cancel()
+    await task?.value
   }
 
   private func receive() {
@@ -150,11 +157,12 @@ actor AgentBridgeConnection {
   }
 
   private func received(_ data: Data?, ended: Bool) {
+    guard !closed else { return }
     if let data {
       pending.append(contentsOf: buffer.append(data))
       if !processing && !pending.isEmpty {
         processing = true
-        Task { await self.drain() }
+        drainTask = Task { await self.drain() }
       }
     }
     if ended {
@@ -166,9 +174,10 @@ actor AgentBridgeConnection {
   }
 
   private func drain() async {
-    while !pending.isEmpty {
+    while !closed && !Task.isCancelled && !pending.isEmpty {
       let line = pending.removeFirst()
       let outcome = await session.handle(line: line)
+      guard !closed && !Task.isCancelled else { break }
       if let reply = outcome.reply {
         send(reply, thenClose: outcome.closeAfterReply)
       }
@@ -178,6 +187,7 @@ actor AgentBridgeConnection {
       }
     }
     processing = false
+    drainTask = nil
   }
 
   private func send(_ response: JSONRPCResponse, thenClose: Bool) {
@@ -196,6 +206,8 @@ actor AgentBridgeConnection {
   private func finish() {
     guard !closed else { return }
     closed = true
+    pending.removeAll()
+    drainTask?.cancel()
     onClose()
   }
 }

@@ -47,6 +47,7 @@ extension EditorState {
 
   func renameProject(_ newName: String) {
     guard var proj = project else { return }
+    let previousBundle = proj.bundleURL
     do {
       try proj.rename(to: newName)
     } catch {
@@ -56,6 +57,12 @@ extension EditorState {
     project = proj
     result = proj.recordingResult
     projectName = proj.name
+    agentTranscript.relocate(to: AgentConversationStore(project: proj))
+    if let processedMicAudioURL, processedMicAudioURL.deletingLastPathComponent() == previousBundle {
+      self.processedMicAudioURL = proj.bundleURL.appendingPathComponent(processedMicAudioURL.lastPathComponent)
+    }
+    syncExternalAudioToPlayer()
+    agentBridgeController.relocate(editorState: self)
   }
 
   func saveState() {

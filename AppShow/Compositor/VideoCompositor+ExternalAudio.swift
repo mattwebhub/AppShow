@@ -104,13 +104,15 @@ extension VideoCompositor {
     tracks.map { entry in
       let parameters = AVMutableAudioMixInputParameters()
       parameters.trackID = entry.trackID
-      let ramps = volumeRamps(for: entry.track, insertions: entry.insertions)
-      let firstRampStartsAtZero = ramps.first.map { CMTimeCompare($0.timeRange.start, .zero) == 0 } ?? false
-      if !firstRampStartsAtZero {
-        parameters.setVolume(entry.track.volume, at: .zero)
-      }
-      for ramp in ramps {
-        parameters.setVolumeRamp(fromStartVolume: ramp.startVolume, toEndVolume: ramp.endVolume, timeRange: ramp.timeRange)
+      parameters.setVolume(entry.track.volume, at: .zero)
+      for insertion in entry.insertions {
+        let ramps = volumeRamps(for: entry.track, insertions: [insertion])
+        if ramps.first?.timeRange.start != insertion.compositionRange.start {
+          parameters.setVolume(entry.track.volume, at: insertion.compositionRange.start)
+        }
+        for ramp in ramps {
+          parameters.setVolumeRamp(fromStartVolume: ramp.startVolume, toEndVolume: ramp.endVolume, timeRange: ramp.timeRange)
+        }
       }
       return parameters
     }

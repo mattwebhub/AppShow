@@ -353,10 +353,6 @@ final class EditorState {
       setCameraCorner(.bottomRight)
     }
 
-    trimStart = .zero
-    trimEnd = playerController.duration
-    playerController.trimEnd = playerController.duration
-
     if let proj = project, let historyData = proj.loadHistory() {
       history.load(from: historyData)
     } else {
