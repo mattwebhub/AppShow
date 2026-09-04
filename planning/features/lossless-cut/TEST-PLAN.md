@@ -15,7 +15,7 @@ Layers from `planning/tdd-strategy.md`. Full assertions in `docs/features/01-los
 | 4 | `EditorStatePlaybackTests` togglePlayPause from gap, skipsGaps sync | T2 | `ReframedTests/Editor/EditorStatePlaybackTests.swift` | generated 2 s movie | green (2) |
 | 6 | `TimelineGeometryTests` compressed x↔source, region pieces, ruler | unit T1 | `ReframedTests/Editor/TimelineGeometryTests.swift` | none | red |
 | 5 | `EditorStateExportTests` exportVideoRegions decision | unit T1 | `ReframedTests/Editor/EditorStateExportTests.swift` | none | green (4) |
-| 5 | `ExportPipelineTests` two-slice duration, camera region per segment | gated T2 | `ReframedTests/Compositor/ExportPipelineTests.swift` | generated movies | red |
+| 5 | `ExportPipelineTests` two-slice duration, full-slice duration | gated T2 | `ReframedTests/Compositor/ExportPipelineTests.swift` | generated movies | green (2, `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1`); camera-per-segment pixel check deferred |
 
 ## Manual checks
 

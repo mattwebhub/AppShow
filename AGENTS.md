@@ -102,6 +102,7 @@ After selection, ScreenCaptureKit captures the chosen target. CVPixelBuffers flo
 
 Built-in editor with:
 - Timeline trimming (independent trim ranges for video, system audio, mic audio)
+- Keep-slices (`CutTimeline`): the transport-bar cut button splits at the playhead, a Cuts track appears under Screen, playback jumps over gaps, export concatenates kept slices
 - Audio regions (per-track independent audio trimming with volume and mute controls)
 - Background styles (none, solid color, gradient presets, background image with fill modes)
 - Canvas aspect ratios (original, 16:9, 1:1, 4:3, 9:16)
