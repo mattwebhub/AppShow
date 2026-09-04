@@ -9,7 +9,7 @@
 | 04 | agent-chat | Feature 03: collapsible chat panel with Claude Code / Codex providers, ported from Toone (`docs/features/03-agent-chat/`) | code complete; PR #6 |
 | 05 | agent-tools-readonly | Feature 04 part 1: MCP transport and read-only project tools (`docs/features/04-agent-tools/`) | code complete; PR #7 |
 | 06 | agent-tools-editing | Feature 04 part 2: mutating tools for existing editor features with live feedback and undo | code complete; PR #8; manual checks remain |
-| 07 | primitives | Text overlay, image overlay, blur, silence detection, transitions, each shipped with its tool | silence, text, image, and blur code complete; transitions remain |
+| 07 | primitives | Text overlay, image overlay, blur, silence detection, transitions, each shipped with its tool | code complete; PR #4; manual checks remain |
 | 08 | upstream-sync-1 | First merge of upstream changes after divergence, exercising `upstream-sync.md`; schedule it after milestone 02 lands, not at the end | planned |
 | 09 | appshow-identity | Rename the app, identifiers, paths, release metadata, and user-facing copy to AppShow before public release (ADR 0005) | planned |
 

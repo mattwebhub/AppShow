@@ -9,6 +9,7 @@ Run on a clean clone before closing the milestone. Record the date and commit.
 | Format | `make format && git diff --exit-code` | no diff | pass (2026-09-04) |
 | Lint | `make lint` | clean | pass (2026-09-04) |
 | Blur export gate | `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` | blur configuration exports through the compositor | pass, 3 tests (2026-09-04) |
+| Transition automation | focused mutation, remapping, and golden-render suites | tool updates text/image/slice targets; cut remapping preserves settings; midpoint fades render | pass (2026-09-04) |
 | Silences, no audio | open a screen-only `.frm`, Video tab | Silences section greyed out | |
 | Silences, preview | record 20 s with two long pauses, Video tab, Preview | line reads "2 silences, N s removed", timeline unchanged | |
 | Silences, apply | press Apply | Cuts track appears with the kept slices, playback jumps over the pauses | |
@@ -27,6 +28,7 @@ Run on a clean clone before closing the milestone. Record the date and commit.
 | Blur, add and edit | Effects > Add Blur; adjust left, top, width, height and radius; drag and resize the chip | preview updates live; the rectangle remains inside the source; one History entry describes each settled edit | |
 | Blur, zoom and export | cover a sharp field, enable 2× zoom, scrub, then export SDR and HDR | blur follows the selected source pixels and exported frames match preview | |
 | Blur, cuts and undo | span a blur across two kept slices, export, then undo its creation | both exported pieces stay blurred; one Undo removes the region | |
+| Agent transition | ask either provider to fade a title and slide a logo; Undo each call | timeline and preview update immediately; each call creates one labelled History row | |
 | Manual smoke | record 5 s of screen, open editor, export MP4 | file plays | |
 
-Silence, text-overlay, image-overlay, blur and manual-smoke rows need a human with the app. The automated gate was rerun after T7 (379 tests in 39 suites plus 3 gated export tests).
+Silence, text-overlay, image-overlay, blur, agent-transition and manual-smoke rows need a human with the app. The primitive branch gate was rerun after T7 (379 tests in 39 suites plus 3 gated export tests); transition automation passes in the milestone 06 integration suite (661 tests in 73 suites).

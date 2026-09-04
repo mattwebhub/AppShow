@@ -494,7 +494,7 @@ struct MutatingToolsTests {
         of: [
           "set_trim", "add_zoom", "add_spotlight", "set_kept_slices", "remove_time_range", "remove_silences",
           "add_text", "update_text", "remove_text", "add_image", "update_image", "remove_image", "begin_batch", "end_batch",
-          "add_blur", "update_blur", "remove_blur",
+          "add_blur", "update_blur", "remove_blur", "set_transition",
         ]
       )
     )
@@ -765,6 +765,73 @@ struct MutatingToolsTests {
     #expect(state.blurRegions.isEmpty)
     state.undo()
     #expect(state.blurRegions.first?.radius == 36)
+  }
+
+  @Test func setTransitionUpdatesEverySupportedTargetAndReturnsItsSettings() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let text = TextOverlayData(startSeconds: 0.1, endSeconds: 1.5, text: "Title")
+    state.textOverlays = [text]
+    let source = try ImageFixtures.solidPNG(width: 24, height: 12, in: directory, name: "Logo.png")
+    let image = try #require(state.addImageOverlay(from: source, atTime: 0.2))
+    state.history.pushSnapshot(state.createSnapshot(), label: "Fixture")
+    let slice = try #require(state.videoRegions.first)
+    let dispatcher = dispatcher(state, in: directory)
+
+    let textResult = try await dispatcher.call(
+      "set_transition",
+      arguments: [
+        "targetId": .string(text.id.uuidString), "entryTransition": "scale", "entryDuration": 0.8,
+        "exitTransition": "slide", "exitDuration": 0.6,
+      ]
+    )
+    #expect(state.textOverlays.first?.entryTransition == .scale)
+    #expect(state.textOverlays.first?.exitTransition == .slide)
+    #expect(textResult["overlays"]?["text"]?[0]?["entryTransition"] == "scale")
+    #expect(textResult["overlays"]?["text"]?[0]?["exitDuration"] == 0.6)
+    state.undo()
+    #expect(state.textOverlays.first?.entryTransition == .fade)
+
+    _ = try await dispatcher.call(
+      "set_transition",
+      arguments: ["targetId": .string(image.id.uuidString), "entryTransition": "none", "exitTransition": "scale"]
+    )
+    #expect(state.imageOverlays.first?.entryTransition == RegionTransitionType.none)
+    #expect(state.imageOverlays.first?.exitTransition == .scale)
+
+    _ = try await dispatcher.call(
+      "set_transition",
+      arguments: [
+        "targetId": .string(slice.id.uuidString), "entryTransition": "fade", "entryDuration": 0.4,
+        "exitTransition": "slide", "exitDuration": 0.5,
+      ]
+    )
+    #expect(state.videoRegions.first?.entryTransition == .fade)
+    #expect(state.videoRegions.first?.entryTransitionDuration == 0.4)
+    #expect(state.videoRegions.first?.exitTransition == .slide)
+    #expect(state.videoRegions.first?.exitTransitionDuration == 0.5)
+  }
+
+  @Test func setTransitionRejectsUnknownTargetWithoutHistory() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let before = state.createSnapshot()
+    let historyCount = state.history.entries.count
+    let dispatcher = dispatcher(state, in: directory)
+
+    await #expect(throws: AgentToolError.self) {
+      try await dispatcher.call(
+        "set_transition",
+        arguments: ["targetId": .string(UUID().uuidString), "entryTransition": "fade"]
+      )
+    }
+
+    #expect(state.createSnapshot() == before)
+    #expect(state.history.entries.count == historyCount)
   }
 
   @Test func exportRequiresApprovalBoundToAnExactNewDestination() async throws {

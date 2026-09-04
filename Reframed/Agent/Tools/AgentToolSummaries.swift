@@ -153,7 +153,9 @@ enum AgentToolSummaries {
       "end": seconds(region.endSeconds),
     ]
     if let entry = region.entryTransition { object["entryTransition"] = .string(entry.rawValue) }
+    if let duration = region.entryTransitionDuration { object["entryDuration"] = seconds(duration) }
     if let exit = region.exitTransition { object["exitTransition"] = .string(exit.rawValue) }
+    if let duration = region.exitTransitionDuration { object["exitDuration"] = seconds(duration) }
     return .object(object)
   }
 
@@ -240,6 +242,10 @@ enum AgentToolSummaries {
       "position": .string(overlay.position.rawValue),
       "offsetX": .number(Double(overlay.offsetX)),
       "offsetY": .number(Double(overlay.offsetY)),
+      "entryTransition": .string(overlay.entryTransition.rawValue),
+      "entryDuration": seconds(overlay.entryTransitionDuration),
+      "exitTransition": .string(overlay.exitTransition.rawValue),
+      "exitDuration": seconds(overlay.exitTransitionDuration),
     ]
   }
 
@@ -252,6 +258,10 @@ enum AgentToolSummaries {
       "position": .string(overlay.position.rawValue),
       "width": .number(Double(overlay.width)),
       "opacity": .number(Double(overlay.opacity)),
+      "entryTransition": .string(overlay.entryTransition.rawValue),
+      "entryDuration": seconds(overlay.entryTransitionDuration),
+      "exitTransition": .string(overlay.exitTransition.rawValue),
+      "exitDuration": seconds(overlay.exitTransitionDuration),
     ]
   }
 
