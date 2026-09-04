@@ -396,4 +396,40 @@ struct RegionRemappingTests {
     #expect(second.filename == "split.png")
     #expect(second.position == .topLeft)
   }
+
+  @Test func blurRegionIsClippedAndShiftedByTrimStart() throws {
+    let trim = range(5, 10)
+    var config = config(trim: trim)
+    let original = BlurRegionData(startSeconds: 2, endSeconds: 8, x: 0.1, y: 0.2, width: 0.3, height: 0.4)
+    config.blurRegions = [original, BlurRegionData(startSeconds: 0, endSeconds: 4)]
+
+    let remapped = remap(config, trim: trim)
+
+    #expect(remapped.blurRegions.count == 1)
+    let result = try #require(remapped.blurRegions.first)
+    #expect(result.id == original.id)
+    #expect(result.startSeconds == 0)
+    #expect(result.endSeconds == 3)
+    #expect(result.rect == original.rect)
+  }
+
+  @Test func blurRegionSpanningTwoSegmentsIsSplitWithFreshIds() throws {
+    var config = config(trim: range(0, 10))
+    let original = BlurRegionData(startSeconds: 1, endSeconds: 6, radius: 30)
+    config.blurRegions = [original, BlurRegionData(startSeconds: 3, endSeconds: 4)]
+
+    let remapped = remapWithCuts(config)
+
+    #expect(remapped.blurRegions.count == 2)
+    let first = try #require(remapped.blurRegions.first)
+    let second = try #require(remapped.blurRegions.last)
+    #expect(first.startSeconds == 1)
+    #expect(first.endSeconds == 2)
+    #expect(second.startSeconds == 2)
+    #expect(second.endSeconds == 3)
+    #expect(first.id != original.id)
+    #expect(second.id != original.id)
+    #expect(first.id != second.id)
+    #expect(second.radius == 30)
+  }
 }

@@ -22,6 +22,13 @@ extension PropertiesPanel {
           Label("Add Image", systemImage: "photo")
         }
         .buttonStyle(PrimaryButtonStyle(size: .small, fullWidth: true))
+
+        Button {
+          editorState.addBlurRegion(atTime: CMTimeGetSeconds(editorState.currentTime))
+        } label: {
+          Label("Add Blur", systemImage: "drop.halffull")
+        }
+        .buttonStyle(PrimaryButtonStyle(size: .small, fullWidth: true))
       }
 
       Text("Adds content at the playhead. Drag it on the Overlays track and right-click to edit.")
@@ -50,6 +57,17 @@ extension PropertiesPanel {
           }
         }
       }
+
+      if !editorState.blurRegions.isEmpty {
+        VStack(spacing: 2) {
+          ForEach(editorState.blurRegions) { region in
+            BlurRegionRow(region: region) {
+              editorState.pause()
+              editorState.seek(to: CMTime(seconds: region.startSeconds, preferredTimescale: 600))
+            }
+          }
+        }
+      }
     }
   }
 
@@ -67,6 +85,33 @@ extension PropertiesPanel {
         )
       }
     }
+  }
+}
+
+private struct BlurRegionRow: View {
+  let region: BlurRegionData
+  let onSeek: () -> Void
+
+  var body: some View {
+    Button(action: onSeek) {
+      HStack(spacing: 8) {
+        Image(systemName: "drop.halffull")
+          .font(.system(size: FontSize.xs))
+          .foregroundStyle(ReframedColors.secondaryText)
+        Text("\(formatCompactTime(seconds: region.startSeconds))–\(formatCompactTime(seconds: region.endSeconds))")
+          .font(.system(size: FontSize.xs, design: .monospaced))
+          .foregroundStyle(ReframedColors.secondaryText)
+        Text("Blur")
+          .font(.system(size: FontSize.xs))
+          .foregroundStyle(ReframedColors.primaryText)
+        Spacer()
+      }
+      .padding(.horizontal, 8)
+      .padding(.vertical, 6)
+      .background(ReframedColors.muted.opacity(0.5), in: RoundedRectangle(cornerRadius: Radius.md))
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(PlainCustomButtonStyle())
   }
 }
 

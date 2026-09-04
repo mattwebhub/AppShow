@@ -67,6 +67,7 @@ enum AgentToolSummaries {
       "overlays": [
         "text": .array((snapshot.textOverlays ?? []).map(textOverlay)),
         "images": .array((snapshot.imageOverlays ?? []).map(imageOverlay)),
+        "blurs": .array((snapshot.blurRegions ?? []).map(blurRegion)),
       ],
       "audio": [
         "system": audioTrack(
@@ -251,6 +252,21 @@ enum AgentToolSummaries {
       "position": .string(overlay.position.rawValue),
       "width": .number(Double(overlay.width)),
       "opacity": .number(Double(overlay.opacity)),
+    ]
+  }
+
+  private static func blurRegion(_ region: BlurRegionData) -> JSONValue {
+    [
+      "id": .string(region.id.uuidString),
+      "start": seconds(region.startSeconds),
+      "end": seconds(region.endSeconds),
+      "rect": [
+        "x": .number(Double(region.x)),
+        "y": .number(Double(region.y)),
+        "width": .number(Double(region.width)),
+        "height": .number(Double(region.height)),
+      ],
+      "radius": .number(Double(region.radius)),
     ]
   }
 

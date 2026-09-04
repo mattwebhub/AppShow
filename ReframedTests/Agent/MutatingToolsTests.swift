@@ -494,6 +494,7 @@ struct MutatingToolsTests {
         of: [
           "set_trim", "add_zoom", "add_spotlight", "set_kept_slices", "remove_time_range", "remove_silences",
           "add_text", "update_text", "remove_text", "add_image", "update_image", "remove_image", "begin_batch", "end_batch",
+          "add_blur", "update_blur", "remove_blur",
         ]
       )
     )
@@ -719,6 +720,51 @@ struct MutatingToolsTests {
     #expect(state.imageOverlays.isEmpty)
     state.undo()
     #expect(state.imageOverlays.first?.width == 0.5)
+  }
+
+  @Test func blurToolsClampCreateUpdateRemoveAndUndo() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+
+    let added = try await dispatcher.call(
+      "add_blur",
+      arguments: [
+        "start": 0.2,
+        "end": 1.2,
+        "rect": ["x": 0.9, "y": 0.8, "width": 0.5, "height": 0.5],
+        "radius": 24,
+      ]
+    )
+    let region = try #require(state.blurRegions.first)
+    #expect(region.startSeconds == 0.2)
+    #expect(region.endSeconds == 1.2)
+    #expect(abs(region.width - 0.1) < 0.0001)
+    #expect(abs(region.height - 0.2) < 0.0001)
+    #expect(region.radius == 24)
+    #expect(added["overlays"]?["blurs"]?[0]?["id"] == .string(region.id.uuidString))
+
+    _ = try await dispatcher.call(
+      "update_blur",
+      arguments: [
+        "id": .string(region.id.uuidString),
+        "start": 0.4,
+        "end": 1.6,
+        "rect": ["x": 0.1, "y": 0.2, "width": 0.3, "height": 0.4],
+        "radius": 36,
+      ]
+    )
+    #expect(state.blurRegions.first?.startSeconds == 0.4)
+    #expect(state.blurRegions.first?.endSeconds == 1.6)
+    #expect(state.blurRegions.first?.rect == CGRect(x: 0.1, y: 0.2, width: 0.3, height: 0.4))
+    #expect(state.blurRegions.first?.radius == 36)
+
+    _ = try await dispatcher.call("remove_blur", arguments: ["id": .string(region.id.uuidString)])
+    #expect(state.blurRegions.isEmpty)
+    state.undo()
+    #expect(state.blurRegions.first?.radius == 36)
   }
 
   @Test func exportRequiresApprovalBoundToAnExactNewDestination() async throws {

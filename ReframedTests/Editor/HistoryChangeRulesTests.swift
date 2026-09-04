@@ -131,4 +131,27 @@ struct HistoryChangeRulesTests {
     #expect(History.describeChanges(from: imageOverlayData([overlay]), to: imageOverlayData(nil)) == ["Image overlay removed"])
     #expect(History.describeChanges(from: imageOverlayData([overlay]), to: imageOverlayData([edited])) == ["Image overlay adjusted"])
   }
+
+  private func blurData(_ regions: [BlurRegionData]?) -> EditorStateData {
+    EditorStateData(
+      trimStartSeconds: 0,
+      trimEndSeconds: 10,
+      backgroundStyle: .none,
+      padding: 0,
+      videoCornerRadius: 0,
+      cameraCornerRadius: 0,
+      cameraBorderWidth: 0,
+      cameraLayout: CameraLayout(),
+      blurRegions: regions
+    )
+  }
+
+  @Test func blurChangesAreDescribedAsAddedRemovedAdjusted() {
+    let region = BlurRegionData(startSeconds: 1, endSeconds: 4)
+    var edited = region
+    edited.radius = 30
+    #expect(History.describeChanges(from: blurData(nil), to: blurData([region])) == ["Blur region added"])
+    #expect(History.describeChanges(from: blurData([region]), to: blurData(nil)) == ["Blur region removed"])
+    #expect(History.describeChanges(from: blurData([region]), to: blurData([edited])) == ["Blur region adjusted"])
+  }
 }

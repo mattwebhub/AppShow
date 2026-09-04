@@ -83,6 +83,7 @@ struct VideoPreviewView: NSViewRepresentable {
   var isHDR: Bool = false
   var textOverlays: [TextOverlayData] = []
   var imageOverlays: [ImageOverlayData] = []
+  var blurRegions: [BlurRegionData] = []
   var imageOverlayDirectory: URL?
 
   func makeNSView(context: Context) -> VideoPreviewContainer {
@@ -128,6 +129,7 @@ struct VideoPreviewView: NSViewRepresentable {
     updateOverlays(nsView)
     updateTextOverlays(nsView)
     nsView.updateImageOverlays(imageOverlays, directory: imageOverlayDirectory, time: currentTime)
+    nsView.updateBlurRegions(blurRegions, time: currentTime)
     updateClickSound(context.coordinator)
   }
 
