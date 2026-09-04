@@ -1,0 +1,7 @@
+{"type":"thread.started","thread_id":"01a06bb4-ffda-70f1-be3c-332c4b2c7a74"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"I’ll read the file now."}}
+{"type":"item.started","item":{"id":"item_1","type":"command_execution","command":"/bin/zsh -lc 'cat note.txt'","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_1","type":"command_execution","command":"/bin/zsh -lc 'cat note.txt'","aggregated_output":"reframed fixture note\n","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_2","type":"agent_message","text":"reframed fixture note"}}
+{"type":"turn.completed","usage":{"input_tokens":27153,"cached_input_tokens":24576,"cache_write_input_tokens":0,"output_tokens":227,"reasoning_output_tokens":109}}

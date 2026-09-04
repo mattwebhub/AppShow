@@ -6,7 +6,9 @@ Paths: `Reframed/...` and `ReframedTests/...` are relative to `/Users/matheuspar
 
 ## 1. Goal
 
-Add a collapsible chat panel on the left edge of the editor window that runs a coding-agent CLI (Claude Code or Codex, user's choice) against the open `.frm` project, streams the agent's text and tool calls into a transcript, keeps one or more threads per project on disk, and can resume a thread through the provider's session id. It must look like the rest of the editor (same cards, tokens, button styles), obey the fork's rules (Swift 6 strict concurrency, tests first, no upstream file edited outside a listed seam), and never expose more of the user's machine than the project directory the user opened.
+Add a collapsible chat panel on the left edge of the editor window that runs a coding-agent CLI (Claude Code or Codex, user's choice), streams text and tool calls into one persisted conversation per `.frm` project, and resumes the logical provider session through its saved id. It must look like the rest of the editor (same cards, tokens, button styles), obey the fork's rules (Swift 6 strict concurrency, tests first, no upstream file edited outside a listed seam), and use a project-scoped sibling workspace for ephemeral runtime files.
+
+Owner decision 2026-09-04: ADR 0010 supersedes the multi-thread sketches below. There is exactly one conversation per project, it can be cleared explicitly, and each turn launches a fresh process while reusing the selected provider's saved resume id.
 
 Out of scope for v1: MCP servers, slash commands beyond `/clear` and `/new`, background jobs, in-app CLI installation or in-app login, image attachments, cost accounting.
 
@@ -83,7 +85,7 @@ Expanded (width persisted, default 320, clamp 260…480)                Collapse
 └─────────────────────────────────────────────────────────────────┘   └────────────────────────────────────────────────────┘
 ```
 
-Collapsed rail: 40 pt wide card with one `IconButton(systemName: "sidebar.left")` and a status dot (`ReframedColors.primaryText` pulse while a turn runs, `tertiaryText` idle). Expanded: header row (title `FontSize.xs` semibold, thread menu, collapse button), thread strip, transcript `ScrollView`, composer. The drag handle is a 6 pt invisible strip on the card's trailing edge; width persists on drag end.
+Collapsed rail: 40 pt wide card with one `IconButton(systemName: "sidebar.left")` and a status dot while a turn runs. Expanded: header row (title, provider picker, clear, collapse), transcript `ScrollView`, composer. The drag handle is an 8 pt invisible strip on the card's trailing edge; width persists on drag end.
 
 ## 3. What Toone already provides
 
@@ -257,9 +259,9 @@ One folder, one concern per file, no upstream file touched except at the seams l
 | `CodexProvider.swift` | `struct` | none | Port of `CodexCommandBuilder` (`exec`, `exec resume`) + the NDJSON half of `CodexMessageParser` |
 | `AgentProcessRunner.swift` | `actor` | actor | Owns `Process`, `Pipe`s, the line buffer and the inactivity watchdog; exposes `func run(executable:arguments:cwd:environment:stdin:) -> AsyncThrowingStream<String, Error>` and `func terminate()` |
 | `AgentSession.swift` | `actor` | actor | One thread's live run: composes runner + provider, turns lines into `AgentEvent`s, tracks `sessionID`, exposes `func send(_ prompt: String) -> AsyncStream<AgentEvent>` and `func cancel()` |
-| `AgentTranscript.swift` | `@MainActor @Observable final class` | main | Per-project UI model: `threads: [AgentThreadData]`, `activeThreadID`, `messages` of the active thread, `isRunning`, `streamingMessageID`, `providerKind`; applies `AgentEvent`s; owns the `Task` that drains the session |
+| `AgentTranscript.swift` | `@MainActor @Observable final class` | main | Per-project UI model: one `AgentConversationData`, messages, provider-scoped resume ids, `isRunning`, `streamingMessageID`; applies `AgentEvent`s; owns the `Task` that drains the session |
 | `AgentTranscript+Persistence.swift` | extension | main | `load(from:)`, `save()`; JSON with the `ReframedProject` encoder settings (`.iso8601`, `[.prettyPrinted, .sortedKeys]`) |
-| `AgentThreadData.swift` | `struct … Codable, Sendable, Equatable, Identifiable` + `AgentMessageData`, `AgentContentData` (enum with string `type` discriminator, unknown → `.text`) | none | The on-disk schema; new fields optional or `decodeOrDefault` per `06-conventions-checklist.md` item 9 |
+| `AgentConversationData.swift` | `struct … Codable, Sendable, Equatable` + `AgentMessageData`, `AgentContentData` (enum with string `type` discriminator, unknown → `.text`) | none | The single-conversation on-disk schema; custom decoding migrates the abandoned legacy session id field |
 | `AgentToolchain.swift` | `enum` + `actor AgentProbe` | none / actor | Filesystem-only binary lookup (port of `ToolchainResolver.searchDirectories`), `--version` probe, login-status probe → `AgentReadiness` |
 | `AgentReadiness.swift` | `enum AgentReadiness: Sendable, Equatable` | none | `.ready(path:version:)`, `.missing`, `.unhealthy(reason:)`, `.notLoggedIn(path:)`; `label`, `detail`, `isReady` |
 | `AgentChatPanel.swift` (+ `+Header`, `+Transcript`, `+Composer`, `+Setup`) | SwiftUI views | main | The card; each extension file stays under ~200 lines |
@@ -296,11 +298,12 @@ recording-…​.frm/
 ├── project.json
 ├── history.json
 └── agent/
-    ├── threads.json              [AgentThreadData] without messages (id, title, provider, sessionID, createdAt, lastActivityAt, workingDirectory)
-    └── <thread-uuid>.json        {messages: [AgentMessageData]}
+    └── conversation.json         provider, resumeIds, timestamps, messages
 ```
 
-Reasons: a transcript is about one project and should move, rename, and delete with it; `ReframedProject.rename(to:)` already moves the whole directory (`ReframedProject.swift:161`), so nothing extra is needed; the alternative (`~/.reframed/agent/<bundle-name>/`) breaks on rename. The `sessionID` stored per thread is provider-scoped (`provider` + `sessionID`, as in Toone's `ProviderThreadSessionState`, `RoutineExecution.swift:60-74`) because a Claude session id is meaningless to Codex. Save policy mirrors `EditorState.scheduleSave` (1 s debounce after the last event, immediate on turn completion). Provider session data itself stays where the CLIs keep it (`~/.claude/projects/...`, `~/.codex/sessions/...`); we store only the id.
+Reasons: a conversation is about one project and should move, rename, and delete with it; `ReframedProject.rename(to:)` already moves the whole directory (`ReframedProject.swift:161`). Resume ids are keyed by provider because a Claude session id is meaningless to Codex. Saves occur at user-message append, turn completion/cancellation, provider change, and clear. Provider session data itself stays where the CLIs keep it (`~/.claude/projects/...`, `~/.codex/sessions/...`); AppShow stores only the ids.
+
+The CLI working directory is a sibling path, `.agent/<project-name>/`, containing ephemeral socket, token, and preview-frame files. It is intentionally separate from the portable conversation record inside the bundle.
 
 ### 5.5 Panel state and preferences
 
@@ -330,7 +333,7 @@ Detection runs once when the panel first expands and again on "Check again", nev
 | `.unhealthy(reason)` | file exists but the probe times out or exits non-zero | setup card with the captured stderr (first 3 lines) |
 | `.notLoggedIn(path)` | `--version` ok, auth probe says not logged in | setup card: "Run `claude auth login` in Terminal, then Check again"; no in-app PTY |
 
-Provider switch is a `SegmentPicker` in the header popover; switching mid-thread is refused while a turn runs and starts a new thread otherwise, because session ids are provider-scoped. When exactly one provider is ready the picker preselects it (Toone's `selectionDecision`, `AIProviderReadiness.swift:54-60`).
+Provider switch is a `SegmentPicker` in the header; switching while a turn runs is disabled, and switching otherwise keeps the same conversation while selecting that provider's resume id. When exactly one provider is ready the picker preselects it (Toone's `selectionDecision`, `AIProviderReadiness.swift:54-60`).
 
 ## 7. Security and permissions
 
@@ -338,7 +341,7 @@ Provider switch is a `SegmentPicker` in the header popover; switching mid-thread
 - Tool policy v1: read-only. Claude Code launched with `--permission-mode default --allowedTools Read Glob Grep` (anything else prompts, and a prompt in `-p` mode is denied, which the transcript shows as a failed tool call); Codex with `--sandbox read-only` and no bypass flag. `--dangerously-skip-permissions` and `--dangerously-bypass-approvals-and-sandbox` are never passed, and there is no setting to enable them. Write access, when it comes, goes through a Reframed-owned MCP server exposing editor operations (Toone's `--mcp-config` / `codex mcp add` shapes), so the agent edits the project through validated operations, never by rewriting `project.json` or media.
 - Environment: a fresh dictionary with `PATH` = the fixed search list, `HOME`, `LANG`, `TERM`; nothing else from the app's environment is forwarded. `REFRAMED_HOME`/`REFRAMED_TMP` are never forwarded.
 - Never exposed: `~/.reframed/reframed.json`, `~/.reframed/state.json`, the Whisper model folders, `~/Movies/Reframed`, recordings of other projects, the app's log file. Media files inside the bundle are readable by the agent (it is in the bundle); if that is unwanted, cwd becomes `<bundle>/agent/` with a symlink to `project.json` only (question in §9).
-- Prompt content is written to the CLI's stdin and to `agent/<thread>.json`; nothing leaves the machine except through the CLI the user installed and logged into.
+- Prompt content is written to the CLI and to `agent/conversation.json`; nothing leaves the machine except through the CLI the user installed and logged into.
 - Test host: `AgentProbe` and `AgentProcessRunner` take the executable URL and environment as parameters, so tests run `/bin/echo`, `/bin/cat`, `/usr/bin/false` and a fixture script instead of any real CLI, and never touch `~/.claude` or `~/.codex`.
 
 ## 8. Risks
@@ -350,7 +353,7 @@ Provider switch is a `SegmentPicker` in the header popover; switching mid-thread
 | Orphans on quit | `EditorWindow.close()` tears down state but nothing today kills child processes | `applicationWillTerminate` is not touched; instead each `AgentProcessRunner` registers with a `@MainActor` `AgentProcessRegistry` whose `deinit` path is the window close; verified by the T3 checklist |
 | Strict-concurrency port pitfalls | Toone is Swift 5 mode: non-isolated `@Observable` services with `NSLock`, `[String: Any]` dictionaries crossing threads, `Log.ai` global, `@unchecked Sendable` health checker | Decode into `Codable` structs inside the actor; never let `[String: Any]` leave `parse(line:)`; every ported type is a `struct`, `enum`, or `actor`; no `NSLock` |
 | `NSNull` and id reuse | `CodexMessageParser.swift:1009-1063`, `ChatViewModel.swift:1358` | Codable decoding removes the `NSNull` class of bug; message ids are UUIDs generated by the transcript |
-| Output volume | Codex resume replies can be megabytes (`CodexService.swift:56-62`) | Per-line cap 1 MB, transcript cap 5 000 messages per thread with the eager/lazy policy from `ChatPanelView.swift:136-186` |
+| Output volume | Codex resume replies can be megabytes (`CodexService.swift:56-62`) | Per-line cap 1 MB; large Markdown falls back to plain text above 64 KB and transcript rows use a lazy stack |
 | Layout regressions | The editor minimum width is 1400 and the properties panel is 390 fixed | Panel width clamp 260…480 keeps the preview ≥ 500 pt at minimum window width; collapse is one click |
 | Argument length | Codex takes the prompt as argv (`exec <prompt>`) | Reject prompts over 100 KB for Codex with an inline message; Claude reads stdin |
 | Upstream merge conflicts | `EditorView.swift` changes often upstream | One-line insertion, documented in `upstream-sync.md`; everything else is in new files |
@@ -360,7 +363,7 @@ Provider switch is a `SegmentPicker` in the header popover; switching mid-thread
 1. Read-only agent in v1 (proposed) or should it be able to change `project.json` immediately? If yes, through which mechanism: direct file edit or an MCP server we write?
 2. Working directory: the `.frm` bundle (agent can read the media files) or a sandbox subfolder with only `project.json` visible?
 3. Transcripts inside the bundle travel with a shared project. Acceptable, or should they be stripped on export/share?
-4. One process per turn (cold start ~1 s, no mid-turn steering) versus a persistent process per thread (Toone's model; more code, more failure modes). Is ~1 s latency per turn acceptable for v1?
+4. Resolved by ADR 0010: one fresh process per turn is acceptable; the logical provider session resumes through its stored id.
 5. Provider preference: global (`ConfigService`, proposed) or per project?
 6. Which shortcut toggles the panel? Adding a `ShortcutAction` case edits `Reframed/Utilities/KeyboardShortcut.swift` (upstream); the alternative is no shortcut in v1.
 7. Provenance of copied Toone code: add a `LICENSE` to `apps/toone-desktop`, or record authorisation in an ADR here?

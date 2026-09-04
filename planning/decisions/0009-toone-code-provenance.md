@@ -1,7 +1,9 @@
 # 0009. Provenance of code copied from the Toone desktop app
 
-Status: proposed
+Status: accepted
 Date: 2026-09-03
+
+Accepted 2026-09-04 under the owner's instruction to proceed; both repositories are owned by the same account. Reversible by deleting Reframed/Agent/.
 
 ## Context
 
@@ -13,5 +15,5 @@ Pending owner confirmation. Proposed: the owner authorizes copying from the Toon
 
 ## Consequences
 
-- Copying is unblocked once accepted; the copy list is in `docs/features/03-agent-chat/ATTACK-PLAN.md`.
+- Copying is unblocked; the copy list lives in `docs/features/03-agent-chat/ATTACK-PLAN.md` ("Toone files to copy first") and is not duplicated here.
 - Toone is Swift 5 without strict concurrency, so process and session classes are rewritten as actors rather than copied; parsers and builders copy nearly as-is.
