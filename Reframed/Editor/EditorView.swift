@@ -43,6 +43,7 @@ struct EditorView: View {
         .padding(.bottom, 2)
 
         HStack(spacing: 8) {
+          AgentChatPanel(transcript: editorState.agentTranscript)
           mainContent
             .background(ReframedColors.backgroundCard)
             .clipShape(RoundedRectangle(cornerRadius: Radius.xxl))

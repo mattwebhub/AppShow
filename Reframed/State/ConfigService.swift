@@ -95,6 +95,11 @@ final class ConfigService {
     set { data.appearance = newValue; save(); applyAppearance() }
   }
 
+  var agentProvider: AgentProviderKind {
+    get { AgentProviderKind(rawValue: data.agentProvider) ?? .claudeCode }
+    set { data.agentProvider = newValue.rawValue; save() }
+  }
+
   func applyAppearance() {
     switch data.appearance {
     case "light":
@@ -106,10 +111,14 @@ final class ConfigService {
     }
   }
 
-  private init() {
-    let dir = ReframedPaths.home
+  private convenience init() {
+    self.init(fileURL: ReframedPaths.home.appendingPathComponent("reframed.json"))
+  }
+
+  init(fileURL: URL) {
+    let dir = fileURL.deletingLastPathComponent()
     try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-    fileURL = dir.appendingPathComponent("reframed.json")
+    self.fileURL = fileURL
     data = ConfigData()
     load()
   }
@@ -182,5 +191,6 @@ private struct ConfigData: Codable {
   var hdrCapture: Bool = false
   var isMicrophoneOn: Bool = false
   var appearance: String = "system"
+  var agentProvider: String = AgentProviderKind.claudeCode.rawValue
   var shortcuts: [String: KeyboardShortcut] = [:]
 }
