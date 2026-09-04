@@ -15,7 +15,7 @@ Depends on: milestone 02 (editor layout as of the Cuts track); ADR 0009 accepted
 - [x] T6. P6 setup UI. Proof: `AgentReadinessTests` and `AgentToolchainTests`.
 - [x] T7. One conversation per project and explicit clear. Proof: `AgentConversationStoreTests`, `AgentTranscriptTests`, ADR 0010.
 - [x] T8. Security test forbidding bypass flags; docs (`AGENTS.md`, `docs/editor.md`, architecture map), `upstream-sync.md`. Proof: `AgentSecurityTests` and source grep.
-- [ ] T9. VERIFY.md, push, PR.
+- [x] T9. VERIFY.md, branch pushed, PR #6 refreshed. Manual rows remain open in `VERIFY.md`.
 
 ## Out of scope
 
