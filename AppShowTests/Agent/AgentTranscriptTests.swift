@@ -349,4 +349,17 @@ struct AgentTranscriptTests {
     await transcript.waitForTurn()
     #expect(!transcript.isRunning)
   }
+  @Test func separateProviderMessagesHaveAParagraphBoundary() {
+    let transcript = makeTranscript()
+    transcript.beginAssistantMessage()
+    let provider = CodexProvider()
+    for line in [
+      #"{"type":"item.completed","item":{"id":"a","type":"agent_message","text":"I’ll check."}}"#,
+      #"{"type":"item.completed","item":{"id":"b","type":"agent_message","text":"Here are the tools."}}"#,
+    ] {
+      for event in provider.parse(line: line) { transcript.apply(event) }
+    }
+    #expect(transcript.messages.last?.text == "I’ll check.\n\nHere are the tools.")
+  }
+
 }

@@ -54,7 +54,7 @@ struct ClaudeCodeProvider: AgentProvider {
       switch block.type {
       case "text":
         if let text = block.text, !text.isEmpty {
-          events.append(.textDelta(text))
+          events.append(.textBlock(text))
         }
       case "tool_use":
         events.append(

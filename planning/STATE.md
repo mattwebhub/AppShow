@@ -28,6 +28,12 @@ Last updated: 2026-09-04
 - Milestone 09: format, lint, Debug build, 678 tests in 76 suites, shim, 5 export tests, 2 presentation-scenario tests, and live Claude Code/Codex skill invocation all pass. A clean clone at `675c9bd` also passes lint, build, 11 identity/path tests, and 17 project tests. `dist/AppShow-0.14.7.dmg` contains a universal `x86_64 arm64` AppShow app with the correct identifiers and a valid image checksum; it is ad-hoc signed and not notarized.
 - PR #10's first runner exposed a stale Swift-package cache missing Sparkle's XCFramework. CI now caches only portable package repositories, checkouts, and artifacts under a versioned key and resolves dependencies explicitly; the replacement run passed in 7m03s.
 
+## Interactive testing fixes (2026-09-04)
+
+The interactive testing fixes add cut-slice selection and Delete/Backspace/toolbar deletion with immediate Undo, shared cut-boundary repositioning, and visible drag handles. Source video remains unchanged (byte-for-byte regression test). Zoom regions can be moved/resized in source or compressed mode, with one timing calculation for preview and commit. Right-click overlays pass ordinary mouse interaction through. Complete provider messages retain paragraph boundaries, and chat renders headings, lists, paragraphs, links, quotes and code with spacing.
+
+Verification: `make format`, `make lint`, `make build`, 690 tests in 76 suites, and 5 gated export tests pass. Human drag/selection and fresh-chat appearance checks remain pending on the updated app. These fixes are committed locally; they have not been pushed.
+
 ## Accepted product decisions
 
 - Final product name: AppShow. Keep inherited names and identifiers during feature development, then perform one pre-release identity migration (ADR 0005).

@@ -84,6 +84,14 @@ final class AgentTranscript {
     switch event {
     case .sessionStarted(let id):
       mutateConversation { $0.resumeIDs[$0.provider] = id }
+    case .textBlock(let text):
+      mutateStreamingMessage { message in
+        if case .text(let existing)? = message.content.last {
+          message.content[message.content.count - 1] = .text(existing + "\n\n" + text)
+        } else {
+          message.content.append(.text(text))
+        }
+      }
     case .textDelta(let text):
       mutateStreamingMessage { message in
         if case .text(let existing)? = message.content.last {

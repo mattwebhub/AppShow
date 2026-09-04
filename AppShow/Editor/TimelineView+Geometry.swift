@@ -55,15 +55,6 @@ extension TimelineView {
   }
 
   private func displayCutTimeline(width: CGFloat) -> CutTimeline {
-    var timeline = editorState.cutTimeline
-    guard effectiveDisplayMode == .compressed,
-      videoDragType != nil,
-      let id = videoDragRegionId,
-      let index = timeline.slices.firstIndex(where: { $0.id == id })
-    else { return timeline }
-    let effective = effectiveVideoRegion(timeline.slices[index], width: width)
-    timeline.slices[index].startSeconds = effective.start
-    timeline.slices[index].endSeconds = effective.end
-    return timeline
+    videoDragTimeline
   }
 }

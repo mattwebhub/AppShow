@@ -37,9 +37,19 @@ extension ZoomKeyframeEditor {
         }
       }
       .foregroundStyle(Track.regionTextColor)
+      .padding(.horizontal, 10)
 
       RoundedRectangle(cornerRadius: Track.borderRadius)
         .strokeBorder(Track.borderColor, lineWidth: Track.borderWidth)
+
+      HStack {
+        Capsule().frame(width: 2, height: 12)
+        Spacer(minLength: 0)
+        Capsule().frame(width: 2, height: 12)
+      }
+      .foregroundStyle(Track.regionTextColor.opacity(0.5))
+      .padding(.horizontal, 4)
+      .allowsHitTesting(false)
 
       RegionCutMarkers(
         geometry: geometry,
@@ -52,7 +62,7 @@ extension ZoomKeyframeEditor {
     .frame(width: regionWidth, height: height)
     .contentShape(Rectangle())
     .overlay {
-      if !region.isAuto && isEditable {
+      if isEditable {
         RightClickOverlay {
           popoverRegionIndex = region.startIndex
         }
@@ -61,7 +71,7 @@ extension ZoomKeyframeEditor {
     .gesture(
       DragGesture(minimumDistance: 3, coordinateSpace: .named("zoomEditor"))
         .onChanged { value in
-          guard !region.isAuto, isEditable else { return }
+          guard isEditable else { return }
           popoverRegionIndex = nil
           if dragType == nil {
             let origStartX = geometry.x(forSource: region.startTime)
@@ -78,12 +88,25 @@ extension ZoomKeyframeEditor {
             }
             dragRegionStartIndex = region.startIndex
           }
-          dragOffset = value.translation.width
+          let anchorX: CGFloat
+          let anchorTime: Double
+          switch dragType {
+          case .resizeLeft:
+            anchorX = geometry.x(forSource: region.startTime)
+            anchorTime = region.startTime
+          case .resizeRight:
+            anchorX = geometry.x(forSource: region.endTime)
+            anchorTime = region.endTime
+          default:
+            anchorX = value.startLocation.x
+            anchorTime = geometry.sourceTime(forX: anchorX)
+          }
+          dragSourceDelta = geometry.sourceTime(forX: anchorX + value.translation.width) - anchorTime
         }
         .onEnded { _ in
           guard dragType != nil else { return }
           commitDrag(for: region)
-          dragOffset = 0
+          dragSourceDelta = 0
           dragType = nil
           dragRegionStartIndex = nil
         }
@@ -106,8 +129,9 @@ extension ZoomKeyframeEditor {
       )
       .presentationBackground(AppShowColors.backgroundPopover)
     }
+    .help("Drag to move · Drag either edge to change duration · Right-click for settings")
     .onContinuousHover { phase in
-      guard !region.isAuto, isEditable else { return }
+      guard isEditable else { return }
       switch phase {
       case .active(let location):
         if location.x <= edgeThreshold || location.x >= regionWidth - edgeThreshold {

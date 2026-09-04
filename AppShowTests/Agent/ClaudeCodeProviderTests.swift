@@ -60,7 +60,7 @@ struct ClaudeCodeProviderTests {
 
   @Test func claudeAssistantTextBlockYieldsTextDelta() throws {
     let events = provider.parse(line: try AgentFixtures.line("claude-2.1.260-turn", 6))
-    #expect(events == [.textDelta("reframed fixture note")])
+    #expect(events == [.textBlock("reframed fixture note")])
   }
 
   @Test func claudeToolUseBlockYieldsToolCallStarted() throws {
@@ -144,7 +144,7 @@ struct ClaudeCodeProviderTests {
     let line =
       #"{"type":"assistant","message":{"content":[{"type":"text","text":"Reading"},{"type":"tool_use","id":"t2","name":"Glob","input":{"pattern":"*.json"}}]}}"#
     #expect(
-      provider.parse(line: line) == [.textDelta("Reading"), .toolCallStarted(id: "t2", name: "Glob", input: #"{"pattern":"*.json"}"#)]
+      provider.parse(line: line) == [.textBlock("Reading"), .toolCallStarted(id: "t2", name: "Glob", input: #"{"pattern":"*.json"}"#)]
     )
   }
 
@@ -185,6 +185,6 @@ struct ClaudeCodeProviderTests {
     let resumed = try AgentFixtures.events("claude-2.1.260-resume", provider: provider)
     #expect(first.first == .sessionStarted(id: "0e5ac684-a18e-4f1f-a028-e63b1d1b8e3b"))
     #expect(resumed.first == first.first)
-    #expect(resumed.contains(.textDelta("second turn")))
+    #expect(resumed.contains(.textBlock("second turn")))
   }
 }

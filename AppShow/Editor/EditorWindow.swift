@@ -101,7 +101,7 @@ final class EditorWindow: NSObject, NSWindowDelegate {
       guard let self, let window = self.window, event.window == window else { return event }
       guard let state = self.editorState else { return event }
 
-      if let textView = window.firstResponder as? NSTextView, textView.isFieldEditor {
+      if window.firstResponder is NSTextView {
         return event
       }
 
@@ -123,12 +123,18 @@ final class EditorWindow: NSObject, NSWindowDelegate {
       }
 
       switch event.keyCode {
+      case 51, 117:
+        return state.deleteSelectedVideoRegion() ? nil : event
       case 49, 36:
         state.togglePlayPause()
         return nil
       case 53:
         if state.isPreviewMode {
           state.isPreviewMode = false
+          return nil
+        }
+        if state.selectedVideoRegionID != nil {
+          state.selectedVideoRegionID = nil
           return nil
         }
         return event

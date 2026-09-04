@@ -46,7 +46,7 @@ struct AgentSessionTests {
     )
     _ = try await collect(await session.send("first"))
     let events = try await collect(await session.send("second"))
-    #expect(events.contains(.textDelta("second turn")))
+    #expect(events.contains(.textBlock("second turn")))
   }
 
   @Test func sessionKeepsResumeIdsPerProvider() async throws {
@@ -82,14 +82,14 @@ struct AgentSessionTests {
     do {
       for try await event in await session.send("go") {
         events.append(event)
-        if case .textDelta = event {
+        if case .textBlock = event {
           await session.cancel()
         }
       }
     } catch let error as AgentError {
       failure = error
     }
-    #expect(events == [.sessionStarted(id: "hang-session"), .textDelta("working")])
+    #expect(events == [.sessionStarted(id: "hang-session"), .textBlock("working")])
     #expect(failure == .cancelled)
     #expect(await session.resumeID() == "hang-session")
     #expect(await session.isRunning == false)

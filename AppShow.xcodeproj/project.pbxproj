@@ -340,6 +340,13 @@
 		FA20000000000000000000B1 /* PropertiesPanel+EffectsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB20000000000000000000B1 /* PropertiesPanel+EffectsTab.swift */; };
 		FE1324E865074398BCC4317D /* WindowSelectionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A435021272D7425AB77F93DF /* WindowSelectionOverlay.swift */; };
 		FF04FF4666451E0283DB5FEC /* CaptureToolbar+ModeSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 815C681612F3844727C988EF /* CaptureToolbar+ModeSelection.swift */; };
+		A6D31F74C27E23481C98837C /* AgentMarkdownParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DCDB4F584E6720B6E9B98 /* AgentMarkdownParser.swift */; };
+		33F0477242C133249416176B /* AgentCodeBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDE4D2FF26104E4D294FCA0 /* AgentCodeBlockView.swift */; };
+		DD3D485D7DFDC3B0FCEBCBBA /* AgentMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E417BBD4067831DC71C68B0 /* AgentMessageView.swift */; };
+		A3EC2C724D06DD48422559DA /* AgentConversationView+Readiness.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCEBE2FF2C63852DA88A773D /* AgentConversationView+Readiness.swift */; };
+		3AA6100EC0EFCD68EA336A4F /* TimelineView+CutInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0A027037B17DB353691112 /* TimelineView+CutInteraction.swift */; };
+		D4268CA99D45E24749DFB574 /* TimelineView+Tracks.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4373EF756D0D00897285113 /* TimelineView+Tracks.swift */; };
+		BB967BC7D7AA71DFED15E967 /* EditorView+PreviewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21AF098EF27738AA63BD47F6 /* EditorView+PreviewProgress.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -707,6 +714,13 @@
 		FB10000000000000000000D3 /* ImageDropSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDropSection.swift; sourceTree = "<group>"; };
 		FB10000000000000000000D4 /* AreaSizePresetsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AreaSizePresetsPopover.swift; sourceTree = "<group>"; };
 		FB20000000000000000000B1 /* PropertiesPanel+EffectsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+EffectsTab.swift"; sourceTree = "<group>"; };
+		4D8DCDB4F584E6720B6E9B98 /* AgentMarkdownParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentMarkdownParser.swift"; sourceTree = "<group>"; };
+		5CDE4D2FF26104E4D294FCA0 /* AgentCodeBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentCodeBlockView.swift"; sourceTree = "<group>"; };
+		1E417BBD4067831DC71C68B0 /* AgentMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentMessageView.swift"; sourceTree = "<group>"; };
+		CCEBE2FF2C63852DA88A773D /* AgentConversationView+Readiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentConversationView+Readiness.swift"; sourceTree = "<group>"; };
+		8A0A027037B17DB353691112 /* TimelineView+CutInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CutInteraction.swift"; sourceTree = "<group>"; };
+		D4373EF756D0D00897285113 /* TimelineView+Tracks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+Tracks.swift"; sourceTree = "<group>"; };
+		21AF098EF27738AA63BD47F6 /* EditorView+PreviewProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorView+PreviewProgress.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -958,6 +972,8 @@
 				B10000000000000000000047 /* ToggleRow.swift */,
 				B10000000000000000000048 /* CustomToggle.swift */,
 				B10000000000000000000049 /* IconButton.swift */,
+				1E417BBD4067831DC71C68B0 /* AgentMessageView.swift */,
+				5CDE4D2FF26104E4D294FCA0 /* AgentCodeBlockView.swift */,
 				7E5700000000000000000024 /* RegionCutMarkers.swift */,
 				B1000000000000000000004A /* InlineEditableText.swift */,
 				B1000000000000000000004B /* SettingsAboutTab.swift */,
@@ -1050,6 +1066,8 @@
 				7E570000000000000000007D /* AgentConversationView.swift */,
 				7E570000000000000000007F /* AgentReadiness.swift */,
 				7E5700000000000000000081 /* AgentMarkdownView.swift */,
+				CCEBE2FF2C63852DA88A773D /* AgentConversationView+Readiness.swift */,
+				4D8DCDB4F584E6720B6E9B98 /* AgentMarkdownParser.swift */,
 				7E5A00000000000000000003 /* AgentConfirmationView.swift */,
 				7E5A00000000000000000005 /* AgentSessionConfig.swift */,
 				7E5E00000000000000000002 /* AgentSkillBundle.swift */,
@@ -1072,6 +1090,7 @@
 				B20000000000000000000018 /* PropertiesPanel.swift */,
 				B20000000000000000000005 /* SyncedPlayerController.swift */,
 				B20000000000000000000009 /* TimelineView.swift */,
+				D4373EF756D0D00897285113 /* TimelineView+Tracks.swift */,
 				B2000000000000000000000A /* TrimHandle.swift */,
 				B20000000000000000000008 /* VideoPreviewView.swift */,
 				B90000000000000000000001 /* CursorMetadata.swift */,
@@ -1099,6 +1118,7 @@
 				B20000000000000000000021 /* PropertiesPanel+AudioTab.swift */,
 				FB20000000000000000000B1 /* PropertiesPanel+EffectsTab.swift */,
 				B2000000000000000000002A /* EditorView+TransportBar.swift */,
+				21AF098EF27738AA63BD47F6 /* EditorView+PreviewProgress.swift */,
 				CC049020CAD98EBD4A251B45 /* EditorTypes.swift */,
 				8BF80E50CD7B9915C3047A7C /* EditorState+Playback.swift */,
 				F53532FE545B3134E1F23E97 /* EditorState+Background.swift */,
@@ -1106,6 +1126,7 @@
 				E1183EC0D0DA57B9B73BC950 /* EditorState+CameraRegions.swift */,
 				C8427D1DE351C8DEC7E3104F /* EditorState+VideoRegions.swift */,
 				7E570000000000000000001A /* CutTimeline.swift */,
+				8A0A027037B17DB353691112 /* TimelineView+CutInteraction.swift */,
 				7E570000000000000000001C /* TimelineView+CutTrack.swift */,
 				7E5700000000000000000020 /* TimelineGeometry.swift */,
 				7E5700000000000000000022 /* TimelineView+Geometry.swift */,
@@ -1469,6 +1490,7 @@
 				A2000000000000000000000B /* AudioWaveformGenerator.swift in Sources */,
 				A20000000000000000000008 /* VideoPreviewView.swift in Sources */,
 				A20000000000000000000009 /* TimelineView.swift in Sources */,
+				D4268CA99D45E24749DFB574 /* TimelineView+Tracks.swift in Sources */,
 				A2000000000000000000000A /* TrimHandle.swift in Sources */,
 				A20000000000000000000013 /* BackgroundStyle.swift in Sources */,
 				A20000000000000000000014 /* GradientPresets.swift in Sources */,
@@ -1561,6 +1583,8 @@
 				A10000000000000000000047 /* ToggleRow.swift in Sources */,
 				A10000000000000000000048 /* CustomToggle.swift in Sources */,
 				A10000000000000000000049 /* IconButton.swift in Sources */,
+				DD3D485D7DFDC3B0FCEBCBBA /* AgentMessageView.swift in Sources */,
+				33F0477242C133249416176B /* AgentCodeBlockView.swift in Sources */,
 				A1000000000000000000004A /* InlineEditableText.swift in Sources */,
 				A1000000000000000000004B /* SettingsAboutTab.swift in Sources */,
 				E1000000000000000000000D /* SparkleUpdater.swift in Sources */,
@@ -1569,6 +1593,7 @@
 				A1000000000000000000004E /* SelectButton.swift in Sources */,
 				A1000000000000000000004F /* LanguagePicker.swift in Sources */,
 				A2000000000000000000002A /* EditorView+TransportBar.swift in Sources */,
+				BB967BC7D7AA71DFED15E967 /* EditorView+PreviewProgress.swift in Sources */,
 				A2000000000000000000002B /* ResizePopover.swift in Sources */,
 				2E77D4CACF876C6A0564A7CA /* EditorTypes.swift in Sources */,
 				0F7476BC63856BC9ADA387CB /* EditorState+Playback.swift in Sources */,
@@ -1577,6 +1602,7 @@
 				099C5B4AFE46AC44C6636A86 /* EditorState+CameraRegions.swift in Sources */,
 				E351B15E58A9971DB73296AD /* EditorState+VideoRegions.swift in Sources */,
 				7E570000000000000000001B /* CutTimeline.swift in Sources */,
+				3AA6100EC0EFCD68EA336A4F /* TimelineView+CutInteraction.swift in Sources */,
 				7E5700000000000000000062 /* AgentProvider.swift in Sources */,
 				7E5700000000000000000064 /* AgentEvent.swift in Sources */,
 				7E5700000000000000000066 /* AgentJSONValue.swift in Sources */,
@@ -1595,6 +1621,8 @@
 				7E570000000000000000007E /* AgentConversationView.swift in Sources */,
 				7E5700000000000000000080 /* AgentReadiness.swift in Sources */,
 				7E5700000000000000000082 /* AgentMarkdownView.swift in Sources */,
+				A3EC2C724D06DD48422559DA /* AgentConversationView+Readiness.swift in Sources */,
+				A6D31F74C27E23481C98837C /* AgentMarkdownParser.swift in Sources */,
 				7E570000000000000000001D /* TimelineView+CutTrack.swift in Sources */,
 				7E5700000000000000000021 /* TimelineGeometry.swift in Sources */,
 				7E5700000000000000000023 /* TimelineView+Geometry.swift in Sources */,

@@ -3,6 +3,7 @@ import Foundation
 enum AgentEvent: Sendable, Equatable {
   case sessionStarted(id: String)
   case textDelta(String)
+  case textBlock(String)
   case toolCallStarted(id: String, name: String, input: String)
   case toolCallFinished(id: String, output: String, isError: Bool)
   case turnCompleted(AgentTurnResult)

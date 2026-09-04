@@ -1,22 +1,6 @@
 import AVFoundation
 import SwiftUI
 
-private struct ScaleHeight: ViewModifier {
-  let scale: CGFloat
-  func body(content: Content) -> some View {
-    content.scaleEffect(x: 1.0, y: scale, anchor: .top)
-  }
-}
-
-private extension AnyTransition {
-  nonisolated(unsafe) static let trackTransition: AnyTransition = .opacity.combined(
-    with: .modifier(
-      active: ScaleHeight(scale: 0.01),
-      identity: ScaleHeight(scale: 1.0)
-    )
-  )
-}
-
 struct TimelineView: View {
   @Bindable var editorState: EditorState
   let systemAudioSamples: [Float]
@@ -64,6 +48,8 @@ struct TimelineView: View {
   @State var cameraDragRegionId: UUID?
   @State var popoverCameraRegionId: UUID?
 
+  @State var videoDragOriginalTimeline: CutTimeline?
+  @State var videoDragSecondsPerPoint: Double = 0
   @State var videoDragOffset: CGFloat = 0
   @State var videoDragType: RegionDragType?
   @State var videoDragRegionId: UUID?
@@ -83,17 +69,17 @@ struct TimelineView: View {
   @State var overlayDragRegionId: UUID?
   @State var popoverOverlayId: UUID?
 
-  private var showSystemAudioTrack: Bool {
+  var showSystemAudioTrack: Bool {
     !editorState.systemAudioMuted
       && (!systemAudioSamples.isEmpty || editorState.hasSystemAudio)
   }
 
-  private var showMicAudioTrack: Bool {
+  var showMicAudioTrack: Bool {
     !editorState.micAudioMuted
       && ((!micAudioSamples.isEmpty && !editorState.isMicProcessing) || editorState.hasMicAudio)
   }
 
-  private var showSpotlightTrack: Bool {
+  var showSpotlightTrack: Bool {
     editorState.spotlightEnabled && editorState.cursorMetadataProvider != nil
   }
 
@@ -118,62 +104,7 @@ struct TimelineView: View {
   var body: some View {
     let _ = colorScheme
     HStack(spacing: 0) {
-      VStack(spacing: 8) {
-        Color.clear.frame(height: rulerHeight)
-        VStack(spacing: 10) {
-          trackSidebar(label: "Screen", icon: "display")
-            .frame(height: trackHeight)
-
-          if editorState.showCutTrack {
-            trackSidebar(label: "Cuts", icon: "hand.point.up.left")
-              .frame(height: trackHeight)
-              .transition(.trackTransition)
-          }
-
-          if editorState.hasWebcam && editorState.webcamEnabled {
-            trackSidebar(label: "Camera", icon: "web.camera")
-              .frame(height: trackHeight)
-              .transition(.trackTransition)
-          }
-
-          if showSystemAudioTrack {
-            trackSidebar(label: "System", icon: "speaker.wave.2")
-              .frame(height: trackHeight)
-              .transition(.trackTransition)
-          }
-
-          if showMicAudioTrack {
-            trackSidebar(label: "Mic", icon: "mic")
-              .frame(height: trackHeight)
-              .transition(.trackTransition)
-          }
-
-          ForEach(editorState.externalAudioTracks) { _ in
-            trackSidebar(label: "Audio", icon: "music.note")
-              .frame(height: trackHeight)
-              .transition(.trackTransition)
-          }
-
-          if editorState.zoomEnabled {
-            trackSidebar(label: "Zoom", icon: "plus.magnifyingglass")
-              .frame(height: trackHeight)
-              .transition(.trackTransition)
-          }
-
-          if showSpotlightTrack {
-            trackSidebar(label: "Spotlight", icon: "light.max")
-              .frame(height: trackHeight)
-              .transition(.trackTransition)
-          }
-
-          if editorState.showOverlayTrack {
-            trackSidebar(label: "Overlays", icon: "square.on.square")
-              .frame(height: trackHeight)
-              .transition(.trackTransition)
-          }
-        }
-      }
-      .frame(width: sidebarWidth)
+      trackLabels
 
       GeometryReader { geo in
         let availableWidth = geo.size.width - playheadInset * 2
@@ -182,82 +113,7 @@ struct TimelineView: View {
 
         ScrollView(.horizontal, showsIndicators: false) {
           ZStack(alignment: .top) {
-            VStack(spacing: 8) {
-              timeRuler(width: cw)
-
-              VStack(spacing: 10) {
-                screenTrackContent(width: cw)
-
-                if editorState.showCutTrack {
-                  cutTrackContent(width: cw)
-                    .transition(.trackTransition)
-                }
-
-                if editorState.hasWebcam && editorState.webcamEnabled {
-                  cameraTrackContent(width: cw)
-                    .transition(.trackTransition)
-                }
-
-                if showSystemAudioTrack {
-                  Group {
-                    if !systemAudioSamples.isEmpty {
-                      audioTrackContent(
-                        trackType: .system,
-                        samples: systemAudioSamples,
-                        width: cw
-                      )
-                    } else {
-                      audioLoadingContent(
-                        progress: systemAudioProgress ?? 0,
-                        width: cw
-                      )
-                    }
-                  }
-                  .transition(.trackTransition)
-                }
-
-                if showMicAudioTrack {
-                  Group {
-                    if !micAudioSamples.isEmpty && !editorState.isMicProcessing {
-                      audioTrackContent(
-                        trackType: .mic,
-                        samples: micAudioSamples,
-                        width: cw
-                      )
-                    } else {
-                      audioLoadingContent(
-                        progress: micAudioProgress ?? 0,
-                        message: micAudioMessage,
-                        width: cw
-                      )
-                    }
-                  }
-                  .transition(.trackTransition)
-                }
-
-                ForEach(editorState.externalAudioTracks) { track in
-                  externalAudioTrackContent(track: track, width: cw)
-                    .transition(.trackTransition)
-                }
-
-                if editorState.zoomEnabled {
-                  zoomTrackContent(width: cw, keyframes: editorState.zoomTimeline?.allKeyframes ?? [])
-                    .transition(.trackTransition)
-                }
-
-                if showSpotlightTrack {
-                  spotlightTrackContent(width: cw)
-                    .transition(.trackTransition)
-                }
-
-                if editorState.showOverlayTrack {
-                  overlayTrackContent(width: cw)
-                    .transition(.trackTransition)
-                }
-              }
-            }
-            .padding(.horizontal, playheadInset)
-            .padding(.bottom, timelineZoom > 1 ? 10 : 0)
+            trackContent(width: cw, inset: playheadInset)
 
             agentChangeOverlay(contentWidth: cw, inset: playheadInset)
             playheadOverlay(contentWidth: cw, inset: playheadInset)
@@ -310,6 +166,9 @@ struct TimelineView: View {
     }
     .background(AppShowColors.backgroundCard)
     .padding(.vertical, 8)
+    .onChange(of: editorState.videoRegions.count) { oldCount, newCount in
+      if newCount < oldCount { displayMode = .compressed }
+    }
   }
 
 }
