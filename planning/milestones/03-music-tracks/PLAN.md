@@ -8,10 +8,10 @@ Depends on: milestone 01 (fixtures, `AudioMixTests`), milestone 02 (`CutTimeline
 
 Mirror of `planning/features/music-tracks/TASKS.md`.
 
-- [ ] T1. P0 pins and fixtures. Proof: `AudioMixTests`, `AudioFixturesTests` green.
-- [ ] T2. P1 model and persistence. Proof: `ExternalAudioTrackDataTests`, `ExternalAudioTrackMathTests`, history rule tests.
-- [ ] T3. P2 import. Proof: `ExternalAudioImporterTests`, `EditorStateExternalAudioTests`.
-- [ ] T4. P3 waveform. Proof: downsampler and store tests.
+- [x] T1. P0 pins and fixtures. Proof: `AudioMixTests`, `AudioFixturesTests` green.
+- [x] T2. P1 model and persistence. Proof: `ExternalAudioTrackDataTests`, `ExternalAudioTrackMathTests`, history rule tests.
+- [x] T3. P2 import. Proof: `ExternalAudioImporterTests`, `EditorStateExternalAudioTests`.
+- [x] T4. P3 waveform. Proof: downsampler and store tests.
 - [ ] T5. P4 timeline track. Proof: manual drag check plus math tests.
 - [ ] T6. P5 properties. Proof: `ExternalAudioScheduleTests` fade rows, effective volume.
 - [ ] T7. P6 preview playback. Proof: schedule tests; gated engine test; manual sync check.
