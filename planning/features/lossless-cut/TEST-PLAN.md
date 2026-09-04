@@ -8,7 +8,7 @@ Layers from `planning/tdd-strategy.md`. Full assertions in `docs/features/01-los
 | 5 | `RegionRemappingTests` video-cut path (camera split, 10 ms match, captions, spotlight, border scale) | unit T1 | `ReframedTests/Compositor/RegionRemappingTests.swift` | none | milestone 01 |
 | 5 | `CompositionInstructionTests` sourceTime inside/outside mappings | unit T1 | `ReframedTests/Compositor/CompositionInstructionTests.swift` | none | milestone 01 |
 | 7 | `ProjectMetadataTests` video regions round trip, legacy → nil | unit T1 | `ReframedTests/Project/ProjectMetadataTests.swift` | none | red |
-| 7 | `HistoryChangeRulesTests` cut added/removed/adjusted, exactly one string | unit T1 @MainActor | `ReframedTests/Editor/HistoryChangeRulesTests.swift` | none | red |
+| 7 | `HistoryChangeRulesTests` cut added/removed/adjusted, exactly one string | unit T1 @MainActor | `ReframedTests/Editor/HistoryChangeRulesTests.swift` | none | green (3) |
 | 7 | `EditorStateVideoRegionsTests` normalize on restore, undo after split, previewElapsedTime characterization, split keeps currentTime | EditorState T2 | `ReframedTests/Editor/EditorStateVideoRegionsTests.swift` | generated 2 s movie | red |
 | 2 | `CutTimelineTests` showCutTrack gate | unit T1 | same as row 1 | none | green |
 | 4 | `SyncedPlayerControllerTests` gapSkipDecision, observer skips gap in edit mode | T1 + T2 | `ReframedTests/Editor/SyncedPlayerControllerTests.swift` | generated 2 s movie | T1 green (4), T2 pending fixture |
