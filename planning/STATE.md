@@ -12,7 +12,7 @@ Last updated: 2026-09-04
 - Milestone 06 is code-complete on PR #8; it integrates milestones 03–05 and milestone 07's completed primitives. Labeled history, rollback, exact cuts, grouped transactions, single-use confirmations, provider-scoped MCP configuration, the signed stdio shim, bridge lifecycle, live activity UI, presentation settings, timed captions, workspace-only draft export, confirmed exact-path full export, silence removal, external music, transitions, text/image/blur tools, and five dual-provider skills are implemented test-first. Both providers pass the live MCP read/mutate/undo path and discover and invoke the bundled title skill; manual UI checks remain.
 - Milestone 07 PR #4 contains silence removal, text overlays, image overlays, source-space blur regions, and entry/exit transitions on overlays and kept slices. T1 to T9 are code-complete; its manual checks remain.
 - Milestone 08 is complete as a verified no-op: the freshly fetched `upstream/main` and the fork base are both `b6a1709` (v0.14.7), so there was nothing to merge before the identity migration.
-- Milestone 09 AppShow identity is implementation-complete and locally verified: the build graph, bundle identifiers, runtime contracts, new `.appshow` project type, safe legacy migration, release metadata, living documentation, and GitHub repository are renamed. Legacy `.frm`, `~/.reframed`, selected `REFRAMED_*` ingress values, upstream attribution, and recorded fixtures remain deliberately compatible.
+- Milestone 09 AppShow identity is complete on green PR #10: the build graph, bundle identifiers, runtime contracts, new `.appshow` project type, safe legacy migration, release metadata, living documentation, and GitHub repository are renamed. Legacy `.frm`, `~/.reframed`, selected `REFRAMED_*` ingress values, upstream attribution, and recorded fixtures remain deliberately compatible.
 
 ## Verified on this machine
 
@@ -26,6 +26,7 @@ Last updated: 2026-09-04
 - Blur-region format, lint, build, 379 tests in 39 suites, and 3 gated export tests pass on `milestone-07-primitives`.
 - `TEST_RUNNER_APPSHOW_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests` is green on `milestone-02-lossless-cut`.
 - Milestone 09: format, lint, Debug build, 678 tests in 76 suites, shim, 5 export tests, 2 presentation-scenario tests, and live Claude Code/Codex skill invocation all pass. A clean clone at `675c9bd` also passes lint, build, 11 identity/path tests, and 17 project tests. `dist/AppShow-0.14.7.dmg` contains a universal `x86_64 arm64` AppShow app with the correct identifiers and a valid image checksum; it is ad-hoc signed and not notarized.
+- PR #10's first runner exposed a stale Swift-package cache missing Sparkle's XCFramework. CI now caches only portable package repositories, checkouts, and artifacts under a versioned key and resolves dependencies explicitly; the replacement run passed in 7m03s.
 
 ## Accepted product decisions
 
@@ -45,4 +46,4 @@ Last updated: 2026-09-04
 
 1. Run the remaining human UI rows for milestone 06 and review its stacked PR.
 2. Human runs the manual rows for milestones 02, 03, 04, and 07.
-3. Review milestone 09's stacked PR and arrange Developer ID signing/notarization before a public release.
+3. Review green milestone 09 PR #10 and arrange Developer ID signing/notarization before a public release.

@@ -9,4 +9,4 @@
 - [x] Update packaging, CI, repository links, and active docs.
 - [x] Validate residual legacy references.
 - [x] Record full local verification.
-- [ ] Open the stacked PR and verify CI.
+- [x] Open stacked PR #10 and verify CI.
