@@ -5,6 +5,7 @@ struct CaptionOverlayView: View {
   let text: String
   let position: CaptionPosition
   let fontSize: CGFloat
+  var fontFamily: String = "System"
   let fontWeight: CaptionFontWeight
   let textColor: CodableColor
   let backgroundColor: CodableColor
@@ -28,7 +29,7 @@ struct CaptionOverlayView: View {
       )
 
       Text(text)
-        .font(.system(size: scaledFontSize, weight: fontWeight.swiftUIWeight))
+        .font(Font(CaptionFont.resolve(family: fontFamily, size: scaledFontSize, weight: fontWeight)))
         .foregroundStyle(Color(cgColor: textColor.cgColor))
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
@@ -82,6 +83,7 @@ struct CaptionOverlayView: View {
         )
         .onChange(of: text) { recomputeBounds(width: geo.size.width, height: geo.size.height) }
         .onChange(of: fontSize) { recomputeBounds(width: geo.size.width, height: geo.size.height) }
+        .onChange(of: fontFamily) { recomputeBounds(width: geo.size.width, height: geo.size.height) }
         .onChange(of: fontWeight) { recomputeBounds(width: geo.size.width, height: geo.size.height) }
         .onChange(of: geo.size) { recomputeBounds(width: geo.size.width, height: geo.size.height) }
         .onAppear { recomputeBounds(width: geo.size.width, height: geo.size.height) }
@@ -101,6 +103,7 @@ struct CaptionOverlayView: View {
     let measured = CaptionLayout.measureText(
       text,
       scaledFontSize: scaledFontSize,
+      fontFamily: fontFamily,
       fontWeight: fontWeight,
       maxTextWidth: maxTextWidth
     )

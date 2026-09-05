@@ -7,6 +7,15 @@ extension PropertiesPanel {
 
       ToggleRow(label: "Enabled", isOn: $editorState.captionsEnabled)
 
+      HStack(spacing: 8) {
+        Text("Font")
+          .font(.system(size: FontSize.xs))
+          .foregroundStyle(AppShowColors.secondaryText)
+          .frame(width: captionLabelWidth, alignment: .leading)
+        FontFamilyPicker(selection: $editorState.captionFontFamily)
+      }
+      .disabled(!editorState.captionsEnabled)
+
       SliderRow(
         label: "Size",
         labelWidth: captionLabelWidth,
@@ -52,7 +61,7 @@ extension PropertiesPanel {
         .disabled(!editorState.captionsEnabled)
 
       HStack(spacing: 8) {
-        Text("Text")
+        Text("Font color")
           .font(.system(size: FontSize.xs))
           .foregroundStyle(AppShowColors.secondaryText)
           .frame(width: captionLabelWidth, alignment: .leading)

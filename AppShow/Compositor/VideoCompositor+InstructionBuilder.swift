@@ -225,6 +225,7 @@ extension VideoCompositor {
       captionSegments: regions.captions,
       captionsEnabled: config.captionsEnabled,
       captionFontSize: config.captionFontSize,
+      captionFontFamily: config.captionFontFamily,
       captionFontWeight: config.captionFontWeight,
       captionTextColor: config.captionTextColor,
       captionBackgroundColor: config.captionBackgroundColor,

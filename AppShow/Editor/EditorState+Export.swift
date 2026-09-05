@@ -177,6 +177,7 @@ extension EditorState {
       captionSegments: settings.burnInCaptions ? captionSegments : [],
       captionsEnabled: settings.burnInCaptions && captionsEnabled,
       captionFontSize: captionFontSize,
+      captionFontFamily: captionFontFamily,
       captionFontWeight: captionFontWeight,
       captionTextColor: captionTextColor,
       captionBackgroundColor: captionBackgroundColor,

@@ -236,10 +236,11 @@ enum CaptionLayout {
   static func measureText(
     _ text: String,
     scaledFontSize: CGFloat,
+    fontFamily: String = "System",
     fontWeight: CaptionFontWeight,
     maxTextWidth: CGFloat
   ) -> CGSize {
-    let nsFont = NSFont.systemFont(ofSize: scaledFontSize, weight: fontWeight.nsWeight)
+    let nsFont = CaptionFont.resolve(family: fontFamily, size: scaledFontSize, weight: fontWeight)
     let ctFont = CTFontCreateWithName(nsFont.fontName as CFString, scaledFontSize, nil)
     var alignment = CTTextAlignment.center
     let paragraphStyle = withUnsafeMutablePointer(to: &alignment) { alignPtr in
@@ -459,6 +460,7 @@ enum CaptionAudioSource: String, Codable, Sendable, CaseIterable, Identifiable, 
 struct CaptionSettingsData: Codable, Sendable, Equatable {
   var enabled: Bool = true
   var fontSize: CGFloat = 48
+  var fontFamily: String = "System"
   var fontWeight: CaptionFontWeight = .bold
   var textColor: CodableColor = CodableColor(r: 1, g: 1, b: 1)
   var backgroundColor: CodableColor = CodableColor(r: 0, g: 0, b: 0, a: 1.0)
@@ -615,6 +617,7 @@ extension CaptionSettingsData {
     let c = try decoder.container(keyedBy: CodingKeys.self)
     enabled = try c.decodeOrDefault(.enabled, true)
     fontSize = try c.decodeOrDefault(.fontSize, 48)
+    fontFamily = try c.decodeOrDefault(.fontFamily, "System")
     fontWeight = try c.decodeOrDefault(.fontWeight, .bold)
     textColor = try c.decodeOrDefault(.textColor, CodableColor(r: 1, g: 1, b: 1))
     backgroundColor = try c.decodeOrDefault(.backgroundColor, CodableColor(r: 0, g: 0, b: 0, a: 1.0))

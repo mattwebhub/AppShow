@@ -11,6 +11,18 @@ enum AgentToolSummaries {
   static let transcriptHint =
     "No transcript exists yet. Use generate_transcript for agent context without visible captions, or generate_captions for both. These tools require an installed local model; the Captions panel offers its download."
 
+  static func captionStyle(_ style: CaptionSettingsData) -> JSONValue {
+    func color(_ value: CodableColor) -> JSONValue {
+      ["r": .number(value.r), "g": .number(value.g), "b": .number(value.b), "a": .number(value.a)]
+    }
+    return [
+      "fontFamily": .string(style.fontFamily), "fontSize": .number(style.fontSize),
+      "weight": .string(style.fontWeight.rawValue), "textColor": color(style.textColor),
+      "backgroundColor": color(style.backgroundColor), "showBackground": .bool(style.showBackground),
+      "backgroundOpacity": .number(style.backgroundOpacity),
+    ]
+  }
+
   static func seconds(_ value: Double) -> JSONValue {
     .number((value * 1000).rounded() / 1000)
   }
@@ -67,6 +79,7 @@ enum AgentToolSummaries {
         "regions": .array((snapshot.cameraRegions ?? []).map(cameraRegion)),
       ],
       "captions": [
+        "style": captionStyle(snapshot.captionSettings ?? CaptionSettingsData()),
         "enabled": .bool(snapshot.captionSettings?.enabled ?? false),
         "count": JSONValue(snapshot.captionSegments?.count ?? 0),
         "segments": .array((snapshot.captionSegments ?? []).map { caption($0, withWords: false) }),

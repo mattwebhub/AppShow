@@ -549,6 +549,49 @@ struct MutatingToolsTests {
     #expect(trim.mcpValue["annotations"]?["destructiveHint"] == true)
   }
 
+  @Test func captionTypographyToolsPersistAndUndoWithoutChangingNarration() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+    state.audioTranscripts = [
+      AudioTranscript(
+        source: .microphone,
+        language: .en,
+        model: "fixture",
+        segments: [CaptionSegment(startSeconds: 0, endSeconds: 1, text: "Recorded narration")]
+      )
+    ]
+    let before = state.createSnapshot()
+    let result = try await dispatcher.call(
+      "set_captions",
+      arguments: [
+        "fontFamily": "Georgia", "textColor": ["r": 1, "g": 0, "b": 0],
+        "backgroundColor": ["r": 0, "g": 0, "b": 1], "backgroundOpacity": 0.5,
+      ]
+    )
+    #expect(state.captionFontFamily == "Georgia")
+    #expect(state.captionTextColor == CodableColor(r: 1, g: 0, b: 0))
+    #expect(state.captionBackgroundColor == CodableColor(r: 0, g: 0, b: 1))
+    #expect(result["captions"]?["style"]?["fontFamily"] == "Georgia")
+    let snapshot = state.createSnapshot()
+    #expect(snapshot.audioTranscripts == before.audioTranscripts)
+    state.saveState()
+    let project = try #require(state.project)
+    let reopened = EditorState(project: try AppShowProject.open(at: project.bundleURL))
+    defer { reopened.teardown() }
+    #expect(reopened.captionFontFamily == "Georgia")
+    #expect(reopened.captionTextColor == state.captionTextColor)
+    let preview = state.agentPreviewConfiguration()
+    #expect(preview.captionFontFamily == "Georgia")
+    #expect(preview.captionBackgroundColor == state.captionBackgroundColor)
+    state.undo()
+    #expect(state.createSnapshot().captionSettings == before.captionSettings)
+    state.redo()
+    #expect(state.createSnapshot().captionSettings == snapshot.captionSettings)
+  }
+
   @Test func presentationSettingsToolsApplyExistingEditorStateAndUndo() async throws {
     let directory = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(directory) }

@@ -371,6 +371,8 @@
 		5A848E36EEB24184B311EE60 /* AudioTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DC41F3010684EFA9643760E /* AudioTranscript.swift */; };
 		E49AA93374994914B940FD49 /* AgentSpokenContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5DF474326C4EE2B64847E2 /* AgentSpokenContext.swift */; };
 		EBCE779EB37F4AE98CA38729 /* VideoPreviewView+CameraVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53CE2610ABC347DABD0FAE9B /* VideoPreviewView+CameraVisibility.swift */; };
+		64D2C334DC5141DA9F74E0F9 /* CaptionFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF59FEC77CD4A7E87546ED7 /* CaptionFont.swift */; };
+		3EE940DDE6204051A4BCA344 /* FontFamilyPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB658D1C600A4415BED163D3 /* FontFamilyPicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -769,6 +771,8 @@
 		7DC41F3010684EFA9643760E /* AudioTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioTranscript.swift"; sourceTree = "<group>"; };
 		8D5DF474326C4EE2B64847E2 /* AgentSpokenContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentSpokenContext.swift"; sourceTree = "<group>"; };
 		53CE2610ABC347DABD0FAE9B /* VideoPreviewView+CameraVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewView+CameraVisibility.swift"; sourceTree = "<group>"; };
+		1EF59FEC77CD4A7E87546ED7 /* CaptionFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CaptionFont.swift"; sourceTree = "<group>"; };
+		AB658D1C600A4415BED163D3 /* FontFamilyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FontFamilyPicker.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -931,6 +935,7 @@
 				CB00000000000000000000B3 /* MenuBarIcon.swift */,
 				B40000000000000000000004 /* MathUtilities.swift */,
 				B60000000000000000000001 /* CodableColor.swift */,
+				1EF59FEC77CD4A7E87546ED7 /* CaptionFont.swift */,
 				DA000000000000000000001D /* RNNoiseProcessor.swift */,
 				B1000000000000000000003E /* KeyboardShortcut.swift */,
 				E1000000000000000000000E /* SparkleUpdater.swift */,
@@ -1033,6 +1038,7 @@
 				B1000000000000000000004D /* PrimaryButton.swift */,
 				B1000000000000000000004E /* SelectButton.swift */,
 				B1000000000000000000004F /* LanguagePicker.swift */,
+				AB658D1C600A4415BED163D3 /* FontFamilyPicker.swift */,
 				CA20000000000000000000A6 /* CaptionOverlayView.swift */,
 				CA20000000000000000000A7 /* CaptionSegmentRow.swift */,
 				414D0B4B5049DED5527EE523 /* MenuBarComponents.swift */,
@@ -1611,6 +1617,7 @@
 				A90000000000000000000007 /* ZoomDetector.swift in Sources */,
 				A90000000000000000000008 /* ZoomKeyframeEditor.swift in Sources */,
 				A60000000000000000000001 /* CodableColor.swift in Sources */,
+				64D2C334DC5141DA9F74E0F9 /* CaptionFont.swift in Sources */,
 				A70000000000000000000001 /* DeviceDiscovery.swift in Sources */,
 				A70000000000000000000002 /* DeviceCapture.swift in Sources */,
 				A70000000000000000000003 /* DevicePreviewWindow.swift in Sources */,
@@ -1674,6 +1681,7 @@
 				A1000000000000000000004D /* PrimaryButton.swift in Sources */,
 				A1000000000000000000004E /* SelectButton.swift in Sources */,
 				A1000000000000000000004F /* LanguagePicker.swift in Sources */,
+				3EE940DDE6204051A4BCA344 /* FontFamilyPicker.swift in Sources */,
 				A2000000000000000000002A /* EditorView+TransportBar.swift in Sources */,
 				BB967BC7D7AA71DFED15E967 /* EditorView+PreviewProgress.swift in Sources */,
 				A2000000000000000000002B /* ResizePopover.swift in Sources */,

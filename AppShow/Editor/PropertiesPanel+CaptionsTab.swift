@@ -7,8 +7,8 @@ extension PropertiesPanel {
   var captionsSection: some View {
     VStack(alignment: .leading, spacing: Layout.sectionSpacing) {
       generateSection
+      styleSection
       if !editorState.captionSegments.isEmpty {
-        styleSection
         segmentsSection
       }
     }

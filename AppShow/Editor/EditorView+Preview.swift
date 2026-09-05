@@ -149,6 +149,7 @@ extension EditorView {
             text: captionText,
             position: editorState.captionPosition,
             fontSize: editorState.captionFontSize,
+            fontFamily: editorState.captionFontFamily,
             fontWeight: editorState.captionFontWeight,
             textColor: editorState.captionTextColor,
             backgroundColor: editorState.captionBackgroundColor,

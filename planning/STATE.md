@@ -52,6 +52,12 @@ Silence removal commits ordinary editable cuts with immediate Undo, stale-previe
 
 Verification: 727 tests in 82 suites, six gated export tests covering eleven encoded cases, format, strict lint, project validation and warning-free Debug build pass. Hardware capture, real speech quality, gesture interaction and live-provider checks remain manual. Changes are local; nothing has been pushed.
 
+## Caption typography and colors
+
+Milestone 12 is code-complete locally: searchable installed fonts, visible style controls before transcription, font/background color controls, shared preview/export font resolution, portable system fallback and font-family persistence/history. The existing `set_captions` MCP tool now exposes font family and RGBA colors; timeline inspection returns style. Recorded narration remains independent.
+
+Verification: 733 tests in 83 suites, format, lint, project validation and warning-free Debug build pass. Interactive font/color selection and exported-video comparisons remain manual in milestone 12 VERIFY.md. No changes have been pushed.
+
 ## Accepted product decisions
 
 - Final product name: AppShow. Keep inherited names and identifiers during feature development, then perform one pre-release identity migration (ADR 0005).

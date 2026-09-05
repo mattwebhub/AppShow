@@ -54,6 +54,7 @@ struct ExportConfiguration: Sendable {
   var captionSegments: [CaptionSegment] = []
   var captionsEnabled: Bool = false
   var captionFontSize: CGFloat = 48
+  var captionFontFamily: String = "System"
   var captionFontWeight: CaptionFontWeight = .bold
   var captionTextColor: CodableColor = CodableColor(r: 1, g: 1, b: 1)
   var captionBackgroundColor: CodableColor = CodableColor(r: 0, g: 0, b: 0, a: 1.0)

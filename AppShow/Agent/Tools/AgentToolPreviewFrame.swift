@@ -259,6 +259,7 @@ extension EditorState {
       captionSegments: captionSegments,
       captionsEnabled: captionsEnabled,
       captionFontSize: captionFontSize,
+      captionFontFamily: captionFontFamily,
       captionFontWeight: captionFontWeight,
       captionTextColor: captionTextColor,
       captionBackgroundColor: captionBackgroundColor,

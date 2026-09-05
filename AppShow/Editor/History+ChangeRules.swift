@@ -349,6 +349,9 @@ extension History {
         sub(\.captionSettings, \.fontSize, default: CGFloat(48)) {
           "Caption font size set to \(Int($0))px"
         },
+        sub(\.captionSettings, \.fontFamily, default: "System") {
+          "Caption font set to \($0)"
+        },
         sub(\.captionSettings, \.fontWeight, default: .bold) {
           "Caption font weight set to \($0.label)"
         },
