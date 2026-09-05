@@ -219,7 +219,8 @@ extension VideoCompositor {
                 CMTime(seconds: compStart - segStart, preferredTimescale: 600)
               ),
               duration: (region.transitionTimeRange ?? region.timeRange).duration
-            )
+            ),
+            cameraPresentation: region.cameraPresentation
           )
         )
       }
@@ -241,7 +242,8 @@ extension VideoCompositor {
         transitionTimeRange: CMTimeRange(
           start: CMTimeSubtract((region.transitionTimeRange ?? region.timeRange).start, effectiveTrim.start),
           duration: (region.transitionTimeRange ?? region.timeRange).duration
-        )
+        ),
+        cameraPresentation: region.cameraPresentation
       )
     ]
   }

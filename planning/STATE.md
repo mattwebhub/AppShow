@@ -1,6 +1,6 @@
 # State
 
-Last updated: 2026-09-04
+Last updated: 2026-09-05
 
 ## Position
 
@@ -43,6 +43,14 @@ The focused review at `planning/reviews/2026-09-04-publication-review.md` patche
 Milestone 10 is code-complete on local branch `webcam-presentation-and-review`: Include webcam, saved corner/size defaults, circular new-recording layout, timed Focus webcam with animated expansion/return, source/compressed timeline editing, numeric timing, and MCP camera-region CRUD. Existing projects retain saved styling. Camera Undo, SDR/HDR fullscreen parity and cut-boundary transition timing were corrected with regressions.
 
 Verification: 707 tests in 78 suites, 6 gated export tests (including SDR and HDR webcam-focus cases), format, lint, warning-free Debug build and project validation pass. Real camera, drag interaction and live-provider checks remain manual in milestone 10 VERIFY.md. No changes have been pushed.
+
+## Webcam layouts, voice and spoken context
+
+Milestone 11 is code-complete locally: left/right half and third webcam sections share animated geometry across preview, MCP preview, SDR and HDR. Include webcam exposes microphone selection, noise cleanup and automatic captions using the existing capture/RNNoise/WhisperKit pipeline. Per-track narration persists independently of caption edits and supplies project overview and source-time frame context; `generate_transcript` preserves visible captions. MCP wire names retain the verb/noun convention with editor-area catalog titles.
+
+Silence removal commits ordinary editable cuts with immediate Undo, stale-preview rejection, cancellation, stereo phase protection and audio-drift alignment. Long analysis refuses commits after a grouped edit ends or is canceled. New state is documented in ADRs 0012/0013 and covered by persistence/history regressions.
+
+Verification: 727 tests in 82 suites, six gated export tests covering eleven encoded cases, format, strict lint, project validation and warning-free Debug build pass. Hardware capture, real speech quality, gesture interaction and live-provider checks remain manual. Changes are local; nothing has been pushed.
 
 ## Accepted product decisions
 

@@ -120,6 +120,7 @@ extension EditorState {
       cameraBackgroundStyle: cameraBackgroundStyle == .none ? nil : cameraBackgroundStyle,
       captionSettings: captionSettings,
       captionSegments: captionSegments.isEmpty ? nil : captionSegments,
+      audioTranscripts: audioTranscripts.isEmpty ? nil : audioTranscripts,
       spotlightRegions: spotlightRegions.isEmpty ? nil : spotlightRegions,
       externalAudioTracks: externalAudioTracks.isEmpty ? nil : externalAudioTracks,
       textOverlays: textOverlays.isEmpty ? nil : textOverlays,
@@ -246,6 +247,7 @@ extension EditorState {
       captionLanguage = captionSettings.language
       captionAudioSource = captionSettings.audioSource
     }
+    audioTranscripts = data.audioTranscripts ?? []
     if let savedSegments = data.captionSegments, !savedSegments.isEmpty {
       captionSegments = savedSegments
     } else {
@@ -427,6 +429,7 @@ extension EditorState {
       _ = self.isPreviewMode
       _ = self.captionsEnabled
       _ = self.captionSegments
+      _ = self.audioTranscripts
       _ = self.captionFontSize
       _ = self.captionFontWeight
       _ = self.captionTextColor
@@ -459,8 +462,7 @@ extension EditorState {
     pendingUndoTask?.cancel()
     micProcessingTask?.cancel()
     micProcessingTask = nil
-    transcriptionTask?.cancel()
-    transcriptionTask = nil
+    cancelTranscription()
     saveState()
     if let project {
       try? project.saveHistory(history.toData())

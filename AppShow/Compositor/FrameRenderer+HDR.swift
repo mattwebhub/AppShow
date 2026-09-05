@@ -28,7 +28,11 @@ extension FrameRenderer {
     if instruction.videoShadow > 0 && !state.isScreenTransitioning {
       let shadow = hdrShadow(
         rect: state.videoRect,
-        cornerRadius: instruction.videoCornerRadius,
+        cornerRadius: screenCornerRadius(
+          instruction: instruction,
+          screenSize: CGSize(width: CVPixelBufferGetWidth(screenBuffer), height: CVPixelBufferGetHeight(screenBuffer)),
+          videoRect: state.videoRect
+        ),
         shadow: instruction.videoShadow
       )
       result = shadow.composited(over: result)
@@ -227,8 +231,9 @@ extension FrameRenderer {
       )
     )
 
-    if instruction.videoCornerRadius > 0 {
-      image = hdrApplyRoundedRectMask(to: image, rect: videoRect, cornerRadius: instruction.videoCornerRadius)
+    let radius = screenCornerRadius(instruction: instruction, screenSize: screenImage.extent.size, videoRect: videoRect)
+    if radius > 0 {
+      image = hdrApplyRoundedRectMask(to: image, rect: videoRect, cornerRadius: radius)
     }
 
     return image
@@ -336,6 +341,26 @@ extension FrameRenderer {
     isCamFullscreen: Bool,
     regionTransition: (type: RegionTransitionType, progress: CGFloat)?
   ) -> CIImage {
+    if let cam = splitCamera(
+      instruction: instruction,
+      time: compositionTime,
+      canvas: CGRect(x: 0, y: 0, width: outputWidth, height: outputHeight)
+    ) {
+      let inner = cam.rect.insetBy(dx: cam.borderWidth, dy: cam.borderWidth)
+      var layer = hdrFitWebcam(webcamImage, in: inner, fillMode: .fill)
+      if cam.mirrored { layer = hdrMirror(layer, centerX: inner.midX) }
+      layer = hdrApplyRoundedRectMask(to: layer, rect: inner, cornerRadius: max(0, cam.cornerRadius - cam.borderWidth))
+      if cam.borderWidth > 0 {
+        let border = hdrApplyRoundedRectMask(
+          to: CIImage(color: CIColor(cgColor: cam.borderColor)).cropped(to: cam.rect),
+          rect: cam.rect,
+          cornerRadius: cam.cornerRadius
+        )
+        layer = layer.composited(over: border)
+      }
+      return layer.composited(over: background)
+    }
+
     var result = background
 
     if isCamFullscreen {

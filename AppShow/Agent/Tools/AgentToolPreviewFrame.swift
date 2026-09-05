@@ -162,6 +162,7 @@ struct AgentToolPreviewFrameHandler: AgentToolHandler {
       "width": JSONValue(output.width),
       "height": JSONValue(output.height),
       "atSeconds": AgentToolSummaries.seconds(output.atSeconds),
+      "spokenContext": state.agentSpokenContext(at: output.atSeconds),
     ]
   }
 }
@@ -195,10 +196,11 @@ extension EditorState {
         entryTransition: region.entryTransition ?? .none,
         entryDuration: region.entryTransitionDuration ?? 0.3,
         exitTransition: region.exitTransition ?? .none,
-        exitDuration: region.exitTransitionDuration ?? 0.3
+        exitDuration: region.exitTransitionDuration ?? 0.3,
+        cameraPresentation: region.type
       )
     }
-    let fullscreen = cameraRegions.filter { $0.type == .fullscreen }.map(transition)
+    let fullscreen = cameraRegions.filter { $0.type.isExpanded }.map(transition)
     let hidden = cameraRegions.filter { $0.type == .hidden }.map(transition)
     let custom: [CameraCustomRegion] = cameraRegions.compactMap { region in
       guard region.type == .custom, let layout = region.customLayout else { return nil }

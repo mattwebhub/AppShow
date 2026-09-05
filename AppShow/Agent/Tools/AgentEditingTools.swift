@@ -219,10 +219,14 @@ enum AgentEditingToolCatalog {
     name: "remove_silences",
     description: "Detect silent audio gaps and remove them from the kept video, preserving speech padding.",
     inputSchema: AgentToolSchema.object([
-      "thresholdDb": AgentToolSchema.number("Silence threshold in dBFS, default -40", minimum: -120, maximum: 0),
+      "thresholdDb": AgentToolSchema.number(
+        "Silence threshold in dB relative to the loudest window, default -40",
+        minimum: -120,
+        maximum: 0
+      ),
       "minGapSeconds": AgentToolSchema.number("Shortest gap to remove, default 0.8", minimum: 0),
       "padding": AgentToolSchema.number("Speech padding on each side, default 0.15", minimum: 0, maximum: 2),
-      "source": AgentToolSchema.string("Audio track to analyse", enum: ["mic", "system"]),
+      "source": AgentToolSchema.string("Audio track to analyse; both preserves sound from either track", enum: ["mic", "system", "both"]),
       "confirmationId": AgentToolSchema.string("Single-use confirmation required when more than 40% would be removed"),
       "label": AgentToolSchema.string("Short undo-history label"),
     ]),
@@ -371,6 +375,8 @@ enum AgentEditingToolCatalog {
       AgentRemoveTimeRangeTool(),
       AgentSetCanvasTool(),
       AgentSetCaptionsTool(),
+      AgentGenerateCaptionsTool(),
+      AgentGenerateCaptionsTool(createCaptions: false),
       AgentReplaceCaptionsTool(),
       AgentSetCursorTool(),
       AgentSetCameraTool(),
@@ -839,11 +845,13 @@ private struct AgentExportVideoTool: AgentToolHandler {
 
 @MainActor
 private struct AgentRemoveSilencesTool: AgentToolHandler {
+  var mutatesOnlyOnSuccess: Bool { true }
   let definition = AgentEditingToolCatalog.removeSilences
 
   func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
+    let batchID = context.editorState.agentMutationBatchID
     let sourceName = arguments["source"]?.stringValue ?? "mic"
-    let source: SilenceSource = sourceName == "system" ? .system : .microphone
+    let source: SilenceSource = sourceName == "both" ? .both : sourceName == "system" ? .system : .microphone
     let config = SilenceDetectorConfig(
       thresholdDb: arguments["thresholdDb"]?.doubleValue ?? -40,
       minimumSilence: arguments["minGapSeconds"]?.doubleValue ?? 0.8,
@@ -851,6 +859,7 @@ private struct AgentRemoveSilencesTool: AgentToolHandler {
     )
     let preview = await context.editorState.previewSilenceRemoval(config: config, source: source)
     try Task.checkCancellation()
+    guard context.editorState.agentMutationBatchID == batchID else { throw CancellationError() }
     if let error = preview.errorDescription { throw AgentToolError.failed(error) }
     guard preview.canApply else { return context.timelineResult() }
     let keptDuration = context.editorState.cutTimeline.totalDuration
@@ -871,7 +880,7 @@ private struct AgentRemoveSilencesTool: AgentToolHandler {
         detail: "Remove \(Int((preview.totalRemoved / keptDuration * 100).rounded()))% of the kept video"
       )
     }
-    context.editorState.videoRegions = preview.slices
+    context.editorState.applySilenceRemoval(preview, label: "Agent: \(arguments["label"]?.stringValue ?? "remove silences")")
     return context.timelineResult()
   }
 }

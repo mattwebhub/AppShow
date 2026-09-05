@@ -12,15 +12,29 @@ enum SilenceAnalysis {
     try await analyze(urls: [url], config: config)
   }
 
-  nonisolated static func analyze(urls: [URL], config: SilenceDetectorConfig) async throws -> [ClosedRange<Double>] {
+  nonisolated static func analyze(
+    urls: [URL],
+    config: SilenceDetectorConfig,
+    driftRatios: [Double] = []
+  ) async throws -> [ClosedRange<Double>] {
+    try Task.checkCancellation()
     var mixed: [Float] = []
-    var windowDuration = config.windowSeconds
-    for url in urls {
-      let track = try rmsWindows(url: url, windowSeconds: config.windowSeconds)
-      windowDuration = track.windowDuration
-      mixed = louder(mixed, track.windows)
+    for (index, url) in urls.enumerated() {
+      let candidate = index < driftRatios.count ? driftRatios[index] : 1
+      let ratio = candidate.isFinite && candidate > 0 ? candidate : 1
+      let track = try rmsWindows(url: url, windowSeconds: config.windowSeconds * ratio)
+      let step = track.windowDuration / ratio
+      let count = Int(ceil(Double(track.windows.count) * step / config.windowSeconds))
+      var aligned = [Float](repeating: 0, count: count)
+      for (window, rms) in track.windows.enumerated() {
+        let first = max(0, Int(floor(Double(window) * step / config.windowSeconds + 1e-9)))
+        let last = min(count, Int(ceil(Double(window + 1) * step / config.windowSeconds - 1e-9)))
+        for bin in first..<max(first, last) { aligned[bin] = max(aligned[bin], rms) }
+      }
+      mixed = louder(mixed, aligned)
     }
-    return SilenceDetector.silentSpans(rms: mixed, windowDuration: windowDuration, config: config)
+    try Task.checkCancellation()
+    return SilenceDetector.silentSpans(rms: mixed, windowDuration: config.windowSeconds, config: config)
   }
 
   nonisolated static func rmsWindows(url: URL, windowSeconds: Double) throws -> (windows: [Float], windowDuration: Double) {
@@ -44,23 +58,22 @@ enum SilenceAnalysis {
     let channelCount = Int(buffer.format.channelCount)
     let frames = Int(buffer.frameLength)
     guard channelCount > 0, frames > 0 else { return }
-    let scale = 1 / Float(channelCount)
     if buffer.format.isInterleaved {
       let interleaved = channels[0]
       for frame in 0..<frames {
-        var sum: Float = 0
+        var peak: Float = 0
         for channel in 0..<channelCount {
-          sum += interleaved[frame * channelCount + channel]
+          peak = max(peak, abs(interleaved[frame * channelCount + channel]))
         }
-        accumulator.append(sum * scale)
+        accumulator.append(peak)
       }
     } else {
       for frame in 0..<frames {
-        var sum: Float = 0
+        var peak: Float = 0
         for channel in 0..<channelCount {
-          sum += channels[channel][frame]
+          peak = max(peak, abs(channels[channel][frame]))
         }
-        accumulator.append(sum * scale)
+        accumulator.append(peak)
       }
     }
   }

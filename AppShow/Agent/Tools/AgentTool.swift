@@ -35,7 +35,7 @@ struct AgentToolDefinition: Sendable, Equatable {
       "description": .string(description),
       "inputSchema": inputSchema,
       "annotations": [
-        "title": .string(name),
+        "title": .string(displayTitle),
         "readOnlyHint": .bool(!mutating),
         "destructiveHint": .bool(mutating),
         "idempotentHint": .bool(!mutating),
@@ -53,6 +53,7 @@ struct AgentToolContext: Sendable {
 
 @MainActor
 protocol AgentToolHandler {
+  var mutatesOnlyOnSuccess: Bool { get }
   var definition: AgentToolDefinition { get }
   func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue
 }
@@ -309,4 +310,8 @@ enum AgentToolSchema {
       throw AgentToolError.invalidArguments("\(path) must be one of \(names)")
     }
   }
+}
+
+extension AgentToolHandler {
+  var mutatesOnlyOnSuccess: Bool { false }
 }

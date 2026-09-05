@@ -50,7 +50,7 @@ extension EditorState {
         end: CMTime(seconds: $0.endSeconds, preferredTimescale: 600)
       )
     }
-    let camFsRegions = cameraRegions.filter { $0.type == .fullscreen }.map {
+    let camFsRegions = cameraRegions.filter { $0.type.isExpanded }.map {
       RegionTransitionInfo(
         timeRange: CMTimeRange(
           start: CMTime(seconds: $0.startSeconds, preferredTimescale: 600),
@@ -59,7 +59,8 @@ extension EditorState {
         entryTransition: $0.entryTransition ?? .none,
         entryDuration: $0.entryTransitionDuration ?? 0.3,
         exitTransition: $0.exitTransition ?? .none,
-        exitDuration: $0.exitTransitionDuration ?? 0.3
+        exitDuration: $0.exitTransitionDuration ?? 0.3,
+        cameraPresentation: $0.type
       )
     }
     let camHiddenRegions = cameraRegions.filter { $0.type == .hidden }.map {

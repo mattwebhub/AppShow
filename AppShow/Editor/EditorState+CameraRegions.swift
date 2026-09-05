@@ -3,13 +3,13 @@ import Foundation
 
 extension EditorState {
   @discardableResult
-  func focusWebcam(atTime time: Double) -> UUID? {
+  func focusWebcam(atTime time: Double, type: CameraRegionType = .fullscreen) -> UUID? {
     guard hasWebcam, webcamEnabled, !isExporting, time.isFinite else { return nil }
     let start = max(0, time)
     guard !cameraRegions.contains(where: { start >= $0.startSeconds && start < $0.endSeconds }) else { return nil }
     let end = min(start + 5, cameraRegions.first(where: { $0.startSeconds > start })?.startSeconds ?? duration.seconds)
     guard end - start >= 0.05 else { return nil }
-    var region = CameraRegionData(startSeconds: start, endSeconds: end)
+    var region = CameraRegionData(startSeconds: start, endSeconds: end, type: type)
     region.entryTransition = .scale
     region.exitTransition = .scale
     region.entryTransitionDuration = min(0.4, (end - start) / 2)
@@ -18,7 +18,7 @@ extension EditorState {
     history.pushSnapshot(createSnapshot())
     cameraRegions.append(region)
     cameraRegions.sort { $0.startSeconds < $1.startSeconds }
-    history.pushSnapshot(createSnapshot(), label: "Focus webcam")
+    history.pushSnapshot(createSnapshot(), label: "Webcam: \(type.label)")
     scheduleSave()
     return region.id
   }

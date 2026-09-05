@@ -97,11 +97,16 @@ final class FrameRenderer: NSObject, AVVideoCompositing, @unchecked Sendable {
       width: CVPixelBufferGetWidth(screenBuffer),
       height: CVPixelBufferGetHeight(screenBuffer)
     )
-    let videoRect = AVMakeRect(aspectRatio: screenAspect, insideRect: paddedArea)
+    let split = webcamBuffer == nil ? nil : instruction.webcamSplit(at: compositionTime, canvas: canvasRect)
+    let videoRect =
+      split?.layout.screenRect(screenSize: screenAspect, originalArea: paddedArea, progress: split!.progress)
+      ?? AVMakeRect(aspectRatio: screenAspect, insideRect: paddedArea)
 
     let isCamFullscreen: Bool = {
       let hidden = instruction.cameraHiddenRegions.contains { $0.timeRange.containsTime(compositionTime) }
-      let fs = instruction.cameraFullscreenRegions.contains { $0.timeRange.containsTime(compositionTime) }
+      let fs = instruction.cameraFullscreenRegions.contains {
+        $0.cameraPresentation == .fullscreen && $0.timeRange.containsTime(compositionTime)
+      }
       return !hidden && fs
     }()
 
@@ -319,9 +324,8 @@ final class FrameRenderer: NSObject, AVVideoCompositing, @unchecked Sendable {
       }
     }
 
-    if let screenImage {
-      let screenAspect = CGSize(width: screenImage.width, height: screenImage.height)
-      let vRect = AVMakeRect(aspectRatio: screenAspect, insideRect: state.paddedArea)
+    if screenImage != nil {
+      let vRect = state.videoRect
       drawTextOverlays(in: context, canvasRect: state.canvasRect, instruction: instruction, compositionTime: compositionTime)
       drawImageOverlays(in: context, instruction: instruction, compositionTime: compositionTime)
       drawCaptions(

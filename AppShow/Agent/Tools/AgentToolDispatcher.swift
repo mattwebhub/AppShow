@@ -110,11 +110,11 @@ final class AgentToolDispatcher {
       logger.info("Agent tool \(name) completed")
       return definition.mutating ? context.timelineResult() : value
     } catch let error as AgentToolError {
-      restore(before)
+      if !handler.mutatesOnlyOnSuccess { restore(before) }
       logger.warning("Agent tool \(name) failed: \(error.message)")
       throw error
     } catch {
-      restore(before)
+      if !handler.mutatesOnlyOnSuccess { restore(before) }
       logger.error("Agent tool \(name) failed: \(error)")
       throw AgentToolError.failed(error.localizedDescription)
     }
@@ -140,7 +140,7 @@ final class AgentToolDispatcher {
       historyIndex: context.editorState.history.currentIndex,
       label: Self.mutationLabel(arguments: arguments, fallback: "batch")
     )
-    context.editorState.agentMutationBatchActive = true
+    context.editorState.agentMutationBatchID = UUID()
     batchTimeoutTask?.cancel()
     batchTimeoutTask = Task { [weak self] in
       guard let self else { return }
@@ -156,7 +156,7 @@ final class AgentToolDispatcher {
     batchTimeoutTask?.cancel()
     batchTimeoutTask = nil
     mutationBatch = nil
-    context.editorState.agentMutationBatchActive = false
+    context.editorState.agentMutationBatchID = nil
     context.editorState.pendingUndoTask?.cancel()
     context.editorState.history.pushSnapshot(context.editorState.createSnapshot(), label: batch.label)
     return context.timelineResult()
@@ -178,7 +178,7 @@ final class AgentToolDispatcher {
     batchTimeoutTask?.cancel()
     batchTimeoutTask = nil
     mutationBatch = nil
-    context.editorState.agentMutationBatchActive = false
+    context.editorState.agentMutationBatchID = nil
     context.editorState.pendingUndoTask?.cancel()
     _ = context.editorState.history.jumpTo(index: batch.historyIndex)
     context.editorState.restoreFromSnapshot(batch.snapshot)
@@ -197,6 +197,7 @@ final class AgentToolDispatcher {
     let track: String =
       switch name {
       case "set_trim", "set_kept_slices", "remove_time_range", "remove_silences": "screen"
+      case "generate_captions", "generate_transcript", "set_captions", "replace_captions": "captions"
       case "add_zoom": "zoom"
       case "add_camera_region", "update_camera_region", "remove_camera_region": "camera"
       case "add_spotlight": "spotlight"

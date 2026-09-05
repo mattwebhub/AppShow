@@ -66,9 +66,9 @@ extension EditorView {
           currentTime: CMTimeGetSeconds(editorState.currentTime),
           zoomTimeline: editorState.zoomTimeline,
           cameraFullscreenRegions: editorState.webcamEnabled
-            ? editorState.cameraRegions.filter { $0.type == .fullscreen }.map { r in
+            ? editorState.cameraRegions.filter { $0.type.isExpanded }.map { r in
               (
-                start: r.startSeconds, end: r.endSeconds,
+                start: r.startSeconds, end: r.endSeconds, presentation: r.type,
                 entryTransition: r.entryTransition ?? .none,
                 entryDuration: r.entryTransitionDuration ?? 0.3,
                 exitTransition: r.exitTransition ?? .none,

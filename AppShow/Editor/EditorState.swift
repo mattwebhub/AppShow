@@ -101,7 +101,8 @@ final class EditorState {
 
   var history = History()
   var isRestoringState = false
-  var agentMutationBatchActive = false
+  var agentMutationBatchID: UUID?
+  var agentMutationBatchActive: Bool { agentMutationBatchID != nil }
   var pendingUndoTask: Task<Void, Never>?
 
   let logger = Logger(label: "com.mattwebhub.appshow.editor-state")
@@ -125,6 +126,7 @@ final class EditorState {
 
   var captionsEnabled: Bool = true
   var captionSegments: [CaptionSegment] = []
+  var audioTranscripts: [AudioTranscript] = []
   var captionFontSize: CGFloat = 48
   var captionFontWeight: CaptionFontWeight = .bold
   var captionTextColor: CodableColor = CodableColor(r: 1, g: 1, b: 1)
@@ -140,6 +142,9 @@ final class EditorState {
   var transcriptionProgress: Double = 0
   var transcriptionDidFinishEmpty: Bool = false
   var transcriptionTask: Task<Void, Never>?
+  var transcriptionGeneration: UUID?
+  var transcriptionError: String?
+  var pendingRecordedVoice: WebcamVoiceOptions?
 
   var hasSystemAudio: Bool { result.systemAudioURL != nil }
   var hasMicAudio: Bool { result.microphoneAudioURL != nil }
@@ -220,6 +225,7 @@ final class EditorState {
         self.captionLanguage = captionSettings.language
         self.captionAudioSource = captionSettings.audioSource
       }
+      self.audioTranscripts = saved.audioTranscripts ?? []
       if let savedSegments = saved.captionSegments, !savedSegments.isEmpty {
         self.captionSegments = savedSegments
       }
@@ -367,6 +373,7 @@ final class EditorState {
     }
 
     startAutoSave()
+    prepareRecordedVoice()
     if !LaunchEnvironment.isTestHost, project != nil {
       try? await agentBridgeController.start(editorState: self)
     }

@@ -102,6 +102,10 @@ enum RegionTransitionType: String, Codable, Sendable, CaseIterable, Identifiable
 
 enum CameraRegionType: String, Codable, Sendable, CaseIterable, Identifiable {
   case fullscreen
+  case leftHalf
+  case rightHalf
+  case leftThird
+  case rightThird
   case hidden
   case custom
 
@@ -110,6 +114,10 @@ enum CameraRegionType: String, Codable, Sendable, CaseIterable, Identifiable {
   var label: String {
     switch self {
     case .fullscreen: "Fullscreen"
+    case .leftHalf: "Left half"
+    case .rightHalf: "Right half"
+    case .leftThird: "Left third"
+    case .rightThird: "Right third"
     case .hidden: "Hidden"
     case .custom: "Custom"
     }
@@ -118,6 +126,8 @@ enum CameraRegionType: String, Codable, Sendable, CaseIterable, Identifiable {
   var icon: String {
     switch self {
     case .fullscreen: "arrow.up.left.and.arrow.down.right"
+    case .leftHalf, .leftThird: "rectangle.lefthalf.filled"
+    case .rightHalf, .rightThird: "rectangle.righthalf.filled"
     case .hidden: "eye.slash"
     case .custom: "pip"
     }
@@ -492,6 +502,7 @@ struct EditorStateData: Codable, Sendable, Equatable {
   var cameraBackgroundStyle: CameraBackgroundStyle?
   var captionSettings: CaptionSettingsData?
   var captionSegments: [CaptionSegment]?
+  var audioTranscripts: [AudioTranscript]?
   var spotlightRegions: [SpotlightRegionData]?
   var externalAudioTracks: [ExternalAudioTrackData]?
   var textOverlays: [TextOverlayData]?

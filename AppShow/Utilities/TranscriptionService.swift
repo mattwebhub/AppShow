@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import Synchronization
 import WhisperKit
 
 enum TranscriptionService {
@@ -10,6 +11,7 @@ enum TranscriptionService {
     language: String? = nil,
     onProgress: (@MainActor @Sendable (Double) -> Void)? = nil
   ) async throws -> [CaptionSegment] {
+    try Task.checkCancellation()
     await onProgress?(0.02)
 
     let asset = AVURLAsset(url: audioURL)
@@ -40,7 +42,7 @@ enum TranscriptionService {
 
     await onProgress?(0.15)
 
-    let workerCount = max(16, ProcessInfo.processInfo.activeProcessorCount)
+    let workerCount = min(4, max(1, ProcessInfo.processInfo.activeProcessorCount))
     var options = DecodingOptions(
       temperatureFallbackCount: 2,
       skipSpecialTokens: true,
@@ -57,12 +59,11 @@ enum TranscriptionService {
 
     let progressCallback = onProgress
     let expectedWindows = totalWindows
-    nonisolated(unsafe) var highWaterMark: Double = 0.15
+    let canceled = Mutex(false)
     let callback: TranscriptionCallback = { (progress: TranscriptionProgress) -> Bool? in
+      if canceled.withLock({ $0 }) { return false }
       let windowProgress = Double(progress.windowId + 1) / Double(expectedWindows)
       let overall = min(0.15 + windowProgress * 0.8, 0.95)
-      guard overall > highWaterMark else { return nil }
-      highWaterMark = overall
       let value = overall
       Task { @MainActor in
         progressCallback?(value)
@@ -70,11 +71,13 @@ enum TranscriptionService {
       return nil
     }
 
-    let results = try await whisperKit.transcribe(
-      audioPath: audioURL.path,
-      decodeOptions: options,
-      callback: callback
-    )
+    try Task.checkCancellation()
+    let results = try await withTaskCancellationHandler {
+      try await whisperKit.transcribe(audioPath: audioURL.path, decodeOptions: options, callback: callback)
+    } onCancel: {
+      canceled.withLock { $0 = true }
+    }
+    try Task.checkCancellation()
 
     await onProgress?(0.95)
 

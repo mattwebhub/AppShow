@@ -11,23 +11,28 @@ extension FrameRenderer {
     outputHeight: Int,
     isTransitioning: Bool = false
   ) {
+    let radius = screenCornerRadius(
+      instruction: instruction,
+      screenSize: CGSize(width: screenImage.width, height: screenImage.height),
+      videoRect: videoRect
+    )
     let screenImage = applyingBlurRegions(
       to: screenImage,
       instruction: instruction,
       compositionTime: compositionTime
     )
     if instruction.videoShadow > 0 && !isTransitioning {
-      drawRoundedShadow(in: context, rect: videoRect, cornerRadius: instruction.videoCornerRadius, shadow: instruction.videoShadow)
+      drawRoundedShadow(in: context, rect: videoRect, cornerRadius: radius, shadow: instruction.videoShadow)
     }
 
     let metadataTime = instruction.sourceTime(for: compositionTime)
     let zoomRect = resolveZoomRect(compositionTime: compositionTime, instruction: instruction)
     context.saveGState()
-    if instruction.videoCornerRadius > 0 {
+    if radius > 0 {
       let path = CGPath(
         roundedRect: videoRect,
-        cornerWidth: instruction.videoCornerRadius,
-        cornerHeight: instruction.videoCornerRadius,
+        cornerWidth: radius,
+        cornerHeight: radius,
         transform: nil
       )
       context.addPath(path)
@@ -45,7 +50,7 @@ extension FrameRenderer {
         width: srcW * scaleX,
         height: srcH * scaleY
       )
-      if instruction.videoCornerRadius <= 0 {
+      if radius <= 0 {
         context.clip(to: videoRect)
       }
       context.draw(screenImage, in: drawRect)

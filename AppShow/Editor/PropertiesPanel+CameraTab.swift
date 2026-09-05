@@ -6,14 +6,20 @@ extension PropertiesPanel {
     VStack(alignment: .leading, spacing: Layout.itemSpacing) {
       SectionHeader(icon: "web.camera", title: "Webcam")
 
-      Button {
-        editorState.focusWebcam(atTime: editorState.currentTime.seconds)
-      } label: {
-        Label("Focus webcam", systemImage: "arrow.up.left.and.arrow.down.right")
+      SelectButton(label: "Add webcam section") { dismiss in
+        VStack(alignment: .leading, spacing: 0) {
+          ForEach(CameraRegionType.allCases.filter { $0.isExpanded }) { type in
+            CheckmarkRow(title: type.label, isSelected: false) {
+              editorState.focusWebcam(atTime: editorState.currentTime.seconds, type: type)
+              dismiss()
+            }
+          }
+        }
+        .padding(.vertical, 8)
+        .frame(width: 200)
       }
-      .buttonStyle(OutlineButtonStyle(size: .medium, fullWidth: true))
       .disabled(!editorState.webcamEnabled || editorState.isExporting)
-      .help("Expand the webcam from the playhead, then return to the bubble. Adjust the section on the Webcam track.")
+      .help("Start at the playhead, then return to the bubble. Adjust timing and transitions on the Webcam track.")
 
       ToggleRow(label: "Enabled", isOn: $editorState.webcamEnabled)
 

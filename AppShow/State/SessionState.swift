@@ -21,6 +21,7 @@ final class SessionState {
   var cameraPreviewState: CameraPreviewState = .off
   var isCameraOn = false
   var recordingWebcamPresentation: WebcamPresentation?
+  var recordingWebcamVoice: WebcamVoiceOptions?
   var isMicrophoneOn = false
   var micAudioLevel: Float = 0
   var systemAudioLevel: Float = 0

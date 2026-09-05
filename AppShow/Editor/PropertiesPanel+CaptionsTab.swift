@@ -2,7 +2,7 @@ import CoreMedia
 import SwiftUI
 
 extension PropertiesPanel {
-  private var captionLabelWidth: CGFloat { 72 }
+  var captionLabelWidth: CGFloat { 72 }
 
   var captionsSection: some View {
     VStack(alignment: .leading, spacing: Layout.sectionSpacing) {
@@ -14,7 +14,7 @@ extension PropertiesPanel {
     }
   }
 
-  private var generateSection: some View {
+  var generateSection: some View {
     VStack(alignment: .leading, spacing: Layout.itemSpacing) {
       SectionHeader(icon: "waveform", title: "Generate")
 
@@ -68,6 +68,13 @@ extension PropertiesPanel {
         }
       }
 
+      if let error = editorState.transcriptionError {
+        Text(error)
+          .font(.system(size: FontSize.xs))
+          .foregroundStyle(AppShowColors.secondaryText)
+          .fixedSize(horizontal: false, vertical: true)
+      }
+
       if WhisperModelManager.shared.isDownloading {
         VStack(spacing: 4) {
           HStack(spacing: 8) {
@@ -115,8 +122,8 @@ extension PropertiesPanel {
       } else {
         HStack(spacing: 8) {
           Button(
-            editorState.captionSegments.isEmpty && !editorState.transcriptionDidFinishEmpty
-              ? "Generate Captions" : "Regenerate"
+            WhisperModel(rawValue: editorState.captionModel).map { !WhisperModelManager.shared.isDownloaded($0) } == true
+              ? "Download model & generate" : editorState.captionSegments.isEmpty ? "Generate Captions" : "Regenerate"
           ) {
             handleGenerateAction()
           }
@@ -161,169 +168,12 @@ extension PropertiesPanel {
         do {
           try await WhisperModelManager.shared.downloadModel(model)
           editorState.generateCaptions()
-        } catch {}
+        } catch is CancellationError {
+        } catch {
+          editorState.transcriptionError = "Model download failed: \(error.localizedDescription)"
+        }
       }
     }
   }
 
-  private var styleSection: some View {
-    VStack(alignment: .leading, spacing: Layout.itemSpacing) {
-      SectionHeader(icon: "textformat", title: "Style")
-
-      ToggleRow(label: "Enabled", isOn: $editorState.captionsEnabled)
-
-      SliderRow(
-        label: "Size",
-        labelWidth: captionLabelWidth,
-        value: $editorState.captionFontSize,
-        range: 16...96,
-        step: 2,
-        formattedValue: "\(Int(editorState.captionFontSize))px",
-        valueWidth: 40
-      )
-      .disabled(!editorState.captionsEnabled)
-
-      VStack(alignment: .leading, spacing: Layout.compactSpacing) {
-        Text("Weight")
-          .font(.system(size: FontSize.xs))
-          .foregroundStyle(AppShowColors.secondaryText)
-        SegmentPicker(
-          items: CaptionFontWeight.allCases,
-          label: { $0.label },
-          selection: $editorState.captionFontWeight
-        )
-      }
-      .disabled(!editorState.captionsEnabled)
-
-      VStack(alignment: .leading, spacing: Layout.compactSpacing) {
-        Text("Position")
-          .font(.system(size: FontSize.xs))
-          .foregroundStyle(AppShowColors.secondaryText)
-        HStack(spacing: 4) {
-          ForEach(Array(CaptionPosition.presets.enumerated()), id: \.offset) { _, preset in
-            Button(preset.label) {
-              editorState.captionPosition = preset.position
-            }
-            .buttonStyle(OutlineButtonStyle(size: .small, fullWidth: true))
-          }
-        }
-        Text("Drag captions in preview to reposition")
-          .font(.system(size: FontSize.xxs))
-          .foregroundStyle(AppShowColors.tertiaryText)
-      }
-      .disabled(!editorState.captionsEnabled)
-
-      ToggleRow(label: "Background", isOn: $editorState.captionShowBackground)
-        .disabled(!editorState.captionsEnabled)
-
-      HStack(spacing: 8) {
-        Text("Text")
-          .font(.system(size: FontSize.xs))
-          .foregroundStyle(AppShowColors.secondaryText)
-          .frame(width: captionLabelWidth, alignment: .leading)
-        captionTextColorPicker
-      }
-      .disabled(!editorState.captionsEnabled)
-
-      if editorState.captionShowBackground {
-        HStack(spacing: 8) {
-          Text("Background")
-            .font(.system(size: FontSize.xs))
-            .foregroundStyle(AppShowColors.secondaryText)
-            .frame(width: captionLabelWidth, alignment: .leading)
-          captionBgColorPicker
-        }
-        .disabled(!editorState.captionsEnabled)
-
-        SliderRow(
-          label: "Opacity",
-          labelWidth: captionLabelWidth,
-          value: $editorState.captionBackgroundOpacity,
-          range: 0.1...1.0,
-          step: 0.05,
-          formattedValue: "\(Int(editorState.captionBackgroundOpacity * 100))%",
-          valueWidth: 40
-        )
-        .disabled(!editorState.captionsEnabled)
-      }
-
-      SliderRow(
-        label: "Words",
-        labelWidth: captionLabelWidth,
-        value: Binding(
-          get: { CGFloat(editorState.captionMaxWordsPerLine) },
-          set: { editorState.captionMaxWordsPerLine = Int($0) }
-        ),
-        range: 2...12,
-        step: 1,
-        formattedValue: "\(editorState.captionMaxWordsPerLine)",
-        valueWidth: 40
-      )
-      .disabled(!editorState.captionsEnabled)
-    }
-  }
-
-  private var captionTextColorPicker: some View {
-    TailwindColorPicker(
-      color: editorState.captionTextColor,
-      onSelect: { editorState.captionTextColor = $0 }
-    )
-  }
-
-  private var captionBgColorPicker: some View {
-    TailwindColorPicker(
-      color: editorState.captionBackgroundColor,
-      onSelect: { editorState.captionBackgroundColor = $0 }
-    )
-  }
-
-  private var segmentsSection: some View {
-    VStack(alignment: .leading, spacing: Layout.itemSpacing) {
-      Button {
-        withAnimation(.easeInOut(duration: 0.2)) {
-          captionSegmentsExpanded.toggle()
-        }
-      } label: {
-        HStack(spacing: 6) {
-          Image(systemName: "list.bullet")
-            .font(.system(size: FontSize.xs, weight: .semibold))
-            .foregroundStyle(AppShowColors.accent)
-          Text("Segments (\(editorState.captionSegments.count))")
-            .font(.system(size: FontSize.xs, weight: .semibold))
-            .foregroundStyle(AppShowColors.primaryText)
-          Spacer()
-          Image(systemName: captionSegmentsExpanded ? "chevron.up" : "chevron.down")
-            .font(.system(size: FontSize.xs, weight: .semibold))
-            .foregroundStyle(AppShowColors.secondaryText)
-        }
-        .contentShape(Rectangle())
-      }
-      .buttonStyle(PlainCustomButtonStyle())
-
-      if captionSegmentsExpanded {
-        ScrollView {
-          LazyVStack(spacing: 2) {
-            ForEach(editorState.captionSegments) { segment in
-              CaptionSegmentRow(
-                segment: segment,
-                onSeek: {
-                  editorState.pause()
-                  editorState.seek(
-                    to: CMTime(seconds: segment.startSeconds, preferredTimescale: 600)
-                  )
-                },
-                onUpdateText: { newText in
-                  editorState.updateSegmentText(segment.id, text: newText)
-                },
-                onDelete: {
-                  editorState.deleteSegment(segment.id)
-                }
-              )
-            }
-          }
-        }
-        .frame(maxHeight: 300)
-      }
-    }
-  }
 }

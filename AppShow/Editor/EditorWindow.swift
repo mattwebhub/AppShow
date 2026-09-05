@@ -12,15 +12,17 @@ final class EditorWindow: NSObject, NSWindowDelegate {
   var onDelete: (() -> Void)?
   var onExportingChanged: ((Bool) -> Void)?
 
-  func show(project: AppShowProject) {
+  func show(project: AppShowProject, recordedVoice: WebcamVoiceOptions? = nil) {
     let state = EditorState(project: project)
+    state.pendingRecordedVoice = recordedVoice
     self.editorState = state
 
     showWindow(state: state)
   }
 
-  func show(result: RecordingResult) {
+  func show(result: RecordingResult, recordedVoice: WebcamVoiceOptions? = nil) {
     let state = EditorState(result: result)
+    state.pendingRecordedVoice = recordedVoice
     self.editorState = state
 
     showWindow(state: state)
