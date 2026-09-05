@@ -1,72 +1,119 @@
 import SwiftUI
 
 struct PermissionsView: View {
+  static let windowSize = NSSize(width: 600, height: 420)
+
   let permissions: PermissionStore
   var onContinue: () -> Void
 
+  @State private var showsRecovery = false
   private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     let _ = colorScheme
-    VStack(alignment: .leading, spacing: 20) {
-      Text("Recording permissions")
-        .font(.system(size: FontSize.xl, weight: .semibold))
-        .foregroundStyle(AppShowColors.primaryText)
-      Text("Allow the features you want to use. You can open and edit projects at any time.")
-        .font(.system(size: FontSize.sm))
-        .foregroundStyle(AppShowColors.secondaryText)
+    VStack(alignment: .leading, spacing: 0) {
+      VStack(alignment: .leading, spacing: Layout.compactSpacing) {
+        Text("Permissions")
+          .font(.system(size: FontSize.lg, weight: .semibold))
+          .foregroundStyle(AppShowColors.primaryText)
+        Text("Choose what AppShow can access on your Mac.")
+          .font(.system(size: FontSize.xs))
+          .foregroundStyle(AppShowColors.secondaryText)
+      }
+      .padding(.horizontal, Layout.settingsPadding)
+      .padding(.top, Layout.settingsPadding)
+      .padding(.bottom, Layout.itemSpacing)
 
       ScrollView {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 0) {
           PermissionRow(
+            icon: "display",
             title: "Screen Recording",
-            description: "Required to record your screen. macOS may ask you to quit and reopen AppShow after allowing access.",
+            description: "Record your screen and capture system audio.",
             granted: permissions.screenRecordingGranted,
             onRequest: { permissions.request(.screenRecording) },
             onOpenSettings: { NSWorkspace.shared.open(PermissionKind.screenRecording.settingsURL) }
           )
+          separator
           PermissionRow(
+            icon: "accessibility",
             title: "Accessibility",
-            description: "Enables global recording shortcuts and interaction with other app windows.",
+            description: "Use global shortcuts and follow app windows.",
             granted: permissions.accessibilityGranted,
             onRequest: { permissions.request(.accessibility) },
             onOpenSettings: { NSWorkspace.shared.open(PermissionKind.accessibility.settingsURL) }
           )
 
           if !permissions.allGranted {
-            VStack(alignment: .leading, spacing: 8) {
-              Text("Already enabled in System Settings?")
-                .font(.system(size: FontSize.sm, weight: .medium))
-              Text(
-                "If Allow does nothing, open Settings directly. If AppShow is enabled there but still unavailable here, remove its old entry and add the copy shown in Finder, then quit and reopen AppShow."
-              )
-              .font(.system(size: FontSize.xs))
-              .foregroundStyle(AppShowColors.secondaryText)
-              .fixedSize(horizontal: false, vertical: true)
-              HStack {
-                Button("Show AppShow in Finder") {
-                  NSWorkspace.shared.activateFileViewerSelecting([Bundle.main.bundleURL])
-                }
-                .buttonStyle(OutlineButtonStyle(size: .small))
-                Button("Check Again") { permissions.refresh() }
-                  .buttonStyle(OutlineButtonStyle(size: .small))
-              }
-            }
+            separator
+            recoverySection
           }
-
         }
+        .padding(.horizontal, Layout.settingsPadding)
       }
 
-      HStack {
-        Spacer()
-        Button("Continue to AppShow", action: onContinue)
-          .buttonStyle(PrimaryButtonStyle())
+      separator
+      HStack(spacing: Layout.itemSpacing) {
+        Text("You can edit projects without these permissions.")
+          .font(.system(size: FontSize.xxs))
+          .foregroundStyle(AppShowColors.secondaryText)
+        Spacer(minLength: 0)
+        Button("Continue", action: onContinue)
+          .buttonStyle(PrimaryButtonStyle(size: .small))
       }
+      .padding(.horizontal, Layout.settingsPadding)
+      .padding(.vertical, Layout.itemSpacing)
     }
-    .padding(32)
-    .frame(width: 720, height: 570)
+    .frame(width: Self.windowSize.width, height: Self.windowSize.height)
+    .background(AppShowColors.backgroundPopover)
     .onAppear { permissions.refresh() }
     .onReceive(timer) { _ in permissions.refresh() }
+  }
+
+  private var separator: some View {
+    Rectangle()
+      .fill(AppShowColors.border)
+      .frame(height: 1)
+  }
+
+  private var recoverySection: some View {
+    VStack(alignment: .leading, spacing: Layout.compactSpacing) {
+      Button {
+        showsRecovery.toggle()
+      } label: {
+        HStack(spacing: Layout.compactSpacing) {
+          Image(systemName: showsRecovery ? "chevron.down" : "chevron.right")
+            .font(.system(size: FontSize.xxs, weight: .semibold))
+            .frame(width: 12)
+          Text("Permission not updating?")
+            .font(.system(size: FontSize.xs, weight: .medium))
+          Spacer()
+        }
+        .foregroundStyle(AppShowColors.secondaryText)
+        .padding(.vertical, Layout.compactSpacing)
+        .contentShape(Rectangle())
+      }
+      .buttonStyle(PlainCustomButtonStyle())
+      .accessibilityValue(showsRecovery ? "Expanded" : "Collapsed")
+
+      if showsRecovery {
+        Text(
+          "Open System Settings using the arrow beside each permission. If AppShow is already enabled, remove its entry and add this copy from Finder, then quit and reopen AppShow."
+        )
+        .font(.system(size: FontSize.xs))
+        .foregroundStyle(AppShowColors.secondaryText)
+        .fixedSize(horizontal: false, vertical: true)
+        HStack(spacing: Layout.compactSpacing) {
+          Button("Show in Finder") {
+            NSWorkspace.shared.activateFileViewerSelecting([Bundle.main.bundleURL])
+          }
+          .buttonStyle(OutlineButtonStyle(size: .small))
+          Button("Check Again") { permissions.refresh() }
+            .buttonStyle(OutlineButtonStyle(size: .small))
+        }
+      }
+    }
+    .padding(.vertical, Layout.compactSpacing)
   }
 }

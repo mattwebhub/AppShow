@@ -71,8 +71,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     let window = NSWindow(
-      contentRect: NSRect(x: 0, y: 0, width: 720, height: 570),
-      styleMask: [.titled, .closable, .fullSizeContentView],
+      contentRect: NSRect(origin: .zero, size: PermissionsView.windowSize),
+      styleMask: [.titled, .closable],
       backing: .buffered,
       defer: false
     )
@@ -94,7 +94,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
       }
     )
 
-    let min = NSSize(width: 720, height: 570)
+    let min = PermissionsView.windowSize
     window.contentMinSize = min
     window.minSize = min
 

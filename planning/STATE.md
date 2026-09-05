@@ -64,6 +64,8 @@ Milestone 13 adopts Toone's shared observable permission status, activation refr
 
 Verification: 737 tests in 84 suites, format, lint, warning-free Debug build, project and signature validation pass. Runtime confirmed both permissions denied for the signed process; only AppShow's ScreenCapture and Accessibility entries were reset through macOS, then the app was reopened for fresh user grants. Actual grants and recording remain manual. Local signing uses the developer's existing certificate via ignored Local.xcconfig. Nothing has been pushed.
 
+The permission UI follow-up uses the existing Settings typography, spacing and monochrome controls, aligned action columns, collapsed recovery help and a fixed Continue footer. Light/dark native renders, expanded recovery, four permission tests, format, lint, build and signature checks pass; the updated app was reopened.
+
 ## Accepted product decisions
 
 - Final product name: AppShow. Keep inherited names and identifiers during feature development, then perform one pre-release identity migration (ADR 0005).

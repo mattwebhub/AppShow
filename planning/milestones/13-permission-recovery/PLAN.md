@@ -7,3 +7,5 @@
 - [x] Restore global shortcuts after an Accessibility grant without requesting access on launch.
 - [x] Format, lint, build, automated tests and reopen the signed Debug app.
 - [ ] Manual: resolve the actual macOS permission entry and verify recording.
+
+- [x] UI follow-up: use Settings typography, spacing and monochrome controls; align permission actions, collapse recovery details and keep the footer visible.

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct PermissionRow: View {
+  let icon: String
   let title: String
   let description: String
   let granted: Bool
@@ -11,12 +12,15 @@ struct PermissionRow: View {
 
   var body: some View {
     let _ = colorScheme
-    HStack(alignment: .center, spacing: 16) {
-      Image(systemName: granted ? "checkmark.circle.fill" : "lock.shield")
-        .foregroundStyle(granted ? .green : AppShowColors.secondaryText)
-      VStack(alignment: .leading, spacing: 4) {
+    HStack(alignment: .center, spacing: Layout.itemSpacing) {
+      Image(systemName: icon)
+        .font(.system(size: FontSize.base))
+        .foregroundStyle(AppShowColors.secondaryText)
+        .frame(width: 24)
+
+      VStack(alignment: .leading, spacing: 6) {
         Text(title)
-          .font(.system(size: FontSize.sm, weight: .medium))
+          .font(.system(size: FontSize.xs, weight: .medium))
           .foregroundStyle(AppShowColors.primaryText)
         Text(description)
           .font(.system(size: FontSize.xs))
@@ -24,20 +28,29 @@ struct PermissionRow: View {
           .fixedSize(horizontal: false, vertical: true)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
-      VStack(alignment: .trailing, spacing: 8) {
+
+      HStack(spacing: Layout.compactSpacing) {
         if granted {
-          Text("Allowed")
+          Label("Allowed", systemImage: "checkmark")
             .font(.system(size: FontSize.xs, weight: .medium))
-            .foregroundStyle(.green)
+            .foregroundStyle(AppShowColors.secondaryText)
+            .frame(width: 84, height: ButtonSize.small.height)
         } else {
           Button("Allow", action: onRequest)
-            .buttonStyle(PrimaryButtonStyle(size: .small))
+            .buttonStyle(OutlineButtonStyle(size: .small, fullWidth: true))
+            .frame(width: 84)
+            .accessibilityLabel("Allow \(title)")
         }
-        Button("Open Settings", action: onOpenSettings)
-          .buttonStyle(OutlineButtonStyle(size: .small))
+        Button(action: onOpenSettings) {
+          Image(systemName: "arrow.up.right")
+            .frame(width: ButtonSize.small.height)
+        }
+        .buttonStyle(OutlineButtonStyle(size: .small, fullWidth: true))
+        .frame(width: ButtonSize.small.height)
+        .help("Open \(title) in System Settings")
+        .accessibilityLabel("Open \(title) in System Settings")
       }
     }
-    .padding(16)
-    .overlay(RoundedRectangle(cornerRadius: Radius.lg).stroke(AppShowColors.border, lineWidth: 1))
+    .padding(.vertical, Layout.itemSpacing)
   }
 }

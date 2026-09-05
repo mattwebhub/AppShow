@@ -151,6 +151,6 @@ Enabling Include webcam also enables Capture voice by default, using the selecte
 
 ### Permission recovery
 
-The permission window and menu share live status, refreshed when AppShow becomes active and while those views are visible. Allow requests access; Open Settings remains available for an existing or stale macOS entry. Show AppShow in Finder reveals the exact running bundle so the corresponding entry can be replaced in System Settings.
+The permission window and menu share live status, refreshed when AppShow becomes active and while those views are visible. Allow requests access; the arrow beside each permission opens its System Settings pane. Expand Permission not updating? to use Show in Finder or Check Again. Finder reveals the exact running bundle so a stale entry can be replaced in System Settings.
 
 Continue opens the toolbar without requiring permissions for editing. Screen capture still checks Screen Recording authorization and returns to recovery when denied. Accessibility enables global shortcuts and interaction with external windows; granting it reinstalls the shortcut event tap without an app restart. Local development should use a stable certificate through the ignored Local.xcconfig; ad-hoc rebuilds can invalidate previous permission associations.
