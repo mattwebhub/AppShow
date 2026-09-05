@@ -17,3 +17,10 @@ Manual checks:
 - Check that the Continue button remains visible when recovery text needs scrolling.
 
 The real macOS grant remains a user action; automated tests do not establish that capture is authorized on this machine.
+
+## UI consistency follow-up
+
+- Permissions now uses the Settings width, typography, spacing and monochrome control styles, with a compact 600 × 420 content area and native title-bar space.
+- Permission icons and action columns align; Settings arrows have descriptive accessibility labels and tooltips. Recovery is a disclosure and Continue remains in a fixed footer.
+- Inspected native NSHostingView renders in light/dark appearance, pending/granted states and expanded recovery. The final expanded layout shows both recovery actions and Continue without clipping. Mocked permission boundaries were used for rendering.
+- Four permission regressions, format, lint, warning-free Debug build and signature validation pass. Reopened the updated Debug app. The earlier 737-test full run remains the last full-suite result; this follow-up changes presentation only.
