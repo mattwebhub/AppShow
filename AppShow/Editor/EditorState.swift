@@ -128,6 +128,7 @@ final class EditorState {
   var captionSegments: [CaptionSegment] = []
   var audioTranscripts: [AudioTranscript] = []
   var captionFontSize: CGFloat = 48
+  var captionFontFamily: String = "System"
   var captionFontWeight: CaptionFontWeight = .bold
   var captionTextColor: CodableColor = CodableColor(r: 1, g: 1, b: 1)
   var captionBackgroundColor: CodableColor = CodableColor(r: 0, g: 0, b: 0, a: 1.0)
@@ -214,6 +215,7 @@ final class EditorState {
       if let captionSettings = saved.captionSettings {
         self.captionsEnabled = captionSettings.enabled
         self.captionFontSize = captionSettings.fontSize
+        self.captionFontFamily = captionSettings.fontFamily
         self.captionFontWeight = captionSettings.fontWeight
         self.captionTextColor = captionSettings.textColor
         self.captionBackgroundColor = captionSettings.backgroundColor

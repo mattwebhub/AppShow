@@ -158,3 +158,9 @@ In Video properties, **Silence cuts → Preview → Create cuts** analyzes micro
 MCP names retain the existing verb/noun families. `generate_captions` generates timed text; `set_captions` styles it; `replace_captions` replaces text. `get_silences` inspects gaps and `remove_silences` creates cuts, with `source: "both"` available to preserve sound from either track. Webcam region `type` supports `leftHalf`, `rightHalf`, `leftThird`, and `rightThird` as well as the existing types. Catalog titles group tools by their editor area.
 
 Recorded narration is also saved separately for assistant context, even when visible captions are off. Caption edits do not alter it. `get_transcript` prefers recorded microphone narration and accepts `source: "mic"`, `"system"`, or `"captions"`; legacy captions remain a fallback. `generate_transcript` transcribes audio without changing visible captions. Project summaries contain a bounded narration excerpt, and preview frames include nearby spoken text and word timestamps in source-video seconds.
+
+### Caption font and colors
+
+The Captions tab exposes style settings before generation. Choose an installed font through the searchable Font control, then adjust size, weight, Font color, background color and opacity. Turn Background off for text alone. Styling persists with the project and supports Undo/Redo. A font unavailable on another Mac falls back to the system font without discarding the saved family name. Export uses these settings when Burn in captions is enabled.
+
+The existing `set_captions` tool accepts `fontFamily`, `textColor` and `backgroundColor`; color objects contain normalized `r`, `g`, `b` and optional `a` channels. Timeline results expose the current caption style. Caption appearance does not change recorded narration or agent context.

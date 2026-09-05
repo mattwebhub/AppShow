@@ -105,11 +105,24 @@ enum AgentEditingToolCatalog {
     mutating: true
   )
 
+  static let captionColor = AgentToolSchema.object(
+    [
+      "r": AgentToolSchema.number("Red channel", minimum: 0, maximum: 1),
+      "g": AgentToolSchema.number("Green channel", minimum: 0, maximum: 1),
+      "b": AgentToolSchema.number("Blue channel", minimum: 0, maximum: 1),
+      "a": AgentToolSchema.number("Alpha, defaults to 1", minimum: 0, maximum: 1),
+    ],
+    required: ["r", "g", "b"]
+  )
+
   static let setCaptions = AgentToolDefinition(
     name: "set_captions",
     description: "Configure caption visibility, typography, position, and line length.",
     inputSchema: AgentToolSchema.object([
       "enabled": AgentToolSchema.boolean("Whether captions are visible"),
+      "fontFamily": AgentToolSchema.string("Installed font family name, or System. Unavailable families render with the system font."),
+      "textColor": captionColor,
+      "backgroundColor": captionColor,
       "fontSize": AgentToolSchema.number("Caption font size", minimum: 12, maximum: 200),
       "weight": AgentToolSchema.string("Caption weight", enum: CaptionFontWeight.allCases.map(\.rawValue)),
       "positionX": AgentToolSchema.number("Horizontal position from 0 to 1", minimum: 0, maximum: 1),
@@ -677,6 +690,13 @@ private struct AgentSetCaptionsTool: AgentToolHandler {
   func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
     let state = context.editorState
     if let value = arguments["enabled"]?.boolValue { state.captionsEnabled = value }
+    if let value = arguments["fontFamily"]?.stringValue {
+      let family = value.trimmingCharacters(in: .whitespacesAndNewlines)
+      guard !family.isEmpty else { throw AgentToolError.invalidArguments("fontFamily must not be empty") }
+      state.captionFontFamily = family
+    }
+    if let value = arguments["textColor"] { state.captionTextColor = color(value) }
+    if let value = arguments["backgroundColor"] { state.captionBackgroundColor = color(value) }
     if let value = arguments["fontSize"]?.doubleValue { state.captionFontSize = value }
     if let value = arguments["weight"]?.stringValue, let weight = CaptionFontWeight(rawValue: value) {
       state.captionFontWeight = weight
@@ -688,6 +708,14 @@ private struct AgentSetCaptionsTool: AgentToolHandler {
     if let value = arguments["showBackground"]?.boolValue { state.captionShowBackground = value }
     if let value = arguments["backgroundOpacity"]?.doubleValue { state.captionBackgroundOpacity = value }
     return context.timelineResult()
+  }
+  private func color(_ value: JSONValue) -> CodableColor {
+    CodableColor(
+      r: value["r"]?.doubleValue ?? 0,
+      g: value["g"]?.doubleValue ?? 0,
+      b: value["b"]?.doubleValue ?? 0,
+      a: value["a"]?.doubleValue ?? 1
+    )
   }
 }
 

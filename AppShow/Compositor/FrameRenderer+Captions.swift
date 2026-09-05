@@ -33,7 +33,7 @@ extension FrameRenderer {
       canvasHeight: canvasRect.height,
       screenWidth: instruction.captionScreenWidth
     )
-    let nsFont = NSFont.systemFont(ofSize: clampedFontSize, weight: instruction.captionFontWeight.nsWeight)
+    let nsFont = CaptionFont.resolve(family: instruction.captionFontFamily, size: clampedFontSize, weight: instruction.captionFontWeight)
     let weightedFont = CTFontCreateWithName(nsFont.fontName as CFString, clampedFontSize, nil)
 
     let textColor = instruction.captionTextColor

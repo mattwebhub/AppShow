@@ -124,6 +124,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
   let captionSegments: [CaptionSegment]
   let captionsEnabled: Bool
   let captionFontSize: CGFloat
+  let captionFontFamily: String
   let captionFontWeight: CaptionFontWeight
   let captionTextColor: CodableColor
   let captionBackgroundColor: CodableColor
@@ -193,6 +194,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
     captionSegments: [CaptionSegment] = [],
     captionsEnabled: Bool = false,
     captionFontSize: CGFloat = 48,
+    captionFontFamily: String = "System",
     captionFontWeight: CaptionFontWeight = .bold,
     captionTextColor: CodableColor = CodableColor(r: 1, g: 1, b: 1),
     captionBackgroundColor: CodableColor = CodableColor(r: 0, g: 0, b: 0, a: 1.0),
@@ -260,6 +262,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
     self.captionSegments = captionSegments
     self.captionsEnabled = captionsEnabled
     self.captionFontSize = captionFontSize
+    self.captionFontFamily = captionFontFamily
     self.captionFontWeight = captionFontWeight
     self.captionTextColor = captionTextColor
     self.captionBackgroundColor = captionBackgroundColor

@@ -79,6 +79,7 @@ extension EditorState {
     let captionSettings = CaptionSettingsData(
       enabled: captionsEnabled,
       fontSize: captionFontSize,
+      fontFamily: captionFontFamily,
       fontWeight: captionFontWeight,
       textColor: captionTextColor,
       backgroundColor: captionBackgroundColor,
@@ -236,6 +237,7 @@ extension EditorState {
     if let captionSettings = data.captionSettings {
       captionsEnabled = captionSettings.enabled
       captionFontSize = captionSettings.fontSize
+      captionFontFamily = captionSettings.fontFamily
       captionFontWeight = captionSettings.fontWeight
       captionTextColor = captionSettings.textColor
       captionBackgroundColor = captionSettings.backgroundColor
@@ -431,6 +433,7 @@ extension EditorState {
       _ = self.captionSegments
       _ = self.audioTranscripts
       _ = self.captionFontSize
+      _ = self.captionFontFamily
       _ = self.captionFontWeight
       _ = self.captionTextColor
       _ = self.captionBackgroundColor
