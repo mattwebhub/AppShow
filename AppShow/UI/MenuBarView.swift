@@ -3,12 +3,12 @@ import SwiftUI
 
 struct MenuBarView: View {
   let session: SessionState
+  let permissions: PermissionStore
   let onDismiss: () -> Void
   let onShowPermissions: () -> Void
 
   @State var recentProjects: [RecentProject] = []
   @State var totalProjectCount: Int = 0
-  @State var permissionsGranted = Permissions.allPermissionsGranted
   @Environment(\.colorScheme) private var colorScheme
 
   private let permissionTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -28,9 +28,7 @@ struct MenuBarView: View {
     let _ = colorScheme
     VStack(alignment: .leading, spacing: 0) {
       HStack {
-        if permissionsGranted {
-          SectionHeader(title: "Quick Actions")
-        }
+        SectionHeader(title: "Quick Actions")
         Spacer()
         Text("v\(UpdateChecker.currentVersion)")
           .font(.system(size: FontSize.xxs, weight: .medium))
@@ -39,7 +37,7 @@ struct MenuBarView: View {
           .padding(.top, 8)
       }
 
-      if permissionsGranted {
+      Group {
         Spacer().frame(height: 2)
 
         HoverEffectScope {
@@ -89,7 +87,8 @@ struct MenuBarView: View {
         }
         .disabled(isBusy)
         .padding(.horizontal, 10)
-      } else {
+      }
+      if !permissions.allGranted {
         PermissionsPrompt {
           onDismiss()
           onShowPermissions()
@@ -179,7 +178,7 @@ struct MenuBarView: View {
       await loadRecentProjects()
     }
     .onReceive(permissionTimer) { _ in
-      permissionsGranted = Permissions.allPermissionsGranted
+      permissions.refresh()
     }
   }
 }
