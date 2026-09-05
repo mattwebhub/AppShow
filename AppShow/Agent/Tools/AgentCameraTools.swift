@@ -23,7 +23,7 @@ private struct AgentCameraRegionTool: AgentToolHandler {
         "start": AgentToolSchema.number("Start in source seconds", minimum: 0),
         "end": AgentToolSchema.number("End in source seconds", minimum: 0),
         "type": AgentToolSchema.string(
-          "Fullscreen focuses the webcam, hidden hides it, custom uses its current layout",
+          "Fullscreen focuses the webcam; leftHalf/rightHalf and leftThird/rightThird fit the app beside it; hidden hides it; custom uses its current layout",
           enum: CameraRegionType.allCases.map(\.rawValue)
         ),
         "entryTransition": AgentToolSchema.string("Entry animation", enum: RegionTransitionType.allCases.map(\.rawValue)),
@@ -72,7 +72,7 @@ private struct AgentCameraRegionTool: AgentToolHandler {
     else {
       throw AgentToolError.invalidArguments("Camera regions cannot overlap")
     }
-    let defaultTransition: RegionTransitionType = region.type == .fullscreen ? .scale : .fade
+    let defaultTransition: RegionTransitionType = region.type.isExpanded ? .scale : .fade
     region.entryTransition =
       arguments["entryTransition"]?.stringValue.flatMap(RegionTransitionType.init(rawValue:)) ?? region.entryTransition ?? defaultTransition
     region.exitTransition =

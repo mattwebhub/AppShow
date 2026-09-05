@@ -43,7 +43,7 @@ extension VideoPreviewContainer {
       width: canvasRect.width - padH * 2,
       height: canvasRect.height - padV * 2
     )
-    let screenRect = AVMakeRect(aspectRatio: currentScreenSize, insideRect: paddedArea)
+    let screenRect = previewScreenRect(canvas: canvasRect, paddedArea: paddedArea)
 
     let zr = currentZoomRect
     let isZoomed = zr.width < 1.0 || zr.height < 1.0

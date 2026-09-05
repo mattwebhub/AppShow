@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import Testing
 
@@ -46,6 +47,37 @@ struct SilenceAnalysisTests {
     let loose = try await SilenceAnalysis.analyze(urls: [mic, system], config: SilenceDetectorConfig(minimumSilence: 0.4))
     #expect(loose.count == 1)
     #expect(near(loose[0], 0.7, 1.2, tolerance: 0.05))
+  }
+
+  @Test func oppositeStereoPhaseIsNotSilence() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let url = directory.appendingPathComponent("stereo.wav")
+    let format = try #require(AVAudioFormat(standardFormatWithSampleRate: 48000, channels: 2))
+    let buffer = try #require(AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 96000))
+    buffer.frameLength = 96000
+    let channels = try #require(buffer.floatChannelData)
+    for frame in 0..<96000 {
+      let sample = Float(sin(Double(frame) * 2 * .pi * 440 / 48000)) * 0.5
+      channels[0][frame] = sample
+      channels[1][frame] = -sample
+    }
+    do {
+      let file = try AVAudioFile(forWriting: url, settings: format.settings)
+      try file.write(from: buffer)
+    }
+    #expect(try AVAudioFile(forReading: url).length == 96000)
+    let spans = try await SilenceAnalysis.analyze(url: url, config: SilenceDetectorConfig())
+    #expect(spans.isEmpty)
+  }
+
+  @Test func silenceTimingUsesTheSourceClockAfterAudioDriftCorrection() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let url = try AudioFixtures.toneWithGap(duration: 4, gap: 1...3, in: directory)
+    let spans = try await SilenceAnalysis.analyze(urls: [url], config: SilenceDetectorConfig(), driftRatios: [2])
+    #expect(spans.count == 1)
+    #expect(near(spans[0], 0.5, 1.5, tolerance: 0.05))
   }
 
   @Test func analyzeOfNoSourcesIsEmpty() async throws {

@@ -43,7 +43,7 @@ struct VideoPreviewView: NSViewRepresentable {
   var zoomTimeline: ZoomTimeline?
   var cameraFullscreenRegions:
     [(
-      start: Double, end: Double,
+      start: Double, end: Double, presentation: CameraRegionType,
       entryTransition: RegionTransitionType, entryDuration: Double,
       exitTransition: RegionTransitionType, exitDuration: Double
     )] = []

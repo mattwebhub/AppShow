@@ -20,6 +20,7 @@ enum SilenceSource: String, CaseIterable, Identifiable, Sendable {
 struct SilenceRemovalPreview: Sendable, Equatable {
   static let historyLabel = "Silences removed"
 
+  var sourceSlices: [VideoRegionData] = []
   var silences: [ClosedRange<Double>] = []
   var slices: [VideoRegionData] = []
   var totalRemoved: Double = 0
@@ -56,34 +57,32 @@ extension EditorState {
     guard let chosen = source ?? availableSilenceSources.first else { return SilenceRemovalPreview() }
     let urls = silenceSourceURLs(for: chosen)
     guard !urls.isEmpty else { return SilenceRemovalPreview() }
+    let driftRatios = urls.map {
+      $0 == self.result.systemAudioURL ? playerController.systemAudioDriftRatio : playerController.micAudioDriftRatio
+    }
+    let existing = cutTimeline
+    let sourceSlices = videoRegions
     let silences: [ClosedRange<Double>]
     do {
-      silences = try await Task.detached(priority: .userInitiated) {
-        try await SilenceAnalysis.analyze(urls: urls, config: config)
-      }.value
+      silences = try await SilenceAnalysis.analyze(urls: urls, config: config, driftRatios: driftRatios)
+      try Task.checkCancellation()
     } catch {
       logger.error("Silence analysis failed: \(error)")
       return SilenceRemovalPreview(errorDescription: error.localizedDescription)
     }
-    let existing = cutTimeline
+    guard sourceSlices == videoRegions else { return SilenceRemovalPreview(errorDescription: "Cuts changed. Preview silences again.") }
     let keep = SilenceDetector.keepSlices(duration: existing.duration, silences: silences, config: config)
     let result = SilenceDetector.intersect(existing: existing, keep: keep)
     return SilenceRemovalPreview(
+      sourceSlices: sourceSlices,
       silences: silences,
       slices: result.slices,
       totalRemoved: max(0, existing.totalDuration - result.totalDuration)
     )
   }
 
-  func applySilenceRemoval(_ preview: SilenceRemovalPreview) {
-    guard preview.canApply else { return }
-    isRestoringState = true
-    pendingUndoTask?.cancel()
-    videoRegions = preview.slices
-    scheduleSave()
-    history.pushSnapshot(createSnapshot(), label: SilenceRemovalPreview.historyLabel)
-    Task { @MainActor [weak self] in
-      self?.isRestoringState = false
-    }
+  func applySilenceRemoval(_ preview: SilenceRemovalPreview, label: String = SilenceRemovalPreview.historyLabel) {
+    guard preview.canApply, preview.sourceSlices == videoRegions else { return }
+    commitVideoRegions(preview.slices, label: label)
   }
 }

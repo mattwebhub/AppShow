@@ -13,8 +13,8 @@ struct ExportPipelineTests {
     ]
   }
 
-  @Test(arguments: [false, true])
-  func webcamFocusExportsAcrossCuts(isHDR: Bool) async throws {
+  @Test(arguments: [false, true], [CameraRegionType.fullscreen, .leftHalf, .rightThird])
+  func webcamFocusExportsAcrossCuts(isHDR: Bool, presentation: CameraRegionType) async throws {
     let dir = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(dir) }
     let result = try await ProjectFixtures.recordingResult(
@@ -40,7 +40,8 @@ struct ExportPipelineTests {
         entryTransition: .scale,
         entryDuration: 0.4,
         exitTransition: .scale,
-        exitDuration: 0.4
+        exitDuration: 0.4,
+        cameraPresentation: presentation
       )
     ]
     config.videoRegions = EditorState.exportVideoRegions(

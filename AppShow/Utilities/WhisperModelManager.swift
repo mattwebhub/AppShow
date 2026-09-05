@@ -37,6 +37,8 @@ enum WhisperModel: String, CaseIterable, Identifiable, Sendable {
   }
 }
 
+typealias WhisperModelDownloader = @Sendable (WhisperModel, URL, @escaping @Sendable (Progress) -> Void) async throws -> URL
+
 @MainActor
 @Observable
 final class WhisperModelManager {
@@ -48,10 +50,11 @@ final class WhisperModelManager {
   var downloadingModel: WhisperModel?
   private var modelPaths: [String: URL] = [:]
   private var downloadTask: Task<URL, Error>?
+  private var downloadGeneration: UUID?
   private let modelsDirectory: URL
 
-  private init() {
-    let base = AppShowPaths.home
+  init(modelsDirectory: URL = AppShowPaths.home) {
+    let base = modelsDirectory
     self.modelsDirectory = base
     try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
     scanDownloadedModels()
@@ -90,8 +93,19 @@ final class WhisperModelManager {
     modelPaths[model.rawValue]
   }
 
-  func downloadModel(_ model: WhisperModel) async throws {
+  func downloadModel(_ model: WhisperModel, using download: @escaping WhisperModelDownloader = WhisperModelManager.fetchModel) async throws
+  {
     downloadTask?.cancel()
+    let generation = UUID()
+    downloadGeneration = generation
+    defer {
+      if downloadGeneration == generation {
+        downloadGeneration = nil
+        downloadTask = nil
+        isDownloading = false
+        downloadingModel = nil
+      }
+    }
     isDownloading = true
     downloadProgress = 0
     downloadingModel = model
@@ -100,21 +114,24 @@ final class WhisperModelManager {
       let mgr = self
       let callback: @Sendable (Progress) -> Void = { progress in
         Task { @MainActor in
+          guard mgr.downloadGeneration == generation else { return }
           mgr.downloadProgress = progress.fractionCompleted
         }
       }
-      let modelFolder = try await WhisperKit.download(
-        variant: model.rawValue,
-        downloadBase: mgr.modelsDirectory,
-        progressCallback: callback
-      )
+      let modelFolder = try await download(model, mgr.modelsDirectory, callback)
       try Task.checkCancellation()
       return modelFolder
     }
     downloadTask = task
 
     do {
-      let modelFolder = try await task.value
+      let modelFolder = try await withTaskCancellationHandler {
+        try await task.value
+      } onCancel: {
+        task.cancel()
+      }
+      try Task.checkCancellation()
+      guard downloadGeneration == generation else { throw CancellationError() }
       modelPaths[model.rawValue] = modelFolder
       downloadedModels.insert(model.rawValue)
       downloadProgress = 1.0
@@ -124,8 +141,11 @@ final class WhisperModelManager {
       throw error
     }
 
-    isDownloading = false
-    downloadingModel = nil
+  }
+
+  nonisolated static func fetchModel(_ model: WhisperModel, base: URL, progress: @escaping @Sendable (Progress) -> Void) async throws -> URL
+  {
+    try await WhisperKit.download(variant: model.rawValue, downloadBase: base, progressCallback: progress)
   }
 
   func deleteModel(_ model: WhisperModel) {
@@ -136,6 +156,7 @@ final class WhisperModelManager {
   }
 
   func cancelDownload() {
+    downloadGeneration = nil
     let model = downloadingModel
     downloadTask?.cancel()
     downloadTask = nil

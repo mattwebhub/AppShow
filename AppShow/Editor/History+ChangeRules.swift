@@ -317,6 +317,8 @@ extension History {
       adjusted: "Blur region adjusted"
     ),
 
+    { old, new in old.audioTranscripts == new.audioTranscripts ? [] : ["Audio transcript updated"] },
+
     { old, new in
       guard old.captionSettings != new.captionSettings || old.captionSegments != new.captionSegments
       else { return [] }

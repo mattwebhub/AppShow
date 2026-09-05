@@ -38,7 +38,11 @@ struct SilenceRemovalSection: View {
   var body: some View {
     let _ = colorScheme
     VStack(alignment: .leading, spacing: Layout.itemSpacing) {
-      SectionHeader(icon: "waveform.badge.minus", title: "Silences")
+      SectionHeader(icon: "waveform.badge.minus", title: "Silence cuts")
+
+      Text("Remove quiet gaps as editable cuts. Undo restores the previous timeline.")
+        .font(.system(size: FontSize.xs))
+        .foregroundStyle(AppShowColors.secondaryText)
 
       if sources.count > 1 {
         SegmentPicker(items: sources, label: { $0.label }, selection: $source)
@@ -85,11 +89,11 @@ struct SilenceRemovalSection: View {
         }
         .buttonStyle(OutlineButtonStyle(size: .small))
         .disabled(isAnalyzing)
-        Button("Apply") {
+        Button("Create cuts") {
           apply()
         }
         .buttonStyle(PrimaryButtonStyle(size: .small))
-        .disabled(!(preview?.canApply ?? false))
+        .disabled(editorState.isExporting || !(preview?.canApply ?? false))
       }
     }
     .disabled(!hasAudio)

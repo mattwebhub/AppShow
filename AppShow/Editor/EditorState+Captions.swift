@@ -9,70 +9,8 @@ extension EditorState {
     }
   }
 
-  func generateCaptions() {
-    guard let audioURL = captionAudioURL else { return }
-    guard let model = WhisperModel(rawValue: captionModel) else { return }
-    guard let modelPath = WhisperModelManager.shared.modelPath(for: model) else { return }
-
-    transcriptionTask?.cancel()
-    isTranscribing = true
-    transcriptionProgress = 0
-    transcriptionDidFinishEmpty = false
-
-    let language = captionLanguage.whisperCode
-    let state = self
-    transcriptionTask = Task {
-      do {
-        var segments = try await TranscriptionService.transcribe(
-          audioURL: audioURL,
-          model: model,
-          modelPath: modelPath,
-          language: language,
-          onProgress: { progress in
-            state.transcriptionProgress = progress
-          }
-        )
-        try Task.checkCancellation()
-        segments = Self.filterNonSpeechSegments(segments)
-        let driftRatio: Double =
-          switch state.captionAudioSource {
-          case .microphone: state.playerController.micAudioDriftRatio
-          case .system: state.playerController.systemAudioDriftRatio
-          }
-        if driftRatio != 1.0 {
-          segments = segments.map { seg in
-            CaptionSegment(
-              id: seg.id,
-              startSeconds: seg.startSeconds / driftRatio,
-              endSeconds: seg.endSeconds / driftRatio,
-              text: seg.text,
-              words: seg.words?.map { w in
-                CaptionWord(
-                  word: w.word,
-                  startSeconds: w.startSeconds / driftRatio,
-                  endSeconds: w.endSeconds / driftRatio
-                )
-              }
-            )
-          }
-        }
-        state.captionSegments = segments
-        state.captionsEnabled = !segments.isEmpty
-        state.transcriptionDidFinishEmpty = segments.isEmpty
-        state.isTranscribing = false
-        state.transcriptionProgress = 1.0
-        state.scheduleSave()
-        state.history.pushSnapshot(state.createSnapshot())
-      } catch is CancellationError {
-        state.isTranscribing = false
-      } catch {
-        state.logger.error("Transcription failed: \(error)")
-        state.isTranscribing = false
-      }
-    }
-  }
-
   func cancelTranscription() {
+    transcriptionGeneration = nil
     transcriptionTask?.cancel()
     transcriptionTask = nil
     isTranscribing = false
@@ -120,7 +58,7 @@ extension EditorState {
 
   private static let nonSpeechPattern: Regex = /^\s*[\[\(].*[\]\)]\s*$/
 
-  private static func filterNonSpeechSegments(_ segments: [CaptionSegment]) -> [CaptionSegment] {
+  static func filterNonSpeechSegments(_ segments: [CaptionSegment]) -> [CaptionSegment] {
     segments.filter { seg in
       let text = seg.text.trimmingCharacters(in: .whitespaces)
       if text.isEmpty { return false }

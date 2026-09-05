@@ -60,3 +60,9 @@ Derived from `05-coding-patterns.md`. Run through the matching list before openi
 6. Sidecar outputs follow `Utilities/SubtitleExporter.swift` and are written next to the URL returned from `export` in `Editor/EditorState+Export.swift`.
 7. Output naming/location goes through `FileManager.default.defaultSaveURL(for:extension:)` (`Recording/FileManager+AppShow.swift`) via `MainActor.run`.
 8. Test one passthrough export (no effects) and one composited export in both `.parallel` and `.normal` modes.
+
+## Tool names and slow preparation
+
+Keep MCP names in the existing `verb_noun` family. Add layout variants to camera-region schemas instead of registering per-layout tools. `AgentToolPresentation` supplies editor-area titles while wire names remain stable. Caption generation, caption styling and caption replacement are separate operations with clear descriptions.
+
+A slow handler may declare `mutatesOnlyOnSuccess` only if all its asynchronous preparation leaves persistent editor state unchanged and its final commit is synchronous, cancellation-checked and validates stale inputs. Such a failure must preserve concurrent user edits. Existing handlers retain dispatcher snapshot rollback.

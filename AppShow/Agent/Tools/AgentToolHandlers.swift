@@ -24,6 +24,7 @@ struct AgentToolProjectSummaryHandler: AgentToolHandler {
       "hasMicAudio": .bool(state.hasMicAudio),
       "hasCursorMetadata": .bool(state.cursorMetadataProvider != nil),
       "isHDR": .bool(state.result.isHDR),
+      "spokenContext": state.agentSpokenOverview,
       "history": ["index": JSONValue(state.history.currentIndex), "count": JSONValue(state.history.entries.count)],
     ]
     if let project = state.project {
@@ -68,11 +69,8 @@ struct AgentToolTranscriptHandler: AgentToolHandler {
 
   func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
     let state = context.editorState
-    return AgentToolSummaries.transcript(
-      segments: state.captionSegments,
-      enabled: state.captionsEnabled,
-      source: state.captionAudioSource,
-      language: state.captionLanguage,
+    return state.agentTranscript(
+      source: arguments["source"]?.stringValue,
       withWords: arguments["withWords"]?.boolValue ?? false,
       from: arguments["from"]?.doubleValue,
       to: arguments["to"]?.doubleValue
@@ -110,7 +108,7 @@ struct AgentToolSilencesHandler: AgentToolHandler {
 
   func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
     let sourceName = arguments["source"]?.stringValue ?? "mic"
-    let source: SilenceSource = sourceName == "system" ? .system : .microphone
+    let source: SilenceSource = sourceName == "both" ? .both : sourceName == "system" ? .system : .microphone
     let config = SilenceDetectorConfig(
       thresholdDb: arguments["thresholdDb"]?.doubleValue ?? -40,
       minimumSilence: arguments["minGapSeconds"]?.doubleValue ?? 0.8

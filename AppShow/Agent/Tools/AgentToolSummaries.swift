@@ -9,7 +9,7 @@ struct AgentToolMediaInfo: Sendable, Equatable {
 
 enum AgentToolSummaries {
   static let transcriptHint =
-    "No captions exist yet. Generate them in the editor's Captions tab, or with the generate_captions tool once the mutating catalog is enabled."
+    "No transcript exists yet. Use generate_transcript for agent context without visible captions, or generate_captions for both. These tools require an installed local model; the Captions panel offers its download."
 
   static func seconds(_ value: Double) -> JSONValue {
     .number((value * 1000).rounded() / 1000)

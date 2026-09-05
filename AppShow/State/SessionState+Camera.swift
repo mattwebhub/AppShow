@@ -8,6 +8,7 @@ extension SessionState {
     guard options.selectedCamera != nil || isCameraOn else { return }
     isCameraOn.toggle()
     if isCameraOn {
+      if options.webcamVoice.captureVoice { setWebcamVoiceEnabled(true) }
       startCameraPreview()
     } else {
       stopCameraPreview()

@@ -15,6 +15,7 @@ final class VideoPreviewContainer: NSView {
   var coordinator: VideoPreviewView.Coordinator?
   var isCameraHidden = false
   var isCameraFullscreen = false
+  var cameraSplitType: CameraRegionType?
   var currentFullscreenFillMode: CameraFullscreenFillMode = .fit
   var currentFullscreenAspect: CameraFullscreenAspect = .original
   var cameraTransitionProgress: CGFloat = 1.0

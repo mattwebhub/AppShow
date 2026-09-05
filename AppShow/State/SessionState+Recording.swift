@@ -40,6 +40,7 @@ extension SessionState {
     }
 
     recordingWebcamPresentation = options.webcamPresentation.normalized
+    recordingWebcamVoice = isCameraOn && isMicrophoneOn ? options.webcamVoice : nil
 
     if captureMode == .device, let capture = deviceCapture {
       try await startDeviceRecordingInternal(capture: capture)
@@ -167,6 +168,8 @@ extension SessionState {
 
     result.webcamPresentation = result.webcamVideoURL == nil ? nil : recordingWebcamPresentation
     recordingWebcamPresentation = nil
+    let voice = result.webcamVideoURL != nil && result.microphoneAudioURL != nil ? recordingWebcamVoice : nil
+    recordingWebcamVoice = nil
     SoundEffect.stopRecording.play()
     recordingCoordinator = nil
     captureTarget = nil
@@ -187,10 +190,10 @@ extension SessionState {
         sourceName: sourceName,
         in: saveDir
       )
-      openEditor(project: project)
+      openEditor(project: project, recordedVoice: voice)
     } catch {
       logger.error("Failed to create project bundle: \(error)")
-      openEditor(project: nil, result: result)
+      openEditor(project: nil, result: result, recordedVoice: voice)
     }
   }
 

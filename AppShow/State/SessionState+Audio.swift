@@ -3,9 +3,17 @@ import Foundation
 
 @MainActor
 extension SessionState {
+  func setWebcamVoiceEnabled(_ enabled: Bool) {
+    options.webcamVoice.captureVoice = enabled
+    if enabled && options.selectedMicrophone == nil { options.selectedMicrophone = options.availableMicrophones.first }
+    isMicrophoneOn = enabled && options.selectedMicrophone != nil
+    ConfigService.shared.isMicrophoneOn = isMicrophoneOn
+  }
+
   func toggleMicrophone() {
     guard options.selectedMicrophone != nil else { return }
     isMicrophoneOn.toggle()
+    if isCameraOn { options.webcamVoice.captureVoice = isMicrophoneOn }
     ConfigService.shared.isMicrophoneOn = isMicrophoneOn
   }
 

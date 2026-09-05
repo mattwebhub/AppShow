@@ -39,16 +39,19 @@ struct CameraRegionEditPopover: View {
       )
       .padding(.horizontal, 12)
 
-      SegmentPicker(
-        items: CameraRegionType.allCases,
-        label: { $0.label },
-        selection: Binding(
-          get: { region.type },
-          set: { onChangeType($0) }
-        )
-      )
+      SelectButton(label: region.type.label) { dismiss in
+        VStack(alignment: .leading, spacing: 0) {
+          ForEach(CameraRegionType.allCases) { type in
+            CheckmarkRow(title: type.label, isSelected: region.type == type) {
+              onChangeType(type)
+              dismiss()
+            }
+          }
+        }
+        .padding(.vertical, 8)
+        .frame(width: 200)
+      }
       .padding(.horizontal, 12)
-      .padding(.vertical, 4)
 
       if region.type == .custom {
         Divider()

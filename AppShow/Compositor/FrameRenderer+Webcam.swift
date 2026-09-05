@@ -13,6 +13,23 @@ extension FrameRenderer {
     regionTransition: (type: RegionTransitionType, progress: CGFloat)?,
     colorSpace: CGColorSpace
   ) {
+    if let cam = splitCamera(
+      instruction: instruction,
+      time: compositionTime,
+      canvas: CGRect(x: 0, y: 0, width: outputWidth, height: outputHeight)
+    ) {
+      drawClippedWebcam(
+        in: context,
+        image: webcamImage,
+        rect: cam.rect,
+        cornerRadius: cam.cornerRadius,
+        borderWidth: cam.borderWidth,
+        borderColor: cam.borderColor,
+        mirrored: cam.mirrored
+      )
+      return
+    }
+
     let isFullscreenPipTransition =
       isCamFullscreen
       && (regionTransition?.type == .scale || regionTransition?.type == .slide)

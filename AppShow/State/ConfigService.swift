@@ -50,6 +50,11 @@ final class ConfigService {
     set { data.cameraDeviceId = newValue; save() }
   }
 
+  var webcamVoice: WebcamVoiceOptions {
+    get { data.webcamVoice ?? WebcamVoiceOptions() }
+    set { data.webcamVoice = newValue; save() }
+  }
+
   var webcamPresentation: WebcamPresentation {
     get { (data.webcamPresentation ?? WebcamPresentation()).normalized }
     set { data.webcamPresentation = newValue.normalized; save() }
@@ -188,6 +193,7 @@ private struct ConfigData: Codable {
   var captureSystemAudio: Bool = false
   var cameraDeviceId: String? = nil
   var cameraMaximumResolution: String = "1080p"
+  var webcamVoice: WebcamVoiceOptions?
   var webcamPresentation: WebcamPresentation?
   var projectFolder: String = "~/AppShow"
   var retinaCapture: Bool = false

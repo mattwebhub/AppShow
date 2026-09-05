@@ -141,3 +141,10 @@ The cursor metadata recorder does the same thing independently with its own `tot
 ## Audio level monitoring
 
 During recording, SessionState polls `RecordingCoordinator.getAudioLevels()` every 100ms in a Task loop. The coordinator reads peak levels from each audio writer. These drive the real-time level meters in the toolbar UI.
+
+
+## Webcam voice defaults
+
+Enabling Include webcam also enables Capture voice by default, using the selected or first available microphone. Recording Options makes the microphone, noise cleanup and automatic-caption choices visible. The normal microphone toggle remains authoritative and updates the webcam voice preference. Capture still uses the existing synchronized microphone writer; there is no second audio capture session.
+
+`SessionState` snapshots the voice options at recording start and passes them to the new editor only when webcam and microphone media actually exist. `prepareRecordedVoice` consumes that one-shot request after setup. RNNoise produces the optional cleaned track; local caption generation waits for it and applies audio drift correction to source timestamps. Preferences persist in `ConfigService`; captions and cleanup settings persist through the existing editor data. Missing models, canceled downloads and transcription failures are handled in Captions.

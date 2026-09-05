@@ -3,7 +3,10 @@ import SwiftUI
 struct WebcamPresentationControls: View {
   @Binding var presentation: WebcamPresentation
 
+  @Environment(\.colorScheme) private var colorScheme
+
   var body: some View {
+    let _ = colorScheme
     VStack(alignment: .leading, spacing: Layout.itemSpacing) {
       HStack {
         Text("Position")
@@ -39,7 +42,10 @@ struct WebcamPresentationControls: View {
 struct WebcamRecordingControls: View {
   let session: SessionState
 
+  @Environment(\.colorScheme) private var colorScheme
+
   var body: some View {
+    let _ = colorScheme
     VStack(alignment: .leading, spacing: Layout.itemSpacing) {
       ToggleRow(label: "Include webcam", isOn: Binding(get: { session.isCameraOn }, set: { session.setWebcamIncluded($0) }))
         .disabled(session.options.availableCameras.isEmpty)
@@ -60,6 +66,7 @@ struct WebcamRecordingControls: View {
           .frame(width: 260)
         }
       }
+      WebcamVoiceControls(session: session)
       WebcamPresentationControls(
         presentation: Binding(get: { session.options.webcamPresentation }, set: { session.options.webcamPresentation = $0 })
       )

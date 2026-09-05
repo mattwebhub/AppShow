@@ -25,8 +25,12 @@ enum AgentToolCatalog {
   static let getTranscript = AgentToolDefinition(
     name: "get_transcript",
     description:
-      "Return the caption segments with text and timing; withWords adds per-word timestamps; from/to keep only segments overlapping that range.",
+      "Return saved narration with source-time text and timing, independent of visible captions. Defaults to recorded microphone, then system audio, then legacy captions. withWords includes word timestamps; from/to select overlapping segments.",
     inputSchema: AgentToolSchema.object([
+      "source": AgentToolSchema.string(
+        "Transcript source; captions explicitly requests the edited on-screen text",
+        enum: ["mic", "system", "captions"]
+      ),
       "withWords": AgentToolSchema.boolean("Include per-word timestamps when the segment has them"),
       "from": AgentToolSchema.number("Window start in seconds", minimum: 0),
       "to": AgentToolSchema.number("Window end in seconds", minimum: 0),
@@ -77,9 +81,13 @@ enum AgentToolCatalog {
     name: "get_silences",
     description: "Return the silent gaps of the microphone or system audio longer than minGapSeconds and quieter than thresholdDb.",
     inputSchema: AgentToolSchema.object([
-      "thresholdDb": AgentToolSchema.number("Silence threshold in dBFS, default -40", minimum: -120, maximum: 0),
+      "thresholdDb": AgentToolSchema.number(
+        "Silence threshold in dB relative to the loudest window, default -40",
+        minimum: -120,
+        maximum: 0
+      ),
       "minGapSeconds": AgentToolSchema.number("Shortest gap to report, default 0.8", minimum: 0),
-      "source": AgentToolSchema.string("Audio track to analyse", enum: ["mic", "system"]),
+      "source": AgentToolSchema.string("Audio track to analyse; both preserves sound from either track", enum: ["mic", "system", "both"]),
     ]),
     mutating: false,
     slow: true

@@ -76,8 +76,8 @@ struct EditorStateSilenceRemovalTests {
     #expect(state.history.entries.count == entriesBefore + 1)
     #expect(state.history.entries.last?.label == "Silences removed")
     #expect(state.history.entries.last?.snapshot.videoRegions == state.videoRegions)
-    await Task.yield()
-    #expect(state.pendingUndoTask?.isCancelled ?? true)
+    try await Task.sleep(for: .milliseconds(500))
+    #expect(state.history.entries.count == entriesBefore + 1)
   }
 
   @Test func undoAfterApplyRestoresPreviousSlices() async throws {
@@ -129,6 +129,38 @@ struct EditorStateSilenceRemovalTests {
     #expect(system.count == 0)
     let both = await state.previewSilenceRemoval(config: SilenceDetectorConfig(), source: .both)
     #expect(both.count == 0)
+  }
+
+  @Test func stalePreviewCannotRestoreDeletedFootage() async throws {
+    let (state, dir) = try await makeState()
+    defer { TestPaths.remove(dir) }
+    let preview = await state.previewSilenceRemoval(config: SilenceDetectorConfig())
+    let newer = [region(0, 0.5)]
+    state.commitVideoRegions(newer, label: "Manual cut")
+    state.applySilenceRemoval(preview)
+    #expect(state.videoRegions == newer)
+  }
+
+  @Test func undoPreservesAnEditMadeImmediatelyBeforeAnalysis() async throws {
+    let (state, dir) = try await makeState()
+    defer { TestPaths.remove(dir) }
+    state.cameraCornerRadius = 37
+    let preview = await state.previewSilenceRemoval(config: SilenceDetectorConfig())
+    let before = state.videoRegions
+    state.applySilenceRemoval(preview)
+    state.undo()
+    #expect(state.videoRegions == before)
+    #expect(state.cameraCornerRadius == 37)
+  }
+
+  @Test func cannotApplyWhileExporting() async throws {
+    let (state, dir) = try await makeState()
+    defer { TestPaths.remove(dir) }
+    let preview = await state.previewSilenceRemoval(config: SilenceDetectorConfig())
+    let before = state.videoRegions
+    state.isExporting = true
+    state.applySilenceRemoval(preview)
+    #expect(state.videoRegions == before)
   }
 
   @Test func previewWithNoAudioSourceIsEmpty() async throws {

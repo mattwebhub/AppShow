@@ -501,3 +501,13 @@ Runners-up in order: `TimeFormatting` (all 8 functions), `CodableColor`, `Keyboa
 ## Webcam presentation follow-up
 
 `WebcamPresentationTests` uses fixture recordings and isolated configuration to verify capture-default seeding, legacy compatibility, region tools and Undo. `WebcamRenderingTests` renders synthetic camera colors through SDR/HDR helpers and measures an offscreen native preview; no camera access is required. `RegionRemappingTests` checks preserved transition progress across cuts. The gated `ExportPipelineTests.webcamFocusExportsAcrossCuts` runs both SDR and HDR exports and decodes an output frame. Real hardware/gesture/provider verification remains in milestone 10 VERIFY.md.
+
+## Webcam layouts and recorded voice
+
+`WebcamSplitLayout` is the pure shared screen/camera geometry seam. `RegionTransitionInfo.cameraPresentation` carries its type through export and agent-preview remapping. `WebcamRenderingTests` compares actual preview layers and SDR/HDR pixels; gated exports exercise encoded results across cuts.
+
+`CaptionTranscriber` accepts an immutable `CaptionTranscriptionRequest` and is injectable without installing models or accessing the network. The main-actor editor owns generation identity and commits only after cancellation and stale-caption checks. `WhisperModelManager` accepts an isolated directory and downloader for failure/retry tests. Recording voice options reach the editor through a one-shot in-memory request, so reopening a project does not regenerate captions.
+
+`SilenceRemovalPreview.sourceSlices` prevents stale analysis from restoring removed footage. Applying uses `commitVideoRegions`, shared with manual cuts. Audio tests use generated files, preserve either stereo channel and align analysis to the source clock before combining tracks.
+
+`SpokenContextTests` proves saved per-track narration survives caption edits and project reopening, checks source selection, and calls the real frame-rendering tool to verify spoken context accompanies its image. Transcript-only generation leaves visible captions unchanged and participates in Undo. A canceled-batch regression prevents asynchronous transcription results from reappearing after rollback.

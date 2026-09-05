@@ -20,7 +20,7 @@ extension SessionState {
     }
   }
 
-  func openEditor(project: AppShowProject?, result: RecordingResult? = nil) {
+  func openEditor(project: AppShowProject?, result: RecordingResult? = nil, recordedVoice: WebcamVoiceOptions? = nil) {
     hideToolbar()
     transition(to: .editing)
 
@@ -49,9 +49,9 @@ extension SessionState {
       }
     }
     if let project {
-      editor.show(project: project)
+      editor.show(project: project, recordedVoice: recordedVoice)
     } else if let result {
-      editor.show(result: result)
+      editor.show(result: result, recordedVoice: recordedVoice)
     }
     editorWindows.append(editor)
   }

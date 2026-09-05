@@ -92,6 +92,10 @@ final class RecordingOptions {
     didSet { ConfigService.shared.hdrCapture = hdrCapture }
   }
 
+  var webcamVoice: WebcamVoiceOptions {
+    didSet { ConfigService.shared.webcamVoice = webcamVoice }
+  }
+
   var webcamPresentation: WebcamPresentation {
     didSet {
       ConfigService.shared.webcamPresentation = webcamPresentation
@@ -130,6 +134,7 @@ final class RecordingOptions {
 
   init() {
     let config = ConfigService.shared
+    webcamVoice = config.webcamVoice
     webcamPresentation = config.webcamPresentation
     timerDelay = TimerDelay(rawValue: config.timerDelay) ?? .none
     rememberLastSelection = config.rememberLastSelection

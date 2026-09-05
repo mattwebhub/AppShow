@@ -7,8 +7,7 @@ extension EditorState {
     pendingSaveTask = nil
     micProcessingTask?.cancel()
     micProcessingTask = nil
-    transcriptionTask?.cancel()
-    transcriptionTask = nil
+    cancelTranscription()
     if let project {
       self.project = nil
       try? project.delete()

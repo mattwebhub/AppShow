@@ -8,6 +8,7 @@ struct RegionTransitionInfo: Sendable {
   let exitTransition: RegionTransitionType
   let exitDuration: Double
   var transitionTimeRange: CMTimeRange? = nil
+  var cameraPresentation: CameraRegionType = .fullscreen
 }
 
 struct CameraCustomRegion: Sendable {

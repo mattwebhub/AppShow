@@ -25,7 +25,7 @@ extension VideoPreviewContainer {
   }
 
   override func mouseMoved(with event: NSEvent) {
-    guard !webcamWrapper.isHidden else {
+    guard !webcamWrapper.isHidden, !isCameraFullscreen, cameraSplitType?.isSplit != true else {
       NSCursor.arrow.set()
       return
     }
@@ -42,7 +42,7 @@ extension VideoPreviewContainer {
   }
 
   override func mouseDown(with event: NSEvent) {
-    guard let coord = coordinator else { return super.mouseDown(with: event) }
+    guard let coord = coordinator, !isCameraFullscreen, cameraSplitType?.isSplit != true else { return super.mouseDown(with: event) }
     let loc = convert(event.locationInWindow, from: nil)
 
     if webcamWrapper.frame.contains(loc) && !webcamWrapper.isHidden {

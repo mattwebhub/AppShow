@@ -24,6 +24,7 @@ Volume and mute are per-track, not per-region. The player and compositor both re
 Camera regions control webcam visibility over time. Each region has a type:
 
 - **Fullscreen** -- webcam fills the entire canvas
+- **Left/right half or third** -- webcam fills that side of the canvas; the entire app view fits in the remaining space
 - **Hidden** -- webcam disappears completely
 - **Custom** -- webcam shows as PiP with its own layout, aspect ratio, corner radius, border, and shadow settings
 
@@ -143,6 +144,17 @@ Assistant replies render separate paragraphs, headings, list rows, and code bloc
 
 Enable **Include webcam** in recording Options, then choose a camera. Options and Settings → Devices offer a corner and size for new recordings. The default is a circular webcam at bottom right, 20% of video width, constrained to fit the canvas. These preferences travel with the recording; reopening an older edit preserves its saved layout.
 
-In the editor’s Webcam properties, **Focus webcam** adds a fullscreen section from the playhead, up to five seconds or the next section/end. It expands from the bubble and returns with a 0.4-second scale animation (short sections shorten transitions). Double-clicking empty space on the Webcam track also adds a focus section. Drag the section to move it or its visible edges to resize it, in source or compressed mode. Click to edit source-second start/end, type and transitions, or remove it. Focus edits use the existing history and project persistence.
+In the editor’s Webcam properties, **Add webcam section** offers fullscreen, left/right half and left/right third sections from the playhead, up to five seconds or the next section/end. Each expands from the bubble and returns with a 0.4-second scale animation (short sections shorten transitions). Double-clicking empty space on the Webcam track also adds a focus section. Drag the section to move it or its visible edges to resize it, in source or compressed mode. Click to edit source-second start/end, type and transitions, or remove it. Focus edits use the existing history and project persistence.
 
 The assistant can use `set_camera` with `shape`, `corner`, `width`, `fullscreenFillMode` and `fullscreenAspect`, and `add_camera_region`, `update_camera_region`, `remove_camera_region`. Region tools accept source times, stable IDs and entry/exit animation settings. Regions cannot overlap and require recorded webcam media. The timeline result reports current layout and transition durations.
+
+
+### Voice and silence cuts
+
+Recording Options includes **Capture voice**, microphone selection, **Reduce background noise** and **Generate captions after recording** alongside Include webcam. Audio is recorded as the existing separate, synchronized microphone track. Cleanup uses RNNoise; captions use the selected local WhisperKit model and word timing. The Captions panel explicitly offers **Download model & generate** when a model is missing. Automatic generation runs for the newly recorded project only. It can be canceled; reopening does not overwrite an existing transcript.
+
+In Video properties, **Silence cuts → Preview → Create cuts** analyzes microphone, system audio or both and creates ordinary editable Cuts slices. The threshold is relative to the loudest window; padding retains sound around detected gaps. Playback, captions and export follow the same keep-slices. Original media is retained. Stale previews are rejected, and one Undo restores the previous cuts.
+
+MCP names retain the existing verb/noun families. `generate_captions` generates timed text; `set_captions` styles it; `replace_captions` replaces text. `get_silences` inspects gaps and `remove_silences` creates cuts, with `source: "both"` available to preserve sound from either track. Webcam region `type` supports `leftHalf`, `rightHalf`, `leftThird`, and `rightThird` as well as the existing types. Catalog titles group tools by their editor area.
+
+Recorded narration is also saved separately for assistant context, even when visible captions are off. Caption edits do not alter it. `get_transcript` prefers recorded microphone narration and accepts `source: "mic"`, `"system"`, or `"captions"`; legacy captions remain a fallback. `generate_transcript` transcribes audio without changing visible captions. Project summaries contain a bounded narration excerpt, and preview frames include nearby spoken text and word timestamps in source-video seconds.
