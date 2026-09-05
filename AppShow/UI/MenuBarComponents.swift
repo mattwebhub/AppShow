@@ -57,14 +57,14 @@ struct PermissionsPrompt: View {
         .font(.system(size: FontSize.xl))
         .foregroundStyle(AppShowColors.secondaryText)
 
-      Text("AppShow needs Screen Recording and Accessibility permissions to work.")
+      Text("Screen recording and global shortcuts need permission. You can still open and edit projects.")
         .font(.system(size: FontSize.xxs))
         .foregroundStyle(AppShowColors.secondaryText)
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
 
       Button(action: action) {
-        Text("Grant Permissions")
+        Text("Review Permissions")
           .font(.system(size: FontSize.xxs, weight: .medium))
       }
       .buttonStyle(OutlineButtonStyle())

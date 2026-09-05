@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
   let session = SessionState()
+  let permissions = PermissionStore.live()
   private var permissionsWindow: NSWindow?
   private var shortcutManager: KeyboardShortcutManager?
   private var eventMonitor: Any?
@@ -14,10 +15,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     ConfigService.shared.applyAppearance()
 
     let manager = KeyboardShortcutManager(session: session)
-    manager.start()
+    manager.start(enableGlobalShortcuts: permissions.accessibilityGranted)
     shortcutManager = manager
+    permissions.onAccessibilityChanged = { [weak manager] granted in
+      manager?.stop()
+      manager?.start(enableGlobalShortcuts: granted)
+    }
+    session.onScreenRecordingPermissionRequired = { [weak self] in
+      self?.showPermissionsWindow()
+    }
 
-    if !Permissions.allPermissionsGranted {
+    if permissions.allGranted {
+      session.showToolbar()
+    } else {
       showPermissionsWindow()
     }
 
@@ -39,15 +49,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
   }
 
   func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-    if Permissions.allPermissionsGranted {
-      session.showToolbar()
-    } else {
-      showPermissionsWindow()
-    }
+    permissions.refresh()
+    session.showToolbar()
     return false
   }
 
+  func applicationDidBecomeActive(_ notification: Notification) {
+    guard !LaunchEnvironment.isTestHost else { return }
+    permissions.refresh()
+    session.logger.info(
+      "Permissions: screenRecording=\(permissions.screenRecordingGranted), accessibility=\(permissions.accessibilityGranted)"
+    )
+  }
+
   func showPermissionsWindow() {
+    permissions.refresh()
     if let permissionsWindow, permissionsWindow.isVisible {
       permissionsWindow.makeKeyAndOrderFront(nil)
       NSApp.activate(ignoringOtherApps: true)
@@ -55,7 +71,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     let window = NSWindow(
-      contentRect: NSRect(x: 0, y: 0, width: 800, height: 500),
+      contentRect: NSRect(x: 0, y: 0, width: 720, height: 570),
       styleMask: [.titled, .closable, .fullSizeContentView],
       backing: .buffered,
       defer: false
@@ -70,14 +86,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     window.delegate = self
     window.contentViewController = NSHostingController(
-      rootView: PermissionsView { [weak self] in
+      rootView: PermissionsView(permissions: permissions) { [weak self] in
         MainActor.assumeIsolated {
           self?.dismissPermissionsWindow()
+          self?.session.showToolbar()
         }
       }
     )
 
-    let min = NSSize(width: 800, height: 500)
+    let min = NSSize(width: 720, height: 570)
     window.contentMinSize = min
     window.minSize = min
 

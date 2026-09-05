@@ -328,7 +328,7 @@ extension SessionState {
 
   func recordEntireScreen(screen: NSScreen) {
     guard Permissions.hasScreenRecordingPermission else {
-      Permissions.requestScreenRecordingPermission()
+      onScreenRecordingPermissionRequired?()
       return
     }
 

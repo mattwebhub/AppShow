@@ -14,6 +14,7 @@ struct AppShowApp: App {
     MenuBarExtra {
       MenuBarView(
         session: appDelegate.session,
+        permissions: appDelegate.permissions,
         onDismiss: { isMenuPresented = false },
         onShowPermissions: { appDelegate.showPermissionsWindow() }
       )

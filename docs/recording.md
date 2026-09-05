@@ -148,3 +148,9 @@ During recording, SessionState polls `RecordingCoordinator.getAudioLevels()` eve
 Enabling Include webcam also enables Capture voice by default, using the selected or first available microphone. Recording Options makes the microphone, noise cleanup and automatic-caption choices visible. The normal microphone toggle remains authoritative and updates the webcam voice preference. Capture still uses the existing synchronized microphone writer; there is no second audio capture session.
 
 `SessionState` snapshots the voice options at recording start and passes them to the new editor only when webcam and microphone media actually exist. `prepareRecordedVoice` consumes that one-shot request after setup. RNNoise produces the optional cleaned track; local caption generation waits for it and applies audio drift correction to source timestamps. Preferences persist in `ConfigService`; captions and cleanup settings persist through the existing editor data. Missing models, canceled downloads and transcription failures are handled in Captions.
+
+### Permission recovery
+
+The permission window and menu share live status, refreshed when AppShow becomes active and while those views are visible. Allow requests access; Open Settings remains available for an existing or stale macOS entry. Show AppShow in Finder reveals the exact running bundle so the corresponding entry can be replaced in System Settings.
+
+Continue opens the toolbar without requiring permissions for editing. Screen capture still checks Screen Recording authorization and returns to recovery when denied. Accessibility enables global shortcuts and interaction with external windows; granting it reinstalls the shortcut event tap without an app restart. Local development should use a stable certificate through the ignored Local.xcconfig; ad-hoc rebuilds can invalidate previous permission associations.

@@ -58,6 +58,12 @@ Milestone 12 is code-complete locally: searchable installed fonts, visible style
 
 Verification: 733 tests in 83 suites, format, lint, project validation and warning-free Debug build pass. Interactive font/color selection and exported-video comparisons remain manual in milestone 12 VERIFY.md. No changes have been pushed.
 
+## Permission recovery
+
+Milestone 13 adopts Toone's shared observable permission status, activation refresh, explicit requests, Settings links and Accessibility transition handling. The editor and toolbar remain accessible; denied capture opens the recovery screen. Continue stays visible, and Finder reveals the exact running bundle for stale-entry recovery. Global shortcuts are installed only while Accessibility is granted and refreshed after grant/revocation.
+
+Verification: 737 tests in 84 suites, format, lint, warning-free Debug build, project and signature validation pass. Runtime confirmed both permissions denied for the signed process; only AppShow's ScreenCapture and Accessibility entries were reset through macOS, then the app was reopened for fresh user grants. Actual grants and recording remain manual. Local signing uses the developer's existing certificate via ignored Local.xcconfig. Nothing has been pushed.
+
 ## Accepted product decisions
 
 - Final product name: AppShow. Keep inherited names and identifiers during feature development, then perform one pre-release identity migration (ADR 0005).

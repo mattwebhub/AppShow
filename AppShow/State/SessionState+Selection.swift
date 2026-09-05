@@ -32,7 +32,7 @@ extension SessionState {
   func startWindowSelection() {
     guard case .idle = state else { return }
     guard Permissions.hasScreenRecordingPermission else {
-      Permissions.requestScreenRecordingPermission()
+      onScreenRecordingPermissionRequired?()
       return
     }
 
@@ -50,7 +50,7 @@ extension SessionState {
     }
 
     guard Permissions.hasScreenRecordingPermission else {
-      Permissions.requestScreenRecordingPermission()
+      onScreenRecordingPermissionRequired?()
       throw CaptureError.permissionDenied
     }
 

@@ -17,7 +17,7 @@ final class KeyboardShortcutManager {
     self.session = session
   }
 
-  func start() {
+  func start(enableGlobalShortcuts: Bool) {
     guard localMonitor == nil else { return }
 
     let context = TapContext()
@@ -25,14 +25,16 @@ final class KeyboardShortcutManager {
     tapContext = context
 
     let eventMask: CGEventMask = 1 << CGEventType.keyDown.rawValue
-    if let tap = CGEvent.tapCreate(
-      tap: .cgSessionEventTap,
-      place: .headInsertEventTap,
-      options: .defaultTap,
-      eventsOfInterest: eventMask,
-      callback: Self.eventTapCallback,
-      userInfo: Unmanaged.passUnretained(context).toOpaque()
-    ) {
+    if enableGlobalShortcuts,
+      let tap = CGEvent.tapCreate(
+        tap: .cgSessionEventTap,
+        place: .headInsertEventTap,
+        options: .defaultTap,
+        eventsOfInterest: eventMask,
+        callback: Self.eventTapCallback,
+        userInfo: Unmanaged.passUnretained(context).toOpaque()
+      )
+    {
       context.eventTap = tap
       eventTap = tap
       let source = CFMachPortCreateRunLoopSource(nil, tap, 0)

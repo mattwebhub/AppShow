@@ -1,104 +1,72 @@
 import SwiftUI
 
 struct PermissionsView: View {
-  var onAllGranted: () -> Void
-
-  @State private var screenRecordingGranted = Permissions.hasScreenRecordingPermission
-  @State private var accessibilityGranted = Permissions.hasAccessibilityPermission
+  let permissions: PermissionStore
+  var onContinue: () -> Void
 
   private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     let _ = colorScheme
-    VStack(spacing: 32) {
-      Image(nsImage: NSApp.applicationIconImage)
-        .resizable()
-        .frame(width: 128, height: 128)
-        .padding(.top, -100)
+    VStack(alignment: .leading, spacing: 20) {
+      Text("Recording permissions")
+        .font(.system(size: FontSize.xl, weight: .semibold))
+        .foregroundStyle(AppShowColors.primaryText)
+      Text("Allow the features you want to use. You can open and edit projects at any time.")
+        .font(.system(size: FontSize.sm))
+        .foregroundStyle(AppShowColors.secondaryText)
 
-      VStack(alignment: .leading, spacing: 32) {
-        PermissionRow(
-          title: "Screen Recording",
-          description: "Required to capture your screen. A restart may be needed after granting this.",
-          granted: screenRecordingGranted,
-          grantedLabel: "Screen recording allowed",
-          requestLabel: "Allow Screen Recording"
-        ) {
-          Permissions.requestScreenRecordingPermission()
-        }
+      ScrollView {
+        VStack(alignment: .leading, spacing: 16) {
+          PermissionRow(
+            title: "Screen Recording",
+            description: "Required to record your screen. macOS may ask you to quit and reopen AppShow after allowing access.",
+            granted: permissions.screenRecordingGranted,
+            onRequest: { permissions.request(.screenRecording) },
+            onOpenSettings: { NSWorkspace.shared.open(PermissionKind.screenRecording.settingsURL) }
+          )
+          PermissionRow(
+            title: "Accessibility",
+            description: "Enables global recording shortcuts and interaction with other app windows.",
+            granted: permissions.accessibilityGranted,
+            onRequest: { permissions.request(.accessibility) },
+            onOpenSettings: { NSWorkspace.shared.open(PermissionKind.accessibility.settingsURL) }
+          )
 
-        PermissionRow(
-          title: "Accessibility",
-          description: "Used to track your cursor and listen for keyboard shortcuts during recording.",
-          granted: accessibilityGranted,
-          grantedLabel: "Accessibility allowed",
-          requestLabel: "Allow Accessibility"
-        ) {
-          Permissions.requestAccessibilityPermission()
-        }
-      }
-    }
-    .padding(80)
-    .frame(minWidth: 800, minHeight: 500)
-    .onReceive(timer) { _ in
-      screenRecordingGranted = Permissions.hasScreenRecordingPermission
-      accessibilityGranted = Permissions.hasAccessibilityPermission
-      if screenRecordingGranted && accessibilityGranted {
-        onAllGranted()
-      }
-    }
-  }
-}
-
-private struct PermissionRow: View {
-  let title: String
-  let description: String
-  let granted: Bool
-  let grantedLabel: String
-  let requestLabel: String
-  let onRequest: () -> Void
-
-  var body: some View {
-    HStack(alignment: .center, spacing: 16) {
-      VStack(alignment: .leading, spacing: 4) {
-        Text(title)
-          .font(.system(size: FontSize.xs, weight: .medium))
-          .foregroundStyle(AppShowColors.primaryText)
-
-        Text(description)
-          .font(.system(size: FontSize.xs))
-          .foregroundStyle(AppShowColors.secondaryText)
-          .lineLimit(3)
-          .fixedSize(horizontal: false, vertical: true)
-      }
-      .frame(maxWidth: 250, alignment: .leading)
-
-      Spacer()
-
-      Button(action: {
-        if !granted {
-          onRequest()
-        }
-      }) {
-        HStack(spacing: 6) {
-          if granted {
-            Image(systemName: "checkmark")
-              .font(.system(size: FontSize.xs, weight: .semibold))
+          if !permissions.allGranted {
+            VStack(alignment: .leading, spacing: 8) {
+              Text("Already enabled in System Settings?")
+                .font(.system(size: FontSize.sm, weight: .medium))
+              Text(
+                "If Allow does nothing, open Settings directly. If AppShow is enabled there but still unavailable here, remove its old entry and add the copy shown in Finder, then quit and reopen AppShow."
+              )
+              .font(.system(size: FontSize.xs))
+              .foregroundStyle(AppShowColors.secondaryText)
+              .fixedSize(horizontal: false, vertical: true)
+              HStack {
+                Button("Show AppShow in Finder") {
+                  NSWorkspace.shared.activateFileViewerSelecting([Bundle.main.bundleURL])
+                }
+                .buttonStyle(OutlineButtonStyle(size: .small))
+                Button("Check Again") { permissions.refresh() }
+                  .buttonStyle(OutlineButtonStyle(size: .small))
+              }
+            }
           }
-          Text(granted ? grantedLabel : requestLabel)
-            .font(.system(size: FontSize.xs, weight: .medium))
+
         }
-        .frame(width: 260)
-        .padding(.vertical, 8)
-        .background(
-          RoundedRectangle(cornerRadius: Radius.lg)
-            .stroke(granted ? Color.green.opacity(0.5) : AppShowColors.permissionBorder, lineWidth: 1)
-        )
-        .foregroundStyle(granted ? .green : AppShowColors.permissionText)
       }
-      .buttonStyle(PlainCustomButtonStyle())
+
+      HStack {
+        Spacer()
+        Button("Continue to AppShow", action: onContinue)
+          .buttonStyle(PrimaryButtonStyle())
+      }
     }
-    .padding(.horizontal)
+    .padding(32)
+    .frame(width: 720, height: 570)
+    .onAppear { permissions.refresh() }
+    .onReceive(timer) { _ in permissions.refresh() }
   }
 }

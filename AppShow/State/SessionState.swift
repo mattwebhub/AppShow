@@ -18,6 +18,7 @@ final class SessionState {
   var lastRecordingURL: URL?
   var captureMode: CaptureMode = .none
   var errorMessage: String?
+  var onScreenRecordingPermissionRequired: (() -> Void)?
   var cameraPreviewState: CameraPreviewState = .off
   var isCameraOn = false
   var recordingWebcamPresentation: WebcamPresentation?
