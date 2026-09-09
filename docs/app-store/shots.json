@@ -1,0 +1,47 @@
+[
+  {
+    "id": "01-record",
+    "eyebrow": "RECORD → EDIT → SHARE",
+    "headline": "Screen recordings.\nWorth watching.",
+    "description": "Capture your screen. Make the result your own.",
+    "accent": "#80e4be",
+    "capture": "01-record.png",
+    "direction": "Actual Store editor with the Routine demo project open, a readable preview and the timeline visible. Capture the completed editor view for the hero; do not show the permissions screen."
+  },
+  {
+    "id": "02-pace",
+    "eyebrow": "KEEP THE GOOD PARTS",
+    "headline": "Less waiting.\nMore showing.",
+    "description": "Trim the take. Cut the pauses. Set the pace.",
+    "accent": "#91bbff",
+    "capture": "02-pace.png",
+    "direction": "Actual Store editor with a real cut and speed region in the disposable demo project. Make both timeline tracks readable. Keep the full app window; no invented timeline regions."
+  },
+  {
+    "id": "03-frame",
+    "eyebrow": "GIVE IT YOUR LOOK",
+    "headline": "A better frame\nfor every idea.",
+    "description": "Choose a background, spacing and rounded corners.",
+    "accent": "#efafa1",
+    "capture": "03-frame.png",
+    "direction": "Actual Store editor with Video properties selected and the real background, padding and corner controls visible. Use the same demo project with an intentional restrained background."
+  },
+  {
+    "id": "04-focus",
+    "eyebrow": "DIRECT THEIR ATTENTION",
+    "headline": "Bring the details\ninto focus.",
+    "description": "Guide the viewer with editable zoom regions.",
+    "accent": "#b6b1fb",
+    "capture": "04-focus.png",
+    "direction": "Actual Store editor paused inside an active zoom region. Show the Zoom properties and corresponding timeline region. The zoom must be an AppShow edit, not a crop applied to the screenshot."
+  },
+  {
+    "id": "05-export",
+    "eyebrow": "READY FOR THE NEXT STEP",
+    "headline": "From your screen\nto their screen.",
+    "description": "Choose your format, resolution and frame rate.",
+    "accent": "#f1d899",
+    "capture": "05-export.png",
+    "direction": "Actual Store export sheet over the demo project. Show real format, resolution and frame-rate choices. Validate each advertised export in the candidate before submission."
+  }
+]
