@@ -22,3 +22,7 @@ Start with the [project introduction](../README.md#get-started), then follow the
 - [Current state](../planning/STATE.md) and [architecture decisions](../planning/decisions/README.md)
 
 The feature spikes under `features/` document earlier exploration. Use the current state and milestone verification files to distinguish implemented behavior from ideas and pending manual checks.
+
+- [Store implementation and local verification](../planning/releases/STORE-IMPLEMENTATION.md)
+- [Store privacy audit](../planning/releases/PRIVACY-AUDIT.md)
+- [Store dependency evidence](../planning/releases/STORE-DEPENDENCIES.md)

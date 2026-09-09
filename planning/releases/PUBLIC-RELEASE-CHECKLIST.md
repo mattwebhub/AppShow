@@ -10,7 +10,7 @@ Use **Pass**, **Fail**, **Not tested**, or **Not applicable (decision linked)** 
 
 | Candidate field | Current value |
 | --- | --- |
-| Channel | Direct download planned; App Store needs a dedicated implementation and evaluation |
+| Channel | Direct download planned; App Store foundation implemented locally, with submission gates still open |
 | Commit/tag | Not frozen; development branch `webcam-presentation-and-review` |
 | Marketing version/build | Current source: `0.14.7` / `26`; release version not selected |
 | Artifact/SHA-256 | No candidate artifact nominated |
@@ -20,7 +20,7 @@ Use **Pass**, **Fail**, **Not tested**, or **Not applicable (decision linked)** 
 
 ## Shared product and repository gates
 
-- [ ] **G1 — Engineering:** freeze the candidate, resolve open changes into reviewed semantic commits, and obtain green CI on that SHA. Evidence: commit, PR/CI URLs, clean checkout and dependency lockfile. Current local baseline: 770 tests and 11 gated export tests passed before the tray change; see [state](../STATE.md).
+- [ ] **G1 — Engineering:** freeze the candidate, resolve open changes into reviewed semantic commits, and obtain green CI on that SHA. Evidence: commit, PR/CI URLs, clean checkout and dependency lockfile. Current local baseline: 789 tests, 11 gated exports and three sandbox-hosted smoke tests pass; see [milestone 19](../milestones/19-store-foundation/VERIFY.md).
 - [ ] **G2 — Engineering:** run the commands below on the candidate and retain logs. Evidence: warning-free build, strict lint, unit suite, shim, deterministic scenario and encoded exports; failures are fixed or the affected feature is removed from the release.
 - [ ] **G3 — QA:** capture display/window/area/device with the supported camera/system-audio/microphone combinations. Test permission denial, later grant and revocation, countdown, pause/resume, cancel, repeated recording, long recording, sleep/wake, display changes and disk-full failure. Evidence: OS/hardware matrix and test recordings; no lost source media.
 - [ ] **G4 — QA:** test real project create/save/reopen/rename/move, `.frm` migration, cuts, trim, overlays, blur, cursor/area zoom, camera layouts, captions/fonts, music, Undo/Redo, and speed presets. Compare native preview with SDR/HDR and normal/parallel exports, including normal-speed webcam/microphone/music and SRT/VTT timing. Evidence: checked manual rows in milestones [10](../milestones/10-webcam-presentation/VERIFY.md), [11](../milestones/11-webcam-voice/VERIFY.md), [12](../milestones/12-caption-style/VERIFY.md), [15](../milestones/15-area-effects-and-recovery/VERIFY.md), [16](../milestones/16-speed-regions/VERIFY.md), plus remaining earlier milestones.
@@ -68,6 +68,9 @@ shasum -a 256 dist/AppShow-X.Y.Z.dmg
 ## Mac App Store gates
 
 Complete the [App Store readiness evaluation](APP-STORE-EVAL.md), attach its evidence and record its verdict before submission. The existing unsandboxed direct-download app is not a store candidate.
+
+Local implementation is underway in [milestone 19](../milestones/19-store-foundation/VERIFY.md): dedicated sandboxed target, updater exclusion, scoped file access, local control adaptations, first-party API privacy reasons and repeatable artifact/smoke checks. These changes do not close the candidate-specific gates below.
+
 
 - [ ] **A1 — Engineering:** dedicated sandboxed store configuration and validated capture/export runtime.
 - [ ] **A2 — Owner/engineering:** store-compatible optional assistant design and tested provider behavior.
