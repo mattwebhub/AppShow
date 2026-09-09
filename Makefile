@@ -9,7 +9,7 @@ TEST_TARGET = AppShowTests
 TEST_FILTER = $(if $(T),-only-testing:'$(TEST_TARGET)/$(T)',-only-testing:$(TEST_TARGET))
 TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning:|failed
 
-.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish prepare-release release-preview store-build store-release store-archive brand tray eval-tray preview-tray
+.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish prepare-release release-preview store-build store-release store-archive test-store brand tray eval-tray preview-tray
 
 all: help
 
@@ -39,6 +39,9 @@ store-release:
 
 store-archive:
 	@xcodebuild -project AppShow.xcodeproj -scheme AppShowStore -configuration Release archive -quiet -derivedDataPath $(BUILD_DIR) -archivePath $(BUILD_DIR)/AppShowStore.xcarchive -destination 'generic/platform=macOS' ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO
+
+test-store:
+	@set -o pipefail; xcodebuild -project AppShow.xcodeproj -scheme AppShowStore -configuration Debug test -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)' -parallel-testing-enabled NO 2>&1 | grep -E '$(TEST_OUTPUT_FILTER)'
 
 run: release
 	@open $(RELEASE_DIR)/$(APP_NAME).app
@@ -89,10 +92,10 @@ publish:
 	@./scripts/publish-release.sh --publish
 
 format:
-	@swift format -i -r AppShow/ Tools/ $(wildcard AppShowTests)
+	@swift format -i -r AppShow/ Tools/ $(wildcard AppShowTests AppShowStoreTests)
 
 lint:
-	@swift format lint -r -s AppShow/ Tools/ $(wildcard AppShowTests)
+	@swift format lint -r -s AppShow/ Tools/ $(wildcard AppShowTests AppShowStoreTests)
 
 clean:
 	@rm -rf $(BUILD_DIR) dist
@@ -108,6 +111,7 @@ help:
 	@echo "  store-build - Build the sandboxed store validation app"
 	@echo "  store-release - Build the universal store validation app"
 	@echo "  store-archive - Create a local universal store archive"
+	@echo "  test-store - Run sandbox-hosted synthetic project/export smoke tests"
 	@echo "  dmg         - Create .dmg installer"
 	@echo "  dmg-release - Create signed and notarized .dmg installer"
 	@echo "  install   - Install to /Applications"

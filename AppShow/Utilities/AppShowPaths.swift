@@ -20,7 +20,12 @@ enum AppDistribution {
 }
 
 enum AppShowPaths {
+  private static let storeTestRoot = FileManager.default.temporaryDirectory.appendingPathComponent(
+    "AppShowTests-" + UUID().uuidString,
+    isDirectory: true
+  )
   static var home: URL {
+    if AppDistribution.isStore && LaunchEnvironment.isTestHost { return storeTestRoot.appendingPathComponent("home", isDirectory: true) }
     return resolveHome(
       environment: ProcessInfo.processInfo.environment,
       homeDirectory: FileManager.default.homeDirectoryForCurrentUser,
@@ -29,6 +34,7 @@ enum AppShowPaths {
   }
 
   static var temp: URL {
+    if AppDistribution.isStore && LaunchEnvironment.isTestHost { return storeTestRoot.appendingPathComponent("tmp", isDirectory: true) }
     return resolveTemp(environment: ProcessInfo.processInfo.environment, sandboxed: AppDistribution.isStore)
   }
 
