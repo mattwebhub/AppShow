@@ -10,12 +10,21 @@ TEST_TARGET = AppShowTests
 TEST_FILTER = $(if $(T),-only-testing:'$(TEST_TARGET)/$(T)',-only-testing:$(TEST_TARGET))
 TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning:|failed
 
-.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish brand
+.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish brand tray eval-tray preview-tray
 
 all: help
 
 brand:
 	@/usr/bin/python3 scripts/generate-brand-assets.py
+
+tray:
+	@/usr/bin/python3 scripts/generate-tray-assets.py
+
+preview-tray: build
+	@./scripts/preview-tray.sh
+
+eval-tray:
+	@/usr/bin/python3 scripts/evaluate-tray-icon.py
 
 build:
 	@xcodebuild -project AppShow.xcodeproj -scheme $(SCHEME) -configuration Debug build -quiet -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)'
@@ -99,6 +108,9 @@ help:
 	@echo "  test-scenario - Replay and export the deterministic presentation scenario"
 	@echo "  format    - Format Swift source files"
 	@echo "  brand     - Regenerate app icons and repository graphics"
+	@echo "  tray      - Regenerate transparent SVG and menu bar template"
+	@echo "  eval-tray - Evaluate SVG transparency, fidelity, and regeneration"
+	@echo "  preview-tray - Render native menu bar states at 1x/2x"
 	@echo "  clean     - Clean build artifacts"
 	@echo "  tag       - Create git tag from Config.xcconfig version and generate changelog"
 	@echo "  changelog - Generate CHANGELOG.md"

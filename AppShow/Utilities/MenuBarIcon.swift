@@ -17,175 +17,64 @@ enum MenuBarIcon {
   }
 
   static func makeImage(for state: State) -> NSImage {
-    let size = NSSize(width: 18, height: 18)
-    let img = NSImage(size: size, flipped: false) { rect in
+    let mark = NSImage(resource: .menuBarMark)
+    let image = NSImage(size: NSSize(width: 18, height: 18), flipped: false) { rect in
+      mark.draw(in: rect)
       NSColor.black.setStroke()
       NSColor.black.setFill()
-      drawBrackets(in: rect)
-      drawCenter(for: state, in: rect)
+      drawActivity(for: state)
       return true
     }
-    img.isTemplate = true
-    return img
+    image.isTemplate = true
+    image.accessibilityDescription = "AppShow — \(label(for: state))"
+    return image
   }
 
-  private static func drawBrackets(in rect: NSRect) {
-    let lineWidth: CGFloat = 1.8
-    let inset: CGFloat = 1.8
-    let cornerLen: CGFloat = 4.5
-    let cornerRadius: CGFloat = 2.0
-    let minX = inset
-    let minY = inset
-    let maxX = rect.width - inset
-    let maxY = rect.height - inset
-
-    let topLeft = NSBezierPath()
-    topLeft.lineWidth = lineWidth
-    topLeft.lineCapStyle = .round
-    topLeft.lineJoinStyle = .round
-    topLeft.move(to: NSPoint(x: minX, y: maxY - cornerLen))
-    topLeft.line(to: NSPoint(x: minX, y: maxY - cornerRadius))
-    topLeft.curve(
-      to: NSPoint(x: minX + cornerRadius, y: maxY),
-      controlPoint1: NSPoint(x: minX, y: maxY),
-      controlPoint2: NSPoint(x: minX, y: maxY)
-    )
-    topLeft.line(to: NSPoint(x: minX + cornerLen, y: maxY))
-    topLeft.stroke()
-
-    let topRight = NSBezierPath()
-    topRight.lineWidth = lineWidth
-    topRight.lineCapStyle = .round
-    topRight.lineJoinStyle = .round
-    topRight.move(to: NSPoint(x: maxX - cornerLen, y: maxY))
-    topRight.line(to: NSPoint(x: maxX - cornerRadius, y: maxY))
-    topRight.curve(
-      to: NSPoint(x: maxX, y: maxY - cornerRadius),
-      controlPoint1: NSPoint(x: maxX, y: maxY),
-      controlPoint2: NSPoint(x: maxX, y: maxY)
-    )
-    topRight.line(to: NSPoint(x: maxX, y: maxY - cornerLen))
-    topRight.stroke()
-
-    let bottomRight = NSBezierPath()
-    bottomRight.lineWidth = lineWidth
-    bottomRight.lineCapStyle = .round
-    bottomRight.lineJoinStyle = .round
-    bottomRight.move(to: NSPoint(x: maxX, y: minY + cornerLen))
-    bottomRight.line(to: NSPoint(x: maxX, y: minY + cornerRadius))
-    bottomRight.curve(
-      to: NSPoint(x: maxX - cornerRadius, y: minY),
-      controlPoint1: NSPoint(x: maxX, y: minY),
-      controlPoint2: NSPoint(x: maxX, y: minY)
-    )
-    bottomRight.line(to: NSPoint(x: maxX - cornerLen, y: minY))
-    bottomRight.stroke()
-
-    let bottomLeft = NSBezierPath()
-    bottomLeft.lineWidth = lineWidth
-    bottomLeft.lineCapStyle = .round
-    bottomLeft.lineJoinStyle = .round
-    bottomLeft.move(to: NSPoint(x: minX + cornerLen, y: minY))
-    bottomLeft.line(to: NSPoint(x: minX + cornerRadius, y: minY))
-    bottomLeft.curve(
-      to: NSPoint(x: minX, y: minY + cornerRadius),
-      controlPoint1: NSPoint(x: minX, y: minY),
-      controlPoint2: NSPoint(x: minX, y: minY)
-    )
-    bottomLeft.line(to: NSPoint(x: minX, y: minY + cornerLen))
-    bottomLeft.stroke()
-  }
-
-  private static func drawCenter(for state: State, in rect: NSRect) {
-    let cx = rect.midX
-    let cy = rect.midY
-
+  private static func label(for state: State) -> String {
     switch state {
-    case .idle:
-      break
+    case .idle: "Ready"
+    case .selecting: "Selecting capture area"
+    case .countdown: "Counting down"
+    case .recording: "Recording"
+    case .paused: "Recording paused"
+    case .processing, .processingPulse: "Processing"
+    case .editing: "Editing"
+    }
+  }
 
+  private static func drawActivity(for state: State) {
+    let center = NSPoint(x: 4.5, y: 4.5)
+    switch state {
+    case .idle, .processing:
+      break
     case .selecting:
-      let crossSize: CGFloat = 2.5
-      let path = NSBezierPath()
-      path.lineWidth = 1.4
-      path.lineCapStyle = .round
-      path.move(to: NSPoint(x: cx - crossSize, y: cy))
-      path.line(to: NSPoint(x: cx + crossSize, y: cy))
-      path.move(to: NSPoint(x: cx, y: cy - crossSize))
-      path.line(to: NSPoint(x: cx, y: cy + crossSize))
-      path.stroke()
-
+      let cross = NSBezierPath()
+      cross.lineWidth = 1.2
+      cross.lineCapStyle = .round
+      cross.move(to: NSPoint(x: center.x - 2, y: center.y))
+      cross.line(to: NSPoint(x: center.x + 2, y: center.y))
+      cross.move(to: NSPoint(x: center.x, y: center.y - 2))
+      cross.line(to: NSPoint(x: center.x, y: center.y + 2))
+      cross.stroke()
     case .countdown:
-      NSColor.black.setFill()
-      let dotRadius: CGFloat = 2.5
-      let dot = NSBezierPath(
-        ovalIn: NSRect(
-          x: cx - dotRadius,
-          y: cy - dotRadius,
-          width: dotRadius * 2,
-          height: dotRadius * 2
-        )
-      )
-      dot.fill()
-
+      let ring = NSBezierPath(ovalIn: NSRect(x: 2.5, y: 2.5, width: 4, height: 4))
+      ring.lineWidth = 1.2
+      ring.stroke()
     case .recording:
-      let circleRadius: CGFloat = 3.0
-      let circle = NSBezierPath(
-        ovalIn: NSRect(
-          x: cx - circleRadius,
-          y: cy - circleRadius,
-          width: circleRadius * 2,
-          height: circleRadius * 2
-        )
-      )
-      circle.fill()
-
+      NSBezierPath(ovalIn: NSRect(x: 2, y: 2, width: 5, height: 5)).fill()
     case .paused:
-      let barWidth: CGFloat = 1.6
-      let barHeight: CGFloat = 5.0
-      let gap: CGFloat = 1.6
-      let leftBar = NSRect(
-        x: cx - gap - barWidth,
-        y: cy - barHeight / 2,
-        width: barWidth,
-        height: barHeight
-      )
-      let rightBar = NSRect(
-        x: cx + gap,
-        y: cy - barHeight / 2,
-        width: barWidth,
-        height: barHeight
-      )
-      NSBezierPath(roundedRect: leftBar, xRadius: 0.5, yRadius: 0.5).fill()
-      NSBezierPath(roundedRect: rightBar, xRadius: 0.5, yRadius: 0.5).fill()
-
-    case .processing:
-      break
-
+      for x in [2.3, 5.1] {
+        NSBezierPath(roundedRect: NSRect(x: x, y: 2, width: 1.6, height: 5), xRadius: 0.4, yRadius: 0.4).fill()
+      }
     case .processingPulse:
-      NSColor.black.setFill()
-      let dotRadius: CGFloat = 2.5
-      let dot = NSBezierPath(
-        ovalIn: NSRect(
-          x: cx - dotRadius,
-          y: cy - dotRadius,
-          width: dotRadius * 2,
-          height: dotRadius * 2
-        )
-      )
-      dot.fill()
-
+      NSBezierPath(ovalIn: NSRect(x: 2.8, y: 2.8, width: 3.4, height: 3.4)).fill()
     case .editing:
-      NSColor.black.setFill()
-      let triW: CGFloat = 4.0
-      let triH: CGFloat = 5.0
-      let offsetX: CGFloat = 0.8
-      let path = NSBezierPath()
-      path.move(to: NSPoint(x: cx - triW / 2 + offsetX, y: cy + triH / 2))
-      path.line(to: NSPoint(x: cx + triW / 2 + offsetX, y: cy))
-      path.line(to: NSPoint(x: cx - triW / 2 + offsetX, y: cy - triH / 2))
-      path.close()
-      path.fill()
+      let triangle = NSBezierPath()
+      triangle.move(to: NSPoint(x: 3, y: 2))
+      triangle.line(to: NSPoint(x: 7, y: 4.5))
+      triangle.line(to: NSPoint(x: 3, y: 7))
+      triangle.close()
+      triangle.fill()
     }
   }
 }
