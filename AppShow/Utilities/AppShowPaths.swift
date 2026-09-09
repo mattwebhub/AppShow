@@ -11,33 +11,50 @@ enum AppShowIdentity {
   static let supportedProjectExtensions = [projectExtension, legacyProjectExtension]
 }
 
+enum AppDistribution {
+  #if APP_STORE
+  static let isStore = true
+  #else
+  static let isStore = false
+  #endif
+}
+
 enum AppShowPaths {
   static var home: URL {
-    resolveHome(
+    return resolveHome(
       environment: ProcessInfo.processInfo.environment,
-      homeDirectory: FileManager.default.homeDirectoryForCurrentUser
+      homeDirectory: FileManager.default.homeDirectoryForCurrentUser,
+      sandboxed: AppDistribution.isStore
     )
   }
 
   static var temp: URL {
-    resolveTemp(environment: ProcessInfo.processInfo.environment)
+    return resolveTemp(environment: ProcessInfo.processInfo.environment, sandboxed: AppDistribution.isStore)
   }
 
-  static func resolveTemp(environment: [String: String]) -> URL {
+  static func resolveTemp(
+    environment: [String: String],
+    sandboxed: Bool = false,
+    temporaryDirectory: URL = FileManager.default.temporaryDirectory
+  ) -> URL {
     if let override = environment["APPSHOW_TMP"] ?? environment["REFRAMED_TMP"] {
       return URL(fileURLWithPath: override, isDirectory: true)
     }
+    if sandboxed { return temporaryDirectory.appendingPathComponent("AppShow", isDirectory: true) }
     return URL(fileURLWithPath: "/tmp/AppShow", isDirectory: true)
   }
 
   static func resolveHome(
     environment: [String: String],
     homeDirectory: URL,
-    fileManager: FileManager = .default
+    fileManager: FileManager = .default,
+    sandboxed: Bool = false
   ) -> URL {
     if let override = environment["APPSHOW_HOME"] ?? environment["REFRAMED_HOME"] {
       return URL(fileURLWithPath: override, isDirectory: true)
     }
+
+    if sandboxed { return homeDirectory.appendingPathComponent("Library/Application Support/AppShow", isDirectory: true) }
 
     let current = homeDirectory.appendingPathComponent(".appshow", isDirectory: true)
     let legacy = homeDirectory.appendingPathComponent(".reframed", isDirectory: true)
