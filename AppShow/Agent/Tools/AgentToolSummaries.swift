@@ -56,6 +56,25 @@ enum AgentToolSummaries {
         "slices": .array(cuts.slices.map(slice)),
         "gaps": .array(cuts.gaps.map { range($0.lowerBound, $0.upperBound) }),
       ],
+      "speed": .array(
+        (snapshot.speedRegions ?? []).map { region in
+          [
+            "id": .string(region.id.uuidString), "start": seconds(region.startSeconds), "end": seconds(region.endSeconds),
+            "rate": .number(region.rate),
+          ]
+        }
+      ),
+      "outputDuration": seconds(
+        SpeedTimeline(
+          duration: duration,
+          regions: snapshot.speedRegions ?? [],
+          slices: slices.compactMap { slice in
+            let start = max(slice.startSeconds, snapshot.trimStartSeconds)
+            let end = min(slice.endSeconds, snapshot.trimEndSeconds)
+            return end > start ? VideoRegionData(startSeconds: start, endSeconds: end) : nil
+          }
+        ).totalDuration
+      ),
       "zoom": [
         "enabled": .bool(zoom?.zoomEnabled ?? false),
         "autoZoom": .bool(zoom?.autoZoomEnabled ?? false),

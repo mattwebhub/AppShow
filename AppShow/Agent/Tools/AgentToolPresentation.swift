@@ -9,6 +9,7 @@ extension AgentToolDefinition {
     case "set_audio", "add_music", "set_music", "remove_music": "Audio"
     case "get_cursor_activity", "set_cursor": "Cursor"
     case "add_zoom": "Zoom"
+    case "add_speed", "update_speed", "remove_speed": "Speed"
     case "add_spotlight": "Spotlight"
     case "set_canvas": "Canvas"
     case "add_text", "update_text", "remove_text": "Text"

@@ -15,7 +15,7 @@ enum AgentToolCatalog {
   static let getTimeline = AgentToolDefinition(
     name: "get_timeline",
     description:
-      "Return the compact timeline: trim, kept slices and gaps, zoom keyframes, spotlight and camera regions, caption segments, audio tracks, background, canvas, history. Times are seconds in source time. detail=full adds the raw editor snapshot.",
+      "Return the compact timeline: trim, kept slices and gaps, speed regions and output duration, zoom keyframes, spotlight and camera regions, caption segments, audio tracks, background, canvas, history. Times are seconds in source time. detail=full adds the raw editor snapshot.",
     inputSchema: AgentToolSchema.object([
       "detail": AgentToolSchema.string("summary (default) or full", enum: ["summary", "full"])
     ]),

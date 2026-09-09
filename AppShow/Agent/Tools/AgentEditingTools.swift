@@ -395,6 +395,9 @@ enum AgentEditingToolCatalog {
   static var handlers: [any AgentToolHandler] {
     [
       AgentSetTrimTool(),
+      AgentSpeedTool(action: .add),
+      AgentSpeedTool(action: .update),
+      AgentSpeedTool(action: .remove),
       AgentAddZoomTool(),
       AgentAddSpotlightTool(),
       AgentSetKeptSlicesTool(),
