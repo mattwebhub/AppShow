@@ -10,9 +10,12 @@ TEST_TARGET = AppShowTests
 TEST_FILTER = $(if $(T),-only-testing:'$(TEST_TARGET)/$(T)',-only-testing:$(TEST_TARGET))
 TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning:|failed
 
-.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish
+.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish brand
 
 all: help
+
+brand:
+	@/usr/bin/python3 scripts/generate-brand-assets.py
 
 build:
 	@xcodebuild -project AppShow.xcodeproj -scheme $(SCHEME) -configuration Debug build -quiet -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)'
@@ -95,6 +98,7 @@ help:
 	@echo "  test-agent-skills - Run live provider skill tests (optional CLAUDE_MODEL=name)"
 	@echo "  test-scenario - Replay and export the deterministic presentation scenario"
 	@echo "  format    - Format Swift source files"
+	@echo "  brand     - Regenerate app icons and repository graphics"
 	@echo "  clean     - Clean build artifacts"
 	@echo "  tag       - Create git tag from Config.xcconfig version and generate changelog"
 	@echo "  changelog - Generate CHANGELOG.md"
