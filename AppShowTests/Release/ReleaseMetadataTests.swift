@@ -5,6 +5,11 @@ import Testing
 
 @MainActor
 struct ReleaseMetadataTests {
+  @Test func bundleDeclaresItsExecutableAndApplicationType() {
+    #expect(Bundle.main.object(forInfoDictionaryKey: "CFBundleExecutable") as? String == "AppShow")
+    #expect(Bundle.main.object(forInfoDictionaryKey: "CFBundlePackageType") as? String == "APPL")
+  }
+
   @Test func hostedBuildNumberIsIndependentOfMarketingVersion() throws {
     let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
     let config = try String(contentsOf: root.appendingPathComponent("Config.xcconfig"), encoding: .utf8)
