@@ -391,6 +391,7 @@
 		D83AAD9EE867491A984778E1 /* PermissionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6754BF44E7E4C6483CCD606 /* PermissionStore.swift */; };
 		6C23D137DE354FBF8A6D936D /* PermissionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD987EC431D6401F8EFF88A2 /* PermissionRow.swift */; };
 		570000000000000000000030 /* BookmarkAccessStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570000000000000000000031 /* BookmarkAccessStore.swift */; };
+		570000000000000000000040 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 570000000000000000000041 /* PrivacyInfo.xcprivacy */; };
 		580000000000000000000020 /* VideoFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580000000000000000000021 /* VideoFixtures.swift */; };
 /* End PBXBuildFile section */
 
@@ -818,6 +819,7 @@
 		AD987EC431D6401F8EFF88A2 /* PermissionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PermissionRow.swift"; sourceTree = "<group>"; };
 		57000000000000000000001B /* AppShowStore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppShowStore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		570000000000000000000031 /* BookmarkAccessStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAccessStore.swift; sourceTree = "<group>"; };
+		570000000000000000000041 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = AppShow/PrivacyInfo.xcprivacy; sourceTree = SOURCE_ROOT; };
 		5800000000000000000002 /* AppShowStoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = AppShowStoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		580000000000000000000021 /* VideoFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShowTests/Support/VideoFixtures.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -1001,6 +1003,7 @@
 				B20000000000000000000011 /* SendableBox.swift */,
 				7E570000000000000000000E /* AppShowPaths.swift */,
 				570000000000000000000031 /* BookmarkAccessStore.swift */,
+				570000000000000000000041 /* PrivacyInfo.xcprivacy */,
 				B40000000000000000000001 /* SoundEffect.swift */,
 				B40000000000000000000002 /* TimeFormatting.swift */,
 				B40000000000000000000003 /* MediaFileInfo.swift */,
@@ -1633,6 +1636,7 @@
 			files = (
 				3DCA03E12F3B511C003FE309 /* Assets.xcassets in Resources */,
 				AA0000000000000000000001 /* Credits.html in Resources */,
+				570000000000000000000040 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 		};
 		5800000000000000000009 /* Resources */ = {
