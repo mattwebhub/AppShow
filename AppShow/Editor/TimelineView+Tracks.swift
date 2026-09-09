@@ -59,6 +59,10 @@ extension TimelineView {
             .transition(.trackTransition)
         }
 
+        if !editorState.speedRegions.isEmpty {
+          trackSidebar(label: "Speed", icon: "speedometer").frame(height: trackHeight).transition(.trackTransition)
+        }
+
         if editorState.zoomEnabled {
           trackSidebar(label: "Zoom", icon: "plus.magnifyingglass")
             .frame(height: trackHeight)
@@ -142,6 +146,10 @@ extension TimelineView {
         ForEach(editorState.externalAudioTracks) { track in
           externalAudioTrackContent(track: track, width: width)
             .transition(.trackTransition)
+        }
+
+        if !editorState.speedRegions.isEmpty {
+          speedTrackContent(width: width).transition(.trackTransition)
         }
 
         if editorState.zoomEnabled {

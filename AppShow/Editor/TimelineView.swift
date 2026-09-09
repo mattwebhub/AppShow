@@ -91,6 +91,7 @@ struct TimelineView: View {
     if showSystemAudioTrack { count += 1 }
     if showMicAudioTrack { count += 1 }
     count += editorState.externalAudioTracks.count
+    if !editorState.speedRegions.isEmpty { count += 1 }
     if editorState.zoomEnabled { count += 1 }
     if showSpotlightTrack { count += 1 }
     if editorState.showOverlayTrack { count += 1 }

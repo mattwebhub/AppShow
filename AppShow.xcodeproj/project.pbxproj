@@ -231,10 +231,12 @@
 		A2000000000000000000001A /* CompositionInstruction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000001A /* CompositionInstruction.swift */; };
 		A2000000000000000000001B /* TimelineView+AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000001B /* TimelineView+AudioTrack.swift */; };
 		A2000000000000000000001C /* TimelineView+CameraTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000001C /* TimelineView+CameraTrack.swift */; };
+		973D492C61014B26A2933574 /* TimelineView+SpeedTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89CC3162B60744488FC0A116 /* TimelineView+SpeedTrack.swift */; };
 		A2000000000000000000001D /* PropertiesPanel+VideoTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000001D /* PropertiesPanel+VideoTab.swift */; };
 		A2000000000000000000001E /* PropertiesPanel+CameraTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000001E /* PropertiesPanel+CameraTab.swift */; };
 		A2000000000000000000001F /* PropertiesPanel+CursorZoomTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000001F /* PropertiesPanel+CursorZoomTab.swift */; };
 		A20000000000000000000021 /* PropertiesPanel+AudioTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000021 /* PropertiesPanel+AudioTab.swift */; };
+		4042AC4F9CC14FECA2C76973 /* PropertiesPanel+Speed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B5BB671B4198868E8CF3 /* PropertiesPanel+Speed.swift */; };
 		C5F822D987134BB68B2EB172 /* PropertiesPanel+CursorMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D359E8901EA4696B0674055 /* PropertiesPanel+CursorMovement.swift */; };
 		CC8341FEA8A94E47B6E87CFD /* PropertiesPanel+Zoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267FDB377E464B08884E1F72 /* PropertiesPanel+Zoom.swift */; };
 		D2CC87DA142C43FAA7C2995E /* PropertiesPanel+AreaSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9363A68941C6495C9BC42536 /* PropertiesPanel+AreaSelection.swift */; };
@@ -359,6 +361,8 @@
 		6103BA147E834BA897084E10 /* AgentCameraTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818D42682C67412089224280 /* AgentCameraTools.swift */; };
 		71A20EA87B914AF88E205EDB /* WebcamPresentationControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFBB879028A4DF787BDEA64 /* WebcamPresentationControls.swift */; };
 		37B364DE8A7A47F68FAAD9EA /* TimeRangeControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C5B7F3292A4795A3E6E7F0 /* TimeRangeControls.swift */; };
+		3B8E403E80444B0CB85FCDBD /* SpeedRegionChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA000979CF54175BFBE1101 /* SpeedRegionChip.swift */; };
+		731001C84E1446E4AAD920C6 /* SpeedRegionEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A012C0AE776D4E56AF038BF9 /* SpeedRegionEditor.swift */; };
 		7290DD4321A547CBB762D313 /* SourceAreaPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96973519A9B147B4B62B03BE /* SourceAreaPicker.swift */; };
 		D55187EB538D4391B28EE3A7 /* TimelineView+CameraRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA79ECF103AD48BAA913BA74 /* TimelineView+CameraRegion.swift */; };
 		99ACD07FB1A14321A1282774 /* TimelineView+CameraInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F71CE458C34C11A441D4D2 /* TimelineView+CameraInteraction.swift */; };
@@ -646,10 +650,12 @@
 		B2000000000000000000001A /* CompositionInstruction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionInstruction.swift; sourceTree = "<group>"; };
 		B2000000000000000000001B /* TimelineView+AudioTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+AudioTrack.swift"; sourceTree = "<group>"; };
 		B2000000000000000000001C /* TimelineView+CameraTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CameraTrack.swift"; sourceTree = "<group>"; };
+		89CC3162B60744488FC0A116 /* TimelineView+SpeedTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+SpeedTrack.swift"; sourceTree = "<group>"; };
 		B2000000000000000000001D /* PropertiesPanel+VideoTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+VideoTab.swift"; sourceTree = "<group>"; };
 		B2000000000000000000001E /* PropertiesPanel+CameraTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+CameraTab.swift"; sourceTree = "<group>"; };
 		B2000000000000000000001F /* PropertiesPanel+CursorZoomTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+CursorZoomTab.swift"; sourceTree = "<group>"; };
 		B20000000000000000000021 /* PropertiesPanel+AudioTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+AudioTab.swift"; sourceTree = "<group>"; };
+		30F6B5BB671B4198868E8CF3 /* PropertiesPanel+Speed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+Speed.swift"; sourceTree = "<group>"; };
 		6D359E8901EA4696B0674055 /* PropertiesPanel+CursorMovement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+CursorMovement.swift"; sourceTree = "<group>"; };
 		267FDB377E464B08884E1F72 /* PropertiesPanel+Zoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+Zoom.swift"; sourceTree = "<group>"; };
 		9363A68941C6495C9BC42536 /* PropertiesPanel+AreaSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+AreaSelection.swift"; sourceTree = "<group>"; };
@@ -771,6 +777,8 @@
 		818D42682C67412089224280 /* AgentCameraTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentCameraTools.swift"; sourceTree = "<group>"; };
 		AAFBB879028A4DF787BDEA64 /* WebcamPresentationControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebcamPresentationControls.swift"; sourceTree = "<group>"; };
 		C9C5B7F3292A4795A3E6E7F0 /* TimeRangeControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeRangeControls.swift"; sourceTree = "<group>"; };
+		5AA000979CF54175BFBE1101 /* SpeedRegionChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SpeedRegionChip.swift"; sourceTree = "<group>"; };
+		A012C0AE776D4E56AF038BF9 /* SpeedRegionEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SpeedRegionEditor.swift"; sourceTree = "<group>"; };
 		96973519A9B147B4B62B03BE /* SourceAreaPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SourceAreaPicker.swift"; sourceTree = "<group>"; };
 		CA79ECF103AD48BAA913BA74 /* TimelineView+CameraRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CameraRegion.swift"; sourceTree = "<group>"; };
 		10F71CE458C34C11A441D4D2 /* TimelineView+CameraInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CameraInteraction.swift"; sourceTree = "<group>"; };
@@ -1021,6 +1029,8 @@
 				B10000000000000000000023 /* CheckmarkRow.swift */,
 				B10000000000000000000024 /* OptionsPopover.swift */,
 				C9C5B7F3292A4795A3E6E7F0 /* TimeRangeControls.swift */,
+				5AA000979CF54175BFBE1101 /* SpeedRegionChip.swift */,
+				A012C0AE776D4E56AF038BF9 /* SpeedRegionEditor.swift */,
 				96973519A9B147B4B62B03BE /* SourceAreaPicker.swift */,
 				AAFBB879028A4DF787BDEA64 /* WebcamPresentationControls.swift */,
 				D1412D34A0004784B58F90F0 /* WebcamVoiceControls.swift */,
@@ -1195,6 +1205,7 @@
 				B9000000000000000000000B /* RightClickOverlay.swift */,
 				B2000000000000000000001B /* TimelineView+AudioTrack.swift */,
 				B2000000000000000000001C /* TimelineView+CameraTrack.swift */,
+				89CC3162B60744488FC0A116 /* TimelineView+SpeedTrack.swift */,
 				10F71CE458C34C11A441D4D2 /* TimelineView+CameraInteraction.swift */,
 				CA79ECF103AD48BAA913BA74 /* TimelineView+CameraRegion.swift */,
 				B2000000000000000000002D /* TimelineView+ScreenTrack.swift */,
@@ -1208,6 +1219,7 @@
 				B90000000000000000000010 /* SystemCursorRenderer.swift */,
 				B90000000000000000000011 /* CursorLoopTelemetry.swift */,
 				B20000000000000000000021 /* PropertiesPanel+AudioTab.swift */,
+				30F6B5BB671B4198868E8CF3 /* PropertiesPanel+Speed.swift */,
 				6D359E8901EA4696B0674055 /* PropertiesPanel+CursorMovement.swift */,
 				267FDB377E464B08884E1F72 /* PropertiesPanel+Zoom.swift */,
 				9363A68941C6495C9BC42536 /* PropertiesPanel+AreaSelection.swift */,
@@ -1585,6 +1597,8 @@
 				A10000000000000000000023 /* CheckmarkRow.swift in Sources */,
 				A10000000000000000000024 /* OptionsPopover.swift in Sources */,
 				37B364DE8A7A47F68FAAD9EA /* TimeRangeControls.swift in Sources */,
+				3B8E403E80444B0CB85FCDBD /* SpeedRegionChip.swift in Sources */,
+				731001C84E1446E4AAD920C6 /* SpeedRegionEditor.swift in Sources */,
 				7290DD4321A547CBB762D313 /* SourceAreaPicker.swift in Sources */,
 				71A20EA87B914AF88E205EDB /* WebcamPresentationControls.swift in Sources */,
 				93AD4543B66945F5BA8EAE6F /* WebcamVoiceControls.swift in Sources */,
@@ -1668,6 +1682,7 @@
 				A80000000000000000000002 /* HoverEffect.swift in Sources */,
 				A2000000000000000000001B /* TimelineView+AudioTrack.swift in Sources */,
 				A2000000000000000000001C /* TimelineView+CameraTrack.swift in Sources */,
+				973D492C61014B26A2933574 /* TimelineView+SpeedTrack.swift in Sources */,
 				99ACD07FB1A14321A1282774 /* TimelineView+CameraInteraction.swift in Sources */,
 				D55187EB538D4391B28EE3A7 /* TimelineView+CameraRegion.swift in Sources */,
 				A2000000000000000000001D /* PropertiesPanel+VideoTab.swift in Sources */,
@@ -1706,6 +1721,7 @@
 				A90000000000000000000010 /* SystemCursorRenderer.swift in Sources */,
 				A90000000000000000000011 /* CursorLoopTelemetry.swift in Sources */,
 				A20000000000000000000021 /* PropertiesPanel+AudioTab.swift in Sources */,
+				4042AC4F9CC14FECA2C76973 /* PropertiesPanel+Speed.swift in Sources */,
 				C5F822D987134BB68B2EB172 /* PropertiesPanel+CursorMovement.swift in Sources */,
 				CC8341FEA8A94E47B6E87CFD /* PropertiesPanel+Zoom.swift in Sources */,
 				D2CC87DA142C43FAA7C2995E /* PropertiesPanel+AreaSelection.swift in Sources */,
