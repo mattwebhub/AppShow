@@ -3,14 +3,13 @@ SCHEME = AppShow
 ARCH = $(shell uname -m)
 DESTINATION = platform=macOS,arch=$(ARCH)
 BUILD_DIR = .build
-VERSION = $(shell grep MARKETING_VERSION Config.xcconfig | cut -d'=' -f2 | tr -d ' ')
 RELEASE_DIR = $(BUILD_DIR)/Build/Products/Release
 DEBUG_DIR = $(BUILD_DIR)/Build/Products/Debug
 TEST_TARGET = AppShowTests
 TEST_FILTER = $(if $(T),-only-testing:'$(TEST_TARGET)/$(T)',-only-testing:$(TEST_TARGET))
 TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning:|failed
 
-.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish brand tray eval-tray preview-tray
+.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish prepare-release release-preview brand tray eval-tray preview-tray
 
 all: help
 
@@ -63,12 +62,7 @@ uninstall:
 	@rm -rf /Applications/$(APP_NAME).app
 
 tag:
-	@if git rev-parse "v$(VERSION)" >/dev/null 2>&1; then \
-		echo "Tag v$(VERSION) already exists"; exit 1; \
-	fi
-	@git tag -a "v$(VERSION)" -m "v$(VERSION)"
-	@echo "Created tag v$(VERSION)"
-	@$(MAKE) changelog
+	@/usr/bin/python3 -B scripts/release_workflow.py tag
 
 changelog:
 	@./scripts/changelog.sh --unreleased
@@ -76,8 +70,14 @@ changelog:
 appcast:
 	@./scripts/generate-appcast.sh
 
-publish: tag dmg-release appcast
-	@./scripts/publish-release.sh
+prepare-release:
+	@/usr/bin/python3 -B scripts/release_workflow.py prepare
+
+release-preview:
+	@./scripts/publish-release.sh --dry-run
+
+publish:
+	@./scripts/publish-release.sh --publish
 
 format:
 	@swift format -i -r AppShow/ Tools/ $(wildcard AppShowTests)
@@ -112,8 +112,10 @@ help:
 	@echo "  eval-tray - Evaluate SVG transparency, fidelity, and regeneration"
 	@echo "  preview-tray - Render native menu bar states at 1x/2x"
 	@echo "  clean     - Clean build artifacts"
-	@echo "  tag       - Create git tag from Config.xcconfig version and generate changelog"
+	@echo "  tag       - Tag the clean committed release version"
 	@echo "  changelog - Generate CHANGELOG.md"
 	@echo "  appcast   - Generate appcast.xml for Sparkle updates"
-	@echo "  publish   - Full release: tag + dmg-release + appcast"
+	@echo "  prepare-release - Build, notarize, and record a local release candidate"
+	@echo "  release-preview - Validate and preview a prepared candidate without publishing"
+	@echo "  publish   - Publish the already prepared and tagged candidate"
 	@echo "  help      - Show this help"
