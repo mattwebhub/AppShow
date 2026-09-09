@@ -188,7 +188,7 @@ extension RecordingCoordinator {
       )
     }
 
-    let destination = await MainActor.run { FileManager.default.defaultSaveURL(for: outputURL) }
+    let destination = try await MainActor.run { try FileManager.default.defaultSaveURL(for: outputURL) }
     try FileManager.default.moveToFinal(from: outputURL, to: destination)
     FileManager.default.cleanupTempDir()
 

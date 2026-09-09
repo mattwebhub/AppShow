@@ -130,12 +130,14 @@ struct SettingsView: View {
     panel.prompt = "Select"
 
     if panel.runModal() == .OK, let url = panel.url {
-      let path = url.path.replacingOccurrences(
-        of: FileManager.default.homeDirectoryForCurrentUser.path,
-        with: "~"
-      )
-      projectFolder = path
-      ConfigService.shared.projectFolder = path
+      do {
+        try ConfigService.shared.selectFolder(url, projects: true)
+        projectFolder = ConfigService.shared.projectFolder
+      } catch {
+        let alert = NSAlert(error: error)
+        alert.informativeText = "AppShow could not retain access to this folder. Select it again or choose another folder."
+        alert.runModal()
+      }
     }
   }
 
@@ -148,12 +150,14 @@ struct SettingsView: View {
     panel.prompt = "Select"
 
     if panel.runModal() == .OK, let url = panel.url {
-      let path = url.path.replacingOccurrences(
-        of: FileManager.default.homeDirectoryForCurrentUser.path,
-        with: "~"
-      )
-      outputFolder = path
-      ConfigService.shared.outputFolder = path
+      do {
+        try ConfigService.shared.selectFolder(url, projects: false)
+        outputFolder = ConfigService.shared.outputFolder
+      } catch {
+        let alert = NSAlert(error: error)
+        alert.informativeText = "AppShow could not retain access to this folder. Select it again or choose another folder."
+        alert.runModal()
+      }
     }
   }
 }

@@ -15,6 +15,20 @@ final class ConfigService {
     set { data.outputFolder = newValue; save() }
   }
 
+  func selectFolder(_ url: URL, projects: Bool) throws {
+    if AppDistribution.isStore {
+      try BookmarkAccessStore.required().remember(url, key: projects ? "projects" : "exports")
+    }
+    if projects { projectFolder = url.path } else { outputFolder = url.path }
+  }
+
+  func resolvedFolder(projects: Bool) throws -> URL {
+    let path = projects ? projectFolder : outputFolder
+    let fallback = URL(fileURLWithPath: NSString(string: path).expandingTildeInPath, isDirectory: true)
+    guard AppDistribution.isStore else { return fallback }
+    return try BookmarkAccessStore.required().resolve(key: projects ? "projects" : "exports", fallback: fallback)
+  }
+
   var timerDelay: Int {
     get { data.timerDelay }
     set { data.timerDelay = newValue; save() }
@@ -184,7 +198,7 @@ final class ConfigService {
 }
 
 private struct ConfigData: Codable {
-  var outputFolder: String = "~/Movies/AppShow"
+  var outputFolder: String = AppDistribution.isStore ? AppShowPaths.home.appendingPathComponent("Exports").path : "~/Movies/AppShow"
   var timerDelay: Int = 3
   var audioDeviceId: String? = nil
   var rememberLastSelection: Bool = true
@@ -195,7 +209,7 @@ private struct ConfigData: Codable {
   var cameraMaximumResolution: String = "1080p"
   var webcamVoice: WebcamVoiceOptions?
   var webcamPresentation: WebcamPresentation?
-  var projectFolder: String = "~/AppShow"
+  var projectFolder: String = AppDistribution.isStore ? AppShowPaths.home.appendingPathComponent("Projects").path : "~/AppShow"
   var retinaCapture: Bool = false
   var dimOuterArea: Bool = true
   var hideCameraPreviewWhileRecording: Bool = false

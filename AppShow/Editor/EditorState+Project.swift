@@ -30,7 +30,7 @@ extension EditorState {
     if let bundleURL = project?.bundleURL {
       NSWorkspace.shared.activateFileViewerSelecting([bundleURL])
     } else {
-      let dir = FileManager.default.projectSaveDirectory()
+      guard let dir = try? FileManager.default.projectSaveDirectory() else { return }
       NSWorkspace.shared.open(dir)
     }
   }
@@ -39,7 +39,7 @@ extension EditorState {
     if let lastExportedURL {
       NSWorkspace.shared.activateFileViewerSelecting([lastExportedURL])
     } else {
-      let dir = FileManager.default.defaultSaveDirectory()
+      guard let dir = try? FileManager.default.defaultSaveDirectory() else { return }
       NSWorkspace.shared.open(dir)
     }
   }

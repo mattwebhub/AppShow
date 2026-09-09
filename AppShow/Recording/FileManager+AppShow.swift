@@ -33,26 +33,22 @@ extension FileManager {
   }
 
   @MainActor
-  func projectSaveDirectory() -> URL {
-    let folderPath = ConfigService.shared.projectFolder
-    let expanded = NSString(string: folderPath).expandingTildeInPath
-    let url = URL(fileURLWithPath: expanded, isDirectory: true)
-    try? createDirectory(at: url, withIntermediateDirectories: true)
+  func projectSaveDirectory() throws -> URL {
+    let url = try ConfigService.shared.resolvedFolder(projects: true)
+    try createDirectory(at: url, withIntermediateDirectories: true)
     return url
   }
 
   @MainActor
-  func defaultSaveDirectory() -> URL {
-    let folderPath = ConfigService.shared.outputFolder
-    let expanded = NSString(string: folderPath).expandingTildeInPath
-    let url = URL(fileURLWithPath: expanded, isDirectory: true)
-    try? createDirectory(at: url, withIntermediateDirectories: true)
+  func defaultSaveDirectory() throws -> URL {
+    let url = try ConfigService.shared.resolvedFolder(projects: false)
+    try createDirectory(at: url, withIntermediateDirectories: true)
     return url
   }
 
   @MainActor
-  func defaultSaveURL(for tempURL: URL, extension ext: String? = nil) -> URL {
-    saveURL(for: tempURL, extension: ext, in: defaultSaveDirectory())
+  func defaultSaveURL(for tempURL: URL, extension ext: String? = nil) throws -> URL {
+    try saveURL(for: tempURL, extension: ext, in: defaultSaveDirectory())
   }
 
   nonisolated func saveURL(for tempURL: URL, extension ext: String?, in directory: URL) -> URL {

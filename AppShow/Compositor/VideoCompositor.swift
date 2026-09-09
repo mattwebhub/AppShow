@@ -17,13 +17,13 @@ enum VideoCompositor {
     for temporaryURL: URL,
     extension fileExtension: String,
     config: ExportConfiguration
-  ) async -> URL {
+  ) async throws -> URL {
     if let outputURL = config.outputURL { return outputURL }
     if let directory = config.outputDirectory {
       return FileManager.default.saveURL(for: temporaryURL, extension: fileExtension, in: directory)
     }
-    return await MainActor.run {
-      FileManager.default.defaultSaveURL(for: temporaryURL, extension: fileExtension)
+    return try await MainActor.run {
+      try FileManager.default.defaultSaveURL(for: temporaryURL, extension: fileExtension)
     }
   }
 
@@ -196,7 +196,7 @@ enum VideoCompositor {
           progressHandler: progressHandler
         )
 
-        let destination = await destination(for: outputURL, extension: "gif", config: config)
+        let destination = try await destination(for: outputURL, extension: "gif", config: config)
         try finishExport(from: outputURL, to: destination, exact: config.outputURL != nil)
 
         logger.info("GIF export saved: \(destination.path)")
@@ -263,7 +263,7 @@ enum VideoCompositor {
       }
 
       let ext = config.exportSettings.format.fileExtension
-      let destination = await destination(for: outputURL, extension: ext, config: config)
+      let destination = try await destination(for: outputURL, extension: ext, config: config)
       try finishExport(from: outputURL, to: destination, exact: config.outputURL != nil)
 
       logger.info("Composited export saved: \(destination.path)")
@@ -297,7 +297,7 @@ enum VideoCompositor {
       progressHandler: progressHandler
     )
 
-    let destination = await destination(
+    let destination = try await destination(
       for: outputURL,
       extension: config.exportSettings.format.fileExtension,
       config: config

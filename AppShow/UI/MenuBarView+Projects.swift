@@ -3,8 +3,10 @@ import SwiftUI
 
 extension MenuBarView {
   func loadRecentProjects() async {
-    let path = (ConfigService.shared.projectFolder as NSString).expandingTildeInPath
-    let folderURL = URL(fileURLWithPath: path)
+    guard let folderURL = try? ConfigService.shared.resolvedFolder(projects: true) else {
+      recentProjects = []
+      return
+    }
     let fm = FileManager.default
 
     guard
@@ -22,7 +24,7 @@ extension MenuBarView {
     decoder.dateDecodingStrategy = .iso8601
 
     var projects: [RecentProject] = []
-    for url in contents where url.pathExtension == "frm" {
+    for url in contents where AppShowIdentity.supportedProjectExtensions.contains(url.pathExtension.lowercased()) {
       let metadataURL = url.appendingPathComponent("project.json")
       guard let data = try? Data(contentsOf: metadataURL),
         let metadata = try? decoder.decode(ProjectMetadata.self, from: data)

@@ -18,6 +18,8 @@ enum ExternalAudioImporter {
   ].compactMap { $0 }
 
   nonisolated static func `import`(sourceURL: URL, into bundleURL: URL) async throws -> ImportedExternalAudio {
+    let access = SecurityScopedAccess(url: sourceURL)
+    defer { withExtendedLifetime(access) {} }
     let asset = AVURLAsset(url: sourceURL)
     let audioTracks = (try? await asset.loadTracks(withMediaType: .audio)) ?? []
     guard !audioTracks.isEmpty else {
