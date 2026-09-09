@@ -509,6 +509,7 @@ struct EditorStateData: Codable, Sendable, Equatable {
   var externalAudioTracks: [ExternalAudioTrackData]?
   var textOverlays: [TextOverlayData]?
   var imageOverlays: [ImageOverlayData]?
+  var speedRegions: [SpeedRegionData]?
   var blurRegions: [BlurRegionData]? = nil
 }
 

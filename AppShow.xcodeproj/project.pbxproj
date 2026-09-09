@@ -109,6 +109,7 @@
 		7E5C00000000000000000000AB /* FrameRenderer+ImageOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000AA /* FrameRenderer+ImageOverlays.swift */; };
 		7E5C00000000000000000000AD /* VideoPreviewContainer+ImageOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C00000000000000000000AC /* VideoPreviewContainer+ImageOverlays.swift */; };
 		7E5D000000000000000000D2 /* BlurRegionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D1 /* BlurRegionData.swift */; };
+		27E489116F7C4FB488B242B8 /* SpeedRegionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FF6615499649D99EEF1DDB /* SpeedRegionData.swift */; };
 		7E5D000000000000000000D4 /* EditorState+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D3 /* EditorState+BlurRegions.swift */; };
 		7E5D000000000000000000D6 /* FrameRenderer+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D5 /* FrameRenderer+BlurRegions.swift */; };
 		7E5D000000000000000000D8 /* VideoPreviewContainer+BlurRegions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D000000000000000000D7 /* VideoPreviewContainer+BlurRegions.swift */; };
@@ -264,6 +265,7 @@
 		A90000000000000000000004 /* CursorRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000004 /* CursorRenderer.swift */; };
 		A90000000000000000000005 /* CursorOverlayLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000005 /* CursorOverlayLayer.swift */; };
 		A90000000000000000000006 /* ZoomTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000006 /* ZoomTimeline.swift */; };
+		C5FE598315F5464E9CE6668B /* SpeedTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = B595B131542A4C23A648F76D /* SpeedTimeline.swift */; };
 		0BFED9C1A8C143DF84E8F2B1 /* ZoomTimeline+Area.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE29640FCA64B219965EA9B /* ZoomTimeline+Area.swift */; };
 		A90000000000000000000007 /* ZoomDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000007 /* ZoomDetector.swift */; };
 		A90000000000000000000008 /* ZoomKeyframeEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000008 /* ZoomKeyframeEditor.swift */; };
@@ -516,6 +518,7 @@
 		7E5C00000000000000000000AA /* FrameRenderer+ImageOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FrameRenderer+ImageOverlays.swift"; sourceTree = "<group>"; };
 		7E5C00000000000000000000AC /* VideoPreviewContainer+ImageOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewContainer+ImageOverlays.swift"; sourceTree = "<group>"; };
 		7E5D000000000000000000D1 /* BlurRegionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurRegionData.swift; sourceTree = "<group>"; };
+		69FF6615499649D99EEF1DDB /* SpeedRegionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SpeedRegionData.swift"; sourceTree = "<group>"; };
 		7E5D000000000000000000D3 /* EditorState+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+BlurRegions.swift"; sourceTree = "<group>"; };
 		7E5D000000000000000000D5 /* FrameRenderer+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FrameRenderer+BlurRegions.swift"; sourceTree = "<group>"; };
 		7E5D000000000000000000D7 /* VideoPreviewContainer+BlurRegions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewContainer+BlurRegions.swift"; sourceTree = "<group>"; };
@@ -677,6 +680,7 @@
 		B90000000000000000000004 /* CursorRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorRenderer.swift; sourceTree = "<group>"; };
 		B90000000000000000000005 /* CursorOverlayLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorOverlayLayer.swift; sourceTree = "<group>"; };
 		B90000000000000000000006 /* ZoomTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomTimeline.swift; sourceTree = "<group>"; };
+		B595B131542A4C23A648F76D /* SpeedTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SpeedTimeline.swift"; sourceTree = "<group>"; };
 		3CE29640FCA64B219965EA9B /* ZoomTimeline+Area.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoomTimeline+Area.swift"; sourceTree = "<group>"; };
 		B90000000000000000000007 /* ZoomDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomDetector.swift; sourceTree = "<group>"; };
 		B90000000000000000000008 /* ZoomKeyframeEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomKeyframeEditor.swift; sourceTree = "<group>"; };
@@ -1174,6 +1178,7 @@
 				B90000000000000000000004 /* CursorRenderer.swift */,
 				B90000000000000000000005 /* CursorOverlayLayer.swift */,
 				B90000000000000000000006 /* ZoomTimeline.swift */,
+				B595B131542A4C23A648F76D /* SpeedTimeline.swift */,
 				3CE29640FCA64B219965EA9B /* ZoomTimeline+Area.swift */,
 				B90000000000000000000007 /* ZoomDetector.swift */,
 				B90000000000000000000008 /* ZoomKeyframeEditor.swift */,
@@ -1329,6 +1334,7 @@
 				7E5C00000000000000000000A2 /* ImageOverlayData.swift */,
 				7E5C00000000000000000000A4 /* ImageOverlayImporter.swift */,
 				7E5D000000000000000000D1 /* BlurRegionData.swift */,
+				69FF6615499649D99EEF1DDB /* SpeedRegionData.swift */,
 			);
 			path = Project;
 			sourceTree = "<group>";
@@ -1638,6 +1644,7 @@
 				A90000000000000000000004 /* CursorRenderer.swift in Sources */,
 				A90000000000000000000005 /* CursorOverlayLayer.swift in Sources */,
 				A90000000000000000000006 /* ZoomTimeline.swift in Sources */,
+				C5FE598315F5464E9CE6668B /* SpeedTimeline.swift in Sources */,
 				0BFED9C1A8C143DF84E8F2B1 /* ZoomTimeline+Area.swift in Sources */,
 				A90000000000000000000007 /* ZoomDetector.swift in Sources */,
 				A90000000000000000000008 /* ZoomKeyframeEditor.swift in Sources */,
@@ -1793,6 +1800,7 @@
 				7E5C00000000000000000000AB /* FrameRenderer+ImageOverlays.swift in Sources */,
 				7E5C00000000000000000000AD /* VideoPreviewContainer+ImageOverlays.swift in Sources */,
 				7E5D000000000000000000D2 /* BlurRegionData.swift in Sources */,
+				27E489116F7C4FB488B242B8 /* SpeedRegionData.swift in Sources */,
 				7E5D000000000000000000D4 /* EditorState+BlurRegions.swift in Sources */,
 				7E5D000000000000000000D6 /* FrameRenderer+BlurRegions.swift in Sources */,
 				7E5D000000000000000000D8 /* VideoPreviewContainer+BlurRegions.swift in Sources */,
