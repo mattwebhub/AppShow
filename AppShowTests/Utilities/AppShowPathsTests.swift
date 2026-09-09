@@ -6,6 +6,21 @@ import Testing
 struct AppShowPathsTests {
   private let realHome = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".reframed", isDirectory: true)
 
+  @Test func storePathsStayInsideTheContainerWithoutLegacyMigration() throws {
+    let root = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(root) }
+    let legacy = root.appendingPathComponent(".reframed")
+    try FileManager.default.createDirectory(at: legacy, withIntermediateDirectories: true)
+    let home = AppShowPaths.resolveHome(environment: [:], homeDirectory: root, sandboxed: true)
+    #expect(home == root.appendingPathComponent("Library/Application Support/AppShow", isDirectory: true))
+    #expect(FileManager.default.fileExists(atPath: legacy.path))
+    let temporary = root.appendingPathComponent("tmp", isDirectory: true)
+    #expect(
+      AppShowPaths.resolveTemp(environment: [:], sandboxed: true, temporaryDirectory: temporary)
+        == temporary.appendingPathComponent("AppShow", isDirectory: true)
+    )
+  }
+
   @Test func homeIsRedirectedAwayFromRealConfigDirectory() {
     let home = AppShowPaths.home
     #expect(home.standardizedFileURL != realHome.standardizedFileURL, "home=\(home.path)")
