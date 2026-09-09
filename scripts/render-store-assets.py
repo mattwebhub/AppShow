@@ -40,6 +40,7 @@ def main():
     parser.add_argument("--output", type=Path, default=ROOT / "dist/app-store-submission/design")
     parser.add_argument("--chrome", type=Path, default=default_browser())
     parser.add_argument("--require-captures", action="store_true")
+    parser.add_argument("--capture-edition", choices=("unverified", "direct", "store"), default="unverified")
     args = parser.parse_args()
     shots = json.loads((ROOT / "docs/app-store/shots.json").read_text())
     missing = [shot["capture"] for shot in shots if not (args.captures / shot["capture"]).is_file()]
@@ -67,7 +68,7 @@ def main():
             "EYEBROW": html.escape(shot["eyebrow"]), "HEADLINE": html.escape(shot["headline"]),
             "DESCRIPTION": html.escape(shot["description"]), "CAPTURE": content,
             "NUMBER": f"{number:02}",
-            "DRAFT": "" if present else '<div class="draft">LAYOUT PROOF · CAPTURE PENDING</div>',
+            "DRAFT": '<div class="draft">' + (html.escape(args.capture_edition.upper()) + ' EDITION · DESIGN REVIEW' if present else 'LAYOUT PROOF · CAPTURE PENDING') + '</div>',
         }
         rendered = template
         for key, value in values.items():
@@ -90,6 +91,7 @@ def main():
         reports.append({
             "file": output.name, "sha256": sha(output), **info,
             "nativeCapturePresent": present,
+            "captureEdition": args.capture_edition if present else None,
             "captureSHA256": sha(capture) if present else None,
             "captureSize": source_info if present else None,
             "status": "content-review-required" if present else "layout-proof-only",
@@ -108,8 +110,7 @@ def main():
         for shot in shots
     )
     gallery = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AppShow · Store asset review</title><style>body{background:#07111e;color:#f5f8fc;font:17px -apple-system,BlinkMacSystemFont,sans-serif;margin:48px auto;max-width:1400px;padding:0 24px}h1{font-size:42px;letter-spacing:-1.5px}p{color:#b8c6d8;line-height:1.6}section{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:32px;margin-top:40px}a{color:inherit;text-decoration:none}img{width:100%;border-radius:12px;border:1px solid #ffffff22}span{display:block;margin-top:12px}code{color:#80e4be}</style><h1>AppShow. Ready to show.</h1><p>Store artwork review · 2880 × 1800 · English<br>''' + (
-        "Layout proofs only. Native AppShow screenshots are still missing. These files must not be uploaded."
-        if missing else "Native captures supplied. Check candidate parity, visible content and rights before uploading."
+        f'Capture edition: {html.escape(args.capture_edition)}. {len(shots) - len(missing)} of {len(shots)} images use supplied screenshots. Remaining images are layout proofs. Owner review and Store candidate parity are pending; do not upload this draft set.'
     ) + '</p><section>' + cards + '</section><p>File checks: <a href="asset-evaluation.json"><code>asset-evaluation.json</code></a></p></html>'
     (args.output / "index.html").write_text(gallery)
     print(json.dumps({"output": str(args.output), "images": len(reports), "missingCaptures": missing, "submissionReady": False}))

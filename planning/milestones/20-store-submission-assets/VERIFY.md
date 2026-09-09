@@ -15,3 +15,7 @@ Local preparation evidence, 2026-09-09. Final captures, authenticated account se
 | Owner review | Gallery opened and PNG folder revealed in Finder. User explicitly requires review before submission. Layout approval and final-image approval are both pending. |
 
 The regular AppShow process was brought back to the foreground after the owner asked about the assistant panel. The Store validation build omits it provisionally; no assistant history was modified or deleted. The initial five-image design set covers the currently enabled Store editor features and does not settle the shipping assistant decision.
+
+## Owner-supplied screenshot follow-up
+
+The owner authorized use of Desktop screenshots. The full editor captures at 19:51:29 and 19:54:40 were inspected and copied unchanged to the hero and pace input slots. They show the direct-edition assistant, video preview and actual cut/speed timeline regions. The regenerated gallery labels both as direct-edition design review and leaves the other three as pending-capture proofs. Source hashes and dimensions are recorded in the local `asset-evaluation.json`; original screenshots are unchanged. These captures do not close Store candidate parity or authorize submission.

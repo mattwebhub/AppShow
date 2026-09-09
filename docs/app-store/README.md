@@ -1,13 +1,13 @@
 # App Store design package
 
-Status: design review, native screenshots pending. The owner explicitly requested review before anything is submitted. No assets, metadata or build have been submitted.
+Status: design review. Two owner-supplied screenshots from the direct edition now fill the hero and pace layouts; three captures remain pending. The owner explicitly requested review before anything is submitted. No assets, metadata or build have been submitted.
 
 The five images use the existing brushstroke identity, ink background, restrained accent colors and large system typography. Every image has one feature claim and space for a complete, authentic AppShow Store window. The editable [shot list](shots.json) supplies copy and capture direction; [slide.html](slide.html) controls the layout.
 
 ## Render and review
 
 ```sh
-/usr/bin/python3 -B scripts/render-store-assets.py
+/usr/bin/python3 -B scripts/render-store-assets.py --capture-edition direct
 open dist/app-store-submission/design/index.html
 ```
 
@@ -16,6 +16,8 @@ The renderer finds an installed Playwright Chromium headless shell, or accepts a
 The renderer makes five opaque RGB PNGs at 2880 × 1800, a local review gallery, a copy of the existing 1024-pixel macOS icon and `asset-evaluation.json`. It verifies PNG dimensions, color format and source/output hashes. Missing captures produce conspicuously labeled layout proofs. These are not submission images. `--require-captures` fails before rendering if any required input is absent.
 
 Native PNG inputs go in ignored `dist/app-store-submission/captures/`, using the names in the shot list. Rendered outputs and private source footage also stay in ignored `dist/`. Do not substitute the inherited Reframed screenshot, generated UI, or a different app's window. The renderer does not crop or retouch the app capture; it places the complete image inside the layout.
+
+The supplied September 9 screenshots at 19:51:29 and 19:54:40 show the real editor, assistant conversation, preview, cuts and speed tracks. They are used unchanged in images 01 and 02. `--capture-edition direct` records that provenance in the report and adds a visible design-review label. Their assistant UI differs from the current Store validation target, so they establish a design direction rather than Store candidate parity. The visible imported music title and demonstration content remain part of the final visible-content/rights review; no audio has been included in these still images.
 
 ## Footage prepared locally
 
