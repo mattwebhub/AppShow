@@ -170,3 +170,7 @@ The existing `set_captions` tool accepts `fontFamily`, `textColor` and `backgrou
 Partial replies and provider session IDs are saved during streaming. If the stream ends before completion, the reply is marked failed and remains visible. Reopening a project also recovers saved partial replies. Unfinished tool rows explain that their outcome needs checking.
 
 Use **Retry interrupted reply** to continue with the same provider session. If that session is unavailable, **Start fresh** opens a new provider session with recent conversation context while keeping the local history. Both actions ask the assistant to inspect current project state before continuing, because some earlier edits may have completed. If the provider remains running without output, Stop cancels the turn and exposes the same recovery actions.
+
+## Removing microphone audio
+
+Right-click the **Mic** track label or waveform and choose **Remove Microphone**. The track disappears and becomes silent in playback and export. Undo restores it immediately; you can also turn off **Mute** in Audio → Microphone. Source media and audio regions are retained. Removing one audio region is a separate waveform context-menu action.
