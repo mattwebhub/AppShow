@@ -15,10 +15,18 @@ final class AgentTranscript {
   private let logger = Logger(label: "com.mattwebhub.appshow.agent-transcript")
   private var turnTask: Task<Void, Never>?
   private var session: AgentSession?
+  private var checkpointTask: Task<Void, Never>?
 
   init(store: AgentConversationStore?, defaultProvider: AgentProviderKind = .claudeCode) {
     self.store = store
     conversation = store.flatMap { try? $0.load() } ?? AgentConversationData(provider: defaultProvider)
+    let needsRecovery = conversation.messages.contains { $0.status == .streaming }
+    for index in conversation.messages.indices where conversation.messages[index].status == .streaming {
+      conversation.messages[index].status = .failed
+      conversation.messages[index].failureReason = "The app closed before this reply finished."
+      Self.settleTools(&conversation.messages[index])
+    }
+    if needsRecovery { persist() }
   }
 
   func relocate(to store: AgentConversationStore) {
@@ -83,6 +91,7 @@ final class AgentTranscript {
     isRunning = true
     isCancelled = false
     lastError = nil
+    persist()
     return message.id
   }
 
@@ -90,6 +99,7 @@ final class AgentTranscript {
     switch event {
     case .sessionStarted(let id):
       mutateConversation { $0.resumeIDs[$0.provider] = id }
+      persist()
     case .textBlock(let text):
       mutateStreamingMessage { message in
         if case .text(let existing)? = message.content.last {
@@ -147,6 +157,7 @@ final class AgentTranscript {
     case .unknown:
       break
     }
+    scheduleCheckpoint()
   }
 
   func finishTurn(error: (any Error)?) {
@@ -162,10 +173,12 @@ final class AgentTranscript {
     } else {
       mutateStreamingMessage { message in
         if message.status == .streaming {
-          message.status = .completed
+          message.status = .failed
+          message.failureReason = "The connection ended before the assistant finished."
         }
       }
     }
+    mutateStreamingMessage { Self.settleTools(&$0) }
     streamingMessageID = nil
     isRunning = false
     persist()
@@ -174,6 +187,7 @@ final class AgentTranscript {
   func markCancelled() {
     mutateStreamingMessage { message in
       message.status = .cancelled
+      Self.settleTools(&message)
     }
     streamingMessageID = nil
     isRunning = false
@@ -183,8 +197,18 @@ final class AgentTranscript {
 
   func send(_ prompt: String, using session: AgentSession) {
     guard !isRunning else { return }
-    self.session = session
     appendUserMessage(prompt)
+    startTurn(prompt, using: session)
+  }
+
+  func retry(using session: AgentSession) {
+    guard let prompt = recoveryPrompt else { return }
+    startTurn(prompt, using: session)
+  }
+
+  private func startTurn(_ prompt: String, using session: AgentSession) {
+    guard !isRunning else { return }
+    self.session = session
     beginAssistantMessage()
     turnTask = Task { [weak self] in
       do {
@@ -216,11 +240,47 @@ final class AgentTranscript {
   }
 
   func teardown() {
+    checkpoint()
     turnTask?.cancel()
     turnTask = nil
     if let session {
       Task {
         await session.cancel()
+      }
+    }
+  }
+
+  var recoveryPrompt: String? {
+    guard !isRunning, let last = messages.last, last.role == .assistant,
+      last.status == .failed || last.status == .cancelled,
+      let request = messages.last(where: { $0.role == .user })
+    else { return nil }
+    let context = messages.suffix(8).map { "\($0.role.rawValue): \($0.text.prefix(6000))" }.joined(separator: "\n\n")
+    return """
+      Recover the interrupted request: \(request.text)
+      Inspect the current project and timeline before making changes. Some tool calls may already have completed; do not repeat edits that are already applied. Continue the unfinished work and preserve completed work.
+      Recent conversation:
+      \(context)
+      """
+  }
+
+  func checkpoint() { persist() }
+
+  private func scheduleCheckpoint() {
+    guard store != nil, checkpointTask == nil else { return }
+    checkpointTask = Task { [weak self] in
+      try? await Task.sleep(for: .milliseconds(250))
+      guard !Task.isCancelled else { return }
+      self?.persist()
+    }
+  }
+
+  private static func settleTools(_ message: inout AgentMessageData) {
+    for index in message.content.indices {
+      if case .toolCall(var tool) = message.content[index], tool.status == .executing {
+        tool.status = .failed
+        tool.output = "No result was received. Check the project before retrying this action."
+        message.content[index] = .toolCall(tool)
       }
     }
   }
@@ -239,6 +299,8 @@ final class AgentTranscript {
   }
 
   private func persist() {
+    checkpointTask?.cancel()
+    checkpointTask = nil
     guard let store else { return }
     do {
       try store.save(conversation)

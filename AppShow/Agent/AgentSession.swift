@@ -63,18 +63,28 @@ actor AgentSession {
     let task = Task {
       do {
         for try await line in await runner.run(launch) {
+          var terminal = false
           for event in provider.parse(line: line) {
             if case .sessionStarted(let id) = event {
               resumeIDs[provider.id] = id
             }
             continuation.yield(event)
+            switch event {
+            case .turnCompleted, .error: terminal = true
+            default: break
+            }
+          }
+          if terminal {
+            await runner.cancel()
+            break
           }
         }
+        turnDidEnd(runner)
         continuation.finish()
       } catch {
+        turnDidEnd(runner)
         continuation.finish(throwing: error)
       }
-      turnDidEnd(runner)
     }
     continuation.onTermination = { reason in
       guard case .cancelled = reason else { return }

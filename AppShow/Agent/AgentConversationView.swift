@@ -10,6 +10,7 @@ struct AgentConversationView: View {
   let isExporting: Bool
 
   @State private var prompt = ""
+  @State private var isPreparing = false
   @State var readiness: [AgentProviderKind: AgentReadiness] = [:]
   @State var isResolving = false
   @State var toolchain = AgentToolchain.standard()
@@ -80,6 +81,16 @@ struct AgentConversationView: View {
   private var composer: some View {
     VStack(alignment: .leading, spacing: Layout.compactSpacing) {
       readinessView
+      if transcript.recoveryPrompt != nil {
+        HStack {
+          Button("Retry interrupted reply") { send(recovering: true) }
+            .buttonStyle(OutlineButtonStyle(size: .small))
+          Button("Start fresh") { send(recovering: true, fresh: true) }
+            .buttonStyle(OutlineButtonStyle(size: .small))
+            .help("Keep this conversation and retry with a new provider session.")
+        }
+        .disabled(!canStart)
+      }
       if project == nil {
         Text("Open a project to start a conversation.")
           .font(.system(size: FontSize.xxs))
@@ -101,14 +112,14 @@ struct AgentConversationView: View {
           .clipShape(RoundedRectangle(cornerRadius: Radius.md))
           .overlay(RoundedRectangle(cornerRadius: Radius.md).strokeBorder(AppShowColors.border, lineWidth: 1))
           .focused($composerFocused)
-          .onSubmit(send)
+          .onSubmit { send() }
           .disabled(transcript.isRunning)
         if transcript.isRunning {
           IconButton(systemName: "stop.fill") {
             transcript.cancel()
           }
         } else {
-          Button(action: send) {
+          Button(action: { send() }) {
             Image(systemName: "arrow.up")
           }
           .buttonStyle(PrimaryButtonStyle(size: .small))
@@ -119,18 +130,22 @@ struct AgentConversationView: View {
     .padding(12)
   }
 
-  private var canSend: Bool {
+  private var canStart: Bool {
     selectedReadiness?.isReady == true
       && project != nil
       && !isExporting
       && !transcript.isRunning
-      && !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+      && !isPreparing
   }
 
-  private func send() {
-    let text = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+  private var canSend: Bool {
+    canStart && !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+  }
+
+  private func send(recovering: Bool = false, fresh: Bool = false) {
+    let text = recovering ? transcript.recoveryPrompt ?? "" : prompt.trimmingCharacters(in: .whitespacesAndNewlines)
     guard
-      canSend,
+      canStart,
       !text.isEmpty,
       let executable = selectedReadiness?.executableURL,
       let project
@@ -142,9 +157,11 @@ struct AgentConversationView: View {
     } catch {
       return
     }
-    prompt = ""
+    isPreparing = true
     Task {
+      defer { isPreparing = false }
       let searchPath = await toolchain.searchPath()
+      guard !transcript.isRunning, transcript.provider == provider.id else { return }
       let home = FileManager.default.homeDirectoryForCurrentUser.path
       var environment = AgentEnvironment.scrubbed(
         path: searchPath,
@@ -158,9 +175,14 @@ struct AgentConversationView: View {
         workingDirectory: workspace,
         environment: environment,
         configuration: sessionConfiguration,
-        resumeIDs: transcript.resumeIDs
+        resumeIDs: fresh ? [:] : transcript.resumeIDs
       )
-      transcript.send(text, using: session)
+      if recovering {
+        transcript.retry(using: session)
+      } else {
+        prompt = ""
+        transcript.send(text, using: session)
+      }
     }
   }
 }
