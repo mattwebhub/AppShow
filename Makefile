@@ -9,7 +9,7 @@ TEST_TARGET = AppShowTests
 TEST_FILTER = $(if $(T),-only-testing:'$(TEST_TARGET)/$(T)',-only-testing:$(TEST_TARGET))
 TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning:|failed
 
-.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish prepare-release release-preview brand tray eval-tray preview-tray
+.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish prepare-release release-preview store-build store-release store-archive brand tray eval-tray preview-tray
 
 all: help
 
@@ -30,6 +30,15 @@ build:
 
 release:
 	@xcodebuild -project AppShow.xcodeproj -scheme $(SCHEME) -configuration Release build -quiet -derivedDataPath $(BUILD_DIR) -destination 'generic/platform=macOS' ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO
+
+store-build:
+	@xcodebuild -project AppShow.xcodeproj -scheme AppShowStore -configuration Debug build -quiet -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)'
+
+store-release:
+	@xcodebuild -project AppShow.xcodeproj -scheme AppShowStore -configuration Release build -quiet -derivedDataPath $(BUILD_DIR) -destination 'generic/platform=macOS' ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO
+
+store-archive:
+	@xcodebuild -project AppShow.xcodeproj -scheme AppShowStore -configuration Release archive -quiet -derivedDataPath $(BUILD_DIR) -archivePath $(BUILD_DIR)/AppShowStore.xcarchive -destination 'generic/platform=macOS' ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO
 
 run: release
 	@open $(RELEASE_DIR)/$(APP_NAME).app
@@ -96,6 +105,9 @@ help:
 	@echo "Targets:"
 	@echo "  build     - Build debug version"
 	@echo "  release   - Build release version"
+	@echo "  store-build - Build the sandboxed store validation app"
+	@echo "  store-release - Build the universal store validation app"
+	@echo "  store-archive - Create a local universal store archive"
 	@echo "  dmg         - Create .dmg installer"
 	@echo "  dmg-release - Create signed and notarized .dmg installer"
 	@echo "  install   - Install to /Applications"

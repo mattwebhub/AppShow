@@ -35,15 +35,17 @@ struct PermissionsView: View {
             onRequest: { permissions.request(.screenRecording) },
             onOpenSettings: { NSWorkspace.shared.open(PermissionKind.screenRecording.settingsURL) }
           )
-          separator
-          PermissionRow(
-            icon: "accessibility",
-            title: "Accessibility",
-            description: "Use global shortcuts and follow app windows.",
-            granted: permissions.accessibilityGranted,
-            onRequest: { permissions.request(.accessibility) },
-            onOpenSettings: { NSWorkspace.shared.open(PermissionKind.accessibility.settingsURL) }
-          )
+          if permissions.requiresAccessibility {
+            separator
+            PermissionRow(
+              icon: "accessibility",
+              title: "Accessibility",
+              description: "Use global shortcuts and follow app windows.",
+              granted: permissions.accessibilityGranted,
+              onRequest: { permissions.request(.accessibility) },
+              onOpenSettings: { NSWorkspace.shared.open(PermissionKind.accessibility.settingsURL) }
+            )
+          }
 
           if !permissions.allGranted {
             separator

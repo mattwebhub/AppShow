@@ -111,6 +111,7 @@ actor AgentProbe {
     arguments: [String],
     environment: [String: String]
   ) async -> AgentProbeResult {
+    guard !AppDistribution.isStore else { return AgentProbeResult(launchError: "The external assistant is unavailable in this build") }
     let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent("appshow-agent-probe-\(UUID().uuidString)")
     guard FileManager.default.createFile(atPath: outputURL.path, contents: nil),
       let outputHandle = try? FileHandle(forWritingTo: outputURL)

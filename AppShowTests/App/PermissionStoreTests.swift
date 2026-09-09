@@ -4,6 +4,24 @@ import Testing
 
 @MainActor
 struct PermissionStoreTests {
+  @Test func storeCaptureDoesNotCheckOrRequestAccessibility() {
+    var accessibilityCalls = 0
+    let store = PermissionStore(
+      screenRecordingCheck: { true },
+      accessibilityCheck: {
+        accessibilityCalls += 1; return false
+      },
+      screenRecordingRequest: {},
+      accessibilityRequest: { accessibilityCalls += 1 },
+      requiresAccessibility: false
+    )
+    store.refresh()
+    store.request(.accessibility)
+    #expect(store.allGranted)
+    #expect(!store.accessibilityGranted)
+    #expect(accessibilityCalls == 0)
+  }
+
   @Test func initializationChecksWithoutRequestingAccess() {
     var requests = 0
     let store = PermissionStore(

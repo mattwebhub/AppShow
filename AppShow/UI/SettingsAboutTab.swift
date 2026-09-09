@@ -4,8 +4,10 @@ extension SettingsView {
   var aboutContent: some View {
     VStack(spacing: Layout.sectionSpacing) {
       appInfoSection
+      #if !APP_STORE
       updateSection
       changelogSection
+      #endif
       Spacer(minLength: 0)
       linksSection
     }
@@ -39,6 +41,7 @@ extension SettingsView {
     .padding(.top, 8)
   }
 
+  #if !APP_STORE
   private var updateSection: some View {
     Group {
       if SparkleUpdater.shared.isAvailable {
@@ -54,6 +57,8 @@ extension SettingsView {
     ChangelogView()
   }
 
+  #endif
+
   private var linksSection: some View {
     VStack(spacing: 8) {
       Divider()
@@ -62,7 +67,9 @@ extension SettingsView {
       HStack(spacing: 16) {
         linkButton("GitHub", icon: "arrow.up.right.square", url: "https://github.com/mattwebhub/AppShow")
         linkButton("Issues", icon: "ladybug", url: "https://github.com/mattwebhub/AppShow/issues")
+        #if !APP_STORE
         linkButton("Releases", icon: "shippingbox", url: "https://github.com/mattwebhub/AppShow/releases")
+        #endif
       }
       .padding(.top, 4)
     }
@@ -93,6 +100,7 @@ extension SettingsView {
   }
 }
 
+#if !APP_STORE
 private struct ChangelogView: View {
   @State private var changelog: String?
   @State private var version: String?
@@ -127,3 +135,4 @@ private struct ChangelogView: View {
     }
   }
 }
+#endif

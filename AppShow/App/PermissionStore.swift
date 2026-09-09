@@ -23,25 +23,29 @@ final class PermissionStore {
   private let screenRecordingRequest: () -> Void
   private let accessibilityRequest: () -> Void
 
-  var allGranted: Bool { screenRecordingGranted && accessibilityGranted }
+  let requiresAccessibility: Bool
+
+  var allGranted: Bool { screenRecordingGranted && (!requiresAccessibility || accessibilityGranted) }
 
   init(
     screenRecordingCheck: @escaping () -> Bool,
     accessibilityCheck: @escaping () -> Bool,
     screenRecordingRequest: @escaping () -> Void,
-    accessibilityRequest: @escaping () -> Void
+    accessibilityRequest: @escaping () -> Void,
+    requiresAccessibility: Bool = true
   ) {
+    self.requiresAccessibility = requiresAccessibility
     self.screenRecordingCheck = screenRecordingCheck
     self.accessibilityCheck = accessibilityCheck
     self.screenRecordingRequest = screenRecordingRequest
     self.accessibilityRequest = accessibilityRequest
     screenRecordingGranted = screenRecordingCheck()
-    accessibilityGranted = accessibilityCheck()
+    accessibilityGranted = requiresAccessibility && accessibilityCheck()
   }
 
   func refresh() {
     screenRecordingGranted = screenRecordingCheck()
-    let trusted = accessibilityCheck()
+    let trusted = requiresAccessibility && accessibilityCheck()
     if trusted != accessibilityGranted {
       accessibilityGranted = trusted
       onAccessibilityChanged?(trusted)
@@ -51,7 +55,8 @@ final class PermissionStore {
   func request(_ kind: PermissionKind) {
     switch kind {
     case .screenRecording: screenRecordingRequest()
-    case .accessibility: accessibilityRequest()
+    case .accessibility:
+      if requiresAccessibility { accessibilityRequest() }
     }
     refresh()
   }
@@ -62,14 +67,16 @@ final class PermissionStore {
         screenRecordingCheck: { false },
         accessibilityCheck: { false },
         screenRecordingRequest: {},
-        accessibilityRequest: {}
+        accessibilityRequest: {},
+        requiresAccessibility: !AppDistribution.isStore
       )
     }
     return PermissionStore(
       screenRecordingCheck: { Permissions.hasScreenRecordingPermission },
       accessibilityCheck: { Permissions.hasAccessibilityPermission },
       screenRecordingRequest: { Permissions.requestScreenRecordingPermission() },
-      accessibilityRequest: { Permissions.requestAccessibilityPermission() }
+      accessibilityRequest: { Permissions.requestAccessibilityPermission() },
+      requiresAccessibility: !AppDistribution.isStore
     )
   }
 }

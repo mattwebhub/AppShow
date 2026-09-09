@@ -20,6 +20,7 @@ final class KeyboardShortcutManager {
   func start(enableGlobalShortcuts: Bool) {
     guard localMonitor == nil else { return }
 
+    #if !APP_STORE
     let context = TapContext()
     context.manager = self
     tapContext = context
@@ -42,6 +43,8 @@ final class KeyboardShortcutManager {
       CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
       CGEvent.tapEnable(tap: tap, enable: true)
     }
+
+    #endif
 
     localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
       guard let self, let session = self.session else { return event }

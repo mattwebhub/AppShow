@@ -378,7 +378,7 @@ final class EditorState {
 
     startAutoSave()
     prepareRecordedVoice()
-    if !LaunchEnvironment.isTestHost, project != nil {
+    if !AppDistribution.isStore, !LaunchEnvironment.isTestHost, project != nil {
       try? await agentBridgeController.start(editorState: self)
     }
   }

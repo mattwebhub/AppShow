@@ -82,11 +82,13 @@ struct WindowSelectionView: View {
                 .font(.system(size: FontSize.xs))
                 .foregroundStyle(Color.black.opacity(0.6))
 
+              #if !APP_STORE
               Button("Resize") { showingResize.toggle() }
                 .buttonStyle(SecondaryButtonStyle(size: .small, forceLightMode: true))
                 .popover(isPresented: $showingResize, arrowEdge: .bottom) {
                   ResizePopover(windowController: windowController, window: current)
                 }
+              #endif
             }
 
             StartRecordingButton(

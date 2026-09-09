@@ -11,7 +11,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
   func applicationDidFinishLaunching(_ notification: Notification) {
     guard !LaunchEnvironment.isTestHost else { return }
+    #if !APP_STORE
     _ = SparkleUpdater.shared
+    #endif
     ConfigService.shared.applyAppearance()
 
     let manager = KeyboardShortcutManager(session: session)

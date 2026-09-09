@@ -22,6 +22,7 @@ final class AgentBridgeController {
   }
 
   func start(editorState: EditorState, helperURL: URL = bundledHelperURL) async throws {
+    guard !AppDistribution.isStore else { throw AgentToolError.failed("The external assistant is unavailable in this build") }
     guard server == nil else { return }
     guard let project = editorState.project else {
       throw AgentToolError.failed("An open project is required to start editor tools")

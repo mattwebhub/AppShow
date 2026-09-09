@@ -149,6 +149,9 @@ extension SessionState {
   }
 
   func focusWindow(pid: pid_t, frame: CGRect) {
+    #if APP_STORE
+    NSRunningApplication(processIdentifier: pid)?.activate()
+    #else
     let axApp = AXUIElementCreateApplication(pid)
     var windowsRef: CFTypeRef?
     AXUIElementCopyAttributeValue(axApp, kAXWindowsAttribute as CFString, &windowsRef)
@@ -180,5 +183,6 @@ extension SessionState {
       }
     }
     NSRunningApplication(processIdentifier: pid)?.activate()
+    #endif
   }
 }
