@@ -47,3 +47,22 @@ The [editor reference](../assets/editor-preview.jpg) is the existing repository 
 ## Repository presentation
 
 The prepared social preview can be uploaded in the repository settings when these changes are published. The README uses local assets, so previews work in forks and checkouts without depending on an attachment hosted elsewhere.
+
+## Transparent vector and menu bar icon
+
+[appshow-transparent.svg](appshow-transparent.svg) is a vector rendition of the current icon with its dark background removed. It contains traced quadratic paths and 32-color artwork, with transparent negative space. It deliberately simplifies photographic texture for small sizes. The original artwork and Dock icon remain the source masters.
+
+The app loads [MenuBarMark.svg](../../AppShow/Assets.xcassets/MenuBarMark.imageset/MenuBarMark.svg) from the asset catalog as an 18-point template with preserved vector representation. Its black paths represent the visible strokes; the background and removed dark areas have no geometry. macOS tints the template for the menu bar appearance. Selection, countdown, recording, pause, processing pulse and editing indicators occupy the lower-left negative space. The icon also describes its state for accessibility.
+
+```sh
+make tray
+make eval-tray
+make preview-tray
+make test T=MenuBarIconTests
+```
+
+`make tray` uses ImageMagick (`magick`) and the system Python to trace the existing master at 256 pixels. Pixels survive only when alpha exceeds 240/255, their brightest RGB channel exceeds 110/255, and their encoded-channel luminance exceeds 42/255. Small islands are removed and contours are simplified into quadratic paths; the colored version and template share the same silhouette. [tray-source.json](tray-source.json) records the source SHA-256 and settings. No raster image is embedded in either SVG. These regeneration tools are not needed to build the app from the checked-in assets.
+
+The [asset evaluation](../../scripts/evaluate-tray-icon.py) also uses `rsvg-convert` to check real rasterized alpha, compare the shape with source pixels, validate vector-only XML and template metadata, and regenerate twice to prove determinism. It writes `.build/brand/tray-eval.json` and exits nonzero on failure. Exact geometry is shared; a bounded edge-antialiasing tolerance accounts for the colored version's clipping.
+
+See the [native state preview](tray-preview.png) for every state at 1×/2× with light/dark template tints. This contact sheet renders the production `MenuBarIcon` with the compiled asset; actual menu bar highlight and interaction checks remain in the [public-release checklist](../../planning/releases/PUBLIC-RELEASE-CHECKLIST.md).
