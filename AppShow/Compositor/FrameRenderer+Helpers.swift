@@ -83,14 +83,8 @@ extension FrameRenderer {
     instruction: CompositionInstruction
   ) -> CGRect? {
     let metadataTime = instruction.sourceTime(for: compositionTime)
-    var zoomRect = instruction.zoomTimeline?.zoomRect(at: metadataTime)
-    if instruction.zoomFollowCursor, let zr = zoomRect, zr.width < 1.0 || zr.height < 1.0,
-      let snapshot = instruction.cursorSnapshot
-    {
-      let cursorPos = snapshot.sample(at: metadataTime)
-      zoomRect = ZoomTimeline.followCursor(zr, cursorPosition: cursorPos)
-    }
-    return zoomRect
+    let cursor = instruction.zoomFollowCursor ? instruction.cursorSnapshot?.sample(at: metadataTime) : nil
+    return instruction.zoomTimeline?.zoomRect(at: metadataTime, cursorPosition: cursor)
   }
 
   static func resolveCamera(

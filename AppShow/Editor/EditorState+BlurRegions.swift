@@ -2,6 +2,22 @@ import CoreMedia
 import Foundation
 
 extension EditorState {
+  @discardableResult
+  func addTimedBlur(rect: CGRect, start: Double, end: Double) throws -> BlurRegionData {
+    guard !isExporting, start.isFinite, end.isFinite, start >= 0, end <= duration.seconds,
+      end - start >= BlurRegionData.minimumLength,
+      [rect.minX, rect.minY, rect.width, rect.height].allSatisfy(\.isFinite),
+      rect.minX >= 0, rect.minY >= 0, rect.maxX <= 1.000001, rect.maxY <= 1.000001,
+      rect.width >= 0.01, rect.height >= 0.01
+    else { throw AgentToolError.invalidArguments("Choose an area inside the source frame and a time range inside the recording.") }
+    let region = BlurRegionData(startSeconds: start, endSeconds: end, x: rect.minX, y: rect.minY, width: rect.width, height: rect.height)
+      .normalized()
+    blurRegions.append(region)
+    sortBlurRegions()
+    scheduleUndoSnapshot()
+    return region
+  }
+
   func activeBlurRegions(at time: Double) -> [BlurRegionData] {
     blurRegions.filter { time >= $0.startSeconds && time <= $0.endSeconds }
   }

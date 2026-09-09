@@ -207,6 +207,30 @@ struct FrameRendererGoldenTests {
     expectClose(try pixel(output, x: Self.width / 2, y: Self.height / 2), Self.green)
   }
 
+  @Test func selectedAreaFillsRenderedFrameOnlyDuringItsTimeRange() throws {
+    let frames = try ZoomTimeline.areaKeyframes(
+      rect: CGRect(x: 0.7, y: 0.2, width: 0.2, height: 0.3),
+      start: 0.2,
+      end: 1.8,
+      transition: 0.2
+    )
+    let config = instruction(zoomTimeline: ZoomTimeline(keyframes: frames), padding: 0)
+    let source = try makeVerticalSplitBuffer()
+    let output = try makeBuffer()
+    for time in [0.0, 1.0, 2.0] {
+      FrameRenderer.renderFrame(
+        screenBuffer: source,
+        webcamBuffer: nil,
+        outputBuffer: output,
+        compositionTime: CMTime(seconds: time, preferredTimescale: 600),
+        instruction: config
+      )
+      let left = try pixel(output, x: 4, y: Self.height / 2)
+      if time == 1 { #expect(left.r > 245) } else { #expect(left.r < 10) }
+      #expect(try pixel(output, x: Self.width - 4, y: Self.height / 2).r > 245)
+    }
+  }
+
   @Test func blurRegionChangesOnlyTheSelectedSourceRect() throws {
     let blur = BlurRegionInstruction(
       timeRange: CMTimeRange(start: .zero, duration: CMTime(seconds: 1, preferredTimescale: 600)),

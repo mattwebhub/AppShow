@@ -270,7 +270,11 @@ extension EditorState {
       spotlightRegions: spotlightEnabled && showCursor ? spotlightRegions : [],
       spotlightRadius: spotlightRadius,
       spotlightDimOpacity: spotlightDimOpacity,
-      spotlightEdgeSoftness: spotlightEdgeSoftness
+      spotlightEdgeSoftness: spotlightEdgeSoftness,
+      textOverlays: textOverlays,
+      imageOverlays: imageOverlays,
+      blurRegions: blurRegions,
+      imageOverlayDirectory: project?.bundleURL
     )
   }
 }

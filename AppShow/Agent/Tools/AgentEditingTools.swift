@@ -18,16 +18,29 @@ enum AgentEditingToolCatalog {
 
   static let addZoom = AgentToolDefinition(
     name: "add_zoom",
-    description: "Add a manual zoom centred at a source time and return the updated timeline.",
+    description:
+      "Add a zoom. Use mode=area with rect and end to focus a source-frame area independently of the cursor, fitting it up to 8x. Times include transitions. Default mode=cursor uses centerX/centerY and level. Inspect the timeline first; area zooms cannot overlap existing zooms.",
     inputSchema: AgentToolSchema.object(
       [
-        "at": AgentToolSchema.number("Zoom centre time in source seconds", minimum: 0),
+        "at": AgentToolSchema.number("Source time; start including transition for area mode", minimum: 0),
+        "mode": AgentToolSchema.string("Targeting mode", enum: ["cursor", "area"]),
+        "end": AgentToolSchema.number("Area zoom end in source seconds, including transition", minimum: 0),
+        "transition": AgentToolSchema.number("Area zoom transition seconds, default 0.5", minimum: 0.01, maximum: 4),
+        "rect": AgentToolSchema.object(
+          [
+            "x": AgentToolSchema.number("Left edge in normalized source coordinates", minimum: 0, maximum: 1),
+            "y": AgentToolSchema.number("Top edge in normalized source coordinates", minimum: 0, maximum: 1),
+            "width": AgentToolSchema.number("Width in normalized source coordinates", minimum: 0.01, maximum: 1),
+            "height": AgentToolSchema.number("Height in normalized source coordinates", minimum: 0.01, maximum: 1),
+          ],
+          required: ["x", "y", "width", "height"]
+        ),
         "centerX": AgentToolSchema.number("Horizontal centre from 0 to 1", minimum: 0, maximum: 1),
         "centerY": AgentToolSchema.number("Vertical centre from 0 to 1", minimum: 0, maximum: 1),
         "level": AgentToolSchema.number("Zoom level from 1 to 8", minimum: 1, maximum: 8),
         "label": AgentToolSchema.string("Short undo-history label"),
       ],
-      required: ["at", "centerX", "centerY"]
+      required: ["at"]
     ),
     mutating: true
   )
@@ -557,6 +570,22 @@ private struct AgentAddZoomTool: AgentToolHandler {
   func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
     let state = context.editorState
     let duration = CMTimeGetSeconds(state.duration)
+    if arguments["mode"]?.stringValue == "area" {
+      guard let rect = arguments["rect"], let x = rect["x"]?.doubleValue, let y = rect["y"]?.doubleValue,
+        let width = rect["width"]?.doubleValue, let height = rect["height"]?.doubleValue,
+        let start = arguments["at"]?.doubleValue, let end = arguments["end"]?.doubleValue
+      else { throw AgentToolError.invalidArguments("Area mode requires rect, at and end.") }
+      try state.addAreaZoom(
+        rect: CGRect(x: x, y: y, width: width, height: height),
+        start: start,
+        end: end,
+        transition: arguments["transition"]?.doubleValue ?? 0.5
+      )
+      return context.timelineResult()
+    }
+    guard arguments["centerX"]?.doubleValue != nil, arguments["centerY"]?.doubleValue != nil else {
+      throw AgentToolError.invalidArguments("Cursor mode requires centerX and centerY.")
+    }
     let time = min(arguments["at"]?.doubleValue ?? 0, duration)
     state.zoomLevel = arguments["level"]?.doubleValue ?? state.zoomLevel
     state.zoomEnabled = true
