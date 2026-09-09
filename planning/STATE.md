@@ -96,6 +96,8 @@ Assistant replies are checkpointed during streaming. Early EOF and reopened stre
 
 Use the [public-release checklist](releases/PUBLIC-RELEASE-CHECKLIST.md) and its [App Store readiness evaluation](releases/APP-STORE-EVAL.md) to track distribution gates. Both channels currently remain NOT READY.
 
+Milestone 20 is active for [Store submission assets and account setup](milestones/20-store-submission-assets/PLAN.md). Five editable layout proofs and a [listing draft](releases/APP-STORE-LISTING-DRAFT.md) are prepared. Apple authentication and native screen capture access remain pending. The owner requires review of the completed design assets before anything is submitted.
+
 1. Restart the updated Debug build and run milestone 10’s real-webcam and interaction checks, then the remaining milestone 06 rows.
 2. Human runs the manual rows for milestones 02, 03, 04, and 07.
 3. Review green milestone 09 PR #10 and arrange Developer ID signing/notarization before a public release.

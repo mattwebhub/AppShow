@@ -4,6 +4,8 @@ Evaluated 2026-09-09 against the local `webcam-presentation-and-review` source a
 
 This is the App Store gate for the [public-release checklist](PUBLIC-RELEASE-CHECKLIST.md). It extends the [source readiness review](../reviews/2026-09-09-app-store-readiness.md) into testable acceptance criteria. The review's historical Debug PID/signature and older packaged artifacts are not proof about a future store archive.
 
+Submission preparation is tracked in [milestone 20](../milestones/20-store-submission-assets/PLAN.md), with a [listing draft](APP-STORE-LISTING-DRAFT.md) and [design package](../../docs/app-store/README.md). The initial account-access attempt reached a login wall; no authenticated account state or changes are established. Five layout proofs are prepared, while native captures and the owner's required final design review remain pending. A10 is not closed by this preparation.
+
 ## Owner checklist
 
 Follow-up guideline review: 2026-09-09. Account state remains uninspected. These tasks need the owner's decisions or account access; engineering can prepare the supporting artifacts.
