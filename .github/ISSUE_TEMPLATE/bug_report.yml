@@ -1,0 +1,31 @@
+name: Bug report
+description: Help us reproduce a recording, editing, or export problem.
+title: "[Bug]: "
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Describe what you expected and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include capture mode or export settings when relevant.
+      placeholder: "1. Open a project…\n2. Change…\n3. Notice…"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: App and Mac
+      description: AppShow version or commit, macOS version, and Apple silicon or Intel.
+    validations:
+      required: true
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Screenshots or sample project
+      description: A small example helps. Remove private recordings, personal information, and credentials before attaching files or logs.

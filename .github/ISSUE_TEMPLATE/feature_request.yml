@@ -1,0 +1,23 @@
+name: Feature or design proposal
+description: Suggest a better recording or editing experience.
+title: "[Idea]: "
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What are you trying to make?
+      description: Describe the workflow and what gets in your way today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed experience
+      description: Explain the interaction. Sketches, examples, and alternatives are welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What would success look like?
+      description: Describe the result a person should be able to achieve.
