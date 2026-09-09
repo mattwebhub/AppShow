@@ -17,6 +17,8 @@ enum ImageOverlayImporter {
   private static let supportedExtensions = Set(["png", "jpeg", "jpg", "heic", "tiff", "tif", "gif"])
 
   static func importImage(from source: URL, into bundle: URL) throws -> ImportedImage {
+    let access = SecurityScopedAccess(url: source)
+    defer { withExtendedLifetime(access) {} }
     let ext = source.pathExtension.lowercased()
     guard supportedExtensions.contains(ext) else { throw ImportError.unsupportedType(ext) }
     guard let image = loadImage(at: source) else { throw ImportError.unreadableImage }

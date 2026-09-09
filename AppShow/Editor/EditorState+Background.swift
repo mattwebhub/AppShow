@@ -3,6 +3,8 @@ import Foundation
 
 extension EditorState {
   func setBackgroundImage(from sourceURL: URL) {
+    let access = SecurityScopedAccess(url: sourceURL)
+    defer { withExtendedLifetime(access) {} }
     guard let bundleURL = project?.bundleURL else { return }
     let fm = FileManager.default
     let contents = (try? fm.contentsOfDirectory(atPath: bundleURL.path)) ?? []
@@ -38,6 +40,8 @@ extension EditorState {
   }
 
   func setCameraBackgroundImage(from sourceURL: URL) {
+    let access = SecurityScopedAccess(url: sourceURL)
+    defer { withExtendedLifetime(access) {} }
     guard let bundleURL = project?.bundleURL else { return }
     let fm = FileManager.default
     let contents = (try? fm.contentsOfDirectory(atPath: bundleURL.path)) ?? []

@@ -58,7 +58,14 @@ extension SessionState {
 
   func openProject(at url: URL) {
     do {
-      let project = try AppShowProject.open(at: url)
+      var accessibleURL = url
+      if AppDistribution.isStore {
+        let access = try BookmarkAccessStore.required()
+        let key = "project:" + url.standardizedFileURL.path
+        accessibleURL = try access.resolve(key: key, fallback: url)
+        try access.remember(accessibleURL, key: key)
+      }
+      let project = try AppShowProject.open(at: accessibleURL)
       openEditor(project: project)
     } catch {
       logger.error("Failed to open project: \(error)")

@@ -181,8 +181,8 @@ extension SessionState {
     deviceCapture = nil
     deviceName = nil
 
-    let saveDir = FileManager.default.projectSaveDirectory()
     do {
+      let saveDir = try FileManager.default.projectSaveDirectory()
       let project = try AppShowProject.create(
         from: result,
         fps: result.fps,
