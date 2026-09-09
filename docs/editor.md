@@ -165,16 +165,6 @@ The Captions tab exposes style settings before generation. Choose an installed f
 
 The existing `set_captions` tool accepts `fontFamily`, `textColor` and `backgroundColor`; color objects contain normalized `r`, `g`, `b` and optional `a` channels. Timeline results expose the current caption style. Caption appearance does not change recorded narration or agent context.
 
-## Recovering an interrupted assistant reply
-
-Partial replies and provider session IDs are saved during streaming. If the stream ends before completion, the reply is marked failed and remains visible. Reopening a project also recovers saved partial replies. Unfinished tool rows explain that their outcome needs checking.
-
-Use **Retry interrupted reply** to continue with the same provider session. If that session is unavailable, **Start fresh** opens a new provider session with recent conversation context while keeping the local history. Both actions ask the assistant to inspect current project state before continuing, because some earlier edits may have completed. If the provider remains running without output, Stop cancels the turn and exposes the same recovery actions.
-
-## Removing microphone audio
-
-Right-click the **Mic** track label or waveform and choose **Remove Microphone**. The track disappears and becomes silent in playback and export. Undo restores it immediately; you can also turn off **Mute** in Audio → Microphone. Source media and audio regions are retained. Removing one audio region is a separate waveform context-menu action.
-
 ## Selecting an area for zoom or blur
 
 In **Zoom**, choose **Select Zoom Area…**, drag a rectangle over the original recording frame, and enter the source-time start and end. AppShow fits the selected area, up to 8×, while preserving the source aspect ratio. The time range includes smooth entry and exit transitions. This area stays fixed even with Follow Cursor enabled. The Zoom track shows a viewfinder icon; drag its edges to change duration, move it to another time, or right-click to adjust transitions and remove it. Area zooms cannot overlap other zooms. Auto Zoom preserves area targets and generates cursor-based regions elsewhere.
@@ -189,6 +179,17 @@ The assistant uses the existing tools:
 ```
 
 Coordinates are normalized from 0 to 1, with the origin at the top-left of the original screen recording. The assistant can inspect frames, choose a target unrelated to the mouse, and render a preview to check the result. `update_blur` and `remove_blur` edit existing blur regions by ID.
+
+## Removing microphone audio
+
+Right-click the **Mic** track label or waveform and choose **Remove Microphone**. The track disappears and becomes silent in playback and export. Undo restores it immediately; you can also turn off **Mute** in Audio → Microphone. Source media and audio regions are retained. Removing one audio region is a separate waveform context-menu action.
+
+## Recovering an interrupted assistant reply
+
+Partial replies and provider session IDs are saved during streaming. If the stream ends before completion, the reply is marked failed and remains visible. Reopening a project also recovers saved partial replies. Unfinished tool rows explain that their outcome needs checking.
+
+Use **Retry interrupted reply** to continue with the same provider session. If that session is unavailable, **Start fresh** opens a new provider session with recent conversation context while keeping the local history. Both actions ask the assistant to inspect current project state before continuing, because some earlier edits may have completed. If the provider remains running without output, Stop cancels the turn and exposes the same recovery actions.
+
 
 ## Speed regions
 
