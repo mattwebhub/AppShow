@@ -1,6 +1,6 @@
 # State
 
-Last updated: 2026-09-05
+Last updated: 2026-09-09
 
 ## Position
 
@@ -66,6 +66,18 @@ Verification: 737 tests in 84 suites, format, lint, warning-free Debug build, pr
 
 The permission UI follow-up uses the existing Settings typography, spacing and monochrome controls, aligned action columns, collapsed recovery help and a fixed Continue footer. Light/dark native renders, expanded recovery, four permission tests, format, lint, build and signature checks pass; the updated app was reopened.
 
+## Public presentation
+
+Milestone 14's assets and documentation are complete locally: the supplied brushstroke artwork is preserved unchanged, the macOS icon fills all ten asset-catalog slots, and `make brand` regenerates the icon, README banner, and social preview. The README introduces the product workflow and source-build availability; a documentation index, contributor guide, and issue/PR templates support public contributions. Existing upstream attribution and license notices are retained.
+
+Verification: format, lint, warning-free Debug build, signature validation, icon dimensions and pixel transparency, artwork identity, local links, SVG and issue-form syntax all pass. Local GitHub-flavored Markdown previews were inspected at desktop and mobile widths. No runtime code changed; the test suite was not rerun for this asset/documentation change. A current AppShow editor capture, Dock inspection, publication, and social-preview upload remain pending in milestone 14's verification record. Nothing has been pushed.
+
+## Area effects and conversation recovery
+
+Milestone 15 implements right-click microphone removal using the existing persisted mute state, immediate Undo, and preserved source media. A shared source-frame picker adds timed blur and area zoom. Area zoom persists its normalized target per keyframe, fits the selection up to 8×, and bypasses cursor following in preview and SDR/HDR export while allowing cursor-based zooms elsewhere. The existing `add_zoom` tool accepts `mode=area`; timed blur retains `add_blur`, `update_blur`, and `remove_blur`.
+
+Assistant replies are checkpointed during streaming. Early EOF and reopened streaming messages become recoverable failures, unfinished tool rows explain their unknown outcome, and terminal provider events release a hung process. Retry preserves provider resume IDs; Start fresh retains local conversation context while opening a new provider session. Both ask the assistant to inspect current state before continuing. The full suite passes 752 tests in 87 suites, seven gated export tests pass, and six recovery tests pass again against the final build. Format, lint, warning-free build, project/signature validation pass; the updated app was reopened. Pointer interactions and real-provider recovery remain manual in milestone 15's `VERIFY.md`. Changes remain local.
+
 ## Accepted product decisions
 
 - Final product name: AppShow. Keep inherited names and identifiers during feature development, then perform one pre-release identity migration (ADR 0005).
@@ -85,3 +97,25 @@ The permission UI follow-up uses the existing Settings typography, spacing and m
 1. Restart the updated Debug build and run milestone 10’s real-webcam and interaction checks, then the remaining milestone 06 rows.
 2. Human runs the manual rows for milestones 02, 03, 04, and 07.
 3. Review green milestone 09 PR #10 and arrange Developer ID signing/notarization before a public release.
+
+
+## Speed regions
+
+Milestone 16 is code-complete locally: selected source-time ranges support 1.5×, 2×, 4×, 8×, 16×, and 32× with the existing region editing controls, a draggable/resizable Speed track, right-click editing/removal, project persistence, immediate Undo/Redo, and agent CRUD. Shared timing maps combine speed with cuts and trim for preview transport, exports, effects, imported-audio fades, and subtitle sidecars. Recorded and imported preview audio use pitch-preserving time stretching. Export writers explicitly end at the computed output duration, eliminating intermittent audio tails.
+
+Verification: 766 tests in 89 suites and nine gated export tests pass, including every preset with encoded audio and speed/cut/effect combinations across SDR/HDR and normal/parallel export. Format, lint, project validation, whitespace checks, warning-free Debug build, and strict signature verification pass; the updated app was reopened. Real-media listening, gestures, and live-provider invocation remain manual in milestone 16 VERIFY.md. Changes remain local and have not been pushed.
+
+
+### Screen-only speed correction
+
+Speed now affects the screen recording, system audio and click audio. Webcam, microphone and imported music retain 1× timing, with their existing cuts/trim and a shared end at the shortened screen duration. Native seeking, agent frame previews, microphone captions and subtitle sidecars use the independent normal-speed clock. Screen effects and system-audio captions retain screen timing. This supersedes milestone 16's original all-track speed behavior.
+
+Verification: 770 tests in 89 suites pass on a retry after an unchanged agent readiness timeout test stalled. Ten gated export tests plus a focused microphone/music export test pass, including actual webcam frame positions in normal/parallel export, all six speed presets, and SDR/HDR combinations. Real-media listening and gestures remain manual.
+
+The corrected Debug build is warning-free, lint and strict signature verification pass, and the updated app was reopened. No changes were pushed.
+
+## Local commit checkpoint (2026-09-09)
+
+Milestones 14–16 and the App Store readiness assessment are committed on `webcam-presentation-and-review`. The commits separate brand assets, public documentation, assistant recovery, microphone removal, area effects, speed timing, export, playback, timeline controls, and agent tools.
+
+Fresh verification: `make format`, `make lint`, warning-free `make build`, all 770 tests in 89 suites, and all 11 gated `ExportPipelineTests` pass. The gated cases cover the speed presets, normal-speed webcam/narration/music, cuts, area effects, and SDR/HDR exports. No changes were pushed. Existing manual interaction, real-media listening, provider recovery, and publication checks remain pending in the milestone verification records.
