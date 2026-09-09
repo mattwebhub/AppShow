@@ -164,3 +164,9 @@ Recorded narration is also saved separately for assistant context, even when vis
 The Captions tab exposes style settings before generation. Choose an installed font through the searchable Font control, then adjust size, weight, Font color, background color and opacity. Turn Background off for text alone. Styling persists with the project and supports Undo/Redo. A font unavailable on another Mac falls back to the system font without discarding the saved family name. Export uses these settings when Burn in captions is enabled.
 
 The existing `set_captions` tool accepts `fontFamily`, `textColor` and `backgroundColor`; color objects contain normalized `r`, `g`, `b` and optional `a` channels. Timeline results expose the current caption style. Caption appearance does not change recorded narration or agent context.
+
+## Recovering an interrupted assistant reply
+
+Partial replies and provider session IDs are saved during streaming. If the stream ends before completion, the reply is marked failed and remains visible. Reopening a project also recovers saved partial replies. Unfinished tool rows explain that their outcome needs checking.
+
+Use **Retry interrupted reply** to continue with the same provider session. If that session is unavailable, **Start fresh** opens a new provider session with recent conversation context while keeping the local history. Both actions ask the assistant to inspect current project state before continuing, because some earlier edits may have completed. If the provider remains running without output, Stop cancels the turn and exposes the same recovery actions.
