@@ -1,0 +1,9 @@
+{
+  "source": "docs/brand/app-icon.png",
+  "sha256": "3b4383d5d24fa25aeb28ee2645d740bf3cffd2a75d0d21dba4c4bb8597f9f586",
+  "traceSize": 256,
+  "minimumAlpha": 241,
+  "minimumMaxRGB": 111,
+  "minimumLuminanceExclusive": 42,
+  "quantizedColors": 32
+}
