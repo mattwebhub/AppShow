@@ -13,7 +13,7 @@ make dmg        # Create DMG installer
 make install    # Install to /Applications
 make format     # Format Swift source (swift format)
 make clean      # Clean build artifacts
-make tag        # Create git tag from Config.xcconfig version and generate changelog
+make tag        # Tag the clean committed version; run make changelog before committing
 make changelog  # Generate CHANGELOG.md
 ```
 
