@@ -189,3 +189,19 @@ The assistant uses the existing tools:
 ```
 
 Coordinates are normalized from 0 to 1, with the origin at the top-left of the original screen recording. The assistant can inspect frames, choose a target unrelated to the mouse, and render a preview to check the result. `update_blur` and `remove_blur` edit existing blur regions by ID.
+
+## Speed regions
+
+In **Video → Speed → Add Speed Region**, choose start/end times and **1.5×, 2×, 4×, 8×, 16×, or 32×**. The editor shows the section's original and resulting duration. A Speed track appears alongside the existing region tracks: drag to move, drag an edge to resize, and click or right-click to change the preset or remove it. Removing a region restores normal speed. Edits support Undo/Redo and persist with the project.
+
+Regions use seconds from the original recording and cannot overlap. Cuts and trim still decide which content is included. Output timing accounts for all three; for example, four source seconds at 4× become one output second. Only the screen recording and its system audio accelerate. Webcam, microphone narration, and imported music play at 1× on the output clock, retaining existing cuts and trim. They end with the shortened screen output; their unused tail remains in the project. Zoom, blur, overlays, and transitions remain attached to screen content. Microphone captions follow the normal-speed narration; system-audio captions follow screen speed. Exported SRT/VTT timestamps follow the resulting output timing.
+
+The assistant can use these tools with the same source-time ranges:
+
+```json
+{"name":"add_speed","arguments":{"start":5,"end":15,"rate":4}}
+{"name":"update_speed","arguments":{"id":"REGION_UUID","rate":8}}
+{"name":"remove_speed","arguments":{"id":"REGION_UUID"}}
+```
+
+`get_timeline` includes the `speed` regions and `outputDuration`. Very fast native previews can skip visual frames; exported video is rendered at the selected output frame rate. Audio uses time stretching to preserve pitch.

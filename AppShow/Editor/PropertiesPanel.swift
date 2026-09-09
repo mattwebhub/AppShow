@@ -35,6 +35,7 @@ struct PropertiesPanel: View {
     }
   }
 
+  @State var speedEditorRegion: SpeedRegionData?
   @State var selectingBlurArea = false
   @State var showingAreaPicker = false
   @State var backgroundMode: BackgroundMode = .color
@@ -66,6 +67,7 @@ struct PropertiesPanel: View {
           cornerRadiusSection
           videoShadowSection
           backgroundSection
+          speedSection
           silencesSection
         case .camera:
           cameraSection

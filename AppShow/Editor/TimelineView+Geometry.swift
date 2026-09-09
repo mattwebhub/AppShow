@@ -3,7 +3,7 @@ import SwiftUI
 
 extension TimelineView {
   var effectiveDisplayMode: TimelineDisplayMode {
-    editorState.showCutTrack ? displayMode : .source
+    (editorState.showCutTrack || !editorState.speedRegions.isEmpty) ? displayMode : .source
   }
 
   var isTrackEditable: Bool {
@@ -11,11 +11,17 @@ extension TimelineView {
   }
 
   var visibleSeconds: Double {
-    TimelineGeometry(timeline: editorState.cutTimeline, width: 1, mode: effectiveDisplayMode).visibleDuration
+    TimelineGeometry(timeline: editorState.cutTimeline, width: 1, mode: effectiveDisplayMode, speedRegions: editorState.speedRegions)
+      .visibleDuration
   }
 
   func geometry(width: CGFloat) -> TimelineGeometry {
-    TimelineGeometry(timeline: displayCutTimeline(width: width), width: width, mode: effectiveDisplayMode)
+    TimelineGeometry(
+      timeline: displayCutTimeline(width: width),
+      width: width,
+      mode: effectiveDisplayMode,
+      speedRegions: editorState.speedRegions
+    )
   }
 
   func xPosition(forSource time: Double, width: CGFloat) -> CGFloat {
