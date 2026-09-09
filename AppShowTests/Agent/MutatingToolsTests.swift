@@ -213,6 +213,25 @@ struct MutatingToolsTests {
     #expect(try store.load() == nil)
   }
 
+  @Test func speedToolsCreateUpdateRemoveAndUndo() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+    let result = try await dispatcher.call("add_speed", arguments: ["start": 0.5, "end": 1.5, "rate": 2])
+    #expect(result["outputDuration"] == 1.5)
+    let id = try #require(state.speedRegions.first?.id.uuidString)
+    _ = try await dispatcher.call("update_speed", arguments: ["id": .string(id), "rate": 32])
+    #expect(state.speedRegions.first?.rate == 32)
+    await #expect(throws: AgentToolError.self) { try await dispatcher.call("update_speed", arguments: ["id": .string(id), "rate": 3]) }
+    #expect(state.speedRegions.first?.rate == 32)
+    _ = try await dispatcher.call("remove_speed", arguments: ["id": .string(id)])
+    #expect(state.speedRegions.isEmpty)
+    state.undo()
+    #expect(state.speedRegions.first?.rate == 32)
+  }
+
   @Test func areaZoomToolPersistsTargetRejectsOverlapAndUndoes() async throws {
     let directory = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(directory) }
