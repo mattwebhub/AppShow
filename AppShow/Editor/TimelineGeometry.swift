@@ -9,18 +9,21 @@ struct TimelineGeometry: Sendable, Equatable {
   let timeline: CutTimeline
   let width: CGFloat
   let mode: TimelineDisplayMode
+  var speedRegions: [SpeedRegionData] = []
+
+  private var speedTimeline: SpeedTimeline { SpeedTimeline(duration: timeline.duration, regions: speedRegions, slices: timeline.slices) }
 
   var visibleDuration: Double {
     switch mode {
     case .source: max(timeline.duration, 0.001)
-    case .compressed: max(timeline.totalDuration, 0.001)
+    case .compressed: max(speedTimeline.totalDuration, 0.001)
     }
   }
 
   func displayTime(forSource time: Double) -> Double {
     switch mode {
     case .source: time
-    case .compressed: timeline.elapsed(forSource: time)
+    case .compressed: speedTimeline.elapsed(forSource: time)
     }
   }
 
@@ -39,15 +42,7 @@ struct TimelineGeometry: Sendable, Equatable {
     case .source:
       return display
     case .compressed:
-      var cursor = 0.0
-      for slice in timeline.slices {
-        let length = slice.endSeconds - slice.startSeconds
-        if display < cursor + length {
-          return slice.startSeconds + (display - cursor)
-        }
-        cursor += length
-      }
-      return timeline.slices.last?.endSeconds ?? 0
+      return speedTimeline.source(forElapsed: display)
     }
   }
 
