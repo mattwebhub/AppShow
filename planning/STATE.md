@@ -94,6 +94,8 @@ Assistant replies are checkpointed during streaming. Early EOF and reopened stre
 
 ## Next
 
+Use the [public-release checklist](releases/PUBLIC-RELEASE-CHECKLIST.md) and its [App Store readiness evaluation](releases/APP-STORE-EVAL.md) to track distribution gates. Both channels currently remain NOT READY.
+
 1. Restart the updated Debug build and run milestone 10’s real-webcam and interaction checks, then the remaining milestone 06 rows.
 2. Human runs the manual rows for milestones 02, 03, 04, and 07.
 3. Review green milestone 09 PR #10 and arrange Developer ID signing/notarization before a public release.
@@ -119,3 +121,9 @@ The corrected Debug build is warning-free, lint and strict signature verificatio
 Milestones 14–16 and the App Store readiness assessment are committed on `webcam-presentation-and-review`. The commits separate brand assets, public documentation, assistant recovery, microphone removal, area effects, speed timing, export, playback, timeline controls, and agent tools.
 
 Fresh verification: `make format`, `make lint`, warning-free `make build`, all 770 tests in 89 suites, and all 11 gated `ExportPipelineTests` pass. The gated cases cover the speed presets, normal-speed webcam/narration/music, cuts, area effects, and SDR/HDR exports. No changes were pushed. Existing manual interaction, real-media listening, provider recovery, and publication checks remain pending in the milestone verification records.
+
+## Vector tray and release planning
+
+Milestone 17 derives a transparent colored SVG and a monochrome menu bar template from the current icon, preserving the original Dock artwork. The native 18-point tray retains activity indicators and accessible state labels. The asset evaluation passes source fidelity, background removal, true-vector structure and deterministic regeneration; three hosted icon tests pass, with native light/dark 1×/2× previews inspected. Formatting, lint, warning-free Debug build, plist/signature and local-link checks pass.
+
+The public-release checklist and App Store evaluation define owners, observable evidence and separate channel gates. Both channels are NOT READY: candidate QA/distribution work and store-specific implementation remain open. See [milestone 17](milestones/17-vector-tray-and-release/VERIFY.md) for evidence and scope. Changes are committed locally in semantic groups; nothing has been published.
