@@ -213,6 +213,34 @@ struct MutatingToolsTests {
     #expect(try store.load() == nil)
   }
 
+  @Test func areaZoomToolPersistsTargetRejectsOverlapAndUndoes() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    let dispatcher = dispatcher(state, in: directory)
+    let before = state.createSnapshot()
+    let args: JSONValue = [
+      "mode": "area", "at": 0.1, "end": 1.8,
+      "rect": ["x": 0.6, "y": 0.1, "width": 0.3, "height": 0.2],
+    ]
+    let result = try await dispatcher.call("add_zoom", arguments: args)
+    #expect(result["zoom"]?["keyframes"]?.arrayValue?.first?["mode"]?.stringValue == "area")
+    let frames = try #require(state.zoomTimeline?.allKeyframes)
+    #expect(frames.allSatisfy { $0.targetRect != nil })
+    #expect(state.zoomFollowCursor)
+    state.generateAutoZoom()
+    #expect(state.zoomTimeline?.allKeyframes.filter { $0.targetRect != nil } == frames)
+    state.clearAutoZoom()
+    let saved = try JSONEncoder().encode(state.createSnapshot())
+    let decoded = try JSONDecoder().decode(EditorStateData.self, from: saved)
+    #expect(decoded.zoomSettings?.keyframes == frames)
+    await #expect(throws: AgentToolError.self) { try await dispatcher.call("add_zoom", arguments: args) }
+    #expect(state.zoomTimeline?.allKeyframes == frames)
+    state.undo()
+    #expect(state.createSnapshot().zoomSettings == before.zoomSettings)
+  }
+
   @Test func zoomAndSpotlightToolsApplyExistingEditorPrimitives() async throws {
     let directory = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(directory) }

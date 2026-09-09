@@ -13,17 +13,22 @@ extension EditorState {
     var newKeyframes = ZoomDetector.detect(from: provider.metadata, duration: dur, config: config)
 
     if let existing = zoomTimeline {
-      let autoRegions = groupZoomRegions(from: newKeyframes)
       let manualKeyframes = existing.allKeyframes.filter { !$0.isAuto }
       let manualRegions = groupZoomRegions(from: manualKeyframes)
-
+      let areaRegions = manualRegions.filter { manualKeyframes[$0.startIndex].targetRect != nil }
+      let autoRegions = groupZoomRegions(from: newKeyframes).filter { auto in
+        !areaRegions.contains { $0.startTime < auto.endTime && $0.endTime > auto.startTime }
+      }
+      if !areaRegions.isEmpty {
+        let detected = newKeyframes
+        newKeyframes = autoRegions.flatMap { Array(detected[$0.startIndex..<($0.startIndex + $0.count)]) }
+      }
       for manualRegion in manualRegions {
         let overlaps = autoRegions.contains { auto in
           manualRegion.startTime < auto.endTime && manualRegion.endTime > auto.startTime
         }
         if !overlaps {
-          let regionKfs = Array(manualKeyframes[manualRegion.startIndex..<(manualRegion.startIndex + manualRegion.count)])
-          newKeyframes.append(contentsOf: regionKfs)
+          newKeyframes.append(contentsOf: manualKeyframes[manualRegion.startIndex..<(manualRegion.startIndex + manualRegion.count)])
         }
       }
     }

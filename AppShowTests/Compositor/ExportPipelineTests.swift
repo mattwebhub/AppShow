@@ -13,6 +13,39 @@ struct ExportPipelineTests {
     ]
   }
 
+  @Test(arguments: [false, true])
+  func areaZoomAndTimedBlurExportTogether(isHDR: Bool) async throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let result = try await ProjectFixtures.recordingResult(
+      in: dir,
+      webcam: false,
+      systemAudio: false,
+      microphone: false,
+      cursor: false,
+      isHDR: isHDR
+    )
+    var config = ExportConfiguration(
+      cameraLayout: CameraLayout(),
+      trimRange: CMTimeRange(start: .zero, duration: CMTime(seconds: 2, preferredTimescale: 600)),
+      outputURL: dir.appendingPathComponent("area-effects.mp4")
+    )
+    config.zoomTimeline = ZoomTimeline(
+      keyframes: try ZoomTimeline.areaKeyframes(
+        rect: CGRect(x: 0.6, y: 0.1, width: 0.3, height: 0.2),
+        start: 0.1,
+        end: 1.9,
+        transition: 0.2
+      )
+    )
+    config.blurRegions = [BlurRegionData(startSeconds: 0.3, endSeconds: 1.5, x: 0.65, y: 0.1, width: 0.1, height: 0.1)]
+    let url = try await VideoCompositor.export(result: result, config: config)
+    let asset = AVURLAsset(url: url)
+    #expect(abs(try await asset.load(.duration).seconds - 2) < 0.05)
+    let frame = try await AVAssetImageGenerator(asset: asset).image(at: CMTime(seconds: 1, preferredTimescale: 600))
+    #expect(frame.image.width > 0 && frame.image.height > 0)
+  }
+
   @Test(arguments: [false, true], [CameraRegionType.fullscreen, .leftHalf, .rightThird])
   func webcamFocusExportsAcrossCuts(isHDR: Bool, presentation: CameraRegionType) async throws {
     let dir = try TestPaths.makeTemporaryDirectory()

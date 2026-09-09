@@ -18,8 +18,11 @@ extension ZoomKeyframeEditor {
         .fill(Track.background)
 
       HStack(spacing: 3) {
-        Image(systemName: region.isAuto ? "sparkle.magnifyingglass" : "plus.magnifyingglass")
-          .font(.system(size: Track.fontSize))
+        Image(
+          systemName: keyframes[region.startIndex].targetRect != nil
+            ? "viewfinder" : region.isAuto ? "sparkle.magnifyingglass" : "plus.magnifyingglass"
+        )
+        .font(.system(size: Track.fontSize))
         if regionWidth > 50 {
           Text(String(format: "%.1fx", region.peakZoom))
             .font(.system(size: Track.fontSize, weight: Track.fontWeight))

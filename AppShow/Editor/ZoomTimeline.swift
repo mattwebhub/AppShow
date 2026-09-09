@@ -7,6 +7,7 @@ struct ZoomKeyframe: Codable, Sendable, Equatable {
   var centerX: Double
   var centerY: Double
   var isAuto: Bool
+  var targetRect: CGRect? = nil
 }
 
 final class ZoomTimeline: @unchecked Sendable {
@@ -24,7 +25,7 @@ final class ZoomTimeline: @unchecked Sendable {
     return kfs
   }
 
-  func zoomRect(at time: Double) -> CGRect {
+  func zoomRect(at time: Double, cursorPosition: CGPoint? = nil) -> CGRect {
     lock.lock()
     let kfs = keyframes
     lock.unlock()
@@ -34,10 +35,10 @@ final class ZoomTimeline: @unchecked Sendable {
     }
 
     if time <= kfs.first!.t {
-      return zoomRect(for: kfs.first!)
+      return resolvedRect(for: kfs.first!, cursorPosition: cursorPosition)
     }
     if time >= kfs.last!.t {
-      return zoomRect(for: kfs.last!)
+      return resolvedRect(for: kfs.last!, cursorPosition: cursorPosition)
     }
 
     var lo = 0
@@ -55,7 +56,7 @@ final class ZoomTimeline: @unchecked Sendable {
     let k1 = kfs[hi]
     let span = k1.t - k0.t
     guard span > 0 else {
-      return zoomRect(for: k1)
+      return resolvedRect(for: k1, cursorPosition: cursorPosition)
     }
 
     let linearT = (time - k0.t) / span
@@ -69,8 +70,10 @@ final class ZoomTimeline: @unchecked Sendable {
       return CGRect(x: 0, y: 0, width: 1, height: 1)
     }
 
-    let cx = k0.centerX + (k1.centerX - k0.centerX) * t
-    let cy = k0.centerY + (k1.centerY - k0.centerY) * t
+    let c0 = resolvedCenter(for: k0, zoom: zoom, cursorPosition: cursorPosition)
+    let c1 = resolvedCenter(for: k1, zoom: zoom, cursorPosition: cursorPosition)
+    let cx = c0.x + (c1.x - c0.x) * t
+    let cy = c0.y + (c1.y - c0.y) * t
     let visibleW = 1.0 / zoom
     let visibleH = 1.0 / zoom
     let originX = cx * (1 - visibleW)
@@ -79,14 +82,21 @@ final class ZoomTimeline: @unchecked Sendable {
     return CGRect(x: originX, y: originY, width: visibleW, height: visibleH)
   }
 
-  private func zoomRect(for k: ZoomKeyframe) -> CGRect {
+  private func resolvedCenter(for k: ZoomKeyframe, zoom: Double, cursorPosition: CGPoint?) -> CGPoint {
+    guard k.targetRect == nil, let cursorPosition else { return CGPoint(x: k.centerX, y: k.centerY) }
+    let margin = min(0.3, 1.0 / (2.0 * max(1, zoom)) + 0.05)
+    return CGPoint(x: Self.softClamp(cursorPosition.x, margin: margin), y: Self.softClamp(cursorPosition.y, margin: margin))
+  }
+
+  private func resolvedRect(for k: ZoomKeyframe, cursorPosition: CGPoint?) -> CGRect {
     if k.zoomLevel <= 1.0 {
       return CGRect(x: 0, y: 0, width: 1, height: 1)
     }
     let visibleW = 1.0 / k.zoomLevel
     let visibleH = 1.0 / k.zoomLevel
-    let originX = k.centerX * (1 - visibleW)
-    let originY = k.centerY * (1 - visibleH)
+    let center = resolvedCenter(for: k, zoom: k.zoomLevel, cursorPosition: cursorPosition)
+    let originX = center.x * (1 - visibleW)
+    let originY = center.y * (1 - visibleH)
     return CGRect(x: originX, y: originY, width: visibleW, height: visibleH)
   }
 

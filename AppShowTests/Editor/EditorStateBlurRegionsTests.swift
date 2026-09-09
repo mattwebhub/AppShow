@@ -76,6 +76,16 @@ struct EditorStateBlurRegionsTests {
     #expect(state.blurRegions.isEmpty)
   }
 
+  @Test func selectedAreaUsesExactTimeRangeNearRecordingEnd() async throws {
+    let (state, directory) = try await makeState()
+    defer { state.teardown(); TestPaths.remove(directory) }
+    let region = try state.addTimedBlur(rect: CGRect(x: 0.1, y: 0.2, width: 0.3, height: 0.4), start: 5.8, end: 6)
+    #expect(region.startSeconds == 5.8)
+    #expect(region.endSeconds == 6)
+    #expect(state.activeBlurRegions(at: 5.7).isEmpty)
+    #expect(state.activeBlurRegions(at: 5.9).count == 1)
+  }
+
   @Test func snapshotRoundTripRestoresBlurRegions() async throws {
     let (state, directory) = try await makeState()
     defer { TestPaths.remove(directory) }

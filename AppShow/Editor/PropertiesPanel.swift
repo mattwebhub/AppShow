@@ -35,6 +35,8 @@ struct PropertiesPanel: View {
     }
   }
 
+  @State var selectingBlurArea = false
+  @State var showingAreaPicker = false
   @State var backgroundMode: BackgroundMode = .color
   @State var selectedGradientId: Int = 0
   @State var selectedColorId: String? = "Black"
@@ -115,6 +117,7 @@ struct PropertiesPanel: View {
     .onChange(of: cameraBackgroundMode) { _, newValue in
       updateCameraBackgroundStyle(mode: newValue)
     }
+    .sheet(isPresented: $showingAreaPicker) { areaPicker }
     .onChange(of: cameraBlurIntensity) { _, newValue in
       if cameraBackgroundMode == .blur {
         editorState.cameraBackgroundStyle = .blur(newValue)

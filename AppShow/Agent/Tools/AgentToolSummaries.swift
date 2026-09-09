@@ -180,13 +180,15 @@ enum AgentToolSummaries {
   }
 
   private static func keyframe(_ keyframe: ZoomKeyframe) -> JSONValue {
-    [
-      "t": seconds(keyframe.t),
-      "level": .number(keyframe.zoomLevel),
-      "x": .number(keyframe.centerX),
-      "y": .number(keyframe.centerY),
-      "auto": .bool(keyframe.isAuto),
+    var object: [String: JSONValue] = [
+      "t": seconds(keyframe.t), "level": .number(keyframe.zoomLevel),
+      "x": .number(keyframe.centerX), "y": .number(keyframe.centerY), "auto": .bool(keyframe.isAuto),
     ]
+    if let rect = keyframe.targetRect {
+      object["mode"] = "area"
+      object["rect"] = ["x": .number(rect.minX), "y": .number(rect.minY), "width": .number(rect.width), "height": .number(rect.height)]
+    }
+    return .object(object)
   }
 
   private static func spotlightRegion(_ region: SpotlightRegionData) -> JSONValue {

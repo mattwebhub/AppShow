@@ -174,3 +174,18 @@ Use **Retry interrupted reply** to continue with the same provider session. If t
 ## Removing microphone audio
 
 Right-click the **Mic** track label or waveform and choose **Remove Microphone**. The track disappears and becomes silent in playback and export. Undo restores it immediately; you can also turn off **Mute** in Audio → Microphone. Source media and audio regions are retained. Removing one audio region is a separate waveform context-menu action.
+
+## Selecting an area for zoom or blur
+
+In **Zoom**, choose **Select Zoom Area…**, drag a rectangle over the original recording frame, and enter the source-time start and end. AppShow fits the selected area, up to 8×, while preserving the source aspect ratio. The time range includes smooth entry and exit transitions. This area stays fixed even with Follow Cursor enabled. The Zoom track shows a viewfinder icon; drag its edges to change duration, move it to another time, or right-click to adjust transitions and remove it. Area zooms cannot overlap other zooms. Auto Zoom preserves area targets and generates cursor-based regions elsewhere.
+
+In **Effects → Overlays → Add Blur**, the same picker selects a source rectangle and exact start/end times. The blur appears on the Overlays track, where you can move/resize its timing and right-click to adjust its rectangle, strength, or remove it. Blur remains anchored to source content when the recording zooms.
+
+The assistant uses the existing tools:
+
+```json
+{"name":"add_zoom","arguments":{"mode":"area","at":2,"end":6,"transition":0.5,"rect":{"x":0.55,"y":0.1,"width":0.3,"height":0.25}}}
+{"name":"add_blur","arguments":{"start":2,"end":6,"rect":{"x":0.1,"y":0.7,"width":0.35,"height":0.1},"radius":25}}
+```
+
+Coordinates are normalized from 0 to 1, with the origin at the top-left of the original screen recording. The assistant can inspect frames, choose a target unrelated to the mouse, and render a preview to check the result. `update_blur` and `remove_blur` edit existing blur regions by ID.

@@ -76,13 +76,8 @@ extension VideoPreviewView {
 
   func updateZoom(_ nsView: VideoPreviewContainer) {
     if let zoom = zoomTimeline {
-      var zoomRect = zoom.zoomRect(at: currentTime)
-      if zoomFollowCursor, zoomRect.width < 1.0 || zoomRect.height < 1.0,
-        let provider = cursorMetadataProvider
-      {
-        let cursorPos = provider.sample(at: currentTime)
-        zoomRect = ZoomTimeline.followCursor(zoomRect, cursorPosition: cursorPos)
-      }
+      let cursor = zoomFollowCursor ? cursorMetadataProvider?.sample(at: currentTime) : nil
+      let zoomRect = zoom.zoomRect(at: currentTime, cursorPosition: cursor)
       nsView.updateZoomRect(zoomRect)
     } else {
       nsView.updateZoomRect(CGRect(x: 0, y: 0, width: 1, height: 1))

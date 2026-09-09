@@ -232,6 +232,9 @@
 		A2000000000000000000001E /* PropertiesPanel+CameraTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000001E /* PropertiesPanel+CameraTab.swift */; };
 		A2000000000000000000001F /* PropertiesPanel+CursorZoomTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000001F /* PropertiesPanel+CursorZoomTab.swift */; };
 		A20000000000000000000021 /* PropertiesPanel+AudioTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000021 /* PropertiesPanel+AudioTab.swift */; };
+		C5F822D987134BB68B2EB172 /* PropertiesPanel+CursorMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D359E8901EA4696B0674055 /* PropertiesPanel+CursorMovement.swift */; };
+		CC8341FEA8A94E47B6E87CFD /* PropertiesPanel+Zoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267FDB377E464B08884E1F72 /* PropertiesPanel+Zoom.swift */; };
+		D2CC87DA142C43FAA7C2995E /* PropertiesPanel+AreaSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9363A68941C6495C9BC42536 /* PropertiesPanel+AreaSelection.swift */; };
 		A20000000000000000000022 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000022 /* History.swift */; };
 		A20000000000000000000023 /* HistoryPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000023 /* HistoryPopover.swift */; };
 		A2000000000000000000002A /* EditorView+TransportBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000002A /* EditorView+TransportBar.swift */; };
@@ -261,6 +264,7 @@
 		A90000000000000000000004 /* CursorRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000004 /* CursorRenderer.swift */; };
 		A90000000000000000000005 /* CursorOverlayLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000005 /* CursorOverlayLayer.swift */; };
 		A90000000000000000000006 /* ZoomTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000006 /* ZoomTimeline.swift */; };
+		0BFED9C1A8C143DF84E8F2B1 /* ZoomTimeline+Area.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE29640FCA64B219965EA9B /* ZoomTimeline+Area.swift */; };
 		A90000000000000000000007 /* ZoomDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000007 /* ZoomDetector.swift */; };
 		A90000000000000000000008 /* ZoomKeyframeEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000008 /* ZoomKeyframeEditor.swift */; };
 		A90000000000000000000009 /* ZoomRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90000000000000000000009 /* ZoomRegion.swift */; };
@@ -350,6 +354,7 @@
 		6103BA147E834BA897084E10 /* AgentCameraTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818D42682C67412089224280 /* AgentCameraTools.swift */; };
 		71A20EA87B914AF88E205EDB /* WebcamPresentationControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFBB879028A4DF787BDEA64 /* WebcamPresentationControls.swift */; };
 		37B364DE8A7A47F68FAAD9EA /* TimeRangeControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C5B7F3292A4795A3E6E7F0 /* TimeRangeControls.swift */; };
+		7290DD4321A547CBB762D313 /* SourceAreaPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96973519A9B147B4B62B03BE /* SourceAreaPicker.swift */; };
 		D55187EB538D4391B28EE3A7 /* TimelineView+CameraRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA79ECF103AD48BAA913BA74 /* TimelineView+CameraRegion.swift */; };
 		99ACD07FB1A14321A1282774 /* TimelineView+CameraInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F71CE458C34C11A441D4D2 /* TimelineView+CameraInteraction.swift */; };
 		22EE076F80324BFB9544EEDD /* CameraRegionEditPopover+Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13CDBA66EA84BE1B369B3F6 /* CameraRegionEditPopover+Controls.swift */; };
@@ -637,6 +642,9 @@
 		B2000000000000000000001E /* PropertiesPanel+CameraTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+CameraTab.swift"; sourceTree = "<group>"; };
 		B2000000000000000000001F /* PropertiesPanel+CursorZoomTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+CursorZoomTab.swift"; sourceTree = "<group>"; };
 		B20000000000000000000021 /* PropertiesPanel+AudioTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+AudioTab.swift"; sourceTree = "<group>"; };
+		6D359E8901EA4696B0674055 /* PropertiesPanel+CursorMovement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+CursorMovement.swift"; sourceTree = "<group>"; };
+		267FDB377E464B08884E1F72 /* PropertiesPanel+Zoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+Zoom.swift"; sourceTree = "<group>"; };
+		9363A68941C6495C9BC42536 /* PropertiesPanel+AreaSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PropertiesPanel+AreaSelection.swift"; sourceTree = "<group>"; };
 		B20000000000000000000022 /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		B20000000000000000000023 /* HistoryPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPopover.swift; sourceTree = "<group>"; };
 		B2000000000000000000002A /* EditorView+TransportBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorView+TransportBar.swift"; sourceTree = "<group>"; };
@@ -669,6 +677,7 @@
 		B90000000000000000000004 /* CursorRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorRenderer.swift; sourceTree = "<group>"; };
 		B90000000000000000000005 /* CursorOverlayLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorOverlayLayer.swift; sourceTree = "<group>"; };
 		B90000000000000000000006 /* ZoomTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomTimeline.swift; sourceTree = "<group>"; };
+		3CE29640FCA64B219965EA9B /* ZoomTimeline+Area.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZoomTimeline+Area.swift"; sourceTree = "<group>"; };
 		B90000000000000000000007 /* ZoomDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomDetector.swift; sourceTree = "<group>"; };
 		B90000000000000000000008 /* ZoomKeyframeEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomKeyframeEditor.swift; sourceTree = "<group>"; };
 		B90000000000000000000009 /* ZoomRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomRegion.swift; sourceTree = "<group>"; };
@@ -752,6 +761,7 @@
 		818D42682C67412089224280 /* AgentCameraTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentCameraTools.swift"; sourceTree = "<group>"; };
 		AAFBB879028A4DF787BDEA64 /* WebcamPresentationControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebcamPresentationControls.swift"; sourceTree = "<group>"; };
 		C9C5B7F3292A4795A3E6E7F0 /* TimeRangeControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeRangeControls.swift"; sourceTree = "<group>"; };
+		96973519A9B147B4B62B03BE /* SourceAreaPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SourceAreaPicker.swift"; sourceTree = "<group>"; };
 		CA79ECF103AD48BAA913BA74 /* TimelineView+CameraRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CameraRegion.swift"; sourceTree = "<group>"; };
 		10F71CE458C34C11A441D4D2 /* TimelineView+CameraInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+CameraInteraction.swift"; sourceTree = "<group>"; };
 		B13CDBA66EA84BE1B369B3F6 /* CameraRegionEditPopover+Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CameraRegionEditPopover+Controls.swift"; sourceTree = "<group>"; };
@@ -1001,6 +1011,7 @@
 				B10000000000000000000023 /* CheckmarkRow.swift */,
 				B10000000000000000000024 /* OptionsPopover.swift */,
 				C9C5B7F3292A4795A3E6E7F0 /* TimeRangeControls.swift */,
+				96973519A9B147B4B62B03BE /* SourceAreaPicker.swift */,
 				AAFBB879028A4DF787BDEA64 /* WebcamPresentationControls.swift */,
 				D1412D34A0004784B58F90F0 /* WebcamVoiceControls.swift */,
 				B10000000000000000000026 /* ModeButton.swift */,
@@ -1163,6 +1174,7 @@
 				B90000000000000000000004 /* CursorRenderer.swift */,
 				B90000000000000000000005 /* CursorOverlayLayer.swift */,
 				B90000000000000000000006 /* ZoomTimeline.swift */,
+				3CE29640FCA64B219965EA9B /* ZoomTimeline+Area.swift */,
 				B90000000000000000000007 /* ZoomDetector.swift */,
 				B90000000000000000000008 /* ZoomKeyframeEditor.swift */,
 				B90000000000000000000009 /* ZoomRegion.swift */,
@@ -1185,6 +1197,9 @@
 				B90000000000000000000010 /* SystemCursorRenderer.swift */,
 				B90000000000000000000011 /* CursorLoopTelemetry.swift */,
 				B20000000000000000000021 /* PropertiesPanel+AudioTab.swift */,
+				6D359E8901EA4696B0674055 /* PropertiesPanel+CursorMovement.swift */,
+				267FDB377E464B08884E1F72 /* PropertiesPanel+Zoom.swift */,
+				9363A68941C6495C9BC42536 /* PropertiesPanel+AreaSelection.swift */,
 				FB20000000000000000000B1 /* PropertiesPanel+EffectsTab.swift */,
 				B2000000000000000000002A /* EditorView+TransportBar.swift */,
 				21AF098EF27738AA63BD47F6 /* EditorView+PreviewProgress.swift */,
@@ -1555,6 +1570,7 @@
 				A10000000000000000000023 /* CheckmarkRow.swift in Sources */,
 				A10000000000000000000024 /* OptionsPopover.swift in Sources */,
 				37B364DE8A7A47F68FAAD9EA /* TimeRangeControls.swift in Sources */,
+				7290DD4321A547CBB762D313 /* SourceAreaPicker.swift in Sources */,
 				71A20EA87B914AF88E205EDB /* WebcamPresentationControls.swift in Sources */,
 				93AD4543B66945F5BA8EAE6F /* WebcamVoiceControls.swift in Sources */,
 				A10000000000000000000025 /* CaptureMode.swift in Sources */,
@@ -1622,6 +1638,7 @@
 				A90000000000000000000004 /* CursorRenderer.swift in Sources */,
 				A90000000000000000000005 /* CursorOverlayLayer.swift in Sources */,
 				A90000000000000000000006 /* ZoomTimeline.swift in Sources */,
+				0BFED9C1A8C143DF84E8F2B1 /* ZoomTimeline+Area.swift in Sources */,
 				A90000000000000000000007 /* ZoomDetector.swift in Sources */,
 				A90000000000000000000008 /* ZoomKeyframeEditor.swift in Sources */,
 				A60000000000000000000001 /* CodableColor.swift in Sources */,
@@ -1673,6 +1690,9 @@
 				A90000000000000000000010 /* SystemCursorRenderer.swift in Sources */,
 				A90000000000000000000011 /* CursorLoopTelemetry.swift in Sources */,
 				A20000000000000000000021 /* PropertiesPanel+AudioTab.swift in Sources */,
+				C5F822D987134BB68B2EB172 /* PropertiesPanel+CursorMovement.swift in Sources */,
+				CC8341FEA8A94E47B6E87CFD /* PropertiesPanel+Zoom.swift in Sources */,
+				D2CC87DA142C43FAA7C2995E /* PropertiesPanel+AreaSelection.swift in Sources */,
 				A20000000000000000000022 /* History.swift in Sources */,
 				A20000000000000000000023 /* HistoryPopover.swift in Sources */,
 				DB000000000000000000000A /* RNNoiseProcessor.swift in Sources */,

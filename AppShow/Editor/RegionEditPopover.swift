@@ -43,18 +43,25 @@ struct RegionEditPopover: View {
   var body: some View {
     let _ = colorScheme
     VStack(alignment: .leading, spacing: Layout.regionPopoverSpacing) {
-      SectionHeader(title: "Zoom")
+      SectionHeader(title: originalKeyframes.first?.targetRect == nil ? "Zoom" : "Area Zoom")
 
-      SliderRow(
-        label: "Level",
-        labelWidth: popoverLabelWidth,
-        value: $zoomLevel,
-        range: 1.1...5.0,
-        step: 0.1,
-        formattedValue: String(format: "%.1fx", zoomLevel)
-      )
-      .padding(.horizontal, 12)
-      .padding(.vertical, 4)
+      if originalKeyframes.first?.targetRect != nil {
+        Text(String(format: "%.1fx · Fits selected area", zoomLevel))
+          .font(.system(size: FontSize.xs))
+          .foregroundStyle(AppShowColors.secondaryText)
+          .padding(.horizontal, 12)
+      } else {
+        SliderRow(
+          label: "Level",
+          labelWidth: popoverLabelWidth,
+          value: $zoomLevel,
+          range: 1.1...5.0,
+          step: 0.1,
+          formattedValue: String(format: "%.1fx", zoomLevel)
+        )
+        .padding(.horizontal, 12)
+        .padding(.vertical, 4)
+      }
 
       Divider()
         .padding(.horizontal, 12)

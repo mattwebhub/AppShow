@@ -24,7 +24,9 @@ extension PropertiesPanel {
         .buttonStyle(PrimaryButtonStyle(size: .small, fullWidth: true))
 
         Button {
-          editorState.addBlurRegion(atTime: CMTimeGetSeconds(editorState.currentTime))
+          editorState.pause()
+          selectingBlurArea = true
+          showingAreaPicker = true
         } label: {
           Label("Add Blur", systemImage: "drop.halffull")
         }
