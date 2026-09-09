@@ -3,6 +3,16 @@ import CoreMedia
 import Foundation
 
 extension EditorState {
+  func removeMicrophone() {
+    guard hasMicAudio, !micAudioMuted, !isExporting else { return }
+    pendingUndoTask?.cancel()
+    history.pushSnapshot(createSnapshot())
+    micAudioMuted = true
+    syncAudioVolumes()
+    history.pushSnapshot(createSnapshot(), label: "Microphone removed")
+    scheduleSave()
+  }
+
   func regions(for trackType: AudioTrackType) -> [AudioRegionData] {
     switch trackType {
     case .system: return systemAudioRegions

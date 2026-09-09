@@ -44,6 +44,11 @@ extension TimelineView {
 
         if showMicAudioTrack {
           trackSidebar(label: "Mic", icon: "mic")
+            .contentShape(Rectangle())
+            .contextMenu {
+              Button("Remove Microphone", role: .destructive) { editorState.removeMicrophone() }
+                .disabled(editorState.isExporting)
+            }
             .frame(height: trackHeight)
             .transition(.trackTransition)
         }
@@ -126,6 +131,10 @@ extension TimelineView {
                 width: width
               )
             }
+          }
+          .contextMenu {
+            Button("Remove Microphone", role: .destructive) { editorState.removeMicrophone() }
+              .disabled(editorState.isExporting)
           }
           .transition(.trackTransition)
         }

@@ -150,10 +150,16 @@ extension TimelineView {
     .frame(width: regionWidth, height: height)
     .contentShape(Rectangle())
     .overlay {
-      if isTrackEditable {
+      if isTrackEditable && trackType != .mic {
         RightClickOverlay {
           editorState.removeRegion(trackType: trackType, regionId: region.id)
         }
+      }
+    }
+    .contextMenu {
+      if trackType == .mic && isTrackEditable {
+        Button("Remove Audio Region", role: .destructive) { editorState.removeRegion(trackType: trackType, regionId: region.id) }
+        Button("Remove Microphone", role: .destructive) { editorState.removeMicrophone() }
       }
     }
     .gesture(
