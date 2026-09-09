@@ -54,7 +54,7 @@ Built for macOS 15 and later.
 
 ## Design review
 
-The [design package](../../docs/app-store/README.md) contains five editable screenshot layouts and a 24-second preview storyboard. Native captures are blocked by this session's macOS Screen Recording access. The generated layout proofs have a visible pending-capture label and must not be uploaded.
+The [design package](../../docs/app-store/README.md) contains five editable screenshot layouts and a 24-second preview storyboard. The owner supplied two real Desktop screenshots for the hero and pace designs, including the assistant conversation. Both are labeled as direct-edition design review; three slots remain empty. Automated capture is still blocked by this session's macOS Screen Recording access. This draft set must not be uploaded.
 
 - [ ] Owner reviews layout and copy.
 - [ ] Engineering captures actual Store UI and completes asset evaluation.
