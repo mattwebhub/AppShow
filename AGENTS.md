@@ -7,6 +7,8 @@ This file provides guidance to developers and to any AI coding assistant working
 ```bash
 make build      # Debug build
 make release    # Release build
+make store-build # Sandboxed store validation build
+make eval-store  # Audit the local store artifact
 make dev        # Build debug and run
 make run        # Build release and run
 make dmg        # Create DMG installer
@@ -196,6 +198,6 @@ Uses `MenuBarExtra(.window)` + MenuBarExtraAccess (1.2.x) for the `isPresented` 
 
 - Bundle ID: `com.mattwebhub.appshow`
 - `LSUIElement = false` (app shows in Dock with icon)
-- App sandbox disabled (required for ScreenCaptureKit)
+- Direct-download target uses the existing unsandboxed configuration; `AppShowStore` enables App Sandbox and excludes Sparkle/the CLI helper. Store capture and file-access runtime acceptance remain required.
 - Version is managed in `Config.xcconfig` (`MARKETING_VERSION` + `CURRENT_PROJECT_VERSION`)
 - SPM PBXBuildFile entries need `productRef` only (no `fileRef`)
