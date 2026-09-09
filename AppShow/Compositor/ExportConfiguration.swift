@@ -51,6 +51,7 @@ struct ExportConfiguration: Sendable {
   var cameraBackgroundStyle: CameraBackgroundStyle = .none
   var cameraBackgroundImageURL: URL? = nil
   var processedMicAudioURL: URL? = nil
+  var captionsFollowScreenSpeed = true
   var captionSegments: [CaptionSegment] = []
   var captionsEnabled: Bool = false
   var captionFontSize: CGFloat = 48
@@ -68,6 +69,7 @@ struct ExportConfiguration: Sendable {
   var spotlightEdgeSoftness: CGFloat = 50
   var textOverlays: [TextOverlayData] = []
   var imageOverlays: [ImageOverlayData] = []
+  var speedRegions: [SpeedRegionData] = []
   var blurRegions: [BlurRegionData] = []
   var imageOverlayDirectory: URL? = nil
   var clickSoundEnabled: Bool = false

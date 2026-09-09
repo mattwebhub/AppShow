@@ -13,6 +13,130 @@ struct ExportPipelineTests {
     ]
   }
 
+  @Test(arguments: [true, false])
+  func narrationAndMusicKeepTheirNormalTiming(isMicrophone: Bool) async throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let screen = try await VideoFixtures.screenMovie(in: dir)
+    let audio = try AudioFixtures.toneWithGap(duration: 2, gap: 0...0.75, in: dir)
+    let result = RecordingResult(
+      screenVideoURL: screen,
+      webcamVideoURL: nil,
+      systemAudioURL: nil,
+      microphoneAudioURL: isMicrophone ? audio : nil,
+      cursorMetadataURL: nil,
+      screenSize: VideoFixtures.screenSize,
+      webcamSize: nil,
+      fps: 30,
+      captureQuality: .standard,
+      isHDR: false
+    )
+    var config = ExportConfiguration(
+      cameraLayout: CameraLayout(),
+      trimRange: CMTimeRange(start: .zero, duration: CMTime(seconds: 2, preferredTimescale: 600)),
+      outputURL: dir.appendingPathComponent("normal-audio.mp4")
+    )
+    config.speedRegions = [SpeedRegionData(startSeconds: 0, endSeconds: 2, rate: 2)]
+    if !isMicrophone {
+      config.externalAudioTracks = [
+        ExternalAudioExportTrack(
+          url: audio,
+          timelineRange: config.trimRange,
+          fileStart: .zero,
+          volume: 1,
+          fadeIn: .zero,
+          fadeOut: .zero
+        )
+      ]
+    }
+    let url = try await VideoCompositor.export(result: result, config: config)
+    #expect(try await AudioFixtures.rmsDecibels(of: url, from: 0.2, to: 0.5) < -60)
+    #expect(try await AudioFixtures.rmsDecibels(of: url, from: 0.85, to: 0.95) > -25)
+  }
+
+  @Test(arguments: [ExportMode.normal, ExportMode.parallel])
+  func webcamFramesRemainAtNormalSpeedWhileScreenAccelerates(mode: ExportMode) async throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let screen = try await VideoFixtures.screenMovie(in: dir)
+    let webcam = try await VideoFixtures.screenMovie(in: dir, name: "webcam")
+    let result = RecordingResult(
+      screenVideoURL: screen,
+      webcamVideoURL: webcam,
+      systemAudioURL: nil,
+      microphoneAudioURL: nil,
+      cursorMetadataURL: nil,
+      screenSize: VideoFixtures.screenSize,
+      webcamSize: VideoFixtures.screenSize,
+      fps: 30,
+      captureQuality: .standard,
+      isHDR: false
+    )
+    var config = ExportConfiguration(
+      cameraLayout: CameraLayout(relativeX: 0, relativeY: 0, relativeWidth: 1),
+      trimRange: CMTimeRange(start: .zero, duration: CMTime(seconds: 2, preferredTimescale: 600)),
+      outputURL: dir.appendingPathComponent("webcam-speed.mp4")
+    )
+    config.exportSettings.mode = mode
+    config.speedRegions = [SpeedRegionData(startSeconds: 0, endSeconds: 2, rate: 2)]
+    config.cameraCornerRadius = 0
+    let url = try await VideoCompositor.export(result: result, config: config)
+    let frames = try await VideoFixtures.centerPixels(of: url)
+    let middle = try #require(frames.first { $0.seconds >= 0.5 })
+    #expect(abs(VideoFixtures.frameIndex(for: middle.color) - 15) <= 2)
+    #expect(abs(try await AVURLAsset(url: url).load(.duration).seconds - 1) < 0.002)
+  }
+
+  @Test(arguments: [1.5, 2.0, 4.0, 8.0, 16.0, 32.0])
+  func speedPresetsShortenVideoAndRetainAudio(rate: Double) async throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let result = try await ProjectFixtures.recordingResult(in: dir, webcam: true, systemAudio: true, microphone: true, cursor: false)
+    var config = ExportConfiguration(
+      cameraLayout: CameraLayout(),
+      trimRange: CMTimeRange(start: .zero, duration: CMTime(seconds: 2, preferredTimescale: 600)),
+      outputURL: dir.appendingPathComponent("speed.mp4")
+    )
+    config.speedRegions = [SpeedRegionData(startSeconds: 0, endSeconds: 2, rate: rate)]
+    let url = try await VideoCompositor.export(result: result, config: config)
+    let asset = AVURLAsset(url: url)
+    #expect(abs(try await asset.load(.duration).seconds - 2 / rate) < 0.002)
+    #expect(try await asset.loadTracks(withMediaType: .video).count == 1)
+    #expect(try await asset.loadTracks(withMediaType: .audio).count == 1)
+    #expect(try await AudioFixtures.rmsDecibels(of: url, from: 0, to: 2 / rate) > -50)
+  }
+
+  @Test(arguments: [false, true], [ExportMode.normal, ExportMode.parallel])
+  func speedExportsWithCutsAndEffects(isHDR: Bool, mode: ExportMode) async throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let result = try await ProjectFixtures.recordingResult(
+      in: dir,
+      webcam: true,
+      systemAudio: true,
+      microphone: false,
+      cursor: false,
+      isHDR: isHDR
+    )
+    var config = ExportConfiguration(
+      cameraLayout: CameraLayout(),
+      trimRange: CMTimeRange(start: .zero, duration: CMTime(seconds: 2, preferredTimescale: 600)),
+      outputURL: dir.appendingPathComponent("cut-speed.mp4")
+    )
+    config.exportSettings.mode = mode
+    config.speedRegions = [SpeedRegionData(startSeconds: 0.5, endSeconds: 1.5, rate: 4)]
+    config.videoRegions = EditorState.exportVideoRegions(
+      from: [VideoRegionData(startSeconds: 0, endSeconds: 0.75), VideoRegionData(startSeconds: 1.25, endSeconds: 2)],
+      trimStart: 0,
+      trimEnd: 2
+    )
+    config.blurRegions = [BlurRegionData(startSeconds: 0.5, endSeconds: 1.5, x: 0.2, y: 0.2, width: 0.3, height: 0.3)]
+    let url = try await VideoCompositor.export(result: result, config: config)
+    let actualDuration = try await AVURLAsset(url: url).load(.duration).seconds
+    #expect(abs(actualDuration - 1.125) < 0.002, "Duration: \(actualDuration)")
+    #expect(try await AudioFixtures.rmsDecibels(of: url, from: 0.1, to: 1.0) > -50)
+  }
+
   @Test(arguments: [false, true])
   func areaZoomAndTimedBlurExportTogether(isHDR: Bool) async throws {
     let dir = try TestPaths.makeTemporaryDirectory()

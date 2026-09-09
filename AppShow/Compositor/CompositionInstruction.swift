@@ -65,7 +65,26 @@ struct VideoSegmentMapping: Sendable {
 }
 
 final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProtocol, @unchecked Sendable {
-  let timeRange: CMTimeRange
+  private let unscaledTimeRange: CMTimeRange
+  var captionsFollowScreenSpeed = true
+  var captionTimeOverride: Double?
+  var speedTimeline: SpeedTimeline?
+  var timeRange: CMTimeRange {
+    guard let speedTimeline else { return unscaledTimeRange }
+    return CMTimeRange(start: .zero, duration: CMTime(seconds: speedTimeline.totalDuration, preferredTimescale: 60000))
+  }
+
+  func captionTime(for effectTime: CMTime) -> Double {
+    if let captionTimeOverride { return captionTimeOverride }
+    let time = !captionsFollowScreenSpeed ? speedTimeline?.elapsed(forSource: effectTime.seconds) ?? effectTime.seconds : effectTime.seconds
+    return time + trimStartSeconds
+  }
+
+  func effectTime(for outputTime: CMTime) -> CMTime {
+    guard let speedTimeline else { return outputTime }
+    return CMTime(seconds: speedTimeline.source(forElapsed: outputTime.seconds), preferredTimescale: 60000)
+  }
+
   let enablePostProcessing = false
   let containsTweening = false
   let requiredSourceTrackIDs: [NSValue]?
@@ -211,7 +230,7 @@ final class CompositionInstruction: NSObject, AVVideoCompositionInstructionProto
     blurRegions: [BlurRegionInstruction] = [],
     isHDR: Bool = false
   ) {
-    self.timeRange = timeRange
+    self.unscaledTimeRange = timeRange
     self.screenTrackID = screenTrackID
     self.webcamTrackID = webcamTrackID
     self.cameraRect = cameraRect

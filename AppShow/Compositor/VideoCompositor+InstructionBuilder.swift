@@ -42,6 +42,7 @@ extension VideoCompositor {
       || (!config.spotlightRegions.isEmpty && config.cursorSnapshot != nil)
       || !config.textOverlays.isEmpty
       || !config.imageOverlays.isEmpty
+      || !config.speedRegions.isEmpty
       || !config.blurRegions.isEmpty
       || clickSoundURL != nil
       || !config.externalAudioTracks.isEmpty
@@ -154,7 +155,7 @@ extension VideoCompositor {
     )
     let images = ImageOverlayImporter.loadImages(for: regions.imageOverlays, in: config.imageOverlayDirectory)
 
-    return CompositionInstruction(
+    let instruction = CompositionInstruction(
       timeRange: CMTimeRange(start: .zero, duration: compositionDuration),
       screenTrackID: 1,
       webcamTrackID: webcamTrackID,
@@ -253,5 +254,7 @@ extension VideoCompositor {
       },
       isHDR: result.isHDR
     )
+    instruction.captionsFollowScreenSpeed = config.captionsFollowScreenSpeed
+    return instruction
   }
 }

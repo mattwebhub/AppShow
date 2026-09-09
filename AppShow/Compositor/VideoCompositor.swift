@@ -10,6 +10,7 @@ enum VideoCompositor {
     let url: URL
     let regions: [CMTimeRange]
     let volume: Float
+    var followsScreenSpeed = true
   }
 
   private static func destination(
@@ -121,7 +122,7 @@ enum VideoCompositor {
     if let micURL = result.microphoneAudioURL, config.micAudioVolume > 0 {
       let effectiveMicURL = processedMicURL ?? micURL
       let micRegs = config.micAudioRegions ?? effectiveAudioRegions
-      audioSources.append(AudioSource(url: effectiveMicURL, regions: micRegs, volume: config.micAudioVolume))
+      audioSources.append(AudioSource(url: effectiveMicURL, regions: micRegs, volume: config.micAudioVolume, followsScreenSpeed: false))
     }
     if let csURL = clickSoundURL {
       let clickAsset = AVURLAsset(url: csURL)
@@ -159,6 +160,13 @@ enum VideoCompositor {
     let exportFPS = config.exportSettings.frameRateOverride ?? config.exportSettings.fps.value(fallback: result.fps)
 
     if needsCompositor {
+      let speedMap = speedMap(
+        regions: config.speedRegions,
+        trim: effectiveTrim,
+        segments: videoSegments,
+        duration: compositionDuration.seconds
+      )
+      let outputDuration = CMTime(seconds: speedMap.totalDuration, preferredTimescale: 60000)
       let instruction = try await buildCompositionInstruction(
         composition: composition,
         result: result,
@@ -172,14 +180,17 @@ enum VideoCompositor {
         renderSize: renderSize
       )
 
+      if !config.speedRegions.isEmpty { instruction.speedTimeline = speedMap }
+
       if config.exportSettings.format.isGIF {
+        applySpeed(speedMap, to: composition, preserving: Set([instruction.webcamTrackID].compactMap { $0 }))
         let outputURL = FileManager.default.tempGIFURL()
         try await gifExport(
           composition: composition,
           instruction: instruction,
           renderSize: renderSize,
           fps: exportFPS,
-          trimDuration: compositionDuration,
+          trimDuration: outputDuration,
           outputURL: outputURL,
           gifQuality: config.exportSettings.gifQuality.value,
           progressHandler: progressHandler
@@ -198,7 +209,7 @@ enum VideoCompositor {
           VideoSegmentInfo(sourceRange: $0.sourceRange, compositionStart: $0.compositionStart)
         }
         : nil
-      try await addAudioTracks(
+      let normalAudioIDs = try await addAudioTracks(
         to: composition,
         sources: audioSources,
         videoTrimRange: effectiveTrim,
@@ -215,6 +226,8 @@ enum VideoCompositor {
         adding: externalMixParameters(for: externalTracks)
       )
 
+      let normalTrackIDs = normalAudioIDs.union(externalTracks.map(\.trackID)).union([instruction.webcamTrackID].compactMap { $0 })
+      applySpeed(speedMap, to: composition, preserving: normalTrackIDs)
       let outputURL = FileManager.default.tempRecordingURL()
 
       if config.exportSettings.mode == ExportMode.parallel {
@@ -223,7 +236,7 @@ enum VideoCompositor {
           instruction: instruction,
           renderSize: renderSize,
           fps: exportFPS,
-          trimDuration: compositionDuration,
+          trimDuration: outputDuration,
           outputURL: outputURL,
           fileType: config.exportSettings.format.fileType,
           codec: config.exportSettings.codec,
@@ -238,7 +251,7 @@ enum VideoCompositor {
           instruction: instruction,
           renderSize: renderSize,
           fps: exportFPS,
-          trimDuration: compositionDuration,
+          trimDuration: outputDuration,
           outputURL: outputURL,
           fileType: config.exportSettings.format.fileType,
           codec: config.exportSettings.codec,

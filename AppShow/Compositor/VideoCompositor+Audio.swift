@@ -8,12 +8,14 @@ extension VideoCompositor {
     let compositionStart: CMTime
   }
 
+  @discardableResult
   static func addAudioTracks(
     to composition: AVMutableComposition,
     sources: [AudioSource],
     videoTrimRange: CMTimeRange,
     videoSegments: [VideoSegmentInfo]? = nil
-  ) async throws {
+  ) async throws -> Set<CMPersistentTrackID> {
+    var normalTrackIDs: Set<CMPersistentTrackID> = []
     for source in sources {
       let asset = AVURLAsset(url: source.url)
       guard let audioTrack = try await asset.loadTracks(withMediaType: .audio).first else { continue }
@@ -22,6 +24,8 @@ extension VideoCompositor {
         withMediaType: .audio,
         preferredTrackID: kCMPersistentTrackID_Invalid
       )
+
+      if !source.followsScreenSpeed, let compTrack { normalTrackIDs.insert(compTrack.trackID) }
 
       if let segments = videoSegments, !segments.isEmpty {
         for seg in segments {
@@ -48,6 +52,7 @@ extension VideoCompositor {
         }
       }
     }
+    return normalTrackIDs
   }
 
   static func buildAudioMix(

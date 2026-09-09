@@ -43,6 +43,17 @@ struct ExternalAudioRemapTests {
     abs(a - b) < 0.001
   }
 
+  @Test func speedSplitsFadesWithoutChangingTheirSourceGain() {
+    let map = SpeedTimeline(duration: 4, regions: [SpeedRegionData(startSeconds: 1, endSeconds: 3, rate: 4)])
+    let ramp = ExternalAudioVolumeRamp(timeRange: range(0, 4), startVolume: 0, endVolume: 1)
+    let ramps = VideoCompositor.retimeRamp(ramp, using: map)
+    #expect(ramps.count == 3)
+    #expect(ramps.map { $0.timeRange.duration.seconds } == [1, 0.5, 1])
+    #expect(ramps.map(\.startVolume) == [0, 0.25, 0.75])
+    #expect(ramps.map(\.endVolume) == [0.25, 0.75, 1])
+    #expect(ramps.last?.timeRange.end.seconds == 2.5)
+  }
+
   @Test func gainResetsAfterACutSkipsTheRestOfAFade() throws {
     let music = track(1, 6, fadeIn: 2)
     let insertions = VideoCompositor.insertions(for: music, trim: range(0, 7), segments: [segment(0, 2, at: 0), segment(5, 7, at: 2)])

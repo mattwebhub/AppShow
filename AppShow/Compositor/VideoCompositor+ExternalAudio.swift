@@ -100,7 +100,10 @@ extension VideoCompositor {
     return added
   }
 
-  static func externalMixParameters(for tracks: [ExternalAudioCompositionTrack]) -> [AVMutableAudioMixInputParameters] {
+  static func externalMixParameters(
+    for tracks: [ExternalAudioCompositionTrack],
+    speedMap: SpeedTimeline? = nil
+  ) -> [AVMutableAudioMixInputParameters] {
     tracks.map { entry in
       let parameters = AVMutableAudioMixInputParameters()
       parameters.trackID = entry.trackID
@@ -108,9 +111,13 @@ extension VideoCompositor {
       for insertion in entry.insertions {
         let ramps = volumeRamps(for: entry.track, insertions: [insertion])
         if ramps.first?.timeRange.start != insertion.compositionRange.start {
-          parameters.setVolume(entry.track.volume, at: insertion.compositionRange.start)
+          parameters.setVolume(
+            entry.track.volume,
+            at: speedMap.map { CMTime(seconds: $0.elapsed(forSource: insertion.compositionRange.start.seconds), preferredTimescale: 60000) }
+              ?? insertion.compositionRange.start
+          )
         }
-        for ramp in ramps {
+        for ramp in ramps.flatMap({ ramp in speedMap.map { retimeRamp(ramp, using: $0) } ?? [ramp] }) {
           parameters.setVolumeRamp(fromStartVolume: ramp.startVolume, toEndVolume: ramp.endVolume, timeRange: ramp.timeRange)
         }
       }

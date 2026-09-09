@@ -231,6 +231,35 @@ struct FrameRendererGoldenTests {
     }
   }
 
+  @Test func speedMapsTimedBlurBackToItsContent() throws {
+    let blur = BlurRegionInstruction(
+      timeRange: CMTimeRange(start: CMTime(seconds: 0.8, preferredTimescale: 600), end: CMTime(seconds: 1.2, preferredTimescale: 600)),
+      rect: CGRect(x: 0.25, y: 0, width: 0.5, height: 1),
+      radius: 8
+    )
+    let config = instruction(blurRegions: [blur], padding: 0)
+    config.speedTimeline = SpeedTimeline(duration: 2, regions: [SpeedRegionData(startSeconds: 0.2, endSeconds: 1.8, rate: 4)])
+    let output = try makeBuffer()
+    let source = try makeVerticalSplitBuffer()
+    FrameRenderer.renderFrame(
+      screenBuffer: source,
+      webcamBuffer: nil,
+      outputBuffer: output,
+      compositionTime: CMTime(seconds: 0.4, preferredTimescale: 600),
+      instruction: config
+    )
+    let blurred = try pixel(output, x: Self.width / 2, y: Self.height / 2)
+    #expect(blurred.r > 40 && blurred.r < 215)
+    FrameRenderer.renderFrame(
+      screenBuffer: source,
+      webcamBuffer: nil,
+      outputBuffer: output,
+      compositionTime: CMTime(seconds: 0.1, preferredTimescale: 600),
+      instruction: config
+    )
+    #expect(try pixel(output, x: Self.width / 2 + 2, y: Self.height / 2).r > 245)
+  }
+
   @Test func blurRegionChangesOnlyTheSelectedSourceRect() throws {
     let blur = BlurRegionInstruction(
       timeRange: CMTimeRange(start: .zero, duration: CMTime(seconds: 1, preferredTimescale: 600)),

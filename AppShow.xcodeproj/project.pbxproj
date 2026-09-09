@@ -70,6 +70,7 @@
 		7E5700000000000000000039 /* AudioWaveformDownsampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000038 /* AudioWaveformDownsampler.swift */; };
 		7E570000000000000000003B /* ExternalAudioWaveformStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000003A /* ExternalAudioWaveformStore.swift */; };
 		7E5700000000000000000051 /* VideoCompositor+ExternalAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000050 /* VideoCompositor+ExternalAudio.swift */; };
+		04FA440FE3AA448B86B06429 /* VideoCompositor+Speed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001037C6EA8A42A1BA28F340 /* VideoCompositor+Speed.swift */; };
 		7E570000000000000000004F /* ExternalAudioExportTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000004E /* ExternalAudioExportTrack.swift */; };
 		7E570000000000000000004D /* ExternalAudioPreviewEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000004C /* ExternalAudioPreviewEngine.swift */; };
 		7E570000000000000000004B /* FileDropModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000004A /* FileDropModifier.swift */; };
@@ -478,6 +479,7 @@
 		7E5700000000000000000038 /* AudioWaveformDownsampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveformDownsampler.swift; sourceTree = "<group>"; };
 		7E570000000000000000003A /* ExternalAudioWaveformStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioWaveformStore.swift; sourceTree = "<group>"; };
 		7E5700000000000000000050 /* VideoCompositor+ExternalAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoCompositor+ExternalAudio.swift"; sourceTree = "<group>"; };
+		001037C6EA8A42A1BA28F340 /* VideoCompositor+Speed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoCompositor+Speed.swift"; sourceTree = "<group>"; };
 		7E570000000000000000004E /* ExternalAudioExportTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioExportTrack.swift; sourceTree = "<group>"; };
 		7E570000000000000000004C /* ExternalAudioPreviewEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioPreviewEngine.swift; sourceTree = "<group>"; };
 		7E570000000000000000004A /* FileDropModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDropModifier.swift; sourceTree = "<group>"; };
@@ -1379,6 +1381,7 @@
 				496C1D98B8AB2982DF4AA7D4 /* ExportSheet+Phases.swift */,
 				7E570000000000000000004E /* ExternalAudioExportTrack.swift */,
 				7E5700000000000000000050 /* VideoCompositor+ExternalAudio.swift */,
+				001037C6EA8A42A1BA28F340 /* VideoCompositor+Speed.swift */,
 			);
 			path = Compositor;
 			sourceTree = "<group>";
@@ -1759,6 +1762,7 @@
 				7E5700000000000000000039 /* AudioWaveformDownsampler.swift in Sources */,
 				7E570000000000000000003B /* ExternalAudioWaveformStore.swift in Sources */,
 				7E5700000000000000000051 /* VideoCompositor+ExternalAudio.swift in Sources */,
+				04FA440FE3AA448B86B06429 /* VideoCompositor+Speed.swift in Sources */,
 				7E570000000000000000004F /* ExternalAudioExportTrack.swift in Sources */,
 				7E570000000000000000004D /* ExternalAudioPreviewEngine.swift in Sources */,
 				7E570000000000000000004B /* FileDropModifier.swift in Sources */,
