@@ -4,6 +4,28 @@ Evaluated 2026-09-09 against the local `webcam-presentation-and-review` source a
 
 This is the App Store gate for the [public-release checklist](PUBLIC-RELEASE-CHECKLIST.md). It extends the [source readiness review](../reviews/2026-09-09-app-store-readiness.md) into testable acceptance criteria. The review's historical Debug PID/signature and older packaged artifacts are not proof about a future store archive.
 
+## Owner checklist
+
+Follow-up guideline review: 2026-09-09. Account state remains uninspected. These tasks need the owner's decisions or account access; engineering can prepare the supporting artifacts.
+
+- [ ] Confirm active Apple Developer Program membership and the intended individual/organization team. The Account Holder must accept the latest agreement before a new app can be added. Create or verify the macOS AppShow record using `com.mattwebhub.appshow`, its primary language and SKU. [Apple app-record instructions](https://developer.apple.com/help/app-store-connect/create-an-app-record/add-a-new-app/).
+- [ ] Decide whether the assistant must ship in the first store release, and whether local-only shortcuts are acceptable. The validation build's exclusions are provisional; no shipping omission has been approved. Engineering must investigate a compatible assistant implementation if retained.
+- [ ] Choose free/paid distribution and territories; complete applicable agreements, tax and banking setup. Declare trader status using Apple's self-assessment. EU traders must provide verified address, phone and email for public display. Do not infer status from app price alone. [Apple trader requirements](https://developer.apple.com/help/app-store-connect/manage-compliance-information/manage-european-union-digital-services-act-trader-requirements/).
+- [ ] Supply the public support contact and privacy-page destination. Review the engineering data-flow inventory and approve accurate App Privacy answers, including integrated partners; these can be entered by an Account Holder, Admin or App Manager. [Apple privacy workflow](https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy/).
+- [ ] Resolve the open rights questions in [the dependency inventory](STORE-DEPENDENCIES.md), including bundled binaries, downloaded models and artwork. Record the resulting decision and evidence against A8.
+- [ ] Recruit testers for the declared Mac/OS matrix, review the actual store edition, and approve its final feature description, screenshots and rollout. Engineering prepares the candidate, sample projects and review notes. Account credentials and private identity documents stay outside this repository.
+
+## Guideline checks made explicit
+
+These supplement the existing gates; none is marked passed by documentation alone.
+
+| Apple section | AppShow acceptance evidence |
+| --- | --- |
+| [2.4.5 / 2.5.2](https://developer.apple.com/app-store/review/guidelines/#hardware-compatibility) | A2/A5/A7: sandboxed, self-contained execution; App Store updates; audit external processes and downloads. MCP is not specifically prohibited; compatibility is an implementation assessment. |
+| [2.5.14](https://developer.apple.com/app-store/review/guidelines/#software-requirements) | A1/A11: demonstrate explicit recording consent and a clear recording indicator, including screen, camera, microphone and cursor/input capture. |
+| [5.1.1 / 5.1.2(i)](https://developer.apple.com/app-store/review/guidelines/#privacy) | A2/A6: accessible in-app privacy-policy link; if AI receives personal data, disclose the recipient/data and obtain explicit permission before transmission. Capture permission alone does not establish AI-sharing consent. |
+| [2.1 / 2.3](https://developer.apple.com/app-store/review/guidelines/#performance) | A10/A11: working reviewer access and metadata matching the retained store features. |
+
 ## Decision method
 
 Every A1–A12 gate is required unless an explicit product decision makes part of it inapplicable. **Fail** means local evidence conflicts with a criterion. **Not tested** means sufficient evidence is missing. Neither permits release. **Pass** requires evidence from the exact candidate and owner/date. Do not average a score; any unresolved required gate keeps the verdict NOT READY. Product decisions must also update the store description and test matrix.
