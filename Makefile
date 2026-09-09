@@ -9,7 +9,7 @@ TEST_TARGET = AppShowTests
 TEST_FILTER = $(if $(T),-only-testing:'$(TEST_TARGET)/$(T)',-only-testing:$(TEST_TARGET))
 TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning:|failed
 
-.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish prepare-release release-preview store-build store-release store-archive test-store brand tray eval-tray preview-tray
+.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish prepare-release release-preview store-build store-release store-archive test-store eval-store brand tray eval-tray preview-tray
 
 all: help
 
@@ -42,6 +42,9 @@ store-archive:
 
 test-store:
 	@set -o pipefail; xcodebuild -project AppShow.xcodeproj -scheme AppShowStore -configuration Debug test -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)' -parallel-testing-enabled NO 2>&1 | grep -E '$(TEST_OUTPUT_FILTER)'
+
+eval-store:
+	@/usr/bin/python3 -B scripts/evaluate-store-build.py
 
 run: release
 	@open $(RELEASE_DIR)/$(APP_NAME).app
@@ -112,6 +115,7 @@ help:
 	@echo "  store-release - Build the universal store validation app"
 	@echo "  store-archive - Create a local universal store archive"
 	@echo "  test-store - Run sandbox-hosted synthetic project/export smoke tests"
+	@echo "  eval-store - Audit the local store build artifact"
 	@echo "  dmg         - Create .dmg installer"
 	@echo "  dmg-release - Create signed and notarized .dmg installer"
 	@echo "  install   - Install to /Applications"
