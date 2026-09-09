@@ -12,6 +12,7 @@ planning/
 ├── tdd-strategy.md        how we test: layers, fixtures, definition of done
 ├── upstream-sync.md       how and when to pull jkuri/Reframed changes
 ├── decisions/             architecture decision records (ADRs), numbered, immutable once accepted
+├── releases/             public-release checklist and channel readiness evaluations
 ├── milestones/
 │   ├── NN-name/PLAN.md    tasks for one milestone, checkboxes, each task names its test
 │   ├── NN-name/VERIFY.md  acceptance checks run before the milestone is closed

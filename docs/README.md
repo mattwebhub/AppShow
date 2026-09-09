@@ -17,6 +17,7 @@ Start with the [project introduction](../README.md#get-started), then follow the
 - [Concurrency](architecture/02-concurrency.md) and [data flow](architecture/03-data-flow.md)
 - [Dependencies](architecture/04-dependencies.md), [coding patterns](architecture/05-coding-patterns.md), and [conventions](architecture/06-conventions-checklist.md)
 - [Testability](architecture/07-testability.md) and [test strategy](../planning/tdd-strategy.md)
+- [Public-release checklist](../planning/releases/PUBLIC-RELEASE-CHECKLIST.md) and [Mac App Store readiness evaluation](../planning/releases/APP-STORE-EVAL.md)
 - [Current state](../planning/STATE.md) and [architecture decisions](../planning/decisions/README.md)
 
 The feature spikes under `features/` document earlier exploration. Use the current state and milestone verification files to distinguish implemented behavior from ideas and pending manual checks.
