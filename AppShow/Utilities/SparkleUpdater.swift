@@ -1,3 +1,4 @@
+#if !APP_STORE
 import Sparkle
 
 @MainActor
@@ -30,3 +31,4 @@ final class SparkleUpdater {
     controller?.checkForUpdates(nil)
   }
 }
+#endif

@@ -84,6 +84,9 @@ final class WindowController: ObservableObject {
   }
 
   private func findAXWindow(for app: AXUIElement, matching frame: CGRect) -> AXUIElement? {
+    #if APP_STORE
+    return nil
+    #else
     var windowsRef: CFTypeRef?
     AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &windowsRef)
     guard let windows = windowsRef as? [AXUIElement] else { return nil }
@@ -111,6 +114,7 @@ final class WindowController: ObservableObject {
     }
 
     return nil
+    #endif
   }
 
   func allVisibleWindows() -> [WindowInfo] {
@@ -186,13 +190,20 @@ final class WindowController: ObservableObject {
   }
 
   func resize(_ window: WindowInfo, to newSize: CGSize) {
+    #if APP_STORE
+
+    #else
     var size = newSize
     guard let sizeVal = AXValueCreate(.cgSize, &size) else { return }
     AXUIElementSetAttributeValue(window.axElement, kAXSizeAttribute as CFString, sizeVal)
     scheduleRefresh()
+    #endif
   }
 
   func center(_ window: WindowInfo) {
+    #if APP_STORE
+
+    #else
     guard let screen = NSScreen.main else { return }
     let screenFrame = screen.frame
 
@@ -203,6 +214,7 @@ final class WindowController: ObservableObject {
     guard let pointVal = AXValueCreate(.cgPoint, &point) else { return }
     AXUIElementSetAttributeValue(window.axElement, kAXPositionAttribute as CFString, pointVal)
     scheduleRefresh()
+    #endif
   }
 
   private func scheduleRefresh() {

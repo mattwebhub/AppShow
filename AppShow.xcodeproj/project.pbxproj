@@ -809,6 +809,7 @@
 		D6754BF44E7E4C6483CCD606 /* PermissionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PermissionStore.swift"; sourceTree = "<group>"; };
 		AD987EC431D6401F8EFF88A2 /* PermissionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PermissionRow.swift"; sourceTree = "<group>"; };
 		570000000000000000000031 /* BookmarkAccessStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAccessStore.swift; sourceTree = "<group>"; };
+		57000000000000000000001B /* AppShowStore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppShowStore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -842,6 +843,17 @@
 				A10000000000000000000019 /* Logging in Frameworks */,
 				A1000000000000000000001A /* MenuBarExtraAccess in Frameworks */,
 				E1000000000000000000000C /* Sparkle in Frameworks */,
+			);
+		};
+		570000000000000000000011 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				3DFD8D482F4E1CA100B8BB8F /* RNNoise in Frameworks */,
+				E10000000000000000000009 /* WhisperKit in Frameworks */,
+				A10000000000000000000017 /* ScreenCaptureKit.framework in Frameworks */,
+				A10000000000000000000018 /* AVFoundation.framework in Frameworks */,
+				A10000000000000000000019 /* Logging in Frameworks */,
+				A1000000000000000000001A /* MenuBarExtraAccess in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -1003,6 +1015,7 @@
 			isa = PBXGroup;
 			children = (
 				B1000000000000000000001B /* AppShow.app */,
+				57000000000000000000001B /* AppShowStore.app */,
 				7E5700000000000000000002 /* AppShowTests.xctest */,
 				7E5B00000000000000000004 /* appshow-mcp */,
 			);
@@ -1480,6 +1493,29 @@
 			productReference = B1000000000000000000001B /* AppShow.app */;
 			productType = "com.apple.product-type.application";
 		};
+		570000000000000000000001 /* AppShowStore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 570000000000000000000004 /* Build configuration list for PBXNativeTarget "AppShowStore" */;
+			buildPhases = (
+				C10000000000000000000002 /* Sources */,
+				570000000000000000000011 /* Frameworks */,
+				570000000000000000000013 /* Store Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AppShowStore;
+			packageProductDependencies = (
+				E10000000000000000000001 /* Logging */,
+				E10000000000000000000002 /* MenuBarExtraAccess */,
+				E10000000000000000000006 /* RNNoise */,
+				E10000000000000000000008 /* WhisperKit */,
+			);
+			productName = AppShowStore;
+			productReference = 57000000000000000000001B /* AppShowStore.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1522,6 +1558,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				570000000000000000000001 /* AppShowStore */,
 				F10000000000000000000001 /* AppShow */,
 				7E5700000000000000000003 /* AppShowTests */,
 				7E5B00000000000000000008 /* appshow-mcp */,
@@ -1542,6 +1579,13 @@
 				AA0000000000000000000001 /* Credits.html in Resources */,
 				7E5E00000000000000000003 /* skills in Resources */,
 				7E5E00000000000000000005 /* AgentWorkspaceGuidance.md in Resources */,
+			);
+		};
+		570000000000000000000013 /* Store Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+				3DCA03E12F3B511C003FE309 /* Assets.xcassets in Resources */,
+				AA0000000000000000000001 /* Credits.html in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -2220,6 +2264,94 @@
 			};
 			name = Release;
 		};
+		570000000000000000000007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC0000000000000000000001 /* Config.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_ENTITLEMENTS = AppShow/AppShowStore.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AppShow/Store-Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AppShow;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "AppShow contributors";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/AppShow/Libraries/gifski";
+				OTHER_LDFLAGS = "-lgifski";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mattwebhub.appshow;
+				PRODUCT_NAME = AppShowStore;
+				PRODUCT_MODULE_NAME = AppShowStore;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APP_STORE";
+				ENABLE_APP_SANDBOX = YES;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INCLUDE_PATHS = "$(PROJECT_DIR)/AppShow/Libraries/gifski";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		570000000000000000000008 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC0000000000000000000001 /* Config.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_ENTITLEMENTS = AppShow/AppShowStore.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AppShow/Store-Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AppShow;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "AppShow contributors";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/AppShow/Libraries/gifski";
+				OTHER_LDFLAGS = "-lgifski";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mattwebhub.appshow;
+				PRODUCT_NAME = AppShowStore;
+				PRODUCT_MODULE_NAME = AppShowStore;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APP_STORE";
+				ENABLE_APP_SANDBOX = YES;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INCLUDE_PATHS = "$(PROJECT_DIR)/AppShow/Libraries/gifski";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2253,6 +2385,14 @@
 			buildConfigurations = (
 				F10000000000000000000007 /* Debug */,
 				F10000000000000000000008 /* Release */,
+			);
+			defaultConfigurationName = Release;
+		};
+		570000000000000000000004 /* Build configuration list for PBXNativeTarget "AppShowStore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				570000000000000000000007 /* Debug */,
+				570000000000000000000008 /* Release */,
 			);
 			defaultConfigurationName = Release;
 		};

@@ -68,6 +68,10 @@ actor AgentProcessRunner {
 
   func run(_ launch: AgentProcessLaunch) -> AsyncThrowingStream<String, Error> {
     let (stream, continuation) = AsyncThrowingStream<String, Error>.makeStream()
+    guard !AppDistribution.isStore else {
+      continuation.finish(throwing: AgentError.launchFailed("The external assistant is unavailable in this build"))
+      return stream
+    }
     guard !isRunning else {
       continuation.finish(throwing: AgentError.alreadyRunning)
       return stream
