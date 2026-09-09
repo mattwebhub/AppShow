@@ -14,6 +14,7 @@ final class EditorState {
   var trimStart: CMTime = .zero
   var trimEnd: CMTime = .zero
   var systemAudioRegions: [AudioRegionData] = []
+  var speedRegions: [SpeedRegionData] = []
   var micAudioRegions: [AudioRegionData] = []
   var externalAudioTracks: [ExternalAudioTrackData] = []
   var cameraRegions: [CameraRegionData] = []
@@ -164,16 +165,16 @@ final class EditorState {
 
   var showCutTrack: Bool { cutTimeline.showsTrack }
 
-  var videoRegionsTotalDuration: Double { cutTimeline.totalDuration }
+  var videoRegionsTotalDuration: Double { speedTimeline.totalDuration }
 
   var hasVideoRegionCuts: Bool { cutTimeline.hasCuts }
 
   var previewElapsedTime: Double {
-    cutTimeline.elapsed(forSource: CMTimeGetSeconds(currentTime))
+    speedTimeline.elapsed(forSource: CMTimeGetSeconds(currentTime))
   }
 
   func sourceTimeForPreviewElapsed(_ elapsed: Double) -> Double {
-    cutTimeline.source(forElapsed: elapsed)
+    speedTimeline.source(forElapsed: elapsed)
   }
 
   init(project: AppShowProject) {
@@ -320,6 +321,7 @@ final class EditorState {
       if let savedSysRegions = saved.systemAudioRegions, !savedSysRegions.isEmpty {
         systemAudioRegions = savedSysRegions
       }
+      speedRegions = (saved.speedRegions ?? []).filter { $0.isValid(duration: dur) }
       if let savedMicRegions = saved.micAudioRegions, !savedMicRegions.isEmpty {
         micAudioRegions = savedMicRegions
       }

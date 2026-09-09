@@ -4,11 +4,11 @@ import SwiftUI
 extension EditorView {
   var previewProgressBar: some View {
     let totalDuration =
-      editorState.hasVideoRegionCuts
+      editorState.hasTimeEdits
       ? editorState.videoRegionsTotalDuration
       : CMTimeGetSeconds(editorState.duration)
     let elapsed =
-      editorState.hasVideoRegionCuts
+      editorState.hasTimeEdits
       ? editorState.previewElapsedTime
       : CMTimeGetSeconds(editorState.currentTime)
     let progress = CGFloat(elapsed / max(0.01, totalDuration))
@@ -55,7 +55,7 @@ extension EditorView {
     let fraction = max(0, min(1, Double(x / width)))
     let targetElapsed = fraction * totalDuration
 
-    if editorState.hasVideoRegionCuts {
+    if editorState.hasTimeEdits {
       let sourceTime = editorState.sourceTimeForPreviewElapsed(targetElapsed)
       editorState.seek(to: CMTime(seconds: sourceTime, preferredTimescale: 600))
     } else {

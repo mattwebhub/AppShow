@@ -15,356 +15,240 @@ final class SyncedPlayerController {
   private let logger = Logger(label: "com.mattwebhub.appshow.synced-player")
   let screenPlayer: AVPlayer
   let webcamPlayer: AVPlayer?
-  private let systemAudioPlayer: AVPlayer?
+  private let systemAudio: RecordedAudioPreviewPlayer?
+  private var microphone: RecordedAudioPreviewPlayer?
   private(set) var currentTime: CMTime = .zero
   private(set) var duration: CMTime = .zero
   private(set) var isPlaying = false
+  private(set) var playbackRate: Double = 1
   private var timeObserver: Any?
   private var boundaryObserver: Any?
+  private var lastNormalSpeedTime: Double?
+  var trimStart: CMTime = .zero
   var trimEnd: CMTime = .zero
   var systemAudioRegions: [(start: CMTime, end: CMTime)] = []
   var micAudioRegions: [(start: CMTime, end: CMTime)] = []
   var videoRegions: [(start: Double, end: Double)] = []
+  var speedRegions: [SpeedRegionData] = []
   var previewMode = false
   var skipsGaps = false
   let externalAudio = ExternalAudioPreviewEngine()
-
-  private var micAudioEngine: AVAudioEngine?
-  private var micPlayerNode: AVAudioPlayerNode?
-  private var micAudioFile: AVAudioFile?
-  private var micVolumeLevel: Float = 1.0
-  private var micIsMutedByRegion: Bool = true
-  private(set) var systemAudioDriftRatio: Double = 1.0
-  private var webcamDriftRatio: Double = 1.0
-  private(set) var micAudioDriftRatio: Double = 1.0
+  private(set) var systemAudioDriftRatio: Double = 1
+  private var webcamDriftRatio: Double = 1
+  private(set) var micAudioDriftRatio: Double = 1
 
   init(result: RecordingResult) {
-    let screenAsset = AVURLAsset(url: result.screenVideoURL)
-    screenPlayer = AVPlayer(playerItem: AVPlayerItem(asset: screenAsset))
+    screenPlayer = AVPlayer(playerItem: AVPlayerItem(asset: AVURLAsset(url: result.screenVideoURL)))
     screenPlayer.actionAtItemEnd = .pause
-
-    if let webcamURL = result.webcamVideoURL {
-      let webcamAsset = AVURLAsset(url: webcamURL)
-      webcamPlayer = AVPlayer(playerItem: AVPlayerItem(asset: webcamAsset))
+    if let url = result.webcamVideoURL {
+      webcamPlayer = AVPlayer(playerItem: AVPlayerItem(asset: AVURLAsset(url: url)))
       webcamPlayer?.actionAtItemEnd = .pause
       webcamPlayer?.isMuted = true
     } else {
       webcamPlayer = nil
     }
-
-    let hasExternalAudio = result.systemAudioURL != nil || result.microphoneAudioURL != nil
-    if hasExternalAudio {
-      screenPlayer.isMuted = true
-    }
-
-    if let sysURL = result.systemAudioURL {
-      systemAudioPlayer = AVPlayer(playerItem: AVPlayerItem(asset: AVURLAsset(url: sysURL)))
-      systemAudioPlayer?.actionAtItemEnd = .pause
-    } else {
-      systemAudioPlayer = nil
-    }
-
-    if let micURL = result.microphoneAudioURL {
-      setupMicEngine(url: micURL)
-    }
-  }
-
-  private func setupMicEngine(url: URL) {
-    let audioFile: AVAudioFile
-    do {
-      audioFile = try AVAudioFile(forReading: url)
-    } catch {
-      logger.error("Failed to open mic audio file: \(error)")
-      return
-    }
-    micAudioFile = audioFile
-
-    let engine = AVAudioEngine()
-    let playerNode = AVAudioPlayerNode()
-
-    engine.attach(playerNode)
-
-    let format = audioFile.processingFormat
-    engine.connect(playerNode, to: engine.mainMixerNode, format: format)
-
-    do {
-      try engine.start()
-    } catch {
-      logger.error("Failed to start audio engine: \(error)")
-    }
-
-    micAudioEngine = engine
-    micPlayerNode = playerNode
+    systemAudio = result.systemAudioURL.flatMap { try? RecordedAudioPreviewPlayer(url: $0) }
+    microphone = result.microphoneAudioURL.flatMap { try? RecordedAudioPreviewPlayer(url: $0) }
+    if result.systemAudioURL != nil || result.microphoneAudioURL != nil { screenPlayer.isMuted = true }
   }
 
   func swapMicAudioFile(url: URL) {
-    let wasPlaying = isPlaying
-    let time = currentTime
-    micPlayerNode?.stop()
-
-    guard let engine = micAudioEngine, let playerNode = micPlayerNode else { return }
-
-    engine.disconnectNodeOutput(playerNode)
-
-    let audioFile: AVAudioFile
-    do {
-      audioFile = try AVAudioFile(forReading: url)
-    } catch {
-      logger.error("Failed to open swapped mic audio file: \(error)")
-      return
-    }
-    micAudioFile = audioFile
-
-    let format = audioFile.processingFormat
-    engine.connect(playerNode, to: engine.mainMixerNode, format: format)
-
-    if wasPlaying {
-      scheduleMicPlayback(from: time)
-    }
+    guard let replacement = try? RecordedAudioPreviewPlayer(url: url) else { return }
+    replacement.volume = microphone?.volume ?? 1
+    microphone?.teardown()
+    microphone = replacement
+    micAudioDriftRatio = ratio(audioDuration: replacement.duration)
+    replacement.driftRatio = micAudioDriftRatio
+    updateAudioMuting(at: currentTime)
+    if isPlaying { replacement.play(from: webcamSourceTime(for: currentTime.seconds), rate: 1) }
   }
 
   func loadDuration() async {
     guard let item = screenPlayer.currentItem else { return }
-    do {
-      duration = try await item.asset.load(.duration)
-    } catch {
-      logger.error("Failed to load duration: \(error)")
-      duration = .zero
-    }
+    duration = (try? await item.asset.load(.duration)) ?? .zero
     trimEnd = duration
   }
 
   func computeDriftRatios() async {
-    let videoDuration = CMTimeGetSeconds(duration)
-    guard videoDuration > 0 else { return }
-
-    if let sysItem = systemAudioPlayer?.currentItem {
-      if let sysDur = try? await sysItem.asset.load(.duration) {
-        let audioSec = CMTimeGetSeconds(sysDur)
-        if audioSec > 0 {
-          let ratio = audioSec / videoDuration
-          if abs(videoDuration - audioSec) > 0.01 {
-            systemAudioDriftRatio = ratio
-            logger.info(
-              "System audio drift ratio: \(String(format: "%.6f", ratio)) (delta=\(String(format: "%.3f", videoDuration - audioSec))s)"
-            )
-          }
-        }
-      }
+    if let audio = systemAudio {
+      systemAudioDriftRatio = ratio(audioDuration: audio.duration)
+      audio.driftRatio = systemAudioDriftRatio
     }
-
-    if let wcItem = webcamPlayer?.currentItem {
-      if let wcDur = try? await wcItem.asset.load(.duration) {
-        let wcSec = CMTimeGetSeconds(wcDur)
-        if wcSec > 0 {
-          let ratio = wcSec / videoDuration
-          if abs(videoDuration - wcSec) > 0.01 {
-            webcamDriftRatio = ratio
-            logger.info("Webcam drift ratio: \(String(format: "%.6f", ratio)) (delta=\(String(format: "%.3f", videoDuration - wcSec))s)")
-          }
-        }
-      }
+    if let audio = microphone {
+      micAudioDriftRatio = ratio(audioDuration: audio.duration)
+      audio.driftRatio = micAudioDriftRatio
     }
-
-    if let micFile = micAudioFile {
-      let micSec = Double(micFile.length) / micFile.processingFormat.sampleRate
-      if micSec > 0 {
-        let ratio = micSec / videoDuration
-        if abs(videoDuration - micSec) > 0.01 {
-          micAudioDriftRatio = ratio
-          logger.info("Mic audio drift ratio: \(String(format: "%.6f", ratio)) (delta=\(String(format: "%.3f", videoDuration - micSec))s)")
-        }
-      }
+    if let item = webcamPlayer?.currentItem, let length = try? await item.asset.load(.duration) {
+      webcamDriftRatio = ratio(audioDuration: length.seconds)
     }
+  }
+
+  private func ratio(audioDuration: Double) -> Double {
+    guard duration.seconds > 0, audioDuration > 0, abs(audioDuration - duration.seconds) > 0.01 else { return 1 }
+    return audioDuration / duration.seconds
   }
 
   func setupTimeObserver() {
-    let interval = CMTime(value: 1, timescale: 60)
-    timeObserver = screenPlayer.addPeriodicTimeObserver(forInterval: interval, queue: .main) {
-      [weak self] time in
+    timeObserver = screenPlayer.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 60), queue: .main) { [weak self] time in
       MainActor.assumeIsolated {
         guard let self else { return }
         self.currentTime = time
-        if self.trimEnd.isValid && CMTimeCompare(time, self.trimEnd) >= 0 {
-          self.pause()
-        }
-        if (self.previewMode || self.skipsGaps) && self.isPlaying {
-          self.applyGapSkip(at: CMTimeGetSeconds(time))
-        }
-        self.updateAudioMuting(at: time)
-        self.externalAudio.tick(at: CMTimeGetSeconds(time))
+        if self.trimEnd.isValid && time >= self.trimEnd { self.pause() }
+        if (self.previewMode || self.skipsGaps) && self.isPlaying { self.applyGapSkip(at: time.seconds) }
+        self.updatePlaybackRate(at: self.currentTime.seconds)
+        self.updateAudioMuting(at: self.currentTime)
+        self.syncNormalSpeedPlayback()
+        self.externalAudio.tick(at: self.webcamSourceTime(for: self.currentTime.seconds))
       }
     }
   }
 
-  nonisolated static func gapSkipDecision(
-    at time: Double,
-    slices: [(start: Double, end: Double)]
-  ) -> GapSkipDecision {
+  nonisolated static func gapSkipDecision(at time: Double, slices: [(start: Double, end: Double)]) -> GapSkipDecision {
     guard !slices.isEmpty else { return .none }
-    if slices.contains(where: { time >= $0.start && time < $0.end }) {
-      return .none
-    }
-    if let next = slices.first(where: { $0.start > time }) {
-      return .seek(next.start)
-    }
+    if slices.contains(where: { time >= $0.start && time < $0.end }) { return .none }
+    if let next = slices.first(where: { $0.start > time }) { return .seek(next.start) }
     return .pause
   }
 
   func installBoundaryObserver() {
-    if let obs = boundaryObserver {
-      screenPlayer.removeTimeObserver(obs)
-      boundaryObserver = nil
-    }
-    let times = videoRegions.dropLast().map {
-      NSValue(time: CMTime(seconds: $0.end, preferredTimescale: 600))
-    }
-    guard !times.isEmpty else { return }
+    if let boundaryObserver { screenPlayer.removeTimeObserver(boundaryObserver) }
+    boundaryObserver = nil
+    let boundaries = Set(videoRegions.dropLast().map(\.end) + speedRegions.flatMap { [$0.startSeconds, $0.endSeconds] }).sorted()
+    guard !boundaries.isEmpty else { return }
+    let times = boundaries.map { NSValue(time: CMTime(seconds: $0, preferredTimescale: 60000)) }
     boundaryObserver = screenPlayer.addBoundaryTimeObserver(forTimes: times, queue: .main) { [weak self] in
       MainActor.assumeIsolated {
-        guard let self, (self.previewMode || self.skipsGaps) && self.isPlaying else { return }
-        self.applyGapSkip(at: CMTimeGetSeconds(self.screenPlayer.currentTime()))
+        guard let self, self.isPlaying else { return }
+        self.currentTime = self.screenPlayer.currentTime()
+        let time = self.currentTime.seconds
+        if self.previewMode || self.skipsGaps { self.applyGapSkip(at: time) }
+        self.updatePlaybackRate(at: self.currentTime.seconds)
       }
+    }
+  }
+
+  func updatePlaybackRate(at time: Double) {
+    let rate = speedRegions.first { time >= $0.startSeconds && time < $0.endSeconds }?.rate ?? 1
+    let changed = rate != playbackRate
+    playbackRate = rate
+    guard isPlaying else { return }
+    if screenPlayer.rate != Float(rate) { screenPlayer.rate = Float(rate) }
+    if webcamPlayer?.rate != Float(webcamDriftRatio) { webcamPlayer?.rate = Float(webcamDriftRatio) }
+    if changed {
+      systemAudio?.play(from: time, rate: rate)
     }
   }
 
   private func applyGapSkip(at time: Double) {
     switch Self.gapSkipDecision(at: time, slices: videoRegions) {
-    case .none:
-      break
-    case .seek(let target):
-      let seekTime = CMTime(seconds: target, preferredTimescale: 600)
-      seek(to: seekTime)
-      screenPlayer.play()
-      webcamPlayer?.rate = Float(webcamDriftRatio)
-      systemAudioPlayer?.rate = Float(systemAudioDriftRatio)
-      scheduleMicPlayback(from: seekTime)
-    case .pause:
-      pause()
+    case .none: break
+    case .seek(let target): seek(to: CMTime(seconds: target, preferredTimescale: 60000))
+    case .pause: pause()
     }
   }
 
   private func updateAudioMuting(at time: CMTime) {
-    if let sysPlayer = systemAudioPlayer {
-      let inRange = systemAudioRegions.contains { region in
-        CMTimeCompare(time, region.start) >= 0 && CMTimeCompare(time, region.end) < 0
-      }
-      sysPlayer.isMuted = !inRange
-    }
-    if micPlayerNode != nil {
-      let inRange = micAudioRegions.contains { region in
-        CMTimeCompare(time, region.start) >= 0 && CMTimeCompare(time, region.end) < 0
-      }
-      micIsMutedByRegion = !inRange
-      micPlayerNode?.volume = micIsMutedByRegion ? 0 : micVolumeLevel
-    }
+    systemAudio?.muted = !systemAudioRegions.contains { time >= $0.start && time < $0.end }
+    let micTime = CMTime(seconds: webcamSourceTime(for: time.seconds), preferredTimescale: 60000)
+    microphone?.muted = !micAudioRegions.contains { micTime >= $0.start && micTime < $0.end }
   }
 
   func play() {
-    guard !isPlaying else { return }
-    if trimEnd.isValid && CMTimeCompare(currentTime, trimEnd) >= 0 {
-      return
-    }
-    screenPlayer.play()
-    webcamPlayer?.rate = Float(webcamDriftRatio)
-    systemAudioPlayer?.rate = Float(systemAudioDriftRatio)
-    scheduleMicPlayback(from: currentTime)
-    externalAudio.start(at: CMTimeGetSeconds(currentTime))
+    guard !isPlaying, !trimEnd.isValid || currentTime < trimEnd else { return }
     isPlaying = true
+    updatePlaybackRate(at: currentTime.seconds)
+    updateAudioMuting(at: currentTime)
+    systemAudio?.play(from: currentTime.seconds, rate: playbackRate)
+    microphone?.play(from: webcamSourceTime(for: currentTime.seconds), rate: 1)
+    externalAudio.setPlaybackRate(1, at: webcamSourceTime(for: currentTime.seconds))
+    externalAudio.start(at: webcamSourceTime(for: currentTime.seconds))
   }
 
   func pause() {
     screenPlayer.pause()
     webcamPlayer?.pause()
-    systemAudioPlayer?.pause()
-    micPlayerNode?.stop()
+    systemAudio?.stop()
+    microphone?.stop()
     externalAudio.stop()
     isPlaying = false
     syncAuxPlayers()
   }
 
   func seek(to time: CMTime) {
-    let toleranceBefore = CMTime(value: 1, timescale: 600)
-    let toleranceAfter = CMTime(value: 1, timescale: 600)
-    screenPlayer.seek(to: time, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
-    let wcTime = CMTimeMultiplyByFloat64(time, multiplier: webcamDriftRatio)
-    webcamPlayer?.seek(to: wcTime, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
-    let sysTime = CMTimeMultiplyByFloat64(time, multiplier: systemAudioDriftRatio)
-    systemAudioPlayer?.seek(to: sysTime, toleranceBefore: toleranceBefore, toleranceAfter: toleranceAfter)
-    micPlayerNode?.stop()
+    let tolerance = CMTime(value: 1, timescale: 60000)
+    screenPlayer.seek(to: time, toleranceBefore: tolerance, toleranceAfter: tolerance)
+    webcamPlayer?.seek(
+      to: CMTime(seconds: webcamSourceTime(for: time.seconds) * webcamDriftRatio, preferredTimescale: 60000),
+      toleranceBefore: tolerance,
+      toleranceAfter: tolerance
+    )
+    systemAudio?.stop()
+    microphone?.stop()
     externalAudio.stop()
     currentTime = time
+    lastNormalSpeedTime = webcamSourceTime(for: time.seconds)
+    updatePlaybackRate(at: time.seconds)
+    updateAudioMuting(at: time)
     if isPlaying {
-      externalAudio.start(at: CMTimeGetSeconds(time))
+      systemAudio?.play(from: time.seconds, rate: playbackRate)
+      microphone?.play(from: webcamSourceTime(for: time.seconds), rate: 1)
+      externalAudio.setPlaybackRate(1, at: webcamSourceTime(for: time.seconds))
+      externalAudio.start(at: webcamSourceTime(for: time.seconds))
     }
   }
 
   func setExternalAudioTracks(_ tracks: [ExternalAudioTrackData], urls: [UUID: URL]) {
-    externalAudio.setTracks(tracks, urls: urls, currentTime: CMTimeGetSeconds(currentTime))
-    if !tracks.isEmpty {
-      screenPlayer.isMuted = true
-    }
+    externalAudio.setTracks(tracks, urls: urls, currentTime: webcamSourceTime(for: currentTime.seconds))
+    if !tracks.isEmpty { screenPlayer.isMuted = true }
   }
 
-  func setSystemAudioVolume(_ volume: Float) {
-    systemAudioPlayer?.volume = volume
-  }
-
-  func setMicAudioVolume(_ volume: Float) {
-    micVolumeLevel = volume
-    if !micIsMutedByRegion {
-      micPlayerNode?.volume = volume
-    }
-  }
+  func setSystemAudioVolume(_ volume: Float) { systemAudio?.volume = volume }
+  func setMicAudioVolume(_ volume: Float) { microphone?.volume = volume }
 
   func teardown() {
-    if let obs = timeObserver {
-      screenPlayer.removeTimeObserver(obs)
-      timeObserver = nil
-    }
-    if let obs = boundaryObserver {
-      screenPlayer.removeTimeObserver(obs)
-      boundaryObserver = nil
-    }
-    screenPlayer.pause()
-    webcamPlayer?.pause()
-    systemAudioPlayer?.pause()
-    if let engine = micAudioEngine {
-      micPlayerNode?.stop()
-      engine.stop()
-      if let node = micPlayerNode { engine.detach(node) }
-      engine.reset()
-    }
-    micPlayerNode = nil
-    micAudioEngine = nil
-    micAudioFile = nil
+    if let timeObserver { screenPlayer.removeTimeObserver(timeObserver) }
+    if let boundaryObserver { screenPlayer.removeTimeObserver(boundaryObserver) }
+    timeObserver = nil
+    boundaryObserver = nil
+    pause()
+    systemAudio?.teardown()
+    microphone?.teardown()
     externalAudio.teardown()
   }
 
-  private func scheduleMicPlayback(from time: CMTime) {
-    guard let playerNode = micPlayerNode, let audioFile = micAudioFile else { return }
-    playerNode.stop()
-    let sampleRate = audioFile.processingFormat.sampleRate
-    let audioTime = CMTimeGetSeconds(time) * micAudioDriftRatio
-    let startFrame = AVAudioFramePosition(audioTime * sampleRate)
-    let totalFrames = AVAudioFramePosition(audioFile.length)
-    guard startFrame < totalFrames else { return }
-    let frameCount = AVAudioFrameCount(totalFrames - startFrame)
-    playerNode.scheduleSegment(
-      audioFile,
-      startingFrame: startFrame,
-      frameCount: frameCount,
-      at: nil
-    )
-    playerNode.play()
+  func webcamSourceTime(for sourceTime: Double) -> Double {
+    guard !speedRegions.isEmpty else { return sourceTime }
+    let kept = videoRegions.isEmpty ? [(start: 0.0, end: duration.seconds)] : videoRegions
+    let slices = kept.compactMap { region -> VideoRegionData? in
+      let start = max(region.start, trimStart.seconds)
+      let end = min(region.end, trimEnd.seconds)
+      return end > start ? VideoRegionData(startSeconds: start, endSeconds: end) : nil
+    }
+    return SpeedTimeline(duration: duration.seconds, regions: speedRegions, slices: slices).normalSpeedSource(forSource: sourceTime)
   }
 
-  private func syncAuxPlayers() {
-    let screenTime = screenPlayer.currentTime()
+  private func syncNormalSpeedPlayback() {
+    let normal = webcamSourceTime(for: currentTime.seconds)
+    defer { lastNormalSpeedTime = normal }
+    guard isPlaying, !speedRegions.isEmpty else { return }
+    let crossedCut =
+      lastNormalSpeedTime.map { previous in
+        zip(videoRegions, videoRegions.dropFirst()).contains { before, after in
+          before.end < after.start && previous < before.end && normal >= after.start
+        }
+      } ?? false
+    if crossedCut {
+      microphone?.play(from: normal, rate: 1)
+      externalAudio.start(at: normal)
+    }
+    if let webcamPlayer, abs(webcamPlayer.currentTime().seconds - normal * webcamDriftRatio) > 0.12 {
+      syncAuxPlayers()
+    }
+  }
+
+  func syncAuxPlayers() {
+    let time = CMTime(seconds: webcamSourceTime(for: currentTime.seconds) * webcamDriftRatio, preferredTimescale: 60000)
     let tolerance = CMTime(value: 1, timescale: 600)
-    let wcTime = CMTimeMultiplyByFloat64(screenTime, multiplier: webcamDriftRatio)
-    webcamPlayer?.seek(to: wcTime, toleranceBefore: tolerance, toleranceAfter: tolerance)
-    let sysTime = CMTimeMultiplyByFloat64(screenTime, multiplier: systemAudioDriftRatio)
-    systemAudioPlayer?.seek(to: sysTime, toleranceBefore: tolerance, toleranceAfter: tolerance)
+    webcamPlayer?.seek(to: time, toleranceBefore: tolerance, toleranceAfter: tolerance)
   }
 }
