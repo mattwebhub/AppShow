@@ -23,6 +23,33 @@
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "NO"
+      shouldAutocreateTestPlan = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5800000000000000000003"
+               BuildableName = "AppShowStoreTests.xctest"
+               BlueprintName = "AppShowStoreTests"
+               ReferencedContainer = "container:AppShow.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "APPSHOW_TEST_HOST"
+            value = "1"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
+   </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
