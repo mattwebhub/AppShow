@@ -174,6 +174,7 @@ extension EditorState {
       cameraBackgroundStyle: cameraBackgroundStyle,
       cameraBackgroundImageURL: cameraBackgroundImageURL(),
       processedMicAudioURL: processedMicAudioURL,
+      captionsFollowScreenSpeed: captionAudioSource != .microphone,
       captionSegments: settings.burnInCaptions ? captionSegments : [],
       captionsEnabled: settings.burnInCaptions && captionsEnabled,
       captionFontSize: captionFontSize,
@@ -191,6 +192,7 @@ extension EditorState {
       spotlightEdgeSoftness: spotlightEdgeSoftness,
       textOverlays: textOverlays,
       imageOverlays: imageOverlays,
+      speedRegions: speedRegions,
       blurRegions: blurRegions,
       imageOverlayDirectory: project?.bundleURL,
       clickSoundEnabled: clickSoundEnabled && showCursor,
@@ -211,11 +213,11 @@ extension EditorState {
     if !captionSegments.isEmpty {
       if settings.exportSRT {
         let srtURL = url.deletingPathExtension().appendingPathExtension("srt")
-        try? SubtitleExporter.exportSRT(segments: captionSegments, to: srtURL)
+        try? SubtitleExporter.exportSRT(segments: subtitleSegmentsForExport, to: srtURL)
       }
       if settings.exportVTT {
         let vttURL = url.deletingPathExtension().appendingPathExtension("vtt")
-        try? SubtitleExporter.exportVTT(segments: captionSegments, to: vttURL)
+        try? SubtitleExporter.exportVTT(segments: subtitleSegmentsForExport, to: vttURL)
       }
     }
 

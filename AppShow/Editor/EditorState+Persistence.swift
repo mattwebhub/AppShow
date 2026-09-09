@@ -126,6 +126,7 @@ extension EditorState {
       externalAudioTracks: externalAudioTracks.isEmpty ? nil : externalAudioTracks,
       textOverlays: textOverlays.isEmpty ? nil : textOverlays,
       imageOverlays: imageOverlays.isEmpty ? nil : imageOverlays,
+      speedRegions: speedRegions.isEmpty ? nil : speedRegions,
       blurRegions: blurRegions.isEmpty ? nil : blurRegions
     )
   }
@@ -209,6 +210,7 @@ extension EditorState {
     if let savedMicRegions = data.micAudioRegions, !savedMicRegions.isEmpty {
       micAudioRegions = savedMicRegions
     }
+    speedRegions = (data.speedRegions ?? []).filter { $0.isValid(duration: duration.seconds) }
     externalAudioTracks = data.externalAudioTracks ?? []
     if let savedCameraRegions = data.cameraRegions {
       cameraRegions = savedCameraRegions
@@ -300,6 +302,9 @@ extension EditorState {
       || prev.micAudioRegions != data.micAudioRegions
     if regionsChanged {
       syncAudioRegionsToPlayer()
+    }
+    if prev.speedRegions != data.speedRegions {
+      syncVideoRegionsToPlayer()
     }
     if prev.externalAudioTracks != data.externalAudioTracks {
       syncExternalAudioToPlayer()
@@ -421,6 +426,7 @@ extension EditorState {
       _ = self.micAudioRegions
       _ = self.externalAudioTracks
       _ = self.cameraRegions
+      _ = self.speedRegions
       _ = self.videoRegions
       _ = self.systemAudioVolume
       _ = self.micAudioVolume

@@ -15,7 +15,7 @@ extension EditorView {
         Spacer()
 
         HStack(spacing: 4) {
-          if isPreview && editorState.hasVideoRegionCuts {
+          if isPreview && editorState.hasTimeEdits {
             Text(formatPreciseDuration(seconds: editorState.previewElapsedTime))
               .font(.system(size: FontSize.xs, design: .monospaced))
               .foregroundStyle(AppShowColors.primaryText)
@@ -29,7 +29,7 @@ extension EditorView {
             .font(.system(size: FontSize.xs, design: .monospaced))
             .foregroundStyle(AppShowColors.primaryText)
 
-            if editorState.hasVideoRegionCuts {
+            if editorState.hasTimeEdits {
               Text("(\(formatPreciseDuration(seconds: editorState.videoRegionsTotalDuration)))")
                 .font(.system(size: FontSize.xs, design: .monospaced))
                 .foregroundStyle(AppShowColors.secondaryText)
@@ -61,14 +61,14 @@ extension EditorView {
             .help("Delete selected slice (Delete)")
           }
 
-          if editorState.showCutTrack {
+          if editorState.showCutTrack || !editorState.speedRegions.isEmpty {
             IconButton(
               systemName: "arrow.left.and.right.square",
               color: timelineDisplayMode == .compressed ? AppShowColors.primaryText : AppShowColors.secondaryText
             ) {
               timelineDisplayMode = timelineDisplayMode == .compressed ? .source : .compressed
             }
-            .help(timelineDisplayMode == .compressed ? "Show source timeline with removed gaps" : "Close gaps in the timeline")
+            .help(timelineDisplayMode == .compressed ? "Show source timeline" : "Show output timing")
           }
 
           IconButton(

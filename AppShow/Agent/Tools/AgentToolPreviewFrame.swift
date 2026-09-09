@@ -11,6 +11,7 @@ struct AgentToolPreviewFrameRequest: Sendable {
   let atSeconds: Double
   let width: Int
   let outputURL: URL
+  var webcamAtSeconds: Double? = nil
 }
 
 struct AgentToolPreviewFrameOutput: Sendable, Equatable {
@@ -60,8 +61,17 @@ enum AgentToolPreviewFrame {
       renderSize: renderSize
     )
     let screenBuffer = try buffer(from: try await frame(of: screenAsset, at: time))
+    let webcamTime = CMTime(
+      seconds: request.webcamAtSeconds
+        ?? SpeedTimeline(
+          duration: assetDuration.seconds,
+          regions: request.configuration.speedRegions
+        ).normalSpeedSource(forSource: clamped),
+      preferredTimescale: 60000
+    )
+    if !request.configuration.captionsFollowScreenSpeed { instruction.captionTimeOverride = webcamTime.seconds }
     var webcamBuffer: CVPixelBuffer?
-    if let webcamURL = request.result.webcamVideoURL, let image = try? await frame(of: AVURLAsset(url: webcamURL), at: time) {
+    if let webcamURL = request.result.webcamVideoURL, let image = try? await frame(of: AVURLAsset(url: webcamURL), at: webcamTime) {
       webcamBuffer = try buffer(from: image)
     }
     let output = try makeBuffer(width: request.width, height: height)
@@ -151,7 +161,8 @@ struct AgentToolPreviewFrameHandler: AgentToolHandler {
       configuration: state.agentPreviewConfiguration(),
       atSeconds: atSeconds,
       width: width,
-      outputURL: context.framesDirectory.appendingPathComponent(AgentToolPreviewFrame.fileName(atSeconds: atSeconds, width: width))
+      outputURL: context.framesDirectory.appendingPathComponent(AgentToolPreviewFrame.fileName(atSeconds: atSeconds, width: width)),
+      webcamAtSeconds: state.playerController.webcamSourceTime(for: atSeconds)
     )
     let output = try await AgentToolPreviewFrame.render(request)
     if !state.isPlaying {
@@ -256,6 +267,7 @@ extension EditorState {
       zoomTimeline: zoomEnabled ? zoomTimeline : nil,
       cameraBackgroundStyle: cameraBackgroundStyle,
       cameraBackgroundImageURL: cameraBackgroundImageURL(),
+      captionsFollowScreenSpeed: captionAudioSource != .microphone,
       captionSegments: captionSegments,
       captionsEnabled: captionsEnabled,
       captionFontSize: captionFontSize,
@@ -273,6 +285,7 @@ extension EditorState {
       spotlightEdgeSoftness: spotlightEdgeSoftness,
       textOverlays: textOverlays,
       imageOverlays: imageOverlays,
+      speedRegions: speedRegions,
       blurRegions: blurRegions,
       imageOverlayDirectory: project?.bundleURL
     )

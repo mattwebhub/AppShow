@@ -6,6 +6,7 @@ import Logging
 final class ExternalAudioPreviewEngine {
   private struct Player {
     let node: AVAudioPlayerNode
+    let pitch: AVAudioUnitTimePitch
     let file: AVAudioFile
     var track: ExternalAudioTrackData
     var anchorTime: Double?
@@ -18,6 +19,7 @@ final class ExternalAudioPreviewEngine {
   private var lastDriftCheck: TimeInterval = 0
   private(set) var isRunning = false
   private(set) var scheduleCount = 0
+  private(set) var playbackRate: Double = 1
 
   var trackIDs: [UUID] { order }
 
@@ -56,6 +58,13 @@ final class ExternalAudioPreviewEngine {
     if players.isEmpty {
       stopEngine()
     }
+  }
+
+  func setPlaybackRate(_ rate: Double, at time: Double) {
+    guard rate != playbackRate else { return }
+    playbackRate = rate
+    for player in players.values { player.pitch.rate = Float(rate) }
+    if isRunning { start(at: time) }
   }
 
   func start(at time: Double) {
@@ -122,7 +131,11 @@ final class ExternalAudioPreviewEngine {
     self.engine = engine
     let node = AVAudioPlayerNode()
     engine.attach(node)
-    engine.connect(node, to: engine.mainMixerNode, format: file.processingFormat)
+    let pitch = AVAudioUnitTimePitch()
+    pitch.rate = Float(playbackRate)
+    engine.attach(pitch)
+    engine.connect(node, to: pitch, format: file.processingFormat)
+    engine.connect(pitch, to: engine.mainMixerNode, format: file.processingFormat)
     if !engine.isRunning {
       do {
         try engine.start()
@@ -130,7 +143,7 @@ final class ExternalAudioPreviewEngine {
         logger.error("Failed to start external audio engine: \(error)")
       }
     }
-    return Player(node: node, file: file, track: track, anchorTime: nil)
+    return Player(node: node, pitch: pitch, file: file, track: track, anchorTime: nil)
   }
 
   private func removePlayer(_ id: UUID) {
@@ -139,6 +152,8 @@ final class ExternalAudioPreviewEngine {
     if let engine {
       engine.disconnectNodeOutput(player.node)
       engine.detach(player.node)
+      engine.disconnectNodeOutput(player.pitch)
+      engine.detach(player.pitch)
     }
   }
 

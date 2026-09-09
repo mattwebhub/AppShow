@@ -116,9 +116,14 @@ extension EditorState {
   }
 
   func syncVideoRegionsToPlayer() {
+    playerController.trimStart = trimStart
+    playerController.trimEnd = trimEnd
+    playerController.speedRegions = speedRegions
+    playerController.updatePlaybackRate(at: currentTime.seconds)
     playerController.videoRegions = videoRegions.map { (start: $0.startSeconds, end: $0.endSeconds) }
     playerController.skipsGaps = hasVideoRegionCuts
     playerController.installBoundaryObserver()
+    if !isPlaying { playerController.syncAuxPlayers() }
   }
 
   func syncAudioVolumes() {

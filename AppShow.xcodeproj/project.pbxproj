@@ -73,6 +73,7 @@
 		04FA440FE3AA448B86B06429 /* VideoCompositor+Speed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001037C6EA8A42A1BA28F340 /* VideoCompositor+Speed.swift */; };
 		7E570000000000000000004F /* ExternalAudioExportTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000004E /* ExternalAudioExportTrack.swift */; };
 		7E570000000000000000004D /* ExternalAudioPreviewEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000004C /* ExternalAudioPreviewEngine.swift */; };
+		98EF9F29CEB6412CB4957E33 /* RecordedAudioPreviewPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D05B8A1C9CD4819A58A41B9 /* RecordedAudioPreviewPlayer.swift */; };
 		7E570000000000000000004B /* FileDropModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E570000000000000000004A /* FileDropModifier.swift */; };
 		7E5700000000000000000049 /* ExternalAudioRegionEditPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000048 /* ExternalAudioRegionEditPopover.swift */; };
 		7E5700000000000000000047 /* TimelineView+ExternalAudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5700000000000000000046 /* TimelineView+ExternalAudioTrack.swift */; };
@@ -307,6 +308,7 @@
 		CB00000000000000000000A3 /* MenuBarIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00000000000000000000B3 /* MenuBarIcon.swift */; };
 		CD88FB9E14F75D2DA0513D3C /* FrameRenderer+Cursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF80A89DF90D50CD417CEE5 /* FrameRenderer+Cursor.swift */; };
 		D231D2CA1110B032A7D42474 /* EditorState+Zoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2354223AAA382DB82EF31D5 /* EditorState+Zoom.swift */; };
+		085649EF77D7468D8DC2BCB8 /* EditorState+Speed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DFFFE8F98BB444393C4A1DB /* EditorState+Speed.swift */; };
 		D3134AAE9FC7FC1D4E19341B /* History+ChangeRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB80B289E404CFF82DC2A109 /* History+ChangeRules.swift */; };
 		D94D3AEDD28008B3B0E5A36A /* RecordingCoordinator+Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8881A46BBB4614D3C430CF0 /* RecordingCoordinator+Device.swift */; };
 		DB000000000000000000000A /* RNNoiseProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA000000000000000000001D /* RNNoiseProcessor.swift */; };
@@ -482,6 +484,7 @@
 		001037C6EA8A42A1BA28F340 /* VideoCompositor+Speed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoCompositor+Speed.swift"; sourceTree = "<group>"; };
 		7E570000000000000000004E /* ExternalAudioExportTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioExportTrack.swift; sourceTree = "<group>"; };
 		7E570000000000000000004C /* ExternalAudioPreviewEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioPreviewEngine.swift; sourceTree = "<group>"; };
+		9D05B8A1C9CD4819A58A41B9 /* RecordedAudioPreviewPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordedAudioPreviewPlayer.swift"; sourceTree = "<group>"; };
 		7E570000000000000000004A /* FileDropModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDropModifier.swift; sourceTree = "<group>"; };
 		7E5700000000000000000048 /* ExternalAudioRegionEditPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalAudioRegionEditPopover.swift; sourceTree = "<group>"; };
 		7E5700000000000000000046 /* TimelineView+ExternalAudioTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+ExternalAudioTrack.swift"; sourceTree = "<group>"; };
@@ -657,6 +660,7 @@
 		B2000000000000000000002D /* TimelineView+ScreenTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimelineView+ScreenTrack.swift"; sourceTree = "<group>"; };
 		B20000000000000000000099 /* RecordingPreviewWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingPreviewWindow.swift; sourceTree = "<group>"; };
 		B2354223AAA382DB82EF31D5 /* EditorState+Zoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+Zoom.swift"; sourceTree = "<group>"; };
+		1DFFFE8F98BB444393C4A1DB /* EditorState+Speed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorState+Speed.swift"; sourceTree = "<group>"; };
 		B2VE00000000000000000001 /* EncodingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodingSettings.swift; sourceTree = "<group>"; };
 		B3000000000000000000001B /* AppShowProject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShowProject.swift; sourceTree = "<group>"; };
 		B3000000000000000000001C /* ProjectMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectMetadata.swift; sourceTree = "<group>"; };
@@ -1235,6 +1239,7 @@
 				7E5D000000000000000000DB /* BlurRegionEditPopover.swift */,
 				E8596CD61869ECC16EAECA92 /* EditorState+CameraLayout.swift */,
 				B2354223AAA382DB82EF31D5 /* EditorState+Zoom.swift */,
+				1DFFFE8F98BB444393C4A1DB /* EditorState+Speed.swift */,
 				3596F81A6E600975B1EB8104 /* EditorState+Cursor.swift */,
 				BCE0AE650CCD0FAC70EC7C05 /* EditorState+Export.swift */,
 				4016F798AD537E3A9A1EB1F0 /* EditorState+Project.swift */,
@@ -1293,6 +1298,7 @@
 				7E5700000000000000000046 /* TimelineView+ExternalAudioTrack.swift */,
 				7E5700000000000000000048 /* ExternalAudioRegionEditPopover.swift */,
 				7E570000000000000000004C /* ExternalAudioPreviewEngine.swift */,
+				9D05B8A1C9CD4819A58A41B9 /* RecordedAudioPreviewPlayer.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -1765,6 +1771,7 @@
 				04FA440FE3AA448B86B06429 /* VideoCompositor+Speed.swift in Sources */,
 				7E570000000000000000004F /* ExternalAudioExportTrack.swift in Sources */,
 				7E570000000000000000004D /* ExternalAudioPreviewEngine.swift in Sources */,
+				98EF9F29CEB6412CB4957E33 /* RecordedAudioPreviewPlayer.swift in Sources */,
 				7E570000000000000000004B /* FileDropModifier.swift in Sources */,
 				7E5700000000000000000049 /* ExternalAudioRegionEditPopover.swift in Sources */,
 				7E5700000000000000000047 /* TimelineView+ExternalAudioTrack.swift in Sources */,
@@ -1822,6 +1829,7 @@
 				7E5C0000000000000000000091 /* TextOverlayData.swift in Sources */,
 				77030A22115111C9D1325490 /* EditorState+CameraLayout.swift in Sources */,
 				D231D2CA1110B032A7D42474 /* EditorState+Zoom.swift in Sources */,
+				085649EF77D7468D8DC2BCB8 /* EditorState+Speed.swift in Sources */,
 				3FD352F00D9D9EE89C9A34AB /* EditorState+Cursor.swift in Sources */,
 				1F3CB98859BA2BA7885A1328 /* EditorState+Export.swift in Sources */,
 				E4063B6461F26561418E4A62 /* EditorState+Project.swift in Sources */,

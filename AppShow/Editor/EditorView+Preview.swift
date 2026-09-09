@@ -143,7 +143,9 @@ extension EditorView {
         )
 
         if let captionText = editorState.visibleCaptionText(
-          at: CMTimeGetSeconds(editorState.currentTime)
+          at: editorState.captionAudioSource == .microphone
+            ? editorState.playerController.webcamSourceTime(for: editorState.currentTime.seconds)
+            : editorState.currentTime.seconds
         ) {
           CaptionOverlayView(
             text: captionText,
