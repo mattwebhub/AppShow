@@ -12,7 +12,7 @@ extension FrameRenderer {
   ) {
     guard instruction.captionsEnabled, !instruction.captionSegments.isEmpty else { return }
 
-    let time = CMTimeGetSeconds(compositionTime) + instruction.trimStartSeconds
+    let time = instruction.captionTime(for: compositionTime)
     guard
       let segment = captionSegmentAt(
         time: time,

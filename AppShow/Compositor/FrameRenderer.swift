@@ -200,6 +200,7 @@ final class FrameRenderer: NSObject, AVVideoCompositing, @unchecked Sendable {
     instruction: CompositionInstruction,
     processedWebcamImage: CGImage? = nil
   ) {
+    let compositionTime = instruction.effectTime(for: compositionTime)
     let state = computeFrameState(
       screenBuffer: screenBuffer,
       webcamBuffer: webcamBuffer,

@@ -94,6 +94,7 @@ extension VideoCompositor {
       let aReader = try AVAssetReader(asset: composition)
       aReader.timeRange = CMTimeRange(start: .zero, duration: trimDuration)
       let mixOutput = AVAssetReaderAudioMixOutput(audioTracks: audioTracks, audioSettings: nil)
+      mixOutput.audioTimePitchAlgorithm = .spectral
       if let audioMix {
         mixOutput.audioMix = audioMix
       }
@@ -344,6 +345,7 @@ extension VideoCompositor {
           }
 
           let finalFrameCount = framesWritten
+          pipelineWriter.endSession(atSourceTime: trimDuration)
           pipelineWriter.finishWriting {
             CVPixelBufferPoolFlush(pipelineOutputPool, .excessBuffers)
 

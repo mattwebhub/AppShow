@@ -4,6 +4,15 @@ import Testing
 @testable import AppShow
 
 struct CompositionInstructionTests {
+  @Test func narrationCaptionsKeepNormalOutputTime() {
+    let value = instruction(trimStartSeconds: 2)
+    value.speedTimeline = SpeedTimeline(duration: 10, regions: [SpeedRegionData(startSeconds: 0, endSeconds: 10, rate: 4)])
+    let effectTime = value.effectTime(for: seconds(1))
+    #expect(value.captionTime(for: effectTime) == 6)
+    value.captionsFollowScreenSpeed = false
+    #expect(value.captionTime(for: effectTime) == 3)
+  }
+
   private func seconds(_ value: Double) -> CMTime {
     CMTime(seconds: value, preferredTimescale: 600)
   }
@@ -131,6 +140,20 @@ struct CompositionInstructionTests {
     let sut = instruction(spotlightRegions: [SpotlightRegionData(startSeconds: 1, endSeconds: 4)])
 
     #expect(sut.effectiveSpotlightSettings(at: 1.01).fadeFactor == 1)
+  }
+
+  @Test func areaZoomUsesSourceTimeAndIgnoresMovingCursorAcrossCuts() throws {
+    let frames = try ZoomTimeline.areaKeyframes(rect: CGRect(x: 0.6, y: 0.1, width: 0.3, height: 0.2), start: 5, end: 7, transition: 0.2)
+    let timeline = ZoomTimeline(keyframes: frames)
+    let sut = instruction(
+      mappings: cutMappings,
+      zoomTimeline: timeline,
+      cursorSnapshot: snapshot([(0, 0, 1), (7, 0, 1)])
+    )
+    let rect = try #require(FrameRenderer.resolveZoomRect(compositionTime: seconds(2.5), instruction: sut))
+    #expect(rect == timeline.zoomRect(at: 5.5))
+    #expect(rect.minX > 0.5)
+    #expect(FrameRenderer.resolveZoomRect(compositionTime: seconds(1), instruction: sut)?.width == 1)
   }
 
   @Test func resolveZoomRectIsNilWithoutTimeline() {
