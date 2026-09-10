@@ -11,9 +11,11 @@ struct StoreTargetTests {
     let products = (store["packageProductDependencies"] as? [String] ?? []).compactMap { objects[$0]?["productName"] as? String }
     #expect(!products.contains("Sparkle"))
     #expect(products.contains("WhisperKit"))
-    #expect((store["dependencies"] as? [String] ?? []).isEmpty)
+    let dependencies = (store["dependencies"] as? [String] ?? []).compactMap { objects[$0]?["target"] as? String }
+    #expect(dependencies.compactMap { objects[$0]?["name"] as? String } == ["appshow-mcp"])
     let phases = (store["buildPhases"] as? [String] ?? []).compactMap { objects[$0] }
     #expect(!phases.contains { $0["isa"] as? String == "PBXCopyFilesBuildPhase" })
+    #expect(phases.contains { $0["name"] as? String == "Embed Store Agents" })
     let list = try #require(store["buildConfigurationList"] as? String)
     for id in try #require(objects[list]?["buildConfigurations"] as? [String]) {
       let settings = try #require(objects[id]?["buildSettings"] as? [String: Any])

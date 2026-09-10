@@ -108,9 +108,9 @@ actor AgentRPCSession {
     let dispatcher = dispatcher
     do {
       let value = try await Self.withTimeout(timeout, name: name) {
-        try await dispatcher.call(name, arguments: arguments)
+        try await dispatcher.callResult(name, arguments: arguments)
       }
-      return reply(to: request, result: AgentToolResult.success(value).mcpValue)
+      return reply(to: request, result: value.mcpValue)
     } catch AgentToolError.failed(let message) {
       return reply(to: request, result: AgentToolResult.failure(message).mcpValue)
     } catch let error as AgentToolError {

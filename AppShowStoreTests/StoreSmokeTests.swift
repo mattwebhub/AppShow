@@ -27,7 +27,27 @@ struct StoreSmokeTests {
     #expect(AppShowPaths.home.standardizedFileURL.path.hasPrefix(temporary + "/"))
     #expect(AppShowPaths.temp.standardizedFileURL.path.hasPrefix(temporary + "/"))
     #expect(Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") == nil)
-    #expect(!FileManager.default.fileExists(atPath: Bundle.main.bundleURL.appendingPathComponent("Contents/Helpers/appshow-mcp").path))
+    let helper = Bundle.main.bundleURL.appendingPathComponent("Contents/Helpers/appshow-mcp")
+    #expect(FileManager.default.isExecutableFile(atPath: helper.path))
+    var helperCode: SecStaticCode?
+    #expect(SecStaticCodeCreateWithPath(helper as CFURL, [], &helperCode) == errSecSuccess)
+    var helperInformation: CFDictionary?
+    #expect(
+      SecCodeCopySigningInformation(try #require(helperCode), SecCSFlags(rawValue: kSecCSSigningInformation), &helperInformation)
+        == errSecSuccess
+    )
+    let helperDictionary = try #require(helperInformation as? [String: Any])
+    let helperEntitlements = try #require(helperDictionary[kSecCodeInfoEntitlementsDict as String] as? [String: Any])
+    #expect(helperEntitlements["com.apple.security.app-sandbox"] as? Bool == true)
+    #expect(helperEntitlements["com.apple.security.inherit"] as? Bool == true)
+    #expect(helperEntitlements.count == 2)
+    let runtime = AgentRuntimePolicy()
+    for name in ["codex", "claude"] {
+      let executable = runtime.runtimeDirectory.appendingPathComponent(name)
+      #expect(runtime.permits(executable))
+      #expect(FileManager.default.isExecutableFile(atPath: executable.path))
+    }
+    #expect(!runtime.permits(URL(fileURLWithPath: "/usr/local/bin/codex")))
   }
 
   @Test func nativeBookmarkPersistsAndRestoresContainerAccess() throws {

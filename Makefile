@@ -13,6 +13,17 @@ TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning
 
 all: help
 
+.PHONY: check-agent-updates stage-store-agents test-agent-updates
+
+check-agent-updates:
+	@/usr/bin/python3 -B scripts/agent_runtime_versions.py
+
+stage-store-agents:
+	@/usr/bin/python3 -B scripts/stage-store-agents.py
+
+test-agent-updates:
+	@/usr/bin/python3 -B -m unittest discover -s scripts/tests -p 'test_agent_runtime_updates.py'
+
 brand:
 	@/usr/bin/python3 scripts/generate-brand-assets.py
 
@@ -112,6 +123,9 @@ help:
 	@echo "  build     - Build debug version"
 	@echo "  release   - Build release version"
 	@echo "  store-build - Build the sandboxed store validation app"
+	@echo "  check-agent-updates - Check official Claude Code and Codex releases"
+	@echo "  stage-store-agents - Download and verify the pinned Store runtimes"
+	@echo "  test-agent-updates - Test runtime update, recovery and version pinning"
 	@echo "  store-release - Build the universal store validation app"
 	@echo "  store-archive - Create a local universal store archive"
 	@echo "  test-store - Run sandbox-hosted synthetic project/export smoke tests"

@@ -13,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     guard !LaunchEnvironment.isTestHost else { return }
     #if !APP_STORE
     _ = SparkleUpdater.shared
+    AgentAutoUpdateService.shared.start()
     #endif
     ConfigService.shared.applyAppearance()
 
@@ -62,6 +63,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     session.logger.info(
       "Permissions: screenRecording=\(permissions.screenRecordingGranted), accessibility=\(permissions.accessibilityGranted)"
     )
+  }
+
+  func applicationWillTerminate(_ notification: Notification) {
+    guard !LaunchEnvironment.isTestHost else { return }
+    #if !APP_STORE
+    AgentAutoUpdateService.shared.stop()
+    #endif
   }
 
   func showPermissionsWindow() {

@@ -30,8 +30,18 @@ struct AgentWorkspace: Sendable, Equatable {
     directory.appendingPathComponent(Self.sessionFileName)
   }
 
-  static func directory(forBundle bundleURL: URL) -> URL {
-    bundleURL
+  static func directory(
+    forBundle bundleURL: URL,
+    containerRoot: URL? = AppDistribution.isStore
+      ? AgentRuntimePolicy().stateRoot.appendingPathComponent("workspaces", isDirectory: true) : nil
+  ) -> URL {
+    if let containerRoot {
+      let digest = SHA256.hash(data: Data(bundleURL.standardizedFileURL.path.utf8))
+      let name = digest.prefix(16).map { String(format: "%02x", $0) }.joined()
+      return containerRoot.appendingPathComponent(name, isDirectory: true)
+    }
+    return
+      bundleURL
       .deletingLastPathComponent()
       .appendingPathComponent(folderName, isDirectory: true)
       .appendingPathComponent(bundleURL.deletingPathExtension().lastPathComponent, isDirectory: true)
@@ -39,7 +49,9 @@ struct AgentWorkspace: Sendable, Equatable {
 
   static func socketURL(
     forWorkspace directory: URL,
-    fallbackRoot: URL = AppShowPaths.temp.appendingPathComponent("agent", isDirectory: true)
+    fallbackRoot: URL = AppDistribution.isStore
+      ? FileManager.default.temporaryDirectory.appendingPathComponent("a", isDirectory: true)
+      : AppShowPaths.temp.appendingPathComponent("agent", isDirectory: true)
   ) -> URL {
     let preferred = directory.appendingPathComponent(socketFileName)
     if preferred.path.utf8.count <= maxSocketPathLength {

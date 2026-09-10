@@ -56,6 +56,7 @@ protocol AgentToolHandler {
   var mutatesOnlyOnSuccess: Bool { get }
   var definition: AgentToolDefinition { get }
   func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue
+  func result(for value: JSONValue, context: AgentToolContext) throws -> AgentToolResult
 }
 
 enum AgentToolError: Error, Equatable, Sendable {
@@ -152,9 +153,10 @@ enum AgentToolError: Error, Equatable, Sendable {
 struct AgentToolResult: Sendable, Equatable {
   var value: JSONValue
   var isError: Bool
+  var pngImages: [Data] = []
 
-  static func success(_ value: JSONValue) -> AgentToolResult {
-    AgentToolResult(value: value, isError: false)
+  static func success(_ value: JSONValue, pngImages: [Data] = []) -> AgentToolResult {
+    AgentToolResult(value: value, isError: false, pngImages: pngImages)
   }
 
   static func failure(_ message: String) -> AgentToolResult {
@@ -163,8 +165,13 @@ struct AgentToolResult: Sendable, Equatable {
 
   var mcpValue: JSONValue {
     let text = isError ? (value.stringValue ?? (try? value.jsonString()) ?? "") : ((try? value.jsonString()) ?? "")
+    let content: [JSONValue] =
+      [["type": "text", "text": .string(text)]]
+      + pngImages.map {
+        ["type": "image", "mimeType": "image/png", "data": .string($0.base64EncodedString())]
+      }
     var object: [String: JSONValue] = [
-      "content": [["type": "text", "text": .string(text)]],
+      "content": .array(content),
       "isError": .bool(isError),
     ]
     if !isError, case .object = value {
@@ -314,4 +321,8 @@ enum AgentToolSchema {
 
 extension AgentToolHandler {
   var mutatesOnlyOnSuccess: Bool { false }
+
+  func result(for value: JSONValue, context: AgentToolContext) throws -> AgentToolResult {
+    .success(value)
+  }
 }

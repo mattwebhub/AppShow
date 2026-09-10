@@ -150,6 +150,16 @@ enum AgentToolPreviewFrame {
 struct AgentToolPreviewFrameHandler: AgentToolHandler {
   var definition: AgentToolDefinition { AgentToolCatalog.renderPreviewFrame }
 
+  func result(for value: JSONValue, context: AgentToolContext) throws -> AgentToolResult {
+    guard let path = value["path"]?.stringValue else { throw AgentToolError.failed("The preview image is missing.") }
+    let url = URL(fileURLWithPath: path).resolvingSymlinksInPath().standardizedFileURL
+    let directory = context.framesDirectory.resolvingSymlinksInPath().standardizedFileURL
+    guard url.deletingLastPathComponent() == directory, url.pathExtension == "png" else {
+      throw AgentToolError.failed("The preview image is outside this project's frames folder.")
+    }
+    return .success(value, pngImages: [try Data(contentsOf: url)])
+  }
+
   func call(arguments: JSONValue, context: AgentToolContext) async throws -> JSONValue {
     let state = context.editorState
     let duration = CMTimeGetSeconds(state.duration)

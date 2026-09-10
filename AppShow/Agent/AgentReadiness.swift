@@ -38,6 +38,18 @@ enum AgentVersionParser {
   }
 }
 
+enum AgentVersionStatus: Equatable, Sendable {
+  case available(String)
+  case unavailable(String)
+
+  var label: String {
+    switch self {
+    case .available(let version): version
+    case .unavailable(let reason): reason
+    }
+  }
+}
+
 struct AgentReadinessSnapshot: Equatable, Sendable {
   var statuses: [AgentProviderKind: AgentReadiness]
 
@@ -56,23 +68,35 @@ actor AgentProbe {
     self.maximumOutputBytes = maximumOutputBytes
   }
 
+  func version(
+    executable: URL,
+    environment: [String: String]
+  ) async -> AgentVersionStatus {
+    let versionResult = await run(executable: executable, arguments: ["--version"], environment: environment)
+    if versionResult.timedOut {
+      return .unavailable("Version check timed out")
+    }
+    if let launchError = versionResult.launchError {
+      return .unavailable(launchError)
+    }
+    guard versionResult.status == 0 else {
+      return .unavailable("Version check failed")
+    }
+    guard let version = AgentVersionParser.semanticVersion(from: versionResult.output) else {
+      return .unavailable("Version output was not recognized")
+    }
+    return .available(version)
+  }
+
   func check(
     provider: AgentProviderKind,
     executable: URL,
     environment: [String: String]
   ) async -> AgentReadiness {
-    let versionResult = await run(executable: executable, arguments: ["--version"], environment: environment)
-    if versionResult.timedOut {
-      return .unhealthy(executable: executable.path, reason: "Version check timed out")
-    }
-    if let launchError = versionResult.launchError {
-      return .unhealthy(executable: executable.path, reason: launchError)
-    }
-    guard versionResult.status == 0 else {
-      return .unhealthy(executable: executable.path, reason: "Version check failed")
-    }
-    guard let version = AgentVersionParser.semanticVersion(from: versionResult.output) else {
-      return .unhealthy(executable: executable.path, reason: "Version output was not recognized")
+    let version: String
+    switch await self.version(executable: executable, environment: environment) {
+    case .available(let installed): version = installed
+    case .unavailable(let reason): return .unhealthy(executable: executable.path, reason: reason)
     }
 
     let arguments = provider == .claudeCode ? ["auth", "status"] : ["login", "status"]
@@ -111,7 +135,9 @@ actor AgentProbe {
     arguments: [String],
     environment: [String: String]
   ) async -> AgentProbeResult {
-    guard !AppDistribution.isStore else { return AgentProbeResult(launchError: "The external assistant is unavailable in this build") }
+    guard AgentRuntimePolicy().permits(executable) else {
+      return AgentProbeResult(launchError: "This provider is not part of the installed application")
+    }
     let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent("appshow-agent-probe-\(UUID().uuidString)")
     guard FileManager.default.createFile(atPath: outputURL.path, contents: nil),
       let outputHandle = try? FileHandle(forWritingTo: outputURL)
@@ -127,6 +153,7 @@ actor AgentProbe {
     process.executableURL = executable
     process.arguments = arguments
     process.environment = environment
+    if AppDistribution.isStore { process.currentDirectoryURL = AgentRuntimePolicy().stateRoot }
     process.standardInput = FileHandle.nullDevice
     process.standardOutput = outputHandle
     process.standardError = outputHandle

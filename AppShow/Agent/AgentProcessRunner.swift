@@ -68,8 +68,8 @@ actor AgentProcessRunner {
 
   func run(_ launch: AgentProcessLaunch) -> AsyncThrowingStream<String, Error> {
     let (stream, continuation) = AsyncThrowingStream<String, Error>.makeStream()
-    guard !AppDistribution.isStore else {
-      continuation.finish(throwing: AgentError.launchFailed("The external assistant is unavailable in this build"))
+    guard AgentRuntimePolicy().permits(launch.executable) else {
+      continuation.finish(throwing: AgentError.launchFailed("This provider is not part of the installed application"))
       return stream
     }
     guard !isRunning else {

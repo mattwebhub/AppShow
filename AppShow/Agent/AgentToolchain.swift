@@ -8,6 +8,7 @@ actor AgentToolchain {
   private let loginShell: URL?
   private let loginShellTimeout: Duration
   private let home: URL
+  private let managedRoot: URL?
   private var cache: [String: URL] = [:]
   private var discoveredDirectories: [URL] = []
 
@@ -16,17 +17,26 @@ actor AgentToolchain {
     extraDirectories: [URL] = [],
     loginShell: URL? = URL(fileURLWithPath: "/bin/zsh"),
     loginShellTimeout: Duration = .seconds(8),
-    home: URL = FileManager.default.homeDirectoryForCurrentUser
+    home: URL = FileManager.default.homeDirectoryForCurrentUser,
+    managedRoot: URL? = nil
   ) {
     pathDirectories = path.split(separator: ":").map { URL(fileURLWithPath: String($0), isDirectory: true) }
     self.extraDirectories = extraDirectories
     self.loginShell = loginShell
     self.loginShellTimeout = loginShellTimeout
     self.home = home
+    self.managedRoot = managedRoot
   }
 
   static func standard() -> AgentToolchain {
-    AgentToolchain(extraDirectories: defaultSearchDirectories())
+    if AppDistribution.isStore {
+      return AgentToolchain(path: AgentRuntimePolicy().runtimeDirectory.path, loginShell: nil)
+    }
+    #if !APP_STORE
+    return AgentToolchain(extraDirectories: defaultSearchDirectories(), managedRoot: AgentManagedRuntimeLocation.root)
+    #else
+    return AgentToolchain(path: AgentRuntimePolicy().runtimeDirectory.path, loginShell: nil)
+    #endif
   }
 
   static func defaultSearchDirectories(home: URL = FileManager.default.homeDirectoryForCurrentUser) -> [URL] {
@@ -80,6 +90,35 @@ actor AgentToolchain {
     cache.removeAll()
     discoveredDirectories.removeAll()
   }
+
+  func resolveProvider(_ provider: AgentProviderKind) async -> URL? {
+    #if APP_STORE
+    return await resolve(provider.makeProvider().executableNames)
+    #else
+    return await bestProvider(provider, allowShellDiscovery: true)?.executable
+    #endif
+  }
+
+  #if !APP_STORE
+  func bestProvider(
+    _ provider: AgentProviderKind,
+    compatibility: AgentRuntimeCompatibility? = .init(),
+    allowShellDiscovery: Bool = false
+  ) async -> AgentRuntimeCandidate? {
+    let names = provider.makeProvider().executableNames
+    var urls = searchDirectories.flatMap { directory in names.map { directory.appendingPathComponent($0) } }.filter(isExecutableFile)
+    if let managedRoot, let managed = AgentManagedRuntimeLocation.current(provider, root: managedRoot) { urls.insert(managed, at: 0) }
+    if urls.isEmpty, allowShellDiscovery, let discovered = await resolve(names) { urls.append(discovered) }
+    var seen: Set<String> = []
+    urls = urls.filter { seen.insert($0.resolvingSymlinksInPath().standardizedFileURL.path).inserted }
+    let path = searchPath()
+    let homePath = home.path
+    return await AgentRuntimeSelection.newest(urls: urls, provider: provider, compatibility: compatibility) { url in
+      let environment = AgentRuntimePolicy().environment(path: path, home: homePath, forwarding: [])
+      return await AgentProbe().version(executable: url, environment: environment)
+    }
+  }
+  #endif
 
   func searchPath() -> String {
     searchDirectories.map(\.path).joined(separator: ":")

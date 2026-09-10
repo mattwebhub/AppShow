@@ -17,8 +17,17 @@ enum AgentPanelLayout {
 
 enum AgentProjectWorkspace {
   static func directory(for bundleURL: URL) -> URL {
-    bundleURL.deletingLastPathComponent()
-      .appendingPathComponent(".agent", isDirectory: true)
-      .appendingPathComponent(bundleURL.deletingPathExtension().lastPathComponent, isDirectory: true)
+    AgentWorkspace.directory(forBundle: bundleURL)
+  }
+}
+
+enum AgentSendPreparation {
+  static func workspace(project: URL, configuration: AgentSessionConfig?, sandboxed: Bool = AppDistribution.isStore) throws -> URL {
+    guard !sandboxed || configuration != nil else {
+      throw AgentError.launchFailed("Editor tools could not start. Close and reopen this project, then try again.")
+    }
+    let directory = configuration?.workspace.directory ?? AgentProjectWorkspace.directory(for: project)
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    return directory
   }
 }
