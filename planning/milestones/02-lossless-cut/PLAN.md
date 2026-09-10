@@ -15,15 +15,21 @@ Mirror of `planning/features/lossless-cut/TASKS.md`; tick both.
 - [x] T5. P2 persistence + history (T2 rows green). Proof: `ProjectMetadataTests`, `HistoryChangeRulesTests`, `EditorStateVideoRegionsTests`.
 - [x] T6. P7 unit rows + seam S3. Proof: `EditorStateExportTests`.
 - [x] T7. P6 compressed timeline. Proof: `TimelineGeometryTests`, manual alignment check.
-- [x] T8. P7 gated export run. Proof: `TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests`.
+- [x] T8. P7 gated export run. Proof: `TEST_RUNNER_APPSHOW_RUN_EXPORT_TESTS=1 make test T=ExportPipelineTests`.
 - [x] T9. Docs and divergences: `docs/editor.md`, `AGENTS.md`, `planning/upstream-sync.md`, `docs/architecture/07-testability.md` seams. Proof: grep.
-- [x] T10. VERIFY.md automated rows run, branch pushed, PR opened (https://github.com/mattwebhub/Reframed/pull/3); manual rows pending a human.
+- [x] T10. VERIFY.md automated rows run, branch pushed, PR opened (https://github.com/mattwebhub/AppShow/pull/3); manual rows pending a human.
 
 ## Out of scope
 
-Literal passthrough export (optional phase 8), editing other tracks in compressed mode, ripple edits of audio regions.
+Literal passthrough export (optional phase 8), editing audio, camera, spotlight, and overlay tracks in compressed mode, ripple edits of audio regions.
 
 ## Risks
 
 - Boundary observers and the 60 Hz periodic observer can both fire at a slice end; the decision function must be idempotent.
 - Compressed mode touches every timeline file; land it last and behind the toggle.
+
+## Interactive testing follow-up
+
+- [x] Slice selection, keyboard/button deletion, immediate Undo, source-media preservation, and shared-boundary repositioning.
+- [x] Zoom movement/resizing remains available after gaps are hidden; drag preview and committed keyframes use one calculation.
+- [ ] Repeat human drag/delete checks on the updated build.

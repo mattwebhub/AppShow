@@ -1,8 +1,8 @@
 # 01 — Module Map
 
-One section per top-level folder under `Reframed/`. Line counts are `wc -l` over `*.swift` at `v0.14.7` (total ≈ 33 000). "Depends on" / "Used by" were derived by grepping every folder's source for the type names declared in every other folder (top-level `class`/`struct`/`enum`/`actor`/`protocol` declarations); the raw matrix is reproduced at the end.
+One section per top-level folder under `AppShow/`. Line counts are `wc -l` over `*.swift` at `v0.14.7` (total ≈ 33 000). "Depends on" / "Used by" were derived by grepping every folder's source for the type names declared in every other folder (top-level `class`/`struct`/`enum`/`actor`/`protocol` declarations); the raw matrix is reproduced at the end.
 
-Reminder: **these folders are not Swift modules.** Everything compiles into the single `Reframed` target with internal access; the dependency direction below is a convention you can *choose* to enforce with tests or a future split, not something the compiler enforces today.
+Reminder: **these folders are not Swift modules.** Everything compiles into the single `AppShow` target with internal access; the dependency direction below is a convention you can *choose* to enforce with tests or a future split, not something the compiler enforces today.
 
 ---
 
@@ -15,7 +15,7 @@ Reminder: **these folders are not Swift modules.** Everything compiles into the 
 | Provider protocol | `AgentProvider`, `ClaudeCodeProvider`, `CodexProvider`, `AgentEvent` | Keeps each CLI's filesystem sandbox read-only, adds only the scoped AppShow MCP server, and reduces versioned NDJSON into typed events. Unknown events are tolerated. |
 | Process boundary | `AgentProcessRunner`, `AgentSession` | Actors. One fresh child process per turn; cancellation terminates it. `AgentSession` maps process lines to events and accepts saved provider resume ids. The scrubbed environment retains `USER`/`LOGNAME`, which Claude's first-party credential lookup requires. |
 | Discovery | `AgentToolchain`, `AgentProbe`, `AgentReadiness` | Actors resolve executables and run bounded version/authentication probes without invoking a real CLI in tests. |
-| Persistence | `AgentConversationData`, `AgentConversationStore`, `AgentTranscript` | Exactly one `agent/conversation.json` inside each `.frm`; provider resume ids are stored independently. `AgentTranscript` is `@MainActor @Observable`. |
+| Persistence | `AgentConversationData`, `AgentConversationStore`, `AgentTranscript` | Exactly one `agent/conversation.json` inside each `.appshow`; provider resume ids are stored independently. `AgentTranscript` is `@MainActor @Observable`. |
 | UI | `AgentChatPanel`, `AgentConversationView`, `AgentMarkdownView` | Persisted collapse/width, provider picker, explicit clear, streamed Markdown and expandable tool rows. |
 | Tool bridge | `AgentBridgeController`, `AgentBridgeServer`, `AgentRPCSession`, `AgentSessionConfig` | The editor owns an authenticated Unix socket. A signed `appshow-mcp` stdio helper relays MCP JSON-RPC for the selected CLI; session configuration exposes only this per-project server. |
 | Tool surface | `AgentToolCatalog`, `AgentToolDispatcher`, `AgentEditingToolCatalog`, `AgentConfirmations` | Read-only inspection and reversible mutations run on the main actor. Each call validates its schema, creates at most one labeled history entry, rolls back on failure, and returns the compact current timeline. Drafts stay inside the private workspace; external image reads, full exports, and destructive silence passes are confirmation-bound. |
@@ -23,9 +23,9 @@ Reminder: **these folders are not Swift modules.** Everything compiles into the 
 
 The portable conversation lives inside the project bundle. Ephemeral runtime state lives in the sibling `.agent/<project-name>/` workspace. `Agent/` depends on `Project`, `State`, and reusable `UI` tokens; only `EditorState` and `EditorView` depend on it.
 
-## `Reframed/ReframedApp.swift` (29 LOC)
+## `AppShow/AppShowApp.swift` (29 LOC)
 
-`@main struct ReframedApp: App`. Bootstraps logging (`LogBootstrap.configure()` in `init`), declares the single `MenuBarExtra(.window)` scene, and wires `MenuBarExtraAccess` so `SessionState.statusItemButton` gets the `NSStatusBarButton`. Delegates everything else to `AppDelegate` via `@NSApplicationDelegateAdaptor`.
+`@main struct AppShowApp: App`. Bootstraps logging (`LogBootstrap.configure()` in `init`), declares the single `MenuBarExtra(.window)` scene, and wires `MenuBarExtraAccess` so `SessionState.statusItemButton` gets the `NSStatusBarButton`. Delegates everything else to `AppDelegate` via `@NSApplicationDelegateAdaptor`.
 
 ## `App/` (383 LOC, 3 files)
 
@@ -33,11 +33,11 @@ The portable conversation lives inside the project bundle. Ephemeral runtime sta
 
 | Type | File | Notes |
 | --- | --- | --- |
-| `AppDelegate` (`@MainActor final class`, `NSApplicationDelegate`, `NSWindowDelegate`) | `Reframed/App/AppDelegate.swift` | Owns `let session = SessionState()` and `KeyboardShortcutManager`; starts `SparkleUpdater.shared`; installs a local left-mouse-down monitor that turns a status-item click into `session.stopRecording()` while recording/paused; handles `.frm` opens via `application(_:open:)`; shows the permissions window. |
-| `Permissions` (enum) | `Reframed/App/Permissions.swift` | Wraps `CGPreflightScreenCaptureAccess`, `AXIsProcessTrusted`, and `SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)` (`fetchShareableContent()`), which every capture path uses. |
-| `WindowController` (`@MainActor final class`, `ObservableObject`), `WindowInfo` | `Reframed/App/WindowController.swift` | `CGWindowListCopyWindowInfo` + Accessibility (`AXUIElement`) lookups to find, cycle, resize and center windows under the cursor. Note: this is the **only** `ObservableObject`/`@Published` in the codebase; everything else uses `@Observable`. |
+| `AppDelegate` (`@MainActor final class`, `NSApplicationDelegate`, `NSWindowDelegate`) | `AppShow/App/AppDelegate.swift` | Owns `let session = SessionState()` and `KeyboardShortcutManager`; starts `SparkleUpdater.shared`; installs a local left-mouse-down monitor that turns a status-item click into `session.stopRecording()` while recording/paused; handles `.appshow` opens via `application(_:open:)`; shows the permissions window. |
+| `Permissions` (enum) | `AppShow/App/Permissions.swift` | Wraps `CGPreflightScreenCaptureAccess`, `AXIsProcessTrusted`, and `SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)` (`fetchShareableContent()`), which every capture path uses. |
+| `WindowController` (`@MainActor final class`, `ObservableObject`), `WindowInfo` | `AppShow/App/WindowController.swift` | `CGWindowListCopyWindowInfo` + Accessibility (`AXUIElement`) lookups to find, cycle, resize and center windows under the cursor. Note: this is the **only** `ObservableObject`/`@Published` in the codebase; everything else uses `@Observable`. |
 
-Depends on: `State` (`SessionState`, `ConfigService`, `KeyboardShortcutManager`), `UI` (`PermissionsView`, `ReframedColors`), `Utilities` (`SparkleUpdater`).
+Depends on: `State` (`SessionState`, `ConfigService`, `KeyboardShortcutManager`), `UI` (`PermissionsView`, `AppShowColors`), `Utilities` (`SparkleUpdater`).
 Used by: `CaptureModes` (`WindowController`, `WindowInfo`), `Recording`/`State`/`UI` (`Permissions`).
 
 ## `CaptureModes/` (1 688 LOC, 16 files)
@@ -94,22 +94,22 @@ Used by: `State` (`EditorWindow`), `Compositor` (cursor/zoom engines, enums, `Ed
 
 ## `Libraries/` (0 Swift LOC)
 
-`Reframed/Libraries/gifski/gifski.h` (346 lines), `libgifski.a` (static, prebuilt, arm64 + x86_64 per the `make release` `ARCHS` setting — verify with `lipo -info`), and `module.modulemap` (`module gifski { header "gifski.h"; export * }`). Wired via pbxproj `LIBRARY_SEARCH_PATHS`, `SWIFT_INCLUDE_PATHS` (both `$(PROJECT_DIR)/Reframed/Libraries/gifski`) and `OTHER_LDFLAGS = "-lgifski"`. Imported only by `Reframed/Compositor/VideoCompositor+GIFExport.swift`. License and provenance: see `04-dependencies.md`.
+`AppShow/Libraries/gifski/gifski.h` (346 lines), `libgifski.a` (static, prebuilt, arm64 + x86_64 per the `make release` `ARCHS` setting — verify with `lipo -info`), and `module.modulemap` (`module gifski { header "gifski.h"; export * }`). Wired via pbxproj `LIBRARY_SEARCH_PATHS`, `SWIFT_INCLUDE_PATHS` (both `$(PROJECT_DIR)/AppShow/Libraries/gifski`) and `OTHER_LDFLAGS = "-lgifski"`. Imported only by `AppShow/Compositor/VideoCompositor+GIFExport.swift`. License and provenance: see `04-dependencies.md`.
 
 ## `Logging/` (100 LOC, 2 files)
 
-`LogBootstrap.configure()` (`Reframed/Logging/LogBootstrap.swift`) bootstraps swift-log: `StreamLogHandler.standardOutput` in `DEBUG`; in release a `MultiplexLogHandler` adding `RotatingFileLogHandler` (`Reframed/Logging/RotatingFileLogHandler.swift`: `~/Library/Logs/Reframed/reframed.log`, 5 MB, 3 rotated files, appends on a private serial queue). Every logger is `Logger(label: "eu.jankuri.reframed.<component>")`; 24 files import `Logging`.
+`LogBootstrap.configure()` (`AppShow/Logging/LogBootstrap.swift`) bootstraps swift-log: `StreamLogHandler.standardOutput` in `DEBUG`; in release a `MultiplexLogHandler` adding `RotatingFileLogHandler` (`AppShow/Logging/RotatingFileLogHandler.swift`: `~/Library/Logs/AppShow/appshow.log`, 5 MB, 3 rotated files, appends on a private serial queue). Every logger is `Logger(label: "com.mattwebhub.appshow.<component>")`; 24 files import `Logging`.
 
-Depends on: nothing internal. Used by: `ReframedApp` only (everything else uses swift-log's `Logger` directly).
+Depends on: nothing internal. Used by: `AppShowApp` only (everything else uses swift-log's `Logger` directly).
 
 ## `Project/` (829 LOC, 2 files)
 
-**Responsibility.** The `.frm` bundle format and the on-disk representation of editor state.
+**Responsibility.** The `.appshow` bundle format and the on-disk representation of editor state.
 
 | Type | File | Notes |
 | --- | --- | --- |
-| `ReframedProject` (`struct … Sendable`) | `Reframed/Project/ReframedProject.swift` | `create(from:fps:captureMode:sourceName:in:)` moves the temp files into a new bundle and writes `project.json`; `open(at:)`; `saveEditorState(_:)`; `rename(to:)`; `saveHistory(_:)` / `loadHistory()`; `delete()`; computed URLs for each media file; `recordingResult` reconstructs a `RecordingResult` from the bundle. |
-| `ProjectMetadata`, `EditorStateData`, and the region/settings structs (`CursorSettingsData`, `ZoomSettingsData`, `AnimationSettingsData`, `AudioSettingsData`, `AudioRegionData`, `CameraRegionData`, `VideoRegionData`, `SpotlightRegionData`, `CaptionSettingsData`, `CaptionSegment`, `CaptionWord`, `CaptionPosition`, enums `RegionTransitionType`, `CameraRegionType`, `CaptionFontWeight`, `CaptionLanguage`, `CaptionAudioSource`, `CaptionLayout`, `CodableSize`) | `Reframed/Project/ProjectMetadata.swift` | All `Codable, Sendable`. Lenient decoding via `decodeOrDefault` (`Reframed/Utilities/LenientCodable.swift`) in `init(from:)` extensions so older `project.json` files load — this file is one of only five with code comments in the whole tree (18 `//` lines total; the others are `FrameRenderer+Helpers.swift`, `FrameRenderer+HDR.swift`, `SelectionOverlayView.swift`, `RotatingFileLogHandler.swift`) — the `// MARK: - Lenient Decoders` block here explains the convention. |
+| `AppShowProject` (`struct … Sendable`) | `AppShow/Project/AppShowProject.swift` | `create(from:fps:captureMode:sourceName:in:)` moves the temp files into a new bundle and writes `project.json`; `open(at:)`; `saveEditorState(_:)`; `rename(to:)`; `saveHistory(_:)` / `loadHistory()`; `delete()`; computed URLs for each media file; `recordingResult` reconstructs a `RecordingResult` from the bundle. |
+| `ProjectMetadata`, `EditorStateData`, and the region/settings structs (`CursorSettingsData`, `ZoomSettingsData`, `AnimationSettingsData`, `AudioSettingsData`, `AudioRegionData`, `CameraRegionData`, `VideoRegionData`, `SpotlightRegionData`, `CaptionSettingsData`, `CaptionSegment`, `CaptionWord`, `CaptionPosition`, enums `RegionTransitionType`, `CameraRegionType`, `CaptionFontWeight`, `CaptionLanguage`, `CaptionAudioSource`, `CaptionLayout`, `CodableSize`) | `AppShow/Project/ProjectMetadata.swift` | All `Codable, Sendable`. Lenient decoding via `decodeOrDefault` (`AppShow/Utilities/LenientCodable.swift`) in `init(from:)` extensions so older `project.json` files load — this file is one of only five with code comments in the whole tree (18 `//` lines total; the others are `FrameRenderer+Helpers.swift`, `FrameRenderer+HDR.swift`, `SelectionOverlayView.swift`, `RotatingFileLogHandler.swift`) — the `// MARK: - Lenient Decoders` block here explains the convention. |
 
 Depends on: `Compositor` (`BackgroundStyle`, `CameraLayout`, `CameraBackgroundStyle`, `BackgroundImageFillMode`), `Editor` (`ZoomKeyframe`, `HistoryData`, `CursorMovementSpeed`, `CanvasAspect`, `CameraAspect`, `CameraFullscreen*`), `Recording` (`RecordingResult`), `State` (`CaptureMode`, `CaptureQuality`, `CaptureError`), `Utilities` (`CodableColor`, `formatTimestamp`).
 Used by: `State`, `Editor`, `Compositor`, `UI` (`ProjectMetadata` for the recent-projects list), `Utilities` (`CaptionSegment` in `SubtitleExporter`/`TranscriptionService`).
@@ -132,7 +132,7 @@ Used by: `State`, `Editor`, `Compositor`, `UI` (`ProjectMetadata` for the recent
 | `DeviceDiscovery` (`@MainActor @Observable` singleton), `ExternalDevice` | `DeviceDiscovery.swift` | | iOS devices via `AVCaptureDevice.DiscoverySession(deviceTypes: [.external], mediaType: .muxed)`. |
 | `WebcamPreviewWindow`, `RecordingPreviewWindow`, `DevicePreviewWindow`, `MouseClickWindow` | respective files | `@MainActor` | Preview panels (UI code inside `Recording/`). |
 | `VideoTranscoder` (enum) | `VideoTranscoder.swift` | | `merge(videoFile:audioFiles:to:)`; only used by `RecordingCoordinator.stopRecording` (the discard path). |
-| `FileManager` extension | `FileManager+Reframed.swift` | some `@MainActor` | temp URLs under `/tmp/Reframed`, `projectSaveDirectory()`, `defaultSaveURL(for:extension:)`, `moveToFinal`, `cleanupTempDir`. |
+| `FileManager` extension | `FileManager+AppShow.swift` | some `@MainActor` | temp URLs under `/tmp/AppShow`, `projectSaveDirectory()`, `defaultSaveURL(for:extension:)`, `moveToFinal`, `cleanupTempDir`. |
 
 Depends on: `State` (`CaptureError`, `CaptureMode`, `CaptureQuality`, `ConfigService`, `StateService`), `App` (`Permissions`), `CaptureModes` (`SelectionRect`, `ResizeHandle`), `Editor` (cursor metadata Codable types), `UI` (colours, `StartRecordingButton`, `Window`), `Utilities` (`EncodingSettings`, `SendableBox`).
 Used by: `State` (12 types), `Editor`/`Compositor`/`Project` (`RecordingResult`), `UI` (`DeviceDiscovery`, `ExternalDevice`).
@@ -147,17 +147,17 @@ Used by: `State` (12 types), `Editor`/`Compositor`/`Project` (`RecordingResult`)
 | `CaptureState` (`enum … Sendable, Equatable`), `CaptureError` (`LocalizedError`) | `CaptureState.swift` | `.idle, .selecting, .countdown(remaining:), .recording(startedAt:), .paused(elapsed:), .processing, .editing`. |
 | `CaptureMode` (`enum String … Codable`) | `CaptureMode.swift` | `.none, .entireScreen, .selectedWindow, .selectedArea, .device`; also hosts `cameraMaxDimensions(for:)`. |
 | `RecordingOptions` (`@MainActor @Observable`) + `CaptureQuality`, `TimerDelay`, `AudioDevice`, `CaptureDevice` | `RecordingOptions.swift` | Each property's `didSet` writes through to `ConfigService`. |
-| `ConfigService`, `StateService` (`@MainActor` singletons) | `ConfigService.swift`, `StateService.swift` | JSON files under `~/.reframed/`; `ConfigService.load()` merges saved keys over encoded defaults. |
+| `ConfigService`, `StateService` (`@MainActor` singletons) | `ConfigService.swift`, `StateService.swift` | JSON files under `~/.appshow/`; `ConfigService.load()` merges saved keys over encoded defaults. |
 | `KeyboardShortcutManager` (`@MainActor`) | `KeyboardShortcutManager.swift` | Local `NSEvent` monitor + `CGEventTap`; `TapContext` (`@unchecked Sendable`) carries a weak manager ref through `userInfo`. |
 
-Depends on: `Recording` (12 types), `CaptureModes` (6), `Editor` (`EditorWindow`), `Project` (`ReframedProject`), `UI` (`CaptureToolbarWindow`, `Window`), `Utilities` (`MenuBarIcon`, `SoundEffect`, `KeyboardShortcut`, `ShortcutAction`, `SendableBox`), `App` (`Permissions`).
+Depends on: `Recording` (12 types), `CaptureModes` (6), `Editor` (`EditorWindow`), `Project` (`AppShowProject`), `UI` (`CaptureToolbarWindow`, `Window`), `Utilities` (`MenuBarIcon`, `SoundEffect`, `KeyboardShortcut`, `ShortcutAction`, `SendableBox`), `App` (`Permissions`).
 Used by: `App`, `CaptureModes`, `Editor`, `Recording`, `UI`, `Compositor`/`Project`/`Utilities` (`CaptureError`, `CaptureQuality`, `CaptureMode`).
 
 ## `UI/` (3 910 LOC, ~46 files)
 
 **Responsibility.** Reusable SwiftUI components and the non-editor screens (toolbar, menu bar popover, settings, permissions).
 
-Key files: `CaptureToolbar.swift` (+ `+Controls`, `+ModeSelection`, `CaptureToolbarComponents.swift`, `CaptureToolbarWindow.swift`), `MenuBarView.swift` (+ `+Projects`, `MenuBarComponents.swift` with `RecentProject`), `SettingsView.swift` + `SettingsGeneralTab`/`RecordingTab`/`DevicesTab`/`ShortcutsTab`/`AboutTab`, `PermissionsView.swift`, `Colors.swift` (`ReframedColors` — `@MainActor` because it reads `NSApp.effectiveAppearance`; `TailwindColors`, `ColorPreset`), `Constants.swift` (`Window`, `Layout`, `Track`, `FontSize`, `Radius`), `PrimaryButton.swift` (`PrimaryButtonStyle`, `SecondaryButtonStyle`, `OutlineButtonStyle`, `PlainCustomButtonStyle` — the only button styles the project allows), `SegmentPicker`, `SliderRow`, `ToggleRow`, `CustomToggle`, `Dropdown`, `IconButton`, `SectionHeader`, `SwatchButton`, `TailwindColorPicker`, `ImageDropSection`, `InlineEditableText`, `LanguagePicker`, `CaptionOverlayView`, `CaptionSegmentRow`, `TransitionControlsSection`, `ShortcutRecorderButton`/`ShortcutCaptureView`/`ShortcutRow`, `StartRecordingButton` (the countdown lives here), `DevicePopover`/`DevicePickerPopover`/`OptionsPopover`/`AreaSizePresetsPopover`, `HoverEffect`.
+Key files: `CaptureToolbar.swift` (+ `+Controls`, `+ModeSelection`, `CaptureToolbarComponents.swift`, `CaptureToolbarWindow.swift`), `MenuBarView.swift` (+ `+Projects`, `MenuBarComponents.swift` with `RecentProject`), `SettingsView.swift` + `SettingsGeneralTab`/`RecordingTab`/`DevicesTab`/`ShortcutsTab`/`AboutTab`, `PermissionsView.swift`, `Colors.swift` (`AppShowColors` — `@MainActor` because it reads `NSApp.effectiveAppearance`; `TailwindColors`, `ColorPreset`), `Constants.swift` (`Window`, `Layout`, `Track`, `FontSize`, `Radius`), `PrimaryButton.swift` (`PrimaryButtonStyle`, `SecondaryButtonStyle`, `OutlineButtonStyle`, `PlainCustomButtonStyle` — the only button styles the project allows), `SegmentPicker`, `SliderRow`, `ToggleRow`, `CustomToggle`, `Dropdown`, `IconButton`, `SectionHeader`, `SwatchButton`, `TailwindColorPicker`, `ImageDropSection`, `InlineEditableText`, `LanguagePicker`, `CaptionOverlayView`, `CaptionSegmentRow`, `TransitionControlsSection`, `ShortcutRecorderButton`/`ShortcutCaptureView`/`ShortcutRow`, `StartRecordingButton` (the countdown lives here), `DevicePopover`/`DevicePickerPopover`/`OptionsPopover`/`AreaSizePresetsPopover`, `HoverEffect`.
 
 Depends on: `State` (9 types incl. `SessionState`, `RecordingOptions`), `Project` (caption types, `ProjectMetadata`), `Recording` (`DeviceDiscovery`, `ExternalDevice`), `Utilities` (`CodableColor`, shortcuts, `SparkleUpdater`, `UpdateChecker`), `App` (`Permissions`). (The grep also matched `TimelineView` in `CaptureToolbarComponents.swift`; that is `SwiftUI.TimelineView`, not the editor's — no real `UI → Editor` dependency.)
 Used by: every other folder except `Logging`.
@@ -169,7 +169,7 @@ Not just "extensions and helpers": several substantial engines live here.
 | Type | File | Notes |
 | --- | --- | --- |
 | `RNNoiseProcessor` (enum) + private `RNNoiseProgressTracker` (actor) + `ChunkParams` | `RNNoiseProcessor.swift` | Chunked, `withThrowingTaskGroup`-parallel RNNoise denoise; 48 kHz mono conversion; dry/wet blend by intensity. |
-| `TranscriptionService` (enum), `WhisperModelManager` (`@MainActor @Observable` singleton), `WhisperModel` | `TranscriptionService.swift`, `WhisperModelManager.swift` | WhisperKit integration; models in `~/.reframed`. |
+| `TranscriptionService` (enum), `WhisperModelManager` (`@MainActor @Observable` singleton), `WhisperModel` | `TranscriptionService.swift`, `WhisperModelManager.swift` | WhisperKit integration; models in `~/.appshow`. |
 | `ClickSoundGenerator`, `ClickSoundStyle`, `ClickSoundCategory`, `ClickSoundData` | `ClickSoundGenerator.swift`, `ClickSoundData.swift` | Synthesises the click-sound audio track for export. |
 | `EncodingSettings` (enum) | `EncodingSettings.swift` | `captureVideoSettings`, `exportVideoSettings`, `aacAudioSettings`; `bt709ColorProperties` is `nonisolated(unsafe) static let`. |
 | `SparkleUpdater` (`@MainActor` singleton), `UpdateChecker` | `SparkleUpdater.swift`, `UpdateChecker.swift` | See `04-dependencies.md`. |
@@ -186,21 +186,21 @@ Used by: everything.
 
 | LOC | File | What is in it |
 | --- | --- | --- |
-| 852 | `Reframed/Compositor/VideoCompositor+ParallelExport.swift` | GCD render farm, hand-rolled queue/condition primitives, ordered writer |
-| 649 | `Reframed/Compositor/GradientPresets.swift` | 86 gradient presets (data) |
-| 612 | `Reframed/Project/ProjectMetadata.swift` | the entire persisted schema + lenient decoders |
-| 607 | `Reframed/Compositor/FrameRenderer+HDR.swift` | HDR/P3 render paths |
-| 483 | `Reframed/Editor/VideoPreviewContainer+Layout.swift` | layer geometry for preview (padding, zoom, PiP, transitions) |
-| 456 | `Reframed/Editor/EditorState+Persistence.swift` | snapshot/restore, observation loop, autosave, undo scheduling |
-| 412 | `Reframed/Editor/CursorOverlayLayer.swift` | preview cursor rendering (CALayer) |
-| 385 | `Reframed/Editor/History+ChangeRules.swift` | undo-label diff rules |
-| 384 | `Reframed/State/SessionState+Recording.swift` | start/stop/pause/restart/device lifecycle |
-| 374 | `Reframed/Compositor/VideoCompositor+ManualExport.swift` | single-threaded reader/writer export |
-| 373 | `Reframed/Compositor/ExportSettings.swift` | export enums + presets |
-| 371 | `Reframed/Utilities/RNNoiseProcessor.swift` | chunked parallel denoise |
-| 366 | `Reframed/Recording/RecordingPreviewWindow.swift` | live-preview panel |
-| 363 | `Reframed/Editor/EditorState.swift` | properties + init + `setup()` |
-| 357 | `Reframed/Compositor/FrameRenderer+Webcam.swift` | PiP/fullscreen webcam drawing |
+| 852 | `AppShow/Compositor/VideoCompositor+ParallelExport.swift` | GCD render farm, hand-rolled queue/condition primitives, ordered writer |
+| 649 | `AppShow/Compositor/GradientPresets.swift` | 86 gradient presets (data) |
+| 612 | `AppShow/Project/ProjectMetadata.swift` | the entire persisted schema + lenient decoders |
+| 607 | `AppShow/Compositor/FrameRenderer+HDR.swift` | HDR/P3 render paths |
+| 483 | `AppShow/Editor/VideoPreviewContainer+Layout.swift` | layer geometry for preview (padding, zoom, PiP, transitions) |
+| 456 | `AppShow/Editor/EditorState+Persistence.swift` | snapshot/restore, observation loop, autosave, undo scheduling |
+| 412 | `AppShow/Editor/CursorOverlayLayer.swift` | preview cursor rendering (CALayer) |
+| 385 | `AppShow/Editor/History+ChangeRules.swift` | undo-label diff rules |
+| 384 | `AppShow/State/SessionState+Recording.swift` | start/stop/pause/restart/device lifecycle |
+| 374 | `AppShow/Compositor/VideoCompositor+ManualExport.swift` | single-threaded reader/writer export |
+| 373 | `AppShow/Compositor/ExportSettings.swift` | export enums + presets |
+| 371 | `AppShow/Utilities/RNNoiseProcessor.swift` | chunked parallel denoise |
+| 366 | `AppShow/Recording/RecordingPreviewWindow.swift` | live-preview panel |
+| 363 | `AppShow/Editor/EditorState.swift` | properties + init + `setup()` |
+| 357 | `AppShow/Compositor/FrameRenderer+Webcam.swift` | PiP/fullscreen webcam drawing |
 
 Two of the top five are pure data (`GradientPresets`, `ProjectMetadata`); the rest are the rendering and lifecycle code where regressions would hide. `VideoPreviewContainer+Layout.swift` and `FrameRenderer+*.swift` implement the same geometry twice (preview vs export) — see `03-data-flow.md` §B.2.
 
@@ -259,14 +259,14 @@ flowchart TD
 | **`Editor` ⇄ `Compositor`** | `Compositor` uses `EditorState` (`ExportSheet.swift`), `CursorRenderer`, `SystemCursorRenderer`, `CursorEffects`, `ZoomTimeline`, `CursorMetadataSnapshot`, `CanvasAspect`, `CameraAspect`; `Editor` uses `ExportSheet`, `FrameRenderer`, `PersonSegmentationProcessor`, `ExportConfiguration`, model types | The compositor cannot be extracted into its own module (or tested in isolation) until the cursor/zoom engines move out of `Editor/` and `ExportSheet` moves out of `Compositor/`. Only `ExportSheet` references `EditorState`; the rest is pure logic. |
 | **`Editor` ⇄ `Project`** | `Project` uses `ZoomKeyframe`, `HistoryData`, `CursorMovementSpeed`, `CanvasAspect`, `CameraAspect`, `CameraFullscreenFillMode`, `CameraFullscreenAspect`; `Editor` uses 19 `Project` types | Persistence format is entangled with editor enums. Moving `EditorTypes.swift`, `ZoomKeyframe`, `CursorMovementSpeed` and `HistoryData` into `Project/` would break the cycle. |
 | **`Project` → `Compositor`** | `EditorStateData` embeds `BackgroundStyle`, `CameraLayout`, `CameraBackgroundStyle`, `BackgroundImageFillMode` | Same fix: those four are data-model types, not compositor code. |
-| **`State` ⇄ `Recording`** | `Recording` reads `ConfigService`/`StateService` (preview window positions, `FileManager+Reframed` save dirs) and `CaptureError`; `State` owns every `Recording` type | `RecordingCoordinator` itself only needs `CaptureError`, `CaptureQuality`, `CaptureMode.cameraMaxDimensions`, and `FileManager.tempXURL`; the `ConfigService` reads are in the preview windows and `FileManager+Reframed`. |
+| **`State` ⇄ `Recording`** | `Recording` reads `ConfigService`/`StateService` (preview window positions, `FileManager+AppShow` save dirs) and `CaptureError`; `State` owns every `Recording` type | `RecordingCoordinator` itself only needs `CaptureError`, `CaptureQuality`, `CaptureMode.cameraMaxDimensions`, and `FileManager.tempXURL`; the `ConfigService` reads are in the preview windows and `FileManager+AppShow`. |
 | **`State` ⇄ `CaptureModes`**, **`State` ⇄ `UI`**, **`State` ⇄ `Editor`** | overlays and toolbar call `session.*` directly; `SessionState` instantiates them | Expected for a hub type, but it means `SessionState` cannot be constructed in a test without AppKit windows being creatable (its `init` only touches `ConfigService`, which is fine; the window-creating paths are in `showToolbar`/`beginSelection`). |
-| **`Recording` → `Editor`** | `CursorMetadataRecorder` writes `CursorMetadataFile`/`CursorSample`/… declared in `Reframed/Editor/CursorMetadata.swift` | The cursor JSON schema is an `Editor` type used by the recorder. Belongs in `Project/`. |
+| **`Recording` → `Editor`** | `CursorMetadataRecorder` writes `CursorMetadataFile`/`CursorSample`/… declared in `AppShow/Editor/CursorMetadata.swift` | The cursor JSON schema is an `Editor` type used by the recorder. Belongs in `Project/`. |
 | **`Recording` → `CaptureModes`** | `CaptureTarget.region(SelectionRect)` | `SelectionRect` is a value type with an `NSScreen` lookup in its `init`; fine for tests on a machine with a display. |
 | **`CaptureModes` → `App`** | `WindowSelectionCoordinator` owns a `WindowController` | `WindowController` is an AX helper, not app-lifecycle code; it would sit better in `CaptureModes/CaptureWindow/`. |
 | **`Utilities` → `State`/`Project`** | `RNNoiseProcessor` throws `CaptureError.recordingFailed` and reads `CaptureQuality`/`EncodingSettings`; `SubtitleExporter`/`TranscriptionService` use `CaptionSegment`/`CaptionWord` | "Utilities" is not a leaf. The `CaptureError` coupling is the one to remove first (introduce a local error type). (The matrix's `Utilities → UI: Window` hit is a false positive — the word "Window" appears in a shortcut label string, not as the `Window` enum.) |
 | UI code outside `UI/` | `ExportSheet*` in `Compositor/`; `*PreviewWindow` in `Recording/`; `CaptureAreaView`/`StartRecordingOverlay` in `CaptureModes/`; all of the editor UI in `Editor/` | `AGENTS.md`'s "put reusable views in `UI/`" applies to *reusable* components only. |
-| `WindowController` is the sole `ObservableObject` | `Reframed/App/WindowController.swift` | Mixed observation systems; harmless but inconsistent. |
+| `WindowController` is the sole `ObservableObject` | `AppShow/App/WindowController.swift` | Mixed observation systems; harmless but inconsistent. |
 
 ### Raw cross-folder reference matrix (distinct type names referenced)
 

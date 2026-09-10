@@ -9,7 +9,7 @@ The chat panel from milestone 04 runs a coding-agent runtime against the open pr
 
 ## Behavior
 
-1. A JSON value type (`JSONValue`) and a JSON-RPC 2.0 codec (`JSONRPC*`) exist in `Reframed/Agent/Tools/`; both are `Sendable`, decode tolerantly (missing `jsonrpc`, int or string ids, absent params), and frame messages as newline-delimited JSON.
+1. A JSON value type (`JSONValue`) and a JSON-RPC 2.0 codec (`JSONRPC*`) exist in `AppShow/Agent/Tools/`; both are `Sendable`, decode tolerantly (missing `jsonrpc`, int or string ids, absent params), and frame messages as newline-delimited JSON.
 2. `AgentToolCatalog.all` lists every tool as data: `name` (`snake_case`, unique), `description`, `inputSchema` (JSON Schema object with `additionalProperties: false`), `mutating`, `slow`, `availability`. `AgentToolCatalog.available` excludes tools whose backing code is not integrated. `tools/list` advertises only available tools in MCP shape (`name`, `description`, `inputSchema`, `annotations.readOnlyHint`).
 3. Read-only catalog for this milestone (times in source seconds, ids are the region UUIDs from `EditorStateData`):
 
@@ -50,14 +50,14 @@ The chat panel from milestone 04 runs a coding-agent runtime against the open pr
 4. `AgentToolDispatcher` (`@MainActor`) is bound to one `EditorState` and a frames directory. `call(name, arguments)` validates the arguments against the tool schema before touching state (object shape, required keys, no unknown keys, primitive types, `enum`, `minimum`/`maximum`), refuses every tool flagged `mutating` in this milestone, answers unknown names with the JSON-RPC method-not-found error, and never pushes a history entry.
 5. Errors are structured. `AgentToolError` carries a JSON-RPC code and a string code: `UNKNOWN_TOOL` (-32601), `TOOL_ARGUMENTS_INVALID` (-32602), `MUTATION_NOT_ALLOWED` (-32003), `TOOL_UNAVAILABLE` (-32004), `TOOL_TIMEOUT` (-32005), `TOOL_FAILED` (-32000). Over the wire the first five are JSON-RPC error responses; `TOOL_FAILED` is an MCP result with `isError: true` so the runtime can read the message.
 6. Transport: `AgentBridgeServer` (actor) listens on a Unix domain socket with `NWListener` and speaks newline-delimited JSON-RPC. Methods: `initialize` (requires `params.token` equal to the session token; wrong token answers `UNAUTHORIZED` (-32001) and closes the connection), `notifications/initialized`, `ping`, `tools/list`, `tools/call`. Any other request before `initialize` answers `NOT_INITIALIZED` (-32002). `tools/call` hops to the dispatcher on the main actor and applies a timeout (30 s, 10 min for slow tools). One `AgentRPCSession` per connection holds the authorization state.
-7. Workspace: `AgentWorkspace.create(forBundle:)` makes `<projectFolder>/.agent/<bundle-name>/` with a `frames/` folder and writes `session.json` (mode 0600) holding `socketPath`, `token`, `bundlePath`, `workspacePath`, `protocolVersion`, `createdAt`. The socket is `<workspace>/bridge.sock` when that path fits the 104-byte `sun_path` limit, otherwise `ReframedPaths.temp/agent/<12 hex>.sock`; `session.json` always says which. `close()` removes `session.json` and the socket file and leaves `frames/` in place.
-8. Nothing in this feature imports SwiftUI or touches upstream files other than `Reframed.xcodeproj/project.pbxproj`.
+7. Workspace: `AgentWorkspace.create(forBundle:)` makes `<projectFolder>/.agent/<bundle-name>/` with a `frames/` folder and writes `session.json` (mode 0600) holding `socketPath`, `token`, `bundlePath`, `workspacePath`, `protocolVersion`, `createdAt`. The socket is `<workspace>/bridge.sock` when that path fits the 104-byte `sun_path` limit, otherwise `AppShowPaths.temp/agent/<12 hex>.sock`; `session.json` always says which. `close()` removes `session.json` and the socket file and leaves `frames/` in place.
+8. Nothing in this feature imports SwiftUI or touches upstream files other than `AppShow.xcodeproj/project.pbxproj`.
 
 ## Stdio shim (implemented in milestone 06)
 
 The runtime spawns MCP servers itself, so the app cannot own a stdio server. Milestone 06 adds a command-line target `appshow-mcp` (Foundation only, under 150 lines, copied to the app's `Contents/Helpers/` by a Copy Files phase, signed with the app):
 
-1. Reads `REFRAMED_AGENT_SOCKET` and `REFRAMED_AGENT_TOKEN` from its environment (the chat panel writes them into the runtime's MCP config from `session.json`).
+1. Reads `APPSHOW_AGENT_SOCKET` and `APPSHOW_AGENT_TOKEN` from its environment (the chat panel writes them into the runtime's MCP config from `session.json`).
 2. Opens `NWConnection(to: .unix(path:), using: .tcp)` and fails fast with a JSON-RPC error on stdout if the socket is gone.
 3. Reads stdin line by line. For the one request whose `method` is `initialize` it decodes the object, sets `params.token`, and re-encodes; every other line is forwarded byte for byte.
 4. Relays every line received from the socket to stdout unchanged and flushes after each line.
@@ -69,8 +69,8 @@ As implemented, the third `PBXNativeTarget` compiles `Tools/appshow-mcp/main.swi
 
 - Mutating tools, batches, history labels, the editing badge, confirmations (milestone 06).
 - HTTP transport. The authenticated Unix socket plus signed stdio shim is the implemented boundary.
-- Any change to `EditorState`, `History`, `ReframedProject`, or the compositor.
+- Any change to `EditorState`, `History`, `AppShowProject`, or the compositor.
 
 ## Touch points
 
-New files, all ours, under `Reframed/Agent/Tools/` (registered in a `Reframed/Agent/Tools` `PBXGroup` with ids `7E57…B0` to `7E57…CF` so the concurrent `Reframed/Agent` group from milestone 04 merges cleanly): `JSONValue.swift`, `JSONRPC.swift`, `AgentTool.swift`, `AgentToolCatalog.swift`, `AgentToolSummaries.swift`, `AgentToolCursorActivity.swift`, `AgentToolHandlers.swift`, `AgentToolPreviewFrame.swift`, `AgentToolDispatcher.swift`, `AgentRPCSession.swift`, `AgentBridgeServer.swift`, `AgentWorkspace.swift`. Tests under `ReframedTests/Agent/`. Read-only use of upstream types: `EditorState` and its extensions, `CutTimeline`, `CursorMetadataProvider`, `History`, `ReframedProject`, `VideoCompositor.buildCompositionInstruction`, `FrameRenderer.renderFrame`.
+New files, all ours, under `AppShow/Agent/Tools/` (registered in a `AppShow/Agent/Tools` `PBXGroup` with ids `7E57…B0` to `7E57…CF` so the concurrent `AppShow/Agent` group from milestone 04 merges cleanly): `JSONValue.swift`, `JSONRPC.swift`, `AgentTool.swift`, `AgentToolCatalog.swift`, `AgentToolSummaries.swift`, `AgentToolCursorActivity.swift`, `AgentToolHandlers.swift`, `AgentToolPreviewFrame.swift`, `AgentToolDispatcher.swift`, `AgentRPCSession.swift`, `AgentBridgeServer.swift`, `AgentWorkspace.swift`. Tests under `AppShowTests/Agent/`. Read-only use of upstream types: `EditorState` and its extensions, `CutTimeline`, `CursorMetadataProvider`, `History`, `AppShowProject`, `VideoCompositor.buildCompositionInstruction`, `FrameRenderer.renderFrame`.

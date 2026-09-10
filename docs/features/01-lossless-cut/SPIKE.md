@@ -12,45 +12,45 @@ The headline: **upstream's "video regions" are already keep-based slices with pl
 
 | Capability | Type / function | File:line | Notes |
 | --- | --- | --- | --- |
-| Slice model | `VideoRegionData { id, startSeconds, endSeconds, entry/exitTransition(+Duration) }` | `Reframed/Project/ProjectMetadata.swift:144-152` | `Codable, Sendable, Identifiable, Equatable`; synthesized Codable, all extras optional |
-| Slice storage | `EditorState.videoRegions: [VideoRegionData]` | `Reframed/Editor/EditorState.swift:19` | Sorted by start, non-overlapping by construction |
+| Slice model | `VideoRegionData { id, startSeconds, endSeconds, entry/exitTransition(+Duration) }` | `AppShow/Project/ProjectMetadata.swift:144-152` | `Codable, Sendable, Identifiable, Equatable`; synthesized Codable, all extras optional |
+| Slice storage | `EditorState.videoRegions: [VideoRegionData]` | `AppShow/Editor/EditorState.swift:19` | Sorted by start, non-overlapping by construction |
 | Default = keep everything | `videoRegions = [VideoRegionData(startSeconds: 0, endSeconds: dur)]` | `EditorState.swift:254`, `EditorState+Persistence.swift:217` | One full-length region is the "no cuts" state |
 | Keep semantics (derived) | `videoRegionsTotalDuration`, `hasVideoRegionCuts` (`abs(total - dur) > 0.01`) | `EditorState.swift:138-146` | "Cuts exist" means the kept total is shorter than the source |
 | Compressed ⇄ source time | `previewElapsedTime`, `sourceTimeForPreviewElapsed(_:)` | `EditorState.swift:148-176` | Already the mapping a compressed timeline needs |
 | Create a slice (UI) | double-click on the Screen track → `addVideoRegion(atTime:)` | `TimelineView+ScreenTrack.swift:22-25`, `EditorState+VideoRegions.swift:5-40` | Inserts a ≤10 s region into the *gap* around `time`; returns early if `time` is inside a region (`:6`). With the default full region a double-click does nothing; the only way to make a gap today is to drag a region edge |
 | Resize / move / remove | `updateVideoRegionStart/End`, `moveVideoRegion`, `removeVideoRegion` | `EditorState+VideoRegions.swift:42-74` | Clamped to neighbours and `[0, duration]`; min length 0.01 s |
 | Slice handles (UI) | `videoRegionView` drag: `.resizeLeft/.resizeRight/.move` from an 8 px edge threshold; `effectiveVideoRegion` for live preview; `commitVideoDrag` | `TimelineView+ScreenTrack.swift:93-120, 138-179` | Identical pattern to `spotlightRegionView` (`TimelineView+SpotlightTrack.swift:119-206`) and the camera track; `RegionDragType` in `ZoomRegion.swift:110` |
-| Slice popover | `VideoRegionEditPopover(region:canRemove:onUpdateTransition:onRemove:)` | `Reframed/Editor/VideoRegionEditPopover.swift:3-68`, opened from `TimelineView+ScreenTrack.swift:62-92` | Entry/exit transition + Remove (only when `count > 1`) |
+| Slice popover | `VideoRegionEditPopover(region:canRemove:onUpdateTransition:onRemove:)` | `AppShow/Editor/VideoRegionEditPopover.swift:3-68`, opened from `TimelineView+ScreenTrack.swift:62-92` | Entry/exit transition + Remove (only when `count > 1`) |
 | Player skips gaps | `SyncedPlayerController.videoRegions`, `previewMode`, `handlePreviewGapSkip(at:)` | `SyncedPlayerController.swift:21-22, 183-185, 191-207` | Only when `previewMode`; from the 60 Hz periodic observer; seeks to `next.start`, pauses after the last slice. `boundaryObserver` (`:17`) is declared and never used |
 | Player sync | `syncVideoRegionsToPlayer()` from the observation loop | `EditorState+AudioRegions.swift:108-110`, `EditorState+Persistence.swift:426-427` | `previewMode` mirrors `isPreviewMode` |
 | Play from a gap | `togglePlayPause()` seeks to the next slice start (or the first) | `EditorState+Playback.swift:8-27` | Only when `isPreviewMode && hasVideoRegionCuts` |
 | Preview hides gaps | `isScreenHidden = isPreviewMode && !videoRegions.isEmpty && videoRegion == nil` | `VideoPreviewView+Update.swift:113-141`, `VideoPreviewContainer+Layout.swift:66-68` | Edit mode still shows the cut-out frames |
 | Transport time readout | elapsed `/ total` in preview; `(total)` suffix in edit mode; preview progress bar seeks through `sourceTimeForPreviewElapsed` | `EditorView+TransportBar.swift:17-38, 112-171` | |
-| Export: segment build | `VideoCompositor.export` inserts each region ∩ trim back-to-back, records `VideoSegment(sourceRange:compositionStart:)`, `compositionDuration = Σ` | `Reframed/Compositor/VideoCompositor.swift:37-61` | `hasVideoRegions` forces the compositor path (`+InstructionBuilder.swift:39`), never passthrough |
-| Export: config gate | `isSingleFullRange` → `videoRegions: nil`, `trimRange = 0…duration` when cuts exist | `Reframed/Editor/EditorState+Export.swift:100-121, 147-154` | |
+| Export: segment build | `VideoCompositor.export` inserts each region ∩ trim back-to-back, records `VideoSegment(sourceRange:compositionStart:)`, `compositionDuration = Σ` | `AppShow/Compositor/VideoCompositor.swift:37-61` | `hasVideoRegions` forces the compositor path (`+InstructionBuilder.swift:39`), never passthrough |
+| Export: config gate | `isSingleFullRange` → `videoRegions: nil`, `trimRange = 0…duration` when cuts exist | `AppShow/Editor/EditorState+Export.swift:100-121, 147-154` | |
 | Export: webcam | webcam track inserted per segment | `VideoCompositor+InstructionBuilder.swift:95-101` | |
 | Export: audio | `addAudioTracks` intersects audio regions with each segment | `VideoCompositor+Audio.swift:26-38`; caller `VideoCompositor.swift:171-181` | |
 | Export: click sounds | clicks remapped per segment | `VideoCompositor+AudioPreprocessing.swift:47-56` | |
-| Export: camera/spotlight/caption remap | `remapAllRegions` → `RemappedRegions`; `remapRegion` splits a region per segment; `remapCaptionSegments` clips words | `VideoCompositor+RegionRemapping.swift:20-63, 65-117, 255-318` | Pinned for the trim path in `ReframedTests/Compositor/RegionRemappingTests.swift`; the cut path has no test yet |
+| Export: camera/spotlight/caption remap | `remapAllRegions` → `RemappedRegions`; `remapRegion` splits a region per segment; `remapCaptionSegments` clips words | `VideoCompositor+RegionRemapping.swift:20-63, 65-117, 255-318` | Pinned for the trim path in `AppShowTests/Compositor/RegionRemappingTests.swift`; the cut path has no test yet |
 | Export: screen transitions | `remapVideoRegions` matches regions to segments within 0.01 s | `+RegionRemapping.swift:223-253`, consumed by `FrameRenderer.swift:116-124` | |
 | Export: zoom + cursor | `CompositionInstruction.sourceTime(for:)` over `videoSegmentMappings`; `resolveZoomRect` uses it | `CompositionInstruction.swift:27-31, 283-292`, `FrameRenderer+Helpers.swift:79-92` | Zoom keyframes and cursor samples stay in source time |
 | Persistence | `EditorStateData.videoRegions?` ; snapshot omits when empty; restore falls back to full region | `ProjectMetadata.swift:490`, `EditorState+Persistence.swift:122, 213-218`, `EditorState.swift:326-328` | |
 | Undo | `_ = self.videoRegions` in `observeChanges`; rule "Video region added/removed/adjusted" | `EditorState+Persistence.swift:403`, `History+ChangeRules.swift:259-264`, `History.swift:145-163` | |
 | Trim range | `trimStart/trimEnd` reset to `0…duration` at the end of `setup()`; `trimHandleOverlay`/`trimBorderOverlay` have no call sites | `EditorState.swift:351-353`, `TimelineView+Overlays.swift:5-55` | Trim is dead UI; video regions replaced it. "Trim bounds" are always the full source |
 | Track appear/disappear | `showSpotlightTrack`, `visibleTrackCount`, sidebar + content `if` blocks with `.transition(.trackTransition)`; `EditorView.timelineTrackSignature` drives the animation | `TimelineView.swift:85-97, 110-141, 157-209`; `EditorView.swift:18-25, 77` | Zoom track is gated by the stored `zoomEnabled` (`PropertiesPanel+CursorZoomTab.swift:225`); spotlight by `spotlightEnabled && cursorMetadataProvider != nil` |
-| Transport-bar buttons | `IconButton(systemName:color:action:)` over `PlainCustomButtonStyle` | `Reframed/UI/IconButton.swift:3-19`, `EditorView+TransportBar.swift:42-96` | Zoom in/out/reset, history, undo, redo, fullscreen |
-| Editor key handling | local `NSEvent` monitor: space/return, esc, arrows; undo/redo via `ShortcutAction` | `Reframed/Editor/EditorWindow.swift:98-146`, `Reframed/Utilities/KeyboardShortcut.swift:113-121` | |
+| Transport-bar buttons | `IconButton(systemName:color:action:)` over `PlainCustomButtonStyle` | `AppShow/UI/IconButton.swift:3-19`, `EditorView+TransportBar.swift:42-96` | Zoom in/out/reset, history, undo, redo, fullscreen |
+| Editor key handling | local `NSEvent` monitor: space/return, esc, arrows; undo/redo via `ShortcutAction` | `AppShow/Editor/EditorWindow.swift:98-146`, `AppShow/Utilities/KeyboardShortcut.swift:113-121` | |
 | Icons | `hand.point.up.left`, `hand.point.up`, `scissors`, `hand.tap` | verified with `NSImage(systemSymbolName:)` on this machine | all resolve |
 
 ### Evidence that regions are keep-slices
 
-The default state is one region covering the whole recording (`Reframed/Editor/EditorState.swift:254`):
+The default state is one region covering the whole recording (`AppShow/Editor/EditorState.swift:254`):
 
 ```swift
     videoRegions = [VideoRegionData(startSeconds: 0, endSeconds: dur)]
 ```
 
-Export inserts only what is inside a region and concatenates it (`Reframed/Compositor/VideoCompositor.swift:46-57`):
+Export inserts only what is inside a region and concatenates it (`AppShow/Compositor/VideoCompositor.swift:46-57`):
 
 ```swift
     if hasVideoRegions, let vRegions = config.videoRegions {
@@ -67,7 +67,7 @@ Export inserts only what is inside a region and concatenates it (`Reframed/Compo
       compositionDuration = insertTime
 ```
 
-The player already jumps from the end of one slice to the start of the next, but only in preview mode (`Reframed/Editor/SyncedPlayerController.swift:183-185, 191-207`):
+The player already jumps from the end of one slice to the start of the next, but only in preview mode (`AppShow/Editor/SyncedPlayerController.swift:183-185, 191-207`):
 
 ```swift
         if self.previewMode && self.isPlaying {
@@ -82,7 +82,7 @@ The player already jumps from the end of one slice to the start of the next, but
         screenPlayer.play()
 ```
 
-Per-frame lookups in the compositor go back to source time, so zoom keyframes and cursor samples never need rewriting (`Reframed/Compositor/CompositionInstruction.swift:283-292`):
+Per-frame lookups in the compositor go back to source time, so zoom keyframes and cursor samples never need rewriting (`AppShow/Compositor/CompositionInstruction.swift:283-292`):
 
 ```swift
   func sourceTime(for compositionTime: CMTime) -> Double {
@@ -97,7 +97,7 @@ Per-frame lookups in the compositor go back to source time, so zoom keyframes an
   }
 ```
 
-The one piece of arithmetic the feature is missing is a split; today's creation path only fills gaps (`Reframed/Editor/EditorState+VideoRegions.swift:5-8`):
+The one piece of arithmetic the feature is missing is a split; today's creation path only fills gaps (`AppShow/Editor/EditorState+VideoRegions.swift:5-8`):
 
 ```swift
   func addVideoRegion(atTime time: Double) {
@@ -116,7 +116,7 @@ The one piece of arithmetic the feature is missing is a split; today's creation 
 6. **The cut path of `remapAllRegions` and the composition builder are untested** (`RegionRemappingTests` covers `hasVideoRegions: false` only).
 7. **Not lossless in the literal sense**: any cut forces re-encoding (`checkNeedsCompositor`, `+InstructionBuilder.swift:39`); the passthrough branch would also be wrong with segments (`VideoCompositor.swift:230-247` uses `effectiveTrim.duration`, not `compositionDuration`, and passes no segments to `addAudioTracks`).
 8. Undo labels say "Video region added" rather than "Cut".
-9. `EditorState+VideoRegions.swift` region math is `@MainActor` and reads `duration` from `AVPlayer` (seam S6 in `07-testability.md`), so the pure logic is T2 until extracted; `ReframedTests/` has no `Fixtures/` or `Support/` yet and `scripts/make-fixtures.swift` does not exist.
+9. `EditorState+VideoRegions.swift` region math is `@MainActor` and reads `duration` from `AVPlayer` (seam S6 in `07-testability.md`), so the pure logic is T2 until extracted; `AppShowTests/` has no `Fixtures/` or `Support/` yet and `scripts/make-fixtures.swift` does not exist.
 
 ## Recommended approach: (a) a UX layer over existing video regions
 
@@ -133,7 +133,7 @@ The data model needs no new persisted type. A "kept slice" **is** a `VideoRegion
 | Kept total / elapsed | `videoRegionsTotalDuration`, `previewElapsedTime` | existing |
 | Track visible | `videoRegions.count > 1 || hasVideoRegionCuts` | **new** derived `showCutTrack` (no stored flag, no persistence, no history rule) |
 
-Put the arithmetic in a new value type, `Reframed/Editor/CutTimeline.swift` (working name; `struct CutTimeline { var slices: [VideoRegionData]; let duration: Double }`), with `split(at:minLength:)`, `remove(id:)`, `totalDuration`, `elapsed(forSource:)`, `source(forElapsed:)`, `nextSliceStart(after:)`, `contains(_:)`, `normalized()` (sort, clamp to `[0, duration]`, drop `< minLength`, merge overlaps). `EditorState` methods delegate to it in one-liners, which is exactly seam S6 phase 2 and makes everything T1. Existing `EditorState.previewElapsedTime`/`sourceTimeForPreviewElapsed` become delegations (pin their current output first, rule 3 of `planning/tdd-strategy.md`).
+Put the arithmetic in a new value type, `AppShow/Editor/CutTimeline.swift` (working name; `struct CutTimeline { var slices: [VideoRegionData]; let duration: Double }`), with `split(at:minLength:)`, `remove(id:)`, `totalDuration`, `elapsed(forSource:)`, `source(forElapsed:)`, `nextSliceStart(after:)`, `contains(_:)`, `normalized()` (sort, clamp to `[0, duration]`, drop `< minLength`, merge overlaps). `EditorState` methods delegate to it in one-liners, which is exactly seam S6 phase 2 and makes everything T1. Existing `EditorState.previewElapsedTime`/`sourceTimeForPreviewElapsed` become delegations (pin their current output first, rule 3 of `planning/tdd-strategy.md`).
 
 Edge cases and the rule for each:
 
@@ -179,7 +179,7 @@ Already complete for the model: `videoRegions` is in `EditorStateData` (optional
 
 ## Risks and unknowns
 
-- **T2 test infrastructure does not exist yet.** `EditorState` tests need `ReframedTests/Fixtures/screen-2s.mov` and `Support/Fixtures.swift` (`07-testability.md` §T2, `planning/tdd-strategy.md` "Fixtures"). Phases 2 and 5 depend on milestone 01 delivering them; phase 1 does not.
+- **T2 test infrastructure does not exist yet.** `EditorState` tests need `AppShowTests/Fixtures/screen-2s.mov` and `Support/Fixtures.swift` (`07-testability.md` §T2, `planning/tdd-strategy.md` "Fixtures"). Phases 2 and 5 depend on milestone 01 delivering them; phase 1 does not.
 - **Upstream merge surface.** `EditorState+VideoRegions.swift`, `EditorState.swift:138-176`, `SyncedPlayerController.swift`, `TimelineView*.swift`, `EditorView+TransportBar.swift` are upstream files. Keep edits to delegations and additive `if` blocks; list each in `planning/upstream-sync.md`.
 - **Frame flash at cut boundaries** in edit mode until the boundary observer lands; preview mode already hides the screen layer.
 - **Passthrough "lossless" export** would cut at non-sync samples; AVFoundation may produce glitches at segment starts. Keep re-encoding as the default and treat passthrough as an opt-in experiment.

@@ -25,3 +25,9 @@ Tools, MCP, skills, project mutation (milestones 05 to 07).
 
 - CLI protocol drift across Claude Code and Codex releases: pin recorded fixtures per version and keep parsers tolerant of unknown event types.
 - Strict-concurrency port of Swift 5 code: rewrite process and session classes as actors rather than copying.
+
+## Interactive testing follow-up
+
+- [x] Preserve paragraph boundaries between complete provider messages while continuing to concatenate true streaming deltas.
+- [x] Render paragraphs, headings, lists, quotes, links, and code blocks with explicit spacing.
+- [ ] Human checks a new multi-paragraph provider reply and code block in the rebuilt app.

@@ -1,6 +1,6 @@
 # Export pipeline
 
-Export turns a .frm project into a final video file. The whole process runs through `VideoCompositor`, a static enum that orchestrates composition setup, per-frame rendering, audio mixing, and file output.
+Export turns a .appshow project into a final video file. The whole process runs through `VideoCompositor`, a static enum that orchestrates composition setup, per-frame rendering, audio mixing, and file output.
 
 ## Entry point
 

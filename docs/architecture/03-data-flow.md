@@ -4,7 +4,7 @@ Three traces through the code, written as `Type.method → Type.method` chains w
 
 ## State machine, as implemented
 
-`CaptureState` (`Reframed/State/CaptureState.swift`):
+`CaptureState` (`AppShow/State/CaptureState.swift`):
 
 ```swift
 enum CaptureState: Sendable, Equatable {
@@ -18,11 +18,11 @@ enum CaptureState: Sendable, Equatable {
 }
 ```
 
-Every mutation goes through `SessionState.transition(to:)` (`Reframed/State/SessionState.swift:57`), which also fires side effects. The complete set of `transition(to:)` call sites:
+Every mutation goes through `SessionState.transition(to:)` (`AppShow/State/SessionState.swift:57`), which also fires side effects. The complete set of `transition(to:)` call sites:
 
 | From | To | Trigger | Call site |
 | --- | --- | --- | --- |
-| `.idle` | `.selecting` | `selectMode(.selectedArea)` → `beginSelection()`; `selectMode(.selectedWindow)` → `startWindowSelection()` | `Reframed/State/SessionState+Selection.swift:39,57` |
+| `.idle` | `.selecting` | `selectMode(.selectedArea)` → `beginSelection()`; `selectMode(.selectedWindow)` → `startWindowSelection()` | `AppShow/State/SessionState+Selection.swift:39,57` |
 | `.selecting` | `.idle` | `cancelSelection()` (Esc, overlay cancel, device preview cancel) | `SessionState+Selection.swift:118` |
 | `.selecting` / `.idle` / `.countdown` | `.recording(startedAt:)` | `startRecording()` after `RecordingCoordinator.startRecording` returns; also `startDeviceRecordingInternal` | `SessionState+Recording.swift:95,132` |
 | any | `.idle` | `cleanupAfterRecordingFailure()` when `startRecording()` throws | `SessionState+Recording.swift:31` |
@@ -30,12 +30,12 @@ Every mutation goes through `SessionState.transition(to:)` (`Reframed/State/Sess
 | `.paused` | `.recording(startedAt: now − elapsed)` | `resumeRecording()` | `SessionState+Recording.swift:212` |
 | `.recording` / `.paused` | `.processing` | `stopRecording()` (status-item click, toolbar, global shortcut, stream error, captured window disappeared) | `SessionState+Recording.swift:149` |
 | `.processing` | `.idle` | `stopRecording()` when `stopRecordingRaw()` returns `nil` (no video written) | `SessionState+Recording.swift:161` |
-| `.processing` | `.editing` | `openEditor(project:result:)` | `Reframed/State/SessionState+Project.swift:25` |
+| `.processing` | `.editing` | `openEditor(project:result:)` | `AppShow/State/SessionState+Project.swift:25` |
 | `.recording`/`.paused`/`.countdown` | `.idle` | `restartRecording()` (discards, then immediately re-enters the countdown UI) | `SessionState+Recording.swift:243` |
 | `.editing` | `.idle` | `removeEditor(_:)` when `editorWindows` becomes empty | `SessionState+Project.swift:73` |
-| `.idle` | `.editing` | `openProject(at:)` (double-click `.frm`, menu bar recent list) → `openEditor` | `SessionState+Project.swift:25` |
+| `.idle` | `.editing` | `openProject(at:)` (double-click `.appshow` or legacy `.frm`, menu bar recent list) → `openEditor` | `SessionState+Project.swift:25` |
 
-**`.countdown` is unreachable.** `grep -rn "\.countdown(remaining" Reframed` only finds `case` patterns. The countdown is implemented as a SwiftUI timer inside `StartRecordingButton` (`Reframed/UI/StartRecordingButton.swift`), embedded in `CaptureAreaView`, `StartRecordingOverlayView`, `WindowSelectionView` and `DevicePreviewWindow`; only when it finishes does the view call `session.confirmSelection(_:)` / `startRecordingFromOverlay` / `startDeviceRecording`. During those seconds `state` is `.selecting` (area, window) or `.idle` (entire screen — `selectMode(.entireScreen)` never transitions). Effects: `MenuBarIcon.State.countdown` is never shown; the `CGEventTap` global shortcuts in `KeyboardShortcutManager` (gated on `.countdown/.recording/.paused`) do not work during a countdown; `restartRecording`'s `.countdown` branch is dead.
+**`.countdown` is unreachable.** `grep -rn "\.countdown(remaining" AppShow` only finds `case` patterns. The countdown is implemented as a SwiftUI timer inside `StartRecordingButton` (`AppShow/UI/StartRecordingButton.swift`), embedded in `CaptureAreaView`, `StartRecordingOverlayView`, `WindowSelectionView` and `DevicePreviewWindow`; only when it finishes does the view call `session.confirmSelection(_:)` / `startRecordingFromOverlay` / `startDeviceRecording`. During those seconds `state` is `.selecting` (area, window) or `.idle` (entire screen — `selectMode(.entireScreen)` never transitions). Effects: `MenuBarIcon.State.countdown` is never shown; the `CGEventTap` global shortcuts in `KeyboardShortcutManager` (gated on `.countdown/.recording/.paused`) do not work during a countdown; `restartRecording`'s `.countdown` branch is dead.
 
 Side effects wired into `transition(to:)` (`SessionState.swift:57-85`): on `.recording` start the 100 ms audio-level polling task, start `WindowPositionObserver` for window targets, hide the webcam preview if configured, show the toolbar, and raise the captured window via AX; on `.paused` un-hide the preview; on anything else stop polling and tracking. `updateStatusIcon()` runs on every transition and starts the 0.6 s pulse timer while `.processing` or while any editor `isExporting`.
 
@@ -47,9 +47,9 @@ Actors involved: `@MainActor` (`SessionState`, overlays) → `RecordingCoordinat
 
 ### A.1 Selecting the area
 
-1. `CaptureToolbar+ModeSelection` (`Reframed/UI/CaptureToolbar+ModeSelection.swift`) or `MenuBarView` calls **`SessionState.selectMode(.selectedArea)`** (`Reframed/State/SessionState+Selection.swift:7`).
+1. `CaptureToolbar+ModeSelection` (`AppShow/UI/CaptureToolbar+ModeSelection.swift`) or `MenuBarView` calls **`SessionState.selectMode(.selectedArea)`** (`AppShow/State/SessionState+Selection.swift:7`).
 2. `selectMode` → `hideToolbar()` → **`beginSelection()`** (`:42`): guards `state == .idle` and `Permissions.hasScreenRecordingPermission` (else `CGRequestScreenCaptureAccess()` and throws `.permissionDenied`), then `transition(to: .selecting)`, `captureTarget = nil`.
-3. `beginSelection` creates **`SelectionCoordinator()`** and calls `coordinator.beginSelection(session: self)` (`Reframed/CaptureModes/Common/SelectionCoordinator.swift:8`): one `SelectionOverlayWindow(screen:session:)` per `NSScreen`, `.screenSaver` level, first one made key, `NSApp.activate`.
+3. `beginSelection` creates **`SelectionCoordinator()`** and calls `coordinator.beginSelection(session: self)` (`AppShow/CaptureModes/Common/SelectionCoordinator.swift:8`): one `SelectionOverlayWindow(screen:session:)` per `NSScreen`, `.screenSaver` level, first one made key, `NSApp.activate`.
 4. If `options.rememberLastSelection` and `StateService.shared.lastSelectionRect` exists → `coordinator.restoreSelection(_:displayID:session:)` → `SelectionOverlayView.applyExternalRect(_:)` and `session.overlayView = overlayView`; `captureTarget` is pre-set to `.region(SelectionRect(...))`.
 5. User drags; `SelectionOverlayView` (+ `+Resize`, `+Drawing`) maintains `selectionRect` in view coordinates; `updateControlsPanel()` (`SelectionOverlayView+Controls.swift:31`) hosts a `CaptureAreaView` (SwiftUI) under the rect containing the `StartRecordingButton` with the countdown and the size-presets popover.
 6. When the countdown completes, **`SelectionOverlayView.confirmSelection()`** (`+Controls.swift:11`) converts view → window → screen coordinates (`window.convertToScreen`), finds the display whose frame contains the midpoint, and builds `SelectionRect(rect: screenRect, displayID:)` (AppKit bottom-left coordinates; `SelectionRect.init` captures `displayOrigin` and `displayHeight` from `NSScreen.screen(for:)`).
@@ -63,15 +63,15 @@ Actors involved: `@MainActor` (`SessionState`, overlays) → `RecordingCoordinat
    - `let coordinator = RecordingCoordinator()` — **a fresh actor per recording**; install `setStreamErrorHandler` / `setDeviceLostHandler` closures that hop back with `Task { @MainActor in … }`.
    - `let metadataRecorder = CursorMetadataRecorder()`; `SoundEffect.startRecording.play()`.
    - `await coordinator.startRecording(target:fps:captureSystemAudio:microphoneDeviceId:cameraDeviceId:cameraResolution:existingWebcam:cursorMetadataRecorder:captureQuality:retinaCapture:hdrCapture:)`, pulling every option from `options` (`RecordingOptions`) and `ConfigService.shared.cameraMaximumResolution`, and passing `attachExistingWebcam()` (the already-running preview `WebcamCapture`, if the camera toggle is on).
-10. **`RecordingCoordinator.startRecording`** (`Reframed/Recording/RecordingCoordinator+Screen.swift:9`), in order:
+10. **`RecordingCoordinator.startRecording`** (`AppShow/Recording/RecordingCoordinator+Screen.swift:9`), in order:
     1. Webcam: reuse `existingWebcam` or `WebcamCapture().startAndVerify(deviceId:fps:maxWidth:maxHeight:)` (waits for first frame, 3 s timeout).
     2. Mic: `MicrophoneCapture().startAndVerify(deviceId:)` (5 s timeout). Any failure stops what was started and rethrows.
     3. `Permissions.fetchShareableContent()` → find `SCDisplay` with `displayID == target.displayID` (else `.displayNotFound`).
-    4. `displayScale` from `CGDisplayCopyDisplayMode(pixelWidth / width)`; `sourceRect = selection.screenCaptureKitRect` (**the Y-flip**: `localQuartzY = displayHeight − localAppKitY − h`, `Reframed/CaptureModes/Common/SelectionRect.swift:17`); `pixelW/H = round(sourceRect × scale) & ~1`, doubled if `retinaCapture`.
+    4. `displayScale` from `CGDisplayCopyDisplayMode(pixelWidth / width)`; `sourceRect = selection.screenCaptureKitRect` (**the Y-flip**: `localQuartzY = displayHeight − localAppKitY − h`, `AppShow/CaptureModes/Common/SelectionRect.swift:17`); `pixelW/H = round(sourceRect × scale) & ~1`, doubled if `retinaCapture`.
     5. `streamCount = 1 + [mic] + [systemAudio] + [webcam]` → **`SharedRecordingClock(streamCount:)`**.
     6. **`VideoTrackWriter(outputURL: FileManager.tempVideoURL(captureQuality:), width:height:fps:clock:captureQuality:isHDR:)`** — `AVAssetWriter` (`.mp4`, or `.mov` for ProRes) with `EncodingSettings.captureVideoSettings`; for HDR the input is created lazily with a `sourceFormatHint` on the first sample.
     7. `cursorMetadataRecorder.configure(captureOrigin: sckRect.origin, captureSize:, displayScale:, displayHeight: CGDisplayPixelsHigh)`.
-    8. **`ScreenCaptureSession(videoWriter:captureQuality:hdrCapture:)`** then `session.start(target:display:displayScale:fps:hideCursor: recorder != nil, retinaCapture:, excludedApps: [self app])` (`Reframed/Recording/ScreenCaptureSession.swift:29`): `SCContentFilter(display:excludingApplications:exceptingWindows:)`, `SCStreamConfiguration` with `sourceRect`, `width/height`, `minimumFrameInterval = 1/(fps×1.2)`, pixel format `420YpCbCr10BiPlanarFullRange` (or `32BGRA` for ProRes, `…VideoRange` + `hdrLocalDisplay` for HDR), `showsCursor = !hideCursor`, `queueDepth = 8`; `stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: videoWriter.queue)`; `try await stream.startCapture()`.
+    8. **`ScreenCaptureSession(videoWriter:captureQuality:hdrCapture:)`** then `session.start(target:display:displayScale:fps:hideCursor: recorder != nil, retinaCapture:, excludedApps: [self app])` (`AppShow/Recording/ScreenCaptureSession.swift:29`): `SCContentFilter(display:excludingApplications:exceptingWindows:)`, `SCStreamConfiguration` with `sourceRect`, `width/height`, `minimumFrameInterval = 1/(fps×1.2)`, pixel format `420YpCbCr10BiPlanarFullRange` (or `32BGRA` for ProRes, `…VideoRange` + `hdrLocalDisplay` for HDR), `showsCursor = !hideCursor`, `queueDepth = 8`; `stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: videoWriter.queue)`; `try await stream.startCapture()`.
     9. Webcam writer: `VideoTrackWriter(... isWebcam: true)`, `cam.attachWriter(camWriter)` (re-points the `AVCaptureVideoDataOutput` delegate queue to `camWriter.queue`), `cam.onDisconnected → handleDeviceLost("camera")`.
     10. Mic writer: `AudioTrackWriter(outputURL: tempAudioURL(label: "mic"), label:sampleRate:channelCount:clock:)`; `mic.attachWriter`.
     11. System audio: `AudioTrackWriter(label: "sysaudio", 48 kHz stereo)` + **`SystemAudioCapture(audioWriter:)`.`start(display:)`** (second `SCStream`, `capturesAudio = true`, `excludesCurrentProcessAudio = true`, 2×2 px video discarded).
@@ -150,7 +150,7 @@ sequenceDiagram
     participant SRC as capture sources
     participant W as track writers (own queues)
     participant R as CursorMetadataRecorder
-    participant P as ReframedProject
+    participant P as AppShowProject
     participant E as EditorWindow / EditorState (main)
     U->>S: stopRecording()
     S->>S: stop MouseClickMonitor, close preview, transition(.processing), cleanupCoordinators()
@@ -169,9 +169,9 @@ sequenceDiagram
     alt result == nil
         S->>S: transition(.idle), showToolbar()
     else
-        S->>P: ReframedProject.create(from: result, fps, captureMode, sourceName, in: projectSaveDirectory())
-        P->>P: mkdir <Prefix>-<ts>.frm ; moveItem × media ; write project.json ; cleanupTempDir()
-        P-->>S: ReframedProject
+        S->>P: AppShowProject.create(from: result, fps, captureMode, sourceName, in: projectSaveDirectory())
+        P->>P: mkdir <Prefix>-<ts>.appshow ; moveItem × media ; write project.json ; cleanupTempDir()
+        P-->>S: AppShowProject
         S->>E: openEditor(project:) → transition(.editing) → EditorWindow().show(project:)
         E->>E: EditorState(project:) ; NSWindow + NSHostingView(EditorView)
         E->>E: .task { await editorState.setup() } → players, default regions, cursor provider, history, startAutoSave()
@@ -187,15 +187,15 @@ sequenceDiagram
     3. Cursor: `offset = recorder.startHostTimeSeconds − clock.referenceTimeSeconds`; if |offset| > 1 ms `recorder.adjustTimestamps(by:)`; `recorder.writeToFile(at: /tmp/…/cursor-metadata-<uuid>.json)`.
     4. Null out all writers and the clock; `guard let videoFile` else return `nil`.
     5. Return **`RecordingResult(screenVideoURL:webcamVideoURL:systemAudioURL: sys ?? deviceAudio, microphoneAudioURL:cursorMetadataURL:screenSize:webcamSize:fps:captureQuality:isHDR:)`**.
-14. `SessionState.stopRecording` continues: `SoundEffect.stopRecording.play()`, release coordinator/target/device, `stopCameraPreview()`, then `saveDir = FileManager.default.projectSaveDirectory()` (`~/Reframed`, `@MainActor` because it reads `ConfigService`) and **`ReframedProject.create(from: result, fps:, captureMode:, sourceName:, in: saveDir)`** (`Reframed/Project/ReframedProject.swift:72`):
-    - `bundleName = "<Prefix>-<yyyy-MM-dd-HHmmss>.frm"` where `Prefix` is the sanitised source name or `Screen`/`Window`/`Area`/`Device`/`Recording`.
+14. `SessionState.stopRecording` continues: `SoundEffect.stopRecording.play()`, release coordinator/target/device, `stopCameraPreview()`, then `saveDir = FileManager.default.projectSaveDirectory()` (`~/AppShow`, `@MainActor` because it reads `ConfigService`) and **`AppShowProject.create(from: result, fps:, captureMode:, sourceName:, in: saveDir)`** (`AppShow/Project/AppShowProject.swift:72`):
+    - `bundleName = "<Prefix>-<yyyy-MM-dd-HHmmss>.appshow"` where `Prefix` is the sanitised source name or `Screen`/`Window`/`Area`/`Device`/`Recording`.
     - `createDirectory`, then **`FileManager.moveItem`** (not copy) for `screen.<mp4|mov>`, `webcam.mp4`, `system-audio.m4a`, `mic-audio.m4a`, `cursor-metadata.json`; `cleanupTempDir()`.
     - Build `ProjectMetadata(name:createdAt:fps:screenSize:webcamSize:hasSystemAudio:hasMicrophoneAudio:hasCursorMetadata:hasWebcam:captureMode:captureQuality:isHDR:)` with `editorState == nil`, encode ISO-8601/pretty/sorted → `project.json`.
-    - Return `ReframedProject(bundleURL:metadata:)`.
-    On failure the editor is still opened with the raw `RecordingResult` (`openEditor(project: nil, result:)`), i.e. files stay in `/tmp/Reframed`.
+    - Return `AppShowProject(bundleURL:metadata:)`.
+    On failure the editor is still opened with the raw `RecordingResult` (`openEditor(project: nil, result:)`), i.e. files stay in `/tmp/AppShow`.
 15. **`SessionState.openEditor(project:)`** (`SessionState+Project.swift:19`): `hideToolbar()`, `transition(to: .editing)`, `EditorWindow()` with `onSave`/`onCancel`/`onDelete`/`onExportingChanged` closures (all wrapped in `MainActor.assumeIsolated`), **`editor.show(project:)`**, append to `editorWindows`.
-16. **`EditorWindow.show(project:)`** (`Reframed/Editor/EditorWindow.swift:14`) → `EditorState(project:)` (reads any saved `editorState` from `project.json`; there is none for a fresh recording) → `showWindow(state:)`: `NSHostingView(rootView: EditorView(editorState:onDelete:))` in a 1400×900-minimum `NSWindow`, frame restored from `StateService.editorWindowFrame`; `setupKeyboardMonitor()`; `observeExporting(state:)`.
-17. `EditorView.body.task { await editorState.setup() }` (`Reframed/Editor/EditorView.swift:90`) → **`EditorState.setup()`** (`EditorState.swift:244`): `playerController.loadDuration()` + `computeDriftRatios()`; default one full-length `AudioRegionData` per audio track and one `VideoRegionData`; `CursorMetadataProvider.load(from: cursor-metadata.json)`; if no saved state and there is a webcam `setCameraCorner(.bottomRight)`; `history.pushSnapshot(createSnapshot())`; **`startAutoSave()`** → `observeChanges()`. The editor is now live; the first autosave (1 s later) writes `editorState` into `project.json` for the first time.
+16. **`EditorWindow.show(project:)`** (`AppShow/Editor/EditorWindow.swift:14`) → `EditorState(project:)` (reads any saved `editorState` from `project.json`; there is none for a fresh recording) → `showWindow(state:)`: `NSHostingView(rootView: EditorView(editorState:onDelete:))` in a 1400×900-minimum `NSWindow`, frame restored from `StateService.editorWindowFrame`; `setupKeyboardMonitor()`; `observeExporting(state:)`.
+17. `EditorView.body.task { await editorState.setup() }` (`AppShow/Editor/EditorView.swift:90`) → **`EditorState.setup()`** (`EditorState.swift:244`): `playerController.loadDuration()` + `computeDriftRatios()`; default one full-length `AudioRegionData` per audio track and one `VideoRegionData`; `CursorMetadataProvider.load(from: cursor-metadata.json)`; if no saved state and there is a webcam `setCameraCorner(.bottomRight)`; `history.pushSnapshot(createSnapshot())`; **`startAutoSave()`** → `observeChanges()`. The editor is now live; the first autosave (1 s later) writes `editorState` into `project.json` for the first time.
 
 ---
 
@@ -205,23 +205,23 @@ Everything here is `@MainActor`. The pattern is: a view writes a stored property
 
 ### B.1 Example: editing a zoom region on the timeline
 
-1. `TimelineView` (`Reframed/Editor/TimelineView.swift`) shows a `ZoomKeyframeEditor` (`Reframed/Editor/ZoomKeyframeEditor.swift`) when `editorState.zoomEnabled`. Regions are derived from keyframes with `groupZoomRegions(from:)` (4 keyframes = one `ZoomRegion`, `Reframed/Editor/ZoomRegion.swift`).
+1. `TimelineView` (`AppShow/Editor/TimelineView.swift`) shows a `ZoomKeyframeEditor` (`AppShow/Editor/ZoomKeyframeEditor.swift`) when `editorState.zoomEnabled`. Regions are derived from keyframes with `groupZoomRegions(from:)` (4 keyframes = one `ZoomRegion`, `AppShow/Editor/ZoomRegion.swift`).
 2. Dragging a region body/edge updates `@State dragOffset`/`dragType`; `effectiveTimes(for:)` (`ZoomKeyframeEditor+Logic.swift:4`) computes clamped preview times without touching `EditorState` (so the preview follows the drag without creating undo entries).
-3. On release, **`ZoomKeyframeEditor.commitDrag(for:)`** (`+Logic.swift:55`) rewrites the four `ZoomKeyframe`s and calls **`EditorState.updateZoomRegion(startIndex:count:newKeyframes:)`** (`Reframed/Editor/EditorState+Zoom.swift:93`), which does `kfs.replaceSubrange(...)` and **`zoomTimeline = ZoomTimeline(keyframes: kfs)`** — a *new instance*, because `ZoomTimeline` is an immutable-after-init class and `@Observable` only sees the property assignment.
+3. On release, **`ZoomKeyframeEditor.commitDrag(for:)`** (`+Logic.swift:55`) rewrites the four `ZoomKeyframe`s and calls **`EditorState.updateZoomRegion(startIndex:count:newKeyframes:)`** (`AppShow/Editor/EditorState+Zoom.swift:93`), which does `kfs.replaceSubrange(...)` and **`zoomTimeline = ZoomTimeline(keyframes: kfs)`** — a *new instance*, because `ZoomTimeline` is an immutable-after-init class and `@Observable` only sees the property assignment.
 4. **Observation fan-out** (synchronous, same run-loop turn):
-   - `EditorView+Preview.videoPreview` (`Reframed/Editor/EditorView+Preview.swift:5`) read `editorState.zoomTimeline` while building `VideoPreviewView(... zoomTimeline: editorState.zoomTimeline, currentTime: CMTimeGetSeconds(editorState.currentTime), zoomFollowCursor:, cursorMetadataProvider: editorState.activeCursorProvider, ...)` → SwiftUI re-evaluates the body and calls **`VideoPreviewView.updateNSView(_:context:)`** (`Reframed/Editor/VideoPreviewView.swift:106`).
-   - `updateNSView` runs, in order: `updateCameraVisibility`, `updateScreenVisibility`, `updateWebcamOutput`, `updateLayout`, **`updateZoom`**, `updateOverlays`, `updateClickSound` (`Reframed/Editor/VideoPreviewView+Update.swift`).
-   - **`updateZoom(_:)`** (`+Update.swift:318`): `zoomRect = zoomTimeline.zoomRect(at: currentTime)` (binary search + quintic ease, `Reframed/Editor/ZoomTimeline.swift:24`); if `zoomFollowCursor` and zoomed in, `ZoomTimeline.followCursor(rect, cursorPosition: provider.sample(at:))`; then **`VideoPreviewContainer.updateZoomRect(_:)`** (`Reframed/Editor/VideoPreviewContainer+Layout.swift`), which sets `currentZoomRect` and re-lays out `screenContainerLayer`/`screenPlayerLayer` (the zoom is a layer transform over the `AVPlayerLayer`, not a re-decode).
+   - `EditorView+Preview.videoPreview` (`AppShow/Editor/EditorView+Preview.swift:5`) read `editorState.zoomTimeline` while building `VideoPreviewView(... zoomTimeline: editorState.zoomTimeline, currentTime: CMTimeGetSeconds(editorState.currentTime), zoomFollowCursor:, cursorMetadataProvider: editorState.activeCursorProvider, ...)` → SwiftUI re-evaluates the body and calls **`VideoPreviewView.updateNSView(_:context:)`** (`AppShow/Editor/VideoPreviewView.swift:106`).
+   - `updateNSView` runs, in order: `updateCameraVisibility`, `updateScreenVisibility`, `updateWebcamOutput`, `updateLayout`, **`updateZoom`**, `updateOverlays`, `updateClickSound` (`AppShow/Editor/VideoPreviewView+Update.swift`).
+   - **`updateZoom(_:)`** (`+Update.swift:318`): `zoomRect = zoomTimeline.zoomRect(at: currentTime)` (binary search + quintic ease, `AppShow/Editor/ZoomTimeline.swift:24`); if `zoomFollowCursor` and zoomed in, `ZoomTimeline.followCursor(rect, cursorPosition: provider.sample(at:))`; then **`VideoPreviewContainer.updateZoomRect(_:)`** (`AppShow/Editor/VideoPreviewContainer+Layout.swift`), which sets `currentZoomRect` and re-lays out `screenContainerLayer`/`screenPlayerLayer` (the zoom is a layer transform over the `AVPlayerLayer`, not a re-decode).
    - `TimelineView+Overlays`/`ZoomKeyframeEditor+RegionView` re-render the region chip from the new `allKeyframes`.
-5. **Persistence fan-out** (asynchronous): `EditorState.observeChanges()` (`Reframed/Editor/EditorState+Persistence.swift:351`) listed `_ = self.zoomTimeline` in its `withObservationTracking` body, so its `onChange` fires → `Task { @MainActor in syncVideoRegionsToPlayer(); playerController.previewMode = isPreviewMode; scheduleSave(); if !isRestoringState { scheduleUndoSnapshot() }; observeChanges() }`.
+5. **Persistence fan-out** (asynchronous): `EditorState.observeChanges()` (`AppShow/Editor/EditorState+Persistence.swift:351`) listed `_ = self.zoomTimeline` in its `withObservationTracking` body, so its `onChange` fires → `Task { @MainActor in syncVideoRegionsToPlayer(); playerController.previewMode = isPreviewMode; scheduleSave(); if !isRestoringState { scheduleUndoSnapshot() }; observeChanges() }`.
    - `scheduleSave()` (`:8`): cancel the pending task, sleep 1 s, then `saveState()` → `project.saveEditorState(createSnapshot())` → rewrite `project.json`.
-   - `scheduleUndoSnapshot()` (`:338`): cancel pending, sleep 1.5 s, then `history.pushSnapshot(createSnapshot())` (`Reframed/Editor/History.swift:31`; truncates redo, caps at 50). Continuous dragging therefore produces one snapshot per pause of ≥ 1.5 s.
-6. **Playback keeps the preview in sync**: `SyncedPlayerController.setupTimeObserver()` (`Reframed/Editor/SyncedPlayerController.swift:173`) updates `currentTime` 60×/s on `.main` inside `MainActor.assumeIsolated`; `EditorState.currentTime` is a computed passthrough, so every view that reads it (the preview, ruler, playhead) re-evaluates and `updateNSView` re-runs `updateZoom`/`updateOverlays` with the new time. Cursor sway/bounce/blur are computed per tick from `CursorEffects` using the sample 1/60 s earlier.
+   - `scheduleUndoSnapshot()` (`:338`): cancel pending, sleep 1.5 s, then `history.pushSnapshot(createSnapshot())` (`AppShow/Editor/History.swift:31`; truncates redo, caps at 50). Continuous dragging therefore produces one snapshot per pause of ≥ 1.5 s.
+6. **Playback keeps the preview in sync**: `SyncedPlayerController.setupTimeObserver()` (`AppShow/Editor/SyncedPlayerController.swift:173`) updates `currentTime` 60×/s on `.main` inside `MainActor.assumeIsolated`; `EditorState.currentTime` is a computed passthrough, so every view that reads it (the preview, ruler, playhead) re-evaluates and `updateNSView` re-runs `updateZoom`/`updateOverlays` with the new time. Cursor sway/bounce/blur are computed per tick from `CursorEffects` using the sample 1/60 s earlier.
 
 ### B.2 Example: changing the background
 
-- **Solid colour / gradient.** `PropertiesPanel+Background.swift` renders `SwatchButton`s that set `PropertiesPanel`'s `@State selectedColorId` / `selectedGradientId`; the panel's `onChange` handlers write **`editorState.backgroundStyle = .solidColor(CodableColor)`** or **`.gradient(id)`** (`BackgroundStyle`, `Reframed/Compositor/BackgroundStyle.swift`).
-- **Image.** `ImageDropSection.onDrop` → **`EditorState.setBackgroundImage(from:)`** (`Reframed/Editor/EditorState+Background.swift:5`): deletes any `background-image.*` in the bundle, `copyItem` to `<bundle>/background-image.<ext>`, `backgroundImage = NSImage(contentsOf:)`, `backgroundStyle = .image(filename)`. (The image therefore travels with the `.frm`, and `restoreFromSnapshot` reloads it by filename.)
+- **Solid colour / gradient.** `PropertiesPanel+Background.swift` renders `SwatchButton`s that set `PropertiesPanel`'s `@State selectedColorId` / `selectedGradientId`; the panel's `onChange` handlers write **`editorState.backgroundStyle = .solidColor(CodableColor)`** or **`.gradient(id)`** (`BackgroundStyle`, `AppShow/Compositor/BackgroundStyle.swift`).
+- **Image.** `ImageDropSection.onDrop` → **`EditorState.setBackgroundImage(from:)`** (`AppShow/Editor/EditorState+Background.swift:5`): deletes any `background-image.*` in the bundle, `copyItem` to `<bundle>/background-image.<ext>`, `backgroundImage = NSImage(contentsOf:)`, `backgroundStyle = .image(filename)`. (The image therefore travels with the `.appshow` bundle, and `restoreFromSnapshot` reloads it by filename.)
 - **Preview.** `EditorView+Preview.videoPreview` recomputes `hasEffects` (any non-`.none` background, non-original aspect, padding, corner radius, or shadow) and `canvasAspect = editorState.canvasSize(for: screenSize)`; if `hasEffects` it draws `backgroundView` (a SwiftUI `LinearGradient`/`Color`/`Image`) *behind* the `VideoPreviewView` and switches the `.aspectRatio` modifier to the canvas ratio. The AppKit container only receives `padding`/`videoCornerRadius`/`videoShadow` through `updateLayout` → `updateCameraLayout(...)`; the background itself is pure SwiftUI in the editor and pure CoreGraphics (`FrameRenderer+Background`) at export — two implementations of the same visual, which is a classic source of preview/export mismatch and a good target for a golden-image test.
 - Persistence and undo proceed exactly as in B.1 step 5 (`backgroundStyle` and `backgroundImageFillMode` are in the observed list; `History+ChangeRules.swift` turns the diff into a label such as "Background changed").
 
@@ -235,10 +235,10 @@ Everything here is `@MainActor`. The pattern is: a view writes a stored property
 
 ### C.1 UI → EditorState
 
-1. `EditorTopBar` sets `editorState.showExportSheet = true`; `EditorView` presents **`ExportSheet(editorState:isPresented:)`** as a `.sheet` (`Reframed/Editor/EditorView.swift:112`).
-2. `ExportSheet` (`Reframed/Compositor/ExportSheet.swift`) edits a local `@State settings = ExportSettings()`; choosing an `ExportPreset` replaces it wholesale; manual edits go through `manualBinding(_:)` which resets the preset to `.custom`. Format/codec coherence rules (`GIF ⇒ fps ≤ 30`, `MP4 ⇒ no ProRes`, `ProRes ⇒ MOV`) are `onChange` handlers.
+1. `EditorTopBar` sets `editorState.showExportSheet = true`; `EditorView` presents **`ExportSheet(editorState:isPresented:)`** as a `.sheet` (`AppShow/Editor/EditorView.swift:112`).
+2. `ExportSheet` (`AppShow/Compositor/ExportSheet.swift`) edits a local `@State settings = ExportSettings()`; choosing an `ExportPreset` replaces it wholesale; manual edits go through `manualBinding(_:)` which resets the preset to `.custom`. Format/codec coherence rules (`GIF ⇒ fps ≤ 30`, `MP4 ⇒ no ProRes`, `ProRes ⇒ MOV`) are `onChange` handlers.
 3. **`ExportSheet.startExport()`** (`ExportSheet+Phases.swift:129`): `phase = .exporting`; `exportTask = Task { let url = try await editorState.export(settings: settings); … phase = .completed }`; stores the task in `editorState.exportTask` so `cancelExport()` can cancel it. `interactiveDismissDisabled` while exporting; `onDisappear` cancels.
-4. **`EditorState.export(settings:)`** (`Reframed/Editor/EditorState+Export.swift:5`):
+4. **`EditorState.export(settings:)`** (`AppShow/Editor/EditorState+Export.swift:5`):
    - `isExporting = true` (observed by `EditorWindow.observeExporting` → `SessionState.updateStatusIcon()` → pulsing menu-bar icon).
    - Waits (100 ms polling) if `isMicProcessing` (a noise-reduction pass is still running from a slider change).
    - `cursorSnapshot = showCursor ? activeCursorProvider?.makeSnapshot() : nil` — `activeCursorProvider` is the spring-smoothed provider when `cursorMovementEnabled` (`EditorState+Cursor.swift`); for GIF the samples are made loopable by `CursorLoopTelemetry.makeLoopable`.
@@ -247,7 +247,7 @@ Everything here is `@MainActor`. The pattern is: a view writes a stored property
    - `let url = try await VideoCompositor.export(result: exportResult, config: exportConfig, progressHandler: { progress, eta in state.exportProgress = progress; state.exportETA = eta })`.
    - Afterwards writes `.srt`/`.vtt` next to the output via `SubtitleExporter` if requested; `lastExportedURL = url`; `defer` resets `isExporting`.
 
-### C.2 `VideoCompositor.export` (`Reframed/Compositor/VideoCompositor.swift:16`) — runs off-main
+### C.2 `VideoCompositor.export` (`AppShow/Compositor/VideoCompositor.swift:16`) — runs off-main
 
 5. `AVMutableComposition`; load the screen track, `naturalSize`, `timeRange`; `effectiveTrim = config.trimRange` if valid else the whole track.
 6. **Timeline compression.** If `config.videoRegions` is non-empty, insert each region's overlap with the trim into the composition track back-to-back, recording `VideoSegment(sourceRange:compositionStart:)`; `compositionDuration = Σ`. Otherwise insert the trim at `.zero`.
@@ -264,7 +264,7 @@ Everything here is `@MainActor`. The pattern is: a view writes a stored property
 12. `format.isGIF` → **`gifExport(...)`** (`+GIFExport.swift`): `gifski_new(&settings)` (quality from `GIFQuality`), `gifski_set_file_output`, then an `AVAssetReader` loop on a global queue calling `FrameRenderer.renderFrame(...)` per frame and `gifski_add_frame_rgba`, `gifski_finish`. Output moved to `defaultSaveURL(for:extension: "gif")`. Return.
 13. Otherwise `addAudioTracks(to:sources:videoTrimRange:videoSegments:)` + `buildAudioMix(for:sources:)` (`+Audio.swift`: one composition audio track per source, `AVMutableAudioMixInputParameters` volume), then:
     - `settings.mode == .parallel` → **`parallelRenderExport(...)`** (C.3), else **`runManualExport(...)`** (C.4). Both receive `composition, instruction, renderSize, fps, trimDuration = compositionDuration, outputURL = tempRecordingURL(), fileType, codec, audioMix, audioBitrate, isHDR, progressHandler`.
-14. `destination = await MainActor.run { FileManager.default.defaultSaveURL(for: outputURL, extension: format.fileExtension) }` (`~/Movies/Reframed/reframed-<ts>.<ext>`), `moveToFinal(from:to:)` (replaces an existing file), return `destination`.
+14. `destination = await MainActor.run { FileManager.default.defaultSaveURL(for: outputURL, extension: format.fileExtension) }` (`~/Movies/AppShow/reframed-<ts>.<ext>`), `moveToFinal(from:to:)` (replaces an existing file), return `destination`.
 
 ### C.3 Parallel export internals (`VideoCompositor+ParallelExport.swift:404-852`)
 
@@ -294,7 +294,7 @@ Key numbers: `maxInFlight = min(max(workers×2, 8), 20)`; pool minimum `maxInFli
 
 Same reader/writer/pool setup, but a single loop on the global queue: match samples → `CVPixelBufferPoolCreatePixelBuffer` → `autoreleasepool { segmentation; FrameRenderer.renderFrame }` → spin-wait (`Thread.sleep(0.001)`) until `videoInput.isReadyForMoreMediaData` → `adaptor.append` → progress every 10 frames. Cancellation is a `nonisolated(unsafe)` `UnsafeMutablePointer<Bool>` flipped by `onCancel`. Despite the docs, this path does **not** use `AVAssetExportSession` or `AVVideoComposition`.
 
-### C.5 Per-frame rendering (`FrameRenderer.renderFrame`, `Reframed/Compositor/FrameRenderer.swift`)
+### C.5 Per-frame rendering (`FrameRenderer.renderFrame`, `AppShow/Compositor/FrameRenderer.swift`)
 
 `computeFrameState(...)` derives, for `compositionTime`: the padded video rect (`AVMakeRect(aspectRatio:insideRect:)`), whether the camera is fullscreen/hidden/custom and its transition progress (`resolveActiveTransitionType`), screen transition state from `videoRegions`, the zoom rect (`instruction.zoomTimeline?.zoomRect(at:)` + `followCursor`), and cursor/spotlight/caption visibility. The extensions then draw in order into a `CGContext` over the output `CVPixelBuffer`: `+Background` → `+Screen` (zoom crop, corner radius, shadow) → `+Webcam` (PiP or fullscreen, border, mirror, segmentation image) → `+Cursor` (`CursorRenderer`/`SystemCursorRenderer`, click rings) → `+Spotlight` → `+Captions` (`CaptionLayout`). `+HDR` handles the P3/HLG paths when `isHDR`.
 
@@ -362,7 +362,7 @@ sequenceDiagram
 | `FrameRenderer.renderFrame` | `CVPixelBuffer` in/out + `CompositionInstruction` | Golden-image tests per feature (background, zoom, cursor). |
 | `ZoomTimeline`, `ZoomDetector`, `CursorSmoothing`, `CursorMetadataProvider`, `VideoCompositor+RegionRemapping` | pure logic | Unit tests. |
 | `SharedRecordingClock`, `VideoTrackWriter`/`AudioTrackWriter` with synthetic `CMSampleBuffer`s | queue-confined classes | Deterministic when driven synchronously on their queue. |
-| `ReframedProject.create/open/saveEditorState`, `EditorStateData` lenient decoding | file system in a temp dir | Round-trip and backward-compatibility tests against checked-in `project.json` fixtures. |
+| `AppShowProject.create/open/saveEditorState`, `EditorStateData` lenient decoding | file system in a temp dir | Round-trip and backward-compatibility tests against checked-in `project.json` fixtures. |
 
 ## Flow D — Project conversation to live editor mutation
 

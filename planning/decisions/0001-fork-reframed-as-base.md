@@ -9,7 +9,7 @@ We want a macOS screen recorder with an editor and export pipeline. `jkuri/Refra
 
 ## Decision
 
-Fork the repository to `mattwebhub/Reframed`, keep `upstream` as a remote, and build our product on top of it rather than starting from scratch. We keep the MIT license and attribution.
+Fork the repository, keep `upstream` as a remote, and build our product on top of it rather than starting from scratch. The fork began as `mattwebhub/Reframed` and became `mattwebhub/AppShow` in the identity migration (ADR 0005). We keep the MIT license and attribution.
 
 ## Consequences
 

@@ -24,9 +24,15 @@ jobs:
       - name: Cache SPM checkouts
         uses: actions/cache@v4
         with:
-          path: .build/SourcePackages
-          key: spm-${{ runner.os }}-${{ hashFiles('Reframed.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-          restore-keys: spm-${{ runner.os }}-
+          path: |
+            .build/SourcePackages/artifacts
+            .build/SourcePackages/checkouts
+            .build/SourcePackages/repositories
+          key: xcode-spm-v2-${{ runner.os }}-${{ hashFiles('AppShow.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: xcode-spm-v2-${{ runner.os }}-
+
+      - name: Resolve package dependencies
+        run: xcodebuild -resolvePackageDependencies -project AppShow.xcodeproj -scheme AppShow -derivedDataPath .build
 
       - name: Lint
         run: make lint
