@@ -1,98 +1,100 @@
 <p align="center">
-  <img width="64" alt="Reframed AppIcon" src="https://github.com/user-attachments/assets/ab90875f-4092-4ca9-b475-9a60b9c6445a" />
+  <img src="docs/assets/banner.svg" width="100%" alt="AppShow — Screen recordings. Worth watching. An open-source screen recorder and presentation editor for Mac." />
 </p>
-
-# <p align="center">Reframed</p>
-
-> Open-source macOS screen recorder and capture editor. A free alternative to Screen Studio - capture your screen, windows, or iOS devices with a webcam overlay, then edit on a timeline with auto-captions and smooth cursor zooms.
 
 <p align="center">
-  <img width="100%" alt="Reframed Editor" src="https://github.com/user-attachments/assets/ea3d9554-8695-4d98-846f-90c422b25550" />
+  <strong>Capture a thought. Shape the story. Share something beautiful.</strong><br />
+  Screen recording, thoughtful editing, and an optional AI assistant in one native Mac app.
 </p>
 
-## The idea
+<p align="center">
+  <a href="#get-started">Get started</a> &nbsp; · &nbsp;
+  <a href="#made-for-the-details">Features</a> &nbsp; · &nbsp;
+  <a href="docs/README.md">Documentation</a> &nbsp; · &nbsp;
+  <a href="CONTRIBUTING.md">Contribute</a>
+</p>
 
-Screen recorders give you a raw .mp4. Getting cursor-tracking zoom effects, auto-captions, or webcam overlays on top of that usually means paying for a proprietary app. Reframed is the open-source alternative - record, edit and export in one app.
+<p align="center"><sub>macOS 15+ &nbsp; / &nbsp; Swift 6 &nbsp; / &nbsp; Open source</sub></p>
 
-### Core features
+---
 
-- **Capture and edit in one place.** Record your screen, window, or region, then go straight into the built-in editor. No round-tripping through other tools.
-- **Zoom and pan that follow your cursor.** Auto-zoom detects where you click and generates keyframes. You can also place them manually or lock the viewport to your cursor.
-- **Noise reduction built in.** Microphone audio runs through RNNoise, so you don't need a separate audio chain to clean up background noise.
-- **Webcam overlay and fullscreen sections.** Drop your camera feed in as a PiP or switch to fullscreen webcam for specific segments on the timeline.
-- **Export exactly what you need.** Pick your codec, resolution, and FPS. Platform presets handle the rest for YouTube, Twitter/X, TikTok, and others.
+## From screen to story
 
-## Install
+AppShow turns screen recordings into product demos, walkthroughs, and tutorials. Record your display, a window, a selected area, or a connected iPhone or iPad. Then bring the important moments forward with smooth zooms, a carefully placed camera, and captions that feel like part of the composition.
 
-Via `homebrew` (recommended):
+Your recording opens directly in the editor. Every project keeps its original media and editable settings together, so you can come back and make the next version.
 
-```bash
-brew install --cask jkuri/reframed/reframed
+| Capture | Compose | Share |
+| --- | --- | --- |
+| Screen, window, region, or iOS device. Add your camera, microphone, and system audio. | Cut pauses. Follow the cursor. Frame your camera. Add captions, music, and overlays. | Export MP4, MOV, or GIF, with canvas sizes and presets for your next destination. |
+
+## Made for the details
+
+### Motion with intention
+
+Use cursor-follow zooms, automatic zoom detection, or your own keyframes to guide attention. Adjust cursor smoothing, click highlights, and transitions. Trim a recording into editable keep-slices, remove silence, and speed up selected sections from 1.5× to 32× without rewriting the original footage.
+
+### A place for your voice
+
+Start with a circular webcam overlay, expand into a focus moment, or use half- and third-width camera layouts. Clean up microphone noise and generate captions with on-device transcription. Choose an installed font, tune the colors, and keep the result editable.
+
+### Your presentation, your composition
+
+Set the canvas, background, padding, and corners. Layer text, images, spotlight and blur regions over the recording. Bring in music with independent volume, fades, and timing. Undo and redo as you explore.
+
+### An assistant at the editing desk
+
+Connect your locally installed Codex or Claude Code. Ask about the project or enable editing tools for cuts, captions, camera regions, and presentation settings. Conversations travel with the project; editing tools support labeled undo steps, with in-app confirmation for sensitive actions.
+
+The assistant is optional and uses the selected provider's service and account. On-device transcription uses WhisperKit models downloaded separately.
+
+<details>
+  <summary><strong>A look at the editing workspace</strong></summary>
+  <br />
+  <img src="docs/assets/editor-preview.jpg" width="100%" alt="The inherited editor workspace, showing a recording preview, properties panel, and screen and zoom timelines." />
+  <p><sub>Interface reference from Reframed, the project AppShow builds on. AppShow adds editable cuts, an assistant panel, expanded webcam layouts, and caption styling.</sub></p>
+</details>
+
+## Get started
+
+AppShow is in active development. Build from source today; packaged builds will appear on the [releases page](https://github.com/mattwebhub/AppShow/releases).
+
+You need **macOS 15 or later** and **Xcode with Swift 6**. On-device transcription requires Apple silicon.
+
+```sh
+git clone https://github.com/mattwebhub/AppShow.git
+cd AppShow
+make dev
 ```
 
-Or grab the `.dmg` from [Releases](https://github.com/jkuri/reframed/releases).
+Xcode resolves the Swift packages during the build. The default configuration uses ad-hoc signing; an Apple Developer account is not required to build locally. For personal signing settings, copy `Local.xcconfig.example` to `Local.xcconfig` and follow its instructions.
 
-## Features
+Grant Screen Recording access when you want to capture. Accessibility enables global shortcuts and capture-related interactions; microphone and camera access are optional. You can open and edit projects without capture permissions.
 
-### Recording
+## Built to keep working
 
-- **Four capture modes:** entire screen, single window, custom region, or iOS device via USB. Multi-display support included.
-- **System audio and microphone** capture with real-time level indicators
-- **Webcam overlay** (Picture-in-Picture) that can be hidden while recording
-- **120 Hz cursor tracking** records position and click data independently from video frame rate
-- **`.frm` project bundles** preserve all source recordings and editor state for re-editing
+Recordings are saved as portable `.appshow` project bundles with their source media, editing settings, and assistant conversation. Legacy `.frm` projects remain supported.
 
-### Video editor
+Export H.264, H.265, ProRes, or GIF. Burn captions into the video or export SRT/VTT sidecars. Set the frame rate, resolution, and aspect ratio for the place your story is going.
 
-- **Timeline trimming** with independent trim ranges for video, system audio, and microphone
-- **Audio region editing** with per-track volume and mute controls
-- **Noise reduction** powered by [RNNoise](https://github.com/xiph/rnnoise) at adjustable intensity
-- **Background styles:** solid color, gradient presets, or custom image (multiple fill modes)
-- **Canvas aspect ratios** (original, 16:9, 1:1, 4:3, 9:16) plus adjustable padding and corner radius
-- **Webcam PiP** with draggable positioning, corner presets, size/radius/border/shadow/mirror
-- **Webcam background replacement** via person segmentation (blur, solid color, gradient, or custom image)
-- **Camera regions** set webcam visibility per-segment on the timeline (fullscreen, hidden, or custom position) with entry/exit transitions
-- **Video regions** for cutting segments from the timeline
-- **Undo/redo history** and fullscreen preview with scrub
+| Explore | |
+| --- | --- |
+| [Recording](docs/recording.md) | Capture modes, devices, audio, and permissions |
+| [Editing](docs/editor.md) | Timelines, camera layouts, captions, and presentation |
+| [Export](docs/export.md) | Formats, quality, audio, and output settings |
+| [Project format](docs/project-format.md) | What travels inside a project bundle |
+| [Architecture](docs/architecture/00-overview.md) | How the native app is put together |
 
-### Cursor
+## Build with us
 
-- **Custom cursor styles** with SVG-based designs, adjustable primary and outline colors
-- **Click highlights** and **click sounds** (30 built-in samples across five categories)
-- **Cursor effects:** click bounce, directional sway, and motion blur with adjustable intensity
-- **Movement smoothing** using spring physics-based interpolation and speed presets
-- **Spotlight effect** dims everything outside a radius around the cursor. Timeline regions control when it's active.
+Good design needs careful engineering and real feedback. Bug reports, small fixes, documentation improvements, and focused design proposals are welcome.
 
-### Zoom & pan
+Read the [contribution guide](CONTRIBUTING.md), [report a bug](https://github.com/mattwebhub/AppShow/issues/new?template=bug_report.yml), or [suggest an improvement](https://github.com/mattwebhub/AppShow/issues/new?template=feature_request.yml). The [project plan](planning/STATE.md) records completed work and the manual checks still ahead.
 
-- **Manual keyframes** on the timeline to set zoom level and center point, eased with Hermite interpolation
-- **Auto-zoom** detects cursor click clusters and generates keyframes from dwell time
-- **Cursor-follow mode** keeps the viewport locked to cursor position in real time
+## Credits & license
 
-### Captions
+AppShow builds on [Reframed](https://github.com/jkuri/Reframed) by Jan Kuri and its contributors. Its capture and editing foundation made this project possible.
 
-- **On-device speech-to-text** using [WhisperKit](https://github.com/argmaxinc/WhisperKit) (Apple Silicon) with four model sizes downloaded on first use
-- **Word-level timestamps** with automatic short-segment merging from microphone or system audio
-- **Language selection** with auto-detect option
-- **Caption styling:** font size, weight, position, text/background colors, opacity, words per line
-- **Export as burned-in captions** or SRT/VTT sidecar files
+The repository retains the [MIT license](LICENSE). GIF export links [gifski](https://gif.ski), which is licensed AGPL-3.0-or-later; its [license text](AppShow/Libraries/gifski/LICENSE) is included. Distributed builds are offered with full source under AGPL-compatible terms. See the [dependency inventory](docs/architecture/04-dependencies.md) for component-level details.
 
-### Export
-
-- **MP4, MOV, or GIF** with H.264, H.265, ProRes 422, and ProRes 4444 codecs
-- **Platform presets** for YouTube, Twitter/X, TikTok, Instagram, Discord, ProRes, and GIF
-- **GIF export** powered by [gifski](https://gif.ski) with quality presets
-- **Configurable FPS and resolution** (Original, 4K, 1080p, 720p)
-- **Parallel multi-core rendering** for faster exports with progress bar and ETA
-
-## Requirements
-
-- macOS 15.0 or later
-- Screen Recording permission
-- Accessibility permission (for cursor and keystroke capture)
-- Microphone permission (optional, for mic capture)
-- Camera permission (optional, for webcam overlay)
-
-## License
-
-MIT. GIF export links [gifski](https://gif.ski), which is licensed AGPL-3.0-or-later (text in `Reframed/Libraries/gifski/LICENSE`); distributed builds of this app are therefore offered with full source under AGPL-compatible terms.
+<p align="center"><sub>AppShow · Made for the moments worth showing.</sub></p>

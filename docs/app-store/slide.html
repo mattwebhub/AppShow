@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AppShow submission image</title>
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 2880px; height: 1800px; overflow: hidden; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; color: #f5f8fc; background: #07111e; }
+.canvas { width: 2880px; height: 1800px; position: relative; isolation: isolate; }
+.art { position: absolute; z-index: -2; width: 1320px; height: 1320px; top: -650px; right: -130px; opacity: .34; }
+.shade { position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, #07111e 38%, #07111e99 73%, #07111e44); }
+.brand { position: absolute; left: 132px; top: 60px; display: flex; gap: 19px; align-items: center; font-size: 35px; font-weight: 550; letter-spacing: -1px; }
+.brand img { width: 76px; height: 76px; }
+.eyebrow { position: absolute; left: 148px; top: 186px; font-size: 23px; font-weight: 600; letter-spacing: 4.5px; color: var(--accent); }
+h1 { position: absolute; top: 230px; left: 141px; margin: 0; font-size: 111px; line-height: 1.035; letter-spacing: -5.5px; font-weight: 580; white-space: pre-line; }
+.description { position: absolute; left: 1490px; top: 359px; width: 1170px; margin: 0; color: #b8c6d8; font-size: 37px; line-height: 1.4; font-weight: 400; }
+.rule { position: absolute; left: 148px; right: 148px; top: 505px; height: 1px; background: #b8c6d82c; }
+.capture { position: absolute; left: 148px; right: 148px; top: 552px; bottom: 105px; display: flex; align-items: center; justify-content: center; }
+.capture img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 24px 38px #0009); }
+.empty { height: 100%; width: 100%; border: 1px solid #b8c6d836; border-radius: 26px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px; background: #0d1927; }
+.empty strong { font-size: 44px; font-weight: 500; }
+.empty span { max-width: 1570px; text-align: center; color: #b8c6d8; font-size: 30px; line-height: 1.5; }
+.footer { position: absolute; left: 148px; right: 148px; bottom: 40px; display: flex; justify-content: space-between; font-size: 20px; letter-spacing: 3px; color: #b8c6d8; }
+.draft { position: absolute; right: 148px; top: 81px; color: #efafa1; border: 1px solid #efafa155; padding: 14px 20px; font-size: 20px; letter-spacing: 2px; border-radius: 8px; }
+</style>
+<main class="canvas" style="--accent: @@ACCENT@@">
+  <img class="art" src="@@ART@@" alt="">
+  <div class="shade"></div>
+  <div class="brand"><img src="@@ICON@@" alt="">AppShow</div>
+  <div class="eyebrow">@@EYEBROW@@</div>
+  <h1>@@HEADLINE@@</h1>
+  <p class="description">@@DESCRIPTION@@</p>
+  <div class="rule"></div>
+  <div class="capture">@@CAPTURE@@</div>
+  <div class="footer"><span>MADE FOR MAC</span><span>@@NUMBER@@ / 05</span></div>
+  @@DRAFT@@
+</main>
+</html>

@@ -4,7 +4,7 @@ Written before any production code. Layer names come from `planning/tdd-strategy
 
 | Spec # | Test name | Layer | File | Fixture | Status |
 |--------|-----------|-------|------|---------|--------|
-| 1 | `zoomKeyframes_interpolateHermite_betweenTwoPoints` | unit | `ReframedTests/Editor/ZoomTests.swift` | none | red |
+| 1 | `zoomKeyframes_interpolateHermite_betweenTwoPoints` | unit | `AppShowTests/Editor/ZoomTests.swift` | none | red |
 
 ## Manual checks
 

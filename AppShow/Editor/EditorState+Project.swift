@@ -1,0 +1,75 @@
+import AppKit
+import Foundation
+
+extension EditorState {
+  func deleteRecording() {
+    pendingSaveTask?.cancel()
+    pendingSaveTask = nil
+    micProcessingTask?.cancel()
+    micProcessingTask = nil
+    cancelTranscription()
+    if let project {
+      self.project = nil
+      try? project.delete()
+    } else {
+      let fm = FileManager.default
+      try? fm.removeItem(at: result.screenVideoURL)
+      if let webcamURL = result.webcamVideoURL {
+        try? fm.removeItem(at: webcamURL)
+      }
+      if let sysURL = result.systemAudioURL {
+        try? fm.removeItem(at: sysURL)
+      }
+      if let micURL = result.microphoneAudioURL {
+        try? fm.removeItem(at: micURL)
+      }
+    }
+  }
+
+  func openProjectFolder() {
+    if let bundleURL = project?.bundleURL {
+      NSWorkspace.shared.activateFileViewerSelecting([bundleURL])
+    } else {
+      guard let dir = try? FileManager.default.projectSaveDirectory() else { return }
+      NSWorkspace.shared.open(dir)
+    }
+  }
+
+  func openExportedFile() {
+    if let lastExportedURL {
+      NSWorkspace.shared.activateFileViewerSelecting([lastExportedURL])
+    } else {
+      guard let dir = try? FileManager.default.defaultSaveDirectory() else { return }
+      NSWorkspace.shared.open(dir)
+    }
+  }
+
+  func renameProject(_ newName: String) {
+    guard var proj = project else { return }
+    let previousBundle = proj.bundleURL
+    do {
+      try proj.rename(to: newName)
+    } catch {
+      logger.error("Failed to rename project: \(error)")
+      return
+    }
+    project = proj
+    result = proj.recordingResult
+    projectName = proj.name
+    agentTranscript.relocate(to: AgentConversationStore(project: proj))
+    if let processedMicAudioURL, processedMicAudioURL.deletingLastPathComponent() == previousBundle {
+      self.processedMicAudioURL = proj.bundleURL.appendingPathComponent(processedMicAudioURL.lastPathComponent)
+    }
+    syncExternalAudioToPlayer()
+    agentBridgeController.relocate(editorState: self)
+  }
+
+  func saveState() {
+    guard let project else { return }
+    do {
+      try project.saveEditorState(createSnapshot())
+    } catch {
+      logger.error("Failed to save editor state: \(error)")
+    }
+  }
+}

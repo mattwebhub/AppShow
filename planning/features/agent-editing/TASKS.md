@@ -1,0 +1,16 @@
+# Tasks: Agent editing tools
+
+- [x] P0. Integrate the green chat and read-only tool branches; resolve the fixture-resource collision; run the combined suite.
+- [x] P1. Add labeled, deduplicated history and transactional `set_trim`, `add_zoom`, `add_spotlight` handlers behind explicit mutation opt-in.
+- [x] P2. Add unambiguous keep-slice/cut operations and tests.
+- [x] P3. Add begin/end batch with one undo entry, timeout, and user-undo cancellation.
+- [x] P4. Add single-use confirmations for external files and export.
+- [x] P5. Build and sign the stdio shim; wire the bridge lifecycle and live activity UI into the single project conversation.
+- [x] P6. Add captions, background/canvas/cursor/camera/audio and confirmed export tools.
+- [x] P7. Merge primitive-backed silence/text/image/blur tools after the Xcode object-id ranges are reconciled.
+- [x] P8. Verify Claude Code and Codex end to end, update architecture and upstream-sync documentation, and open the milestone PR.
+- [x] P9. Add `set_transition` for text overlays, image overlays, and kept slices with remapping and midpoint-render proofs.
+- [x] P10. Add confirmed external-music import plus update/remove tools over the milestone 03 model.
+- [x] P11. Materialize the five initial skills for both providers and prove every referenced tool exists.
+- [x] P12. Exercise skill discovery and an exact title mutation through each installed provider.
+- [x] P13. Replay the deterministic presentation scenario and add workspace-only draft export.

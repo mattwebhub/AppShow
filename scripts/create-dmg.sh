@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-APP_NAME="Reframed"
+APP_NAME="AppShow"
 BUILD_DIR=".build/Build/Products/Release"
 VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "${BUILD_DIR}/${APP_NAME}.app/Contents/Info.plist" 2>/dev/null || echo "0.0.0")
 DMG_NAME="${APP_NAME}-${VERSION}.dmg"
@@ -9,7 +9,7 @@ APP_BUNDLE="${BUILD_DIR}/${APP_NAME}.app"
 DMG_TEMP="/tmp/${APP_NAME}_dmg_temp"
 DMG_TEMP_IMG="/tmp/temp_${DMG_NAME}"
 DMG_FINAL="dist/${DMG_NAME}"
-ENTITLEMENTS="Reframed/Reframed.entitlements"
+ENTITLEMENTS="AppShow/AppShow.entitlements"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -80,16 +80,16 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ -z "${SIGNING_IDENTITY}" ]; then
-    : "${SIGNING_IDENTITY:=${REFRAMED_SIGNING_IDENTITY:-}}"
+    : "${SIGNING_IDENTITY:=${APPSHOW_SIGNING_IDENTITY:-}}"
 fi
 if [ -z "${APPLE_ID}" ]; then
-    : "${APPLE_ID:=${REFRAMED_APPLE_ID:-}}"
+    : "${APPLE_ID:=${APPSHOW_APPLE_ID:-}}"
 fi
 if [ -z "${TEAM_ID}" ]; then
-    : "${TEAM_ID:=${REFRAMED_TEAM_ID:-}}"
+    : "${TEAM_ID:=${APPSHOW_TEAM_ID:-}}"
 fi
 if [ -z "${APP_PASSWORD}" ]; then
-    : "${APP_PASSWORD:=${REFRAMED_APP_PASSWORD:-}}"
+    : "${APP_PASSWORD:=${APPSHOW_APP_PASSWORD:-}}"
 fi
 
 if [ -n "${SIGNING_IDENTITY}" ]; then
@@ -109,7 +109,7 @@ if [ -n "${SIGNING_IDENTITY}" ]; then
     info "Code signature verified"
 else
     warn "No signing identity provided. DMG will not pass Gatekeeper."
-    warn "Use --sign 'Developer ID Application: ...' or set REFRAMED_SIGNING_IDENTITY"
+    warn "Use --sign 'Developer ID Application: ...' or set APPSHOW_SIGNING_IDENTITY"
 fi
 
 info "Creating DMG for ${APP_NAME} v${VERSION}..."
@@ -197,7 +197,7 @@ fi
 
 if [ "${NOTARIZE}" = true ]; then
     if [ -z "${APPLE_ID}" ] || [ -z "${TEAM_ID}" ] || [ -z "${APP_PASSWORD}" ]; then
-        error "Notarization requires --apple-id, --team-id, and --password (or REFRAMED_APPLE_ID, REFRAMED_TEAM_ID, REFRAMED_APP_PASSWORD env vars)"
+        error "Notarization requires --apple-id, --team-id, and --password (or APPSHOW_APPLE_ID, APPSHOW_TEAM_ID, APPSHOW_APP_PASSWORD env vars)"
     fi
 
     info "Submitting DMG for notarization..."

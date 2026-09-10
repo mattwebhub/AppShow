@@ -1,12 +1,12 @@
 # Video editor
 
-After recording, Reframed opens a built-in editor. Everything lives in `EditorState` (`@MainActor`, `@Observable`), which owns the player, all editing parameters, and the undo history.
+After recording, AppShow opens a built-in editor. Everything lives in `EditorState` (`@MainActor`, `@Observable`), which owns the player, all editing parameters, and the undo history.
 
 ## Timeline trimming
 
 The video has a single trim range (`trimStart`, `trimEnd`) that defines the playback window. Audio tracks have independent trim systems -- each track gets its own array of `AudioRegionData` regions with start/end times. Gaps between regions are silence.
 
-Video regions (`VideoRegionData`) work differently. They define segments to cut out of the timeline entirely. When video regions exist, the compositor remaps all other regions (camera, captions, spotlight) to the resulting compressed timeline.
+Video regions (`VideoRegionData`) are the slices that are kept, not the parts that are cut. A project starts with one region covering the whole recording; the cut button in the transport bar splits the slice under the playhead, and the Cuts track that appears under Screen lets you drag slice edges or remove a slice to create a gap. Playback jumps over gaps, and the compositor exports only the kept slices back to back, remapping all other regions (camera, captions, spotlight) onto the resulting compressed timeline. The pure model behind this is `CutTimeline`.
 
 ## Audio regions
 
@@ -24,6 +24,7 @@ Volume and mute are per-track, not per-region. The player and compositor both re
 Camera regions control webcam visibility over time. Each region has a type:
 
 - **Fullscreen** -- webcam fills the entire canvas
+- **Left/right half or third** -- webcam fills that side of the canvas; the entire app view fits in the remaining space
 - **Hidden** -- webcam disappears completely
 - **Custom** -- webcam shows as PiP with its own layout, aspect ratio, corner radius, border, and shadow settings
 
@@ -45,7 +46,7 @@ All three feed into the same `ZoomTimeline`, which the compositor queries per-fr
 
 ## Cursor overlay
 
-Instead of baking the system cursor into the screen recording, Reframed hides it during capture and renders it from metadata at export time. This means you can change cursor appearance after recording.
+Instead of baking the system cursor into the screen recording, AppShow hides it during capture and renders it from metadata at export time. This means you can change cursor appearance after recording.
 
 **Styles** -- multiple SVG-based designs (center default, crosshair, outline, etc.) with configurable primary fill and outline stroke colors, plus size scaling.
 
@@ -111,8 +112,97 @@ Export options: burned into the video, or as SRT/VTT sidecar files.
 
 50-snapshot system. Each snapshot captures the full `EditorStateData` -- every setting, every region, every keyframe. Snapshots are diffed to generate human-readable change descriptions like "Trim range 0:00-1:23 to 0:05-1:20" or "Camera region added".
 
-Operations: push (truncates redo stack), undo, redo, jump to specific entry. History persists in the .frm project bundle as `history.json`, so reopening a project restores the full edit history.
+Operations: push (truncates redo stack), undo, redo, jump to specific entry. History persists in the .appshow project bundle as `history.json`, so reopening a project restores the full edit history.
 
 ## Auto-save
 
-EditorState debounces saves with a 1-second delay. Every change schedules a save, but only the last one within any 1-second window actually writes to disk. The full editor state (including history) goes into `project.json` inside the .frm bundle.
+EditorState debounces saves with a 1-second delay. Every change schedules a save, but only the last one within any 1-second window actually writes to disk. The full editor state (including history) goes into `project.json` inside the .appshow bundle.
+
+## Music tracks (fork)
+
+External audio files can be added from the Audio tab or by dropping them on the timeline. Each becomes an `ExternalAudioTrackData` entry with a bundle-relative file name (`audio-<hash8>.<ext>`), a timeline start, in/out points inside the file, volume, mute, and linear fades, shown as its own "Audio" row under Mic. Preview playback runs through `ExternalAudioPreviewEngine` on an `AVAudioEngine`, resynced on play, seek, and gap skips; export inserts each track into the composition and applies `trackID`-keyed volume ramps (`VideoCompositor+ExternalAudio`). Fades are timeline-based and are clipped by trims and cuts.
+
+## Assistant panel
+
+The editor's left edge contains a collapsible, resizable assistant panel. It supports Claude Code and Codex, discovers their executables through PATH, common install locations, and a login shell, and checks version and authentication before enabling the composer.
+
+Each project owns exactly one conversation at `agent/conversation.json` inside its `.appshow` bundle. Messages and provider-specific resume identifiers survive reopening the project. Clear Conversation removes both after confirmation. Switching providers keeps the conversation and uses that provider's own resume identifier.
+
+Each submitted turn launches a fresh provider process, streams Markdown and tool events into the transcript, and exits at completion or cancellation. The process runs in `.agent/<project-name>/` beside the bundle. That sibling directory is ephemeral workspace for sockets, tokens, and generated preview frames; it is not the portable conversation record.
+
+The chat is read-only toward the editor in milestone 04. Project inspection and mutation arrive through the authenticated agent bridge in milestones 05 and 06.
+
+## Interactive timeline controls
+
+Click a kept slice to select it. Delete/Backspace or the transport trash button removes the selected slice, closes its visible gap, and creates one immediate Undo step. Source media is unchanged. Drag a shared cut edge to move the split point between its two neighbors; drag an exposed edge to trim that slice. Source mode also allows moving slices into available gaps without reordering the recording.
+
+Zoom regions have visible edge handles for changing duration and can be dragged to move, including while cut gaps are hidden. Editing an automatically generated zoom converts its keyframes to manual. The drag preview and final keyframes use the same clamped timing calculation.
+
+Assistant replies render separate paragraphs, headings, list rows, and code blocks. Complete provider messages are separated by paragraph breaks; incremental text chunks remain contiguous.
+
+### Webcam recording and focus
+
+Enable **Include webcam** in recording Options, then choose a camera. Options and Settings → Devices offer a corner and size for new recordings. The default is a circular webcam at bottom right, 20% of video width, constrained to fit the canvas. These preferences travel with the recording; reopening an older edit preserves its saved layout.
+
+In the editor’s Webcam properties, **Add webcam section** offers fullscreen, left/right half and left/right third sections from the playhead, up to five seconds or the next section/end. Each expands from the bubble and returns with a 0.4-second scale animation (short sections shorten transitions). Double-clicking empty space on the Webcam track also adds a focus section. Drag the section to move it or its visible edges to resize it, in source or compressed mode. Click to edit source-second start/end, type and transitions, or remove it. Focus edits use the existing history and project persistence.
+
+The assistant can use `set_camera` with `shape`, `corner`, `width`, `fullscreenFillMode` and `fullscreenAspect`, and `add_camera_region`, `update_camera_region`, `remove_camera_region`. Region tools accept source times, stable IDs and entry/exit animation settings. Regions cannot overlap and require recorded webcam media. The timeline result reports current layout and transition durations.
+
+
+### Voice and silence cuts
+
+Recording Options includes **Capture voice**, microphone selection, **Reduce background noise** and **Generate captions after recording** alongside Include webcam. Audio is recorded as the existing separate, synchronized microphone track. Cleanup uses RNNoise; captions use the selected local WhisperKit model and word timing. The Captions panel explicitly offers **Download model & generate** when a model is missing. Automatic generation runs for the newly recorded project only. It can be canceled; reopening does not overwrite an existing transcript.
+
+In Video properties, **Silence cuts → Preview → Create cuts** analyzes microphone, system audio or both and creates ordinary editable Cuts slices. The threshold is relative to the loudest window; padding retains sound around detected gaps. Playback, captions and export follow the same keep-slices. Original media is retained. Stale previews are rejected, and one Undo restores the previous cuts.
+
+MCP names retain the existing verb/noun families. `generate_captions` generates timed text; `set_captions` styles it; `replace_captions` replaces text. `get_silences` inspects gaps and `remove_silences` creates cuts, with `source: "both"` available to preserve sound from either track. Webcam region `type` supports `leftHalf`, `rightHalf`, `leftThird`, and `rightThird` as well as the existing types. Catalog titles group tools by their editor area.
+
+Recorded narration is also saved separately for assistant context, even when visible captions are off. Caption edits do not alter it. `get_transcript` prefers recorded microphone narration and accepts `source: "mic"`, `"system"`, or `"captions"`; legacy captions remain a fallback. `generate_transcript` transcribes audio without changing visible captions. Project summaries contain a bounded narration excerpt, and preview frames include nearby spoken text and word timestamps in source-video seconds.
+
+### Caption font and colors
+
+The Captions tab exposes style settings before generation. Choose an installed font through the searchable Font control, then adjust size, weight, Font color, background color and opacity. Turn Background off for text alone. Styling persists with the project and supports Undo/Redo. A font unavailable on another Mac falls back to the system font without discarding the saved family name. Export uses these settings when Burn in captions is enabled.
+
+The existing `set_captions` tool accepts `fontFamily`, `textColor` and `backgroundColor`; color objects contain normalized `r`, `g`, `b` and optional `a` channels. Timeline results expose the current caption style. Caption appearance does not change recorded narration or agent context.
+
+## Selecting an area for zoom or blur
+
+In **Zoom**, choose **Select Zoom Area…**, drag a rectangle over the original recording frame, and enter the source-time start and end. AppShow fits the selected area, up to 8×, while preserving the source aspect ratio. The time range includes smooth entry and exit transitions. This area stays fixed even with Follow Cursor enabled. The Zoom track shows a viewfinder icon; drag its edges to change duration, move it to another time, or right-click to adjust transitions and remove it. Area zooms cannot overlap other zooms. Auto Zoom preserves area targets and generates cursor-based regions elsewhere.
+
+In **Effects → Overlays → Add Blur**, the same picker selects a source rectangle and exact start/end times. The blur appears on the Overlays track, where you can move/resize its timing and right-click to adjust its rectangle, strength, or remove it. Blur remains anchored to source content when the recording zooms.
+
+The assistant uses the existing tools:
+
+```json
+{"name":"add_zoom","arguments":{"mode":"area","at":2,"end":6,"transition":0.5,"rect":{"x":0.55,"y":0.1,"width":0.3,"height":0.25}}}
+{"name":"add_blur","arguments":{"start":2,"end":6,"rect":{"x":0.1,"y":0.7,"width":0.35,"height":0.1},"radius":25}}
+```
+
+Coordinates are normalized from 0 to 1, with the origin at the top-left of the original screen recording. The assistant can inspect frames, choose a target unrelated to the mouse, and render a preview to check the result. `update_blur` and `remove_blur` edit existing blur regions by ID.
+
+## Removing microphone audio
+
+Right-click the **Mic** track label or waveform and choose **Remove Microphone**. The track disappears and becomes silent in playback and export. Undo restores it immediately; you can also turn off **Mute** in Audio → Microphone. Source media and audio regions are retained. Removing one audio region is a separate waveform context-menu action.
+
+## Recovering an interrupted assistant reply
+
+Partial replies and provider session IDs are saved during streaming. If the stream ends before completion, the reply is marked failed and remains visible. Reopening a project also recovers saved partial replies. Unfinished tool rows explain that their outcome needs checking.
+
+Use **Retry interrupted reply** to continue with the same provider session. If that session is unavailable, **Start fresh** opens a new provider session with recent conversation context while keeping the local history. Both actions ask the assistant to inspect current project state before continuing, because some earlier edits may have completed. If the provider remains running without output, Stop cancels the turn and exposes the same recovery actions.
+
+
+## Speed regions
+
+In **Video → Speed → Add Speed Region**, choose start/end times and **1.5×, 2×, 4×, 8×, 16×, or 32×**. The editor shows the section's original and resulting duration. A Speed track appears alongside the existing region tracks: drag to move, drag an edge to resize, and click or right-click to change the preset or remove it. Removing a region restores normal speed. Edits support Undo/Redo and persist with the project.
+
+Regions use seconds from the original recording and cannot overlap. Cuts and trim still decide which content is included. Output timing accounts for all three; for example, four source seconds at 4× become one output second. Only the screen recording and its system audio accelerate. Webcam, microphone narration, and imported music play at 1× on the output clock, retaining existing cuts and trim. They end with the shortened screen output; their unused tail remains in the project. Zoom, blur, overlays, and transitions remain attached to screen content. Microphone captions follow the normal-speed narration; system-audio captions follow screen speed. Exported SRT/VTT timestamps follow the resulting output timing.
+
+The assistant can use these tools with the same source-time ranges:
+
+```json
+{"name":"add_speed","arguments":{"start":5,"end":15,"rate":4}}
+{"name":"update_speed","arguments":{"id":"REGION_UUID","rate":8}}
+{"name":"remove_speed","arguments":{"id":"REGION_UUID"}}
+```
+
+`get_timeline` includes the `speed` regions and `outputDuration`. Very fast native previews can skip visual frames; exported video is rendered at the selected output frame rate. Audio uses time stretching to preserve pitch.

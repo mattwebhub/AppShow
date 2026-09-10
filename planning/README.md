@@ -1,6 +1,6 @@
 # Planning
 
-This folder is the working memory of the fork. It lives inside the repo so it is versioned with the code and survives upstream merges (upstream never touches `planning/`, `docs/architecture/`, or `ReframedTests/`).
+This folder is the working memory of the fork. It lives inside the repo so it is versioned with the code and survives upstream merges (upstream never touches `planning/`, `docs/architecture/`, or `AppShowTests/`).
 
 ## Layout
 
@@ -12,6 +12,7 @@ planning/
 ├── tdd-strategy.md        how we test: layers, fixtures, definition of done
 ├── upstream-sync.md       how and when to pull jkuri/Reframed changes
 ├── decisions/             architecture decision records (ADRs), numbered, immutable once accepted
+├── releases/             public-release checklist and channel readiness evaluations
 ├── milestones/
 │   ├── NN-name/PLAN.md    tasks for one milestone, checkboxes, each task names its test
 │   ├── NN-name/VERIFY.md  acceptance checks run before the milestone is closed
@@ -29,7 +30,7 @@ Engineering documentation about the inherited codebase lives in `docs/architectu
 
 1. Read `STATE.md`, then the active milestone's `PLAN.md`.
 2. For a feature, copy `features/_TEMPLATE` and fill `SPEC.md` first, then `TEST-PLAN.md`.
-3. Write the failing test in `ReframedTests/`, run `make test`, see red.
+3. Write the failing test in `AppShowTests/`, run `make test`, see red.
 4. Write the minimum code, run `make test`, see green. Run `make format`.
 5. Tick the task in `PLAN.md` or `TASKS.md`. Update `STATE.md` at the end of the session.
 6. A decision that changes structure, tooling, or a public contract gets an ADR in `decisions/`.

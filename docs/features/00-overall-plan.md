@@ -46,7 +46,7 @@ These surface in feature 04's spike but are real editor features in their own ri
 ## Principles for every feature
 
 - Tests first, per `planning/tdd-strategy.md`. Pure logic (remaps, parsers, tool dispatch) is tier 1 and gets tested before any UI exists.
-- New code goes in new folders where possible (`Reframed/Agent/`, `ReframedTests/`), upstream files get the smallest seams. Every divergence lands in `planning/upstream-sync.md`.
+- New code goes in new folders where possible (`AppShow/Agent/`, `AppShowTests/`), upstream files get the smallest seams. Every divergence lands in `planning/upstream-sync.md`.
 - UI follows `docs/architecture/05-coding-patterns.md` and the checklist in `06-conventions-checklist.md`: existing button styles, color tokens, track patterns (Zoom and Spotlight tracks are the template for new tracks).
 - Every agent mutation is one undoable history step with a readable label, so the user can watch and revert.
 - The agent runtime is pluggable: Claude Code and Codex are the first two providers behind one protocol.
@@ -82,8 +82,8 @@ Collected from the spikes. Each has a stated assumption so work continues; an an
 
 20. v1 agent is read-only (chat, inspect) until feature 04 adds tools? Assumed yes.
 21. Working directory: the `.frm` bundle itself (agent can read media) or a sandbox subfolder exposing only `project.json`? Assumed a workspace folder next to the bundle, consistent with question 14.
-22. Transcripts stored inside the bundle travel with a shared project. Acceptable, or strip on export/share? Assumed acceptable, with a strip option later.
-23. One process per turn (about 1 s cold start, no mid-turn steering, less code) or a persistent process per thread as Toone does? Assumed one per turn for v1.
+22. Conversation stored inside the bundle travels with a shared project. Decided: acceptable, with an explicit clear action; exactly one conversation belongs to each project (ADR 0010).
+23. One process per turn (about 1 s cold start, no mid-turn steering, less code) or a persistent process as Toone does? Decided: one fresh process per turn (ADR 0010).
 24. Provider preference global (assumed) or per project?
 25. Keyboard shortcut to toggle the panel in v1 (edits upstream `KeyboardShortcut.swift`) or none? Assumed none.
 26. Provenance of copied Toone code: add a LICENSE there, or record authorization in an ADR here? Assumed ADR here (`planning/decisions/0009-toone-code-provenance.md`), LICENSE there when convenient.
@@ -91,7 +91,7 @@ Collected from the spikes. Each has a stated assumption so work continues; an an
 
 ### 04 Agent tools
 
-14. Agent workspace next to the project folder (assumed) or inside the `.frm` bundle?
+14. Agent workspace next to the project folder or inside the `.frm` bundle? Decided: ephemeral runtime state lives in a sibling `.agent/` workspace; the persisted conversation lives inside the `.frm` bundle (ADR 0010).
 15. May the agent trigger a full export after confirmation, or is a low-res draft the ceiling? Assumed draft only.
 16. Undo granularity: one step per tool call with explicit batches (assumed) or one step per chat turn?
 17. Ship the Swift shim first and verify HTTP MCP on both runtimes later? Assumed yes.

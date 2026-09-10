@@ -1,72 +1,54 @@
-# Contributing to Reframed
+# Contributing to AppShow
 
-Thanks for wanting to help out. Here's what you need to know.
+AppShow is a native Mac app for making screen recordings feel considered. Contributions should make recording, editing, and sharing clearer, more reliable, or more expressive.
 
-## Getting started
+## Start here
 
-You'll need macOS 15+ and Xcode with Swift 6. Clone the repo and run:
+Read [AGENTS.md](AGENTS.md) for the build, architecture, and code conventions, then check [the current plan](planning/STATE.md). For a substantial feature or design change, open an issue describing the user need and the proposed interaction before starting implementation.
 
-```bash
-make build
-```
+Small bug fixes, documentation corrections, and focused improvements can go straight to a pull request.
 
-That's it. Dependencies are managed through SPM and resolve automatically.
+## Run locally
 
-To build and launch in one step:
+Use macOS 15 or later and Xcode with Swift 6. Clone the repository and run:
 
-```bash
+```sh
 make dev
 ```
 
-## Making changes
+The default signing configuration works ad-hoc. Personal signing belongs in the ignored `Local.xcconfig`, based on [Local.xcconfig.example](Local.xcconfig.example).
 
-1. Fork the repo and create a branch from `main`.
-2. Make your changes.
-3. Run `make format` to format your code.
-4. Run `make build` and fix any warnings or errors.
-5. Open a pull request against `main`.
+## Make a focused change
 
-## Code style
+1. Fork the repository and create a branch from `main` with a descriptive name.
+2. For a behavior change, add a failing regression test using Swift Testing, then implement the smallest complete fix.
+3. Reuse the app's existing controls, typography, and spacing. Include before/after screenshots for visual changes.
+4. Update the relevant user documentation and planning entry when behavior changes.
+5. Run the checks that apply to your change.
 
-- No code comments. No inline comments, no doc comments. The code should speak for itself.
-- Reuse existing UI components from `Reframed/UI/` before creating new ones. The project has its own button styles (`OutlineButtonStyle`, `PrimaryButtonStyle`, `SecondaryButtonStyle`) -- never use `.borderless`, `.plain`, or other stock SwiftUI button styles.
-- Reuse utility functions from `Reframed/Utilities/` when they exist.
-- If a view goes past 200 lines, split it into separate files using Swift extensions.
-- Fix root causes. No band-aid fixes or temporary workarounds.
+```sh
+make test T=SuiteName
+make format
+make lint
+make build
+```
 
-## Project structure
+Run `make test` for changes that affect several areas. Tests use an isolated app host and must not access personal recordings, preferences, permissions, or the network. See [the testing strategy](planning/tdd-strategy.md) for the full workflow. Hardware capture and gesture behavior need manual verification; describe what you actually checked.
 
-The codebase is organized by concern:
+Documentation and asset-only changes do not need artificial unit tests. Check links, preview the result, and build the app when its bundled assets change.
 
-- `App/` -- entry point, permissions, window management
-- `Recording/` -- capture pipeline and writers
-- `Editor/` -- timeline, properties, preview
-- `Compositor/` -- video composition and export
-- `State/` -- app state, config, services
-- `UI/` -- reusable components, toolbar, settings
-- `Utilities/` -- extensions and helpers
+## Open a pull request
 
-See `AGENTS.md` for a more detailed breakdown.
+Open your pull request against `main`. Explain the user-visible problem, the resulting behavior, and how you verified it. Keep unrelated refactoring separate. Mention any manual checks that still need another Mac or a physical device.
 
-## Concurrency
+Use short, concrete issue reports: expected behavior, actual behavior, reproduction steps, macOS version, and the app version or commit. A small example project is especially useful for rendering and export problems. Use sample media and remove private information from shared recordings and logs.
 
-Everything uses Swift 6 strict concurrency. `SessionState` lives on `@MainActor`. Recording coordinators and writers are actors. If you're passing data across isolation boundaries, look at how existing code handles it before inventing a new pattern.
+## Design contributions
 
-## Reporting bugs
+Show the interaction in context, including empty, selected, and disabled states when relevant. Keep the editor focused on the recording. Use the [brand assets](docs/brand/README.md) for AppShow's identity and the existing `AppShow/UI/` components for interface work.
 
-Open an issue with:
+## Attribution
 
-- What you did
-- What happened
-- What you expected
-- macOS version and any relevant system info
-
-Screenshots or screen recordings help a lot, especially for UI issues.
-
-## Feature requests
-
-Open an issue describing what you want and why. Keep it concrete -- "I want X so I can do Y" is more useful than a vague suggestion.
-
-## License
+Preserve upstream notices and dependency licenses. Include the source and terms for any new third-party assets or libraries. Discuss dependency additions before making them part of the build.
 
 By contributing, you agree that your contributions will be licensed under the MIT License.

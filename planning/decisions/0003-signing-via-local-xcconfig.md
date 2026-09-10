@@ -5,7 +5,7 @@ Date: 2026-09-03
 
 ## Context
 
-`Reframed.xcodeproj/project.pbxproj` sets `DEVELOPMENT_TEAM = 5A5U3XX696` (upstream author's team) and `CODE_SIGN_STYLE = Automatic` on the app target. On any other machine `make build` fails with `No signing certificate "Mac Development" found`. The project already reads `Config.xcconfig` for version numbers.
+`AppShow.xcodeproj/project.pbxproj` sets `DEVELOPMENT_TEAM = 5A5U3XX696` (upstream author's team) and `CODE_SIGN_STYLE = Automatic` on the app target. On any other machine `make build` fails with `No signing certificate "Mac Development" found`. The project already reads `Config.xcconfig` for version numbers.
 
 ## Decision
 

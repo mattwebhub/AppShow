@@ -1,10 +1,10 @@
 # Recording pipeline
 
-This covers how Reframed captures screen content, audio, webcam, and cursor data, and how everything ends up synchronized in the output files.
+This covers how AppShow captures screen content, audio, webcam, and cursor data, and how everything ends up synchronized in the output files.
 
 ## Capture modes
 
-Reframed has four ways to start a recording:
+AppShow has four ways to start a recording:
 
 **Entire screen** -- captures the full display. The user clicks a screen in the overlay to select it, then a countdown starts.
 
@@ -107,7 +107,7 @@ All cursor timestamps get shifted by this offset before writing the JSON file, s
 
 ### Output format
 
-Saved as `cursor-metadata.json` in the .frm bundle:
+Saved as `cursor-metadata.json` in the .appshow bundle:
 
 ```json
 {
@@ -135,9 +135,22 @@ The cursor metadata recorder does the same thing independently with its own `tot
 1. All writers finish asynchronously.
 2. Cursor metadata timestamps are adjusted and written to a temp JSON file.
 3. RecordingCoordinator returns a `RecordingResult` with URLs to all output files plus metadata (screen size, webcam size, FPS, capture quality).
-4. SessionState passes the result to `ReframedProject.create()`, which bundles everything into a `.frm` directory.
+4. SessionState passes the result to `AppShowProject.create()`, which bundles everything into a `.appshow` directory.
 5. The editor window opens with the project loaded.
 
 ## Audio level monitoring
 
 During recording, SessionState polls `RecordingCoordinator.getAudioLevels()` every 100ms in a Task loop. The coordinator reads peak levels from each audio writer. These drive the real-time level meters in the toolbar UI.
+
+
+## Webcam voice defaults
+
+Enabling Include webcam also enables Capture voice by default, using the selected or first available microphone. Recording Options makes the microphone, noise cleanup and automatic-caption choices visible. The normal microphone toggle remains authoritative and updates the webcam voice preference. Capture still uses the existing synchronized microphone writer; there is no second audio capture session.
+
+`SessionState` snapshots the voice options at recording start and passes them to the new editor only when webcam and microphone media actually exist. `prepareRecordedVoice` consumes that one-shot request after setup. RNNoise produces the optional cleaned track; local caption generation waits for it and applies audio drift correction to source timestamps. Preferences persist in `ConfigService`; captions and cleanup settings persist through the existing editor data. Missing models, canceled downloads and transcription failures are handled in Captions.
+
+### Permission recovery
+
+The permission window and menu share live status, refreshed when AppShow becomes active and while those views are visible. Allow requests access; the arrow beside each permission opens its System Settings pane. Expand Permission not updating? to use Show in Finder or Check Again. Finder reveals the exact running bundle so a stale entry can be replaced in System Settings.
+
+Continue opens the toolbar without requiring permissions for editing. Screen capture still checks Screen Recording authorization and returns to recovery when denied. Accessibility enables global shortcuts and interaction with external windows; granting it reinstalls the shortcut event tap without an app restart. Local development should use a stable certificate through the ignored Local.xcconfig; ad-hoc rebuilds can invalidate previous permission associations.
