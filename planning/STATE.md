@@ -1,6 +1,8 @@
 # State
 
-Last updated: 2026-09-09
+Last updated: 2026-09-10
+
+Owner identifiers (developer team, App Store Connect record, local checkout paths) are kept out of the repository in the git-ignored `planning/local/OWNER.md`; public docs use `<team id>`, `<app id>`, `<toone-repo>` and "the owner".
 
 ## Position
 
@@ -80,6 +82,7 @@ Assistant replies are checkpointed during streaming. Early EOF and reopened stre
 
 ## Accepted product decisions
 
+- The Store product must retain project chat, MCP editing tools, and integrations with both Codex and Claude Code under App Sandbox. The owner confirmed this on 2026-09-09; the temporary validation exclusion is not an approved shipping fallback (ADR 0020).
 - Final product name: AppShow. Keep inherited names and identifiers during feature development, then perform one pre-release identity migration (ADR 0005).
 - Each project bundle (`.appshow`, or legacy `.frm`) owns exactly one persisted, explicitly clearable conversation; there is no thread list (ADR 0010).
 - Each turn launches a fresh Claude Code or Codex process and resumes through that provider's stored logical-session id (ADR 0010).
@@ -96,7 +99,9 @@ Assistant replies are checkpointed during streaming. Early EOF and reopened stre
 
 Use the [public-release checklist](releases/PUBLIC-RELEASE-CHECKLIST.md) and its [App Store readiness evaluation](releases/APP-STORE-EVAL.md) to track distribution gates. Both channels currently remain NOT READY.
 
-Milestone 20 is active for [Store submission assets and account setup](milestones/20-store-submission-assets/PLAN.md). Five editable layout proofs and a [listing draft](releases/APP-STORE-LISTING-DRAFT.md) are prepared. Apple authentication and native screen capture access remain pending. The owner requires review of the completed design assets before anything is submitted.
+Milestone 21 is active for [sandboxed Codex, Claude and MCP](milestones/21-sandboxed-agents/PLAN.md). An isolated native probe verifies both providers start and reach AppShow's MCP shim inside App Sandbox; authenticated model turns and Store integration remain open. See [feasibility evidence](releases/STORE-AGENT-FEASIBILITY.md).
+
+Milestone 20 remains open for [Store submission assets and account setup](milestones/20-store-submission-assets/PLAN.md). Native captures and an editable Figma design are now available, but final Store captures must follow the restored agent experience. The owner requires review of completed design assets before anything is submitted.
 
 1. Restart the updated Debug build and run milestone 10’s real-webcam and interaction checks, then the remaining milestone 06 rows.
 2. Human runs the manual rows for milestones 02, 03, 04, and 07.
@@ -143,3 +148,49 @@ Milestone 19 adds the independent `AppShowStore` target/module, sandbox entitlem
 Verification: 789 direct-edition tests, all 11 gated exports and three sandbox-hosted tests pass. Store tests verify actual sandbox entitlements, isolated storage, native container bookmarks and synthetic project reopen/trim/speed export through normal and parallel modes. Direct/store Debug builds, formatting/lint and a universal local store archive are warning-free. All 15 archive audit checks pass, including both architectures, no debugging entitlement and strict signature integrity. The archive uses Apple Development signing and is not a store distribution candidate.
 
 See [milestone 19 evidence](milestones/19-store-foundation/VERIFY.md), [store workflow](releases/STORE-IMPLEMENTATION.md) and [updated A1–A12 evaluation](releases/APP-STORE-EVAL.md). Store readiness remains NOT READY pending real capture/file-access/model acceptance, feature decisions, rights, full privacy/disclosures, distribution signing/upload, TestFlight and App Review. Changes are committed locally in small semantic groups; nothing was pushed or published.
+
+## September 9 sandboxed agents and design continuation
+
+The Store build now bundles pinned Codex/Claude runtimes and the signed MCP shim, confines provider state to its container and supports native provider sign-in. Codex login, live MCP editing, Undo/Redo, session resumption and actual PNG preview inspection passed. Claude account acceptance is pending. A subsequent longer-conversation send exposed an unresolved native SwiftUI layout stall, so the Store candidate is not ready. See milestone 21 for the scope and diagnostic evidence.
+
+Five Rubik Figma layouts exist, including a dedicated Claude Code + Codex slide. The sample video was cropped to remove its baked matte while preserving the original. The owner requested distinct feature views for each slide, paused App Store submission and will make further design changes in Figma.
+
+Final restored code check: formatting, strict lint, all 795 tests in 96 suites and warning-free direct/Store Debug builds pass. The owner deferred all new recordings. Five different native capture sources are assigned to the Figma frames; upload receipts confirm the hero/export replacements. The native client requires refresh/visual review after desktop control became unavailable. No new video, Store upload, commit or publication was made.
+
+## Provider update support (September 9)
+
+Settings → Agents now exposes provider versions and the update path for each edition. Store runtimes update only with AppShow through the Mac App Store; Claude background and manual self-updates are disabled. The direct edition shows its resolved CLI paths, documented installer-specific commands and version rechecks without probing authentication. Ready conversations can also recheck their provider after a CLI update.
+
+Checked-in version pins, `make check-agent-updates`, and `make stage-store-agents` provide the maintainer workflow. Staging verifies all universal payloads before replacement, preserves the previous set on failure, and locks against concurrent builds. Store embedding and the evaluator reject stale pins. Ten offline packaging tests, nine readiness tests, five runtime-policy tests and three sandbox-hosted smoke tests pass. Formatting/lint and warning-free direct/Store Debug builds pass; rebuilding the normal Store artifact after hosted tests passes all 16 audit checks. Logs are in ignored `dist/sandbox-agent-probe/runtime-updates/`.
+
+The live update check found Codex 0.153.4 and Claude Code 2.1.267; the previously exercised 0.153.3/2.1.263 pins remain selected until compatibility QA. The new Agents tab is present in native Settings, but the visual walkthrough could not finish because desktop control reported concurrent window changes. This work does not close the existing long-conversation layout stall, Claude account acceptance, universal candidate or distribution gates. No new recordings, Store submission, commits or publication occurred. See ADR 0021 and the Store implementation guide.
+
+## Toone-derived automatic CLI updates
+
+The direct edition now automatically maintains AppShow-owned Claude Code and Codex runtimes. Settings → Agents includes a default-on toggle, manual check/install actions, per-provider progress/results and resolved versions. Checks run daily with six-hour retry polling; hosted tests never start the loop. Background discovery avoids shell profiles. Verified immutable releases and one atomic provider pointer keep running replies on their original executable/resources. User-installed CLIs remain available, and the newest compatible working candidate is resolved for every reply. Provider self-update is disabled within AppShow so global installations are preserved.
+
+All 811 regression tests pass; the test fixture's concurrency warning was fixed and its six tests rerun cleanly. Final direct/Store Debug builds, format/lint and project checks are clean. Three Store smoke tests and all 16 normal-artifact audit checks pass; direct updater symbols are absent from the Store app. A live isolated probe linked to production AppShow code downloaded and activated Claude 2.1.267 and complete Codex 0.153.4, verifying checksums, signatures, versions, pointer activation and toolchain selection. The native direct app completed automatic updates on launch: Settings confirmed Claude 2.1.267 and Codex 0.154.0 in AppShow-managed release folders, displayed both Updated outcomes and re-enabled the manual check. Codex 0.154.0 appeared upstream after the isolated probe had verified 0.153.4. See milestone 21 and ADR 0021 for details and evidence.
+
+The Store edition still updates its pinned CLIs through AppShow Store releases. Earlier Store chat-layout and Claude account acceptance remain open. No recording, Figma modification, Store submission, commit or publication occurred during the updater work.
+
+## Design handoff completed (September 10)
+
+The existing Figma file now has five visually reviewed, distinct feature frames and five native PNG exports at 2880 × 1800. The owner’s updated “Record. Tell AI. Show.” headline is preserved, and the agent eyebrow explicitly names Claude Code + Codex in Rubik. Native inspection resolved changed hero/agent image nodes before refreshing the fills. Four new stills show the cropped working source in the Direct build; the agent frame preserves the real earlier Store conversation.
+
+The ignored asset folder contains `final-exports/index.html`, PNGs, source/hash provenance, handoff notes and `AppShow-design-handoff.zip`. All final frames were inspected in the refreshed native Figma client. The local HTML gallery’s links were checked from the files; browser preview of the file URL was blocked by browser policy. No workaround was attempted. No new recordings or App Store submission occurred.
+
+Opening the external cropped project through Finder failed in the Store build during this pass, while the Direct build opened it successfully. That observation remains a product acceptance issue alongside the longer-conversation layout stall and pending Claude account acceptance; completion of the design handoff does not close those gates.
+
+## Owner-approved listing preparation (September 10)
+
+The owner completed the Figma edits, deleted the first original frame and authorized uploading the four remaining screenshots to App Store Connect while preparing the release. This supersedes the earlier listing pause. No new recordings are requested. Fresh native exports preserve the owner's content; all four 2880 × 1800 RGB PNG upload copies have distinct hashes and decode identically to their Figma sources. The current package is `dist/app-store-submission/2026-09-10-owner-approved/`.
+
+A fresh universal Release archive completed without warnings and passed all 16 artifact checks. Version 0.14.7 / build 26 uses Apple Development signing for team <team id>, without a debugging entitlement; it is not a distribution candidate. Both a fresh Debug Store launch and the exact archived Store app successfully opened the external cropped demo project through Finder. The earlier opening failure is not claimed fixed and the remaining file-access matrix, long-conversation stall and Claude account acceptance remain open.
+
+The listing draft and privacy inventory now describe the implemented provider integrations. Toone access is unavailable after a failed Apple sign-in; Safari shows the working Apple sign-in form and the owner has been asked to authenticate. No App Store record, asset, metadata, binary, tag or review submission has been published. The [submission packet](releases/SUBMISSION-PREPARATION.md) records evidence and the remaining release sequence.
+
+## App Store listing saved and runtime fixes (September 10)
+
+App Store Connect now contains **AppShow: AI Screen Recorder**, Apple ID **<app id>**, explicit bundle ID **com.mattwebhub.appshow**, under the owner's team **<team id>**. Four owner-approved screenshots, promotional text, description, keywords, subtitle and categories are saved. The screenshots' numbered order was verified after reload and in Media Manager. The draft matches version **0.14.7** and uses manual release. No binary or review request is submitted; support/privacy destinations, review contact and remaining account declarations are pending.
+
+The previous long-conversation request and a subsequent Codex MCP edit complete in Debug Store after replacing the lazy transcript stack. Authenticated Claude now completes an MCP edit after its temporary directory is confined to private container storage. Native Undo uncovered a separate stale pre-edit history baseline; both individual and batch regressions now pass, as do all 32 editing tests. Full regression, normal builds and a replacement universal archive are being validated. The earlier September 10 archive predates these fixes and has been removed while its pre-fix audit/receipt is retained. No new recordings were made. See the current submission packet and chat acceptance record for evidence limits.
