@@ -2,7 +2,7 @@
 
 Status: spike, no code written. Date: 2026-09-03. Companion: `ATTACK-PLAN.md`.
 
-Paths: `AppShow/...` and `AppShowTests/...` are relative to `/Users/matheusparanhos/Projects/appshow/reframed`. `Toone/...` and `TooneTests/...` are relative to `/Users/matheusparanhos/Projects/toone/apps/toone-desktop/Toone`. Every path and line below was read on the date above.
+Paths: `AppShow/...` and `AppShowTests/...` are relative to the repository root. `Toone/...` and `TooneTests/...` are relative to `<toone-repo>/apps/toone-desktop/Toone`. Every path and line below was read on the date above.
 
 ## 1. Goal
 
@@ -233,7 +233,7 @@ Two traps the Codex parser guards: `JSONSerialization` maps JSON `null` to `NSNu
 
 ### 3.4 License of the source repo
 
-`/Users/matheusparanhos/Projects/toone` has no root `LICENSE`; `apps/toone-desktop` has none either. `apps/toone-desktop/README.md:72-74` says `[MIT](LICENSE)` with a dangling link, and its disclaimer (line 68) names Hexagonal.io as the developer. Root `package.json` has no `license` field and is `"private": true`. No Swift file carries a license header. Sibling packages (`apps/toone-oss/LICENSE`, `apps/toone-edge-relay/LICENSE`, `packages/toone-edge-*/LICENSE`) are MIT, copyright `io-hexagonal`. Both repositories live under the same GitHub account (`mattwebhub/toone`, `mattwebhub/AppShow`). Conclusion: copying is a decision for the owner, not a legal blocker, but the first commit that copies code should be accompanied by either a `LICENSE` added to `apps/toone-desktop` or an ADR in `planning/decisions/` recording provenance and the owner's authorisation (the target app is MIT, ADR 0008 already tracks a licence question for gifski).
+`<toone-repo>` has no root `LICENSE`; `apps/toone-desktop` has none either. `apps/toone-desktop/README.md:72-74` says `[MIT](LICENSE)` with a dangling link, and its disclaimer (line 68) names Hexagonal.io as the developer. Root `package.json` has no `license` field and is `"private": true`. No Swift file carries a license header. Sibling packages (`apps/toone-oss/LICENSE`, `apps/toone-edge-relay/LICENSE`, `packages/toone-edge-*/LICENSE`) are MIT, copyright `io-hexagonal`. Both repositories live under the same GitHub account (`mattwebhub/toone`, `mattwebhub/AppShow`). Conclusion: copying is a decision for the owner, not a legal blocker, but the first commit that copies code should be accompanied by either a `LICENSE` added to `apps/toone-desktop` or an ADR in `planning/decisions/` recording provenance and the owner's authorisation (the target app is MIT, ADR 0008 already tracks a licence question for gifski).
 
 ## 4. What the target app lacks
 

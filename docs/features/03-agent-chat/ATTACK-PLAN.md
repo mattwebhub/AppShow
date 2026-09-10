@@ -4,7 +4,7 @@ Companion to `SPIKE.md`. Rules from `planning/tdd-strategy.md`: failing test fir
 
 Owner decision 2026-09-04: ADR 0010 supersedes the multi-thread portions of the original spike. Each project has exactly one persisted conversation, a confirmed clear action, and provider-specific resume ids. Every turn still launches a fresh operating-system process.
 
-Toone paths below are relative to `/Users/matheusparanhos/Projects/toone/apps/toone-desktop/Toone`.
+Toone paths below are relative to `<toone-repo>/apps/toone-desktop/Toone`.
 
 ## Toone files to copy first, in this order
 

@@ -70,3 +70,6 @@ fastlane/test_output
 
 # Per-developer signing overrides (see Local.xcconfig.example)
 Local.xcconfig
+
+# Local-only planning notes with owner identifiers
+planning/local/
