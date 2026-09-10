@@ -46,7 +46,6 @@ struct EditorView: View {
         .padding(.bottom, 2)
 
         HStack(spacing: 8) {
-          #if !APP_STORE
           AgentChatPanel(
             transcript: editorState.agentTranscript,
             confirmations: editorState.agentConfirmations,
@@ -54,7 +53,6 @@ struct EditorView: View {
             project: editorState.project,
             isExporting: editorState.isExporting
           )
-          #endif
           mainContent
             .background(AppShowColors.backgroundCard)
             .clipShape(RoundedRectangle(cornerRadius: Radius.xxl))

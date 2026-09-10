@@ -61,7 +61,7 @@ enum AgentToolCatalog {
   static let renderPreviewFrame = AgentToolDefinition(
     name: "render_preview_frame",
     description:
-      "Render one frame of the current edit (background, canvas, camera, cursor, zoom, spotlight, captions) at atSeconds to a PNG in the workspace frames folder and return its path. Slow: about a second per call.",
+      "Render one frame of the current edit (background, canvas, camera, cursor, zoom, spotlight, captions) at atSeconds. Returns the actual PNG image for visual inspection, its workspace path and nearby spoken context. Slow: about a second per call.",
     inputSchema: AgentToolSchema.object(
       [
         "atSeconds": AgentToolSchema.number("Source time of the frame in seconds", minimum: 0),

@@ -42,3 +42,6 @@ jobs:
 
       - name: Test
         run: make test
+
+      - name: Test runtime packaging
+        run: make test-agent-updates

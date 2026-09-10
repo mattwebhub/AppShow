@@ -141,6 +141,27 @@ struct MutatingToolsTests {
     )
   }
 
+  @Test(arguments: [false, true])
+  func undoingAgentChangesPreservesEditsNotYetInHistory(batched: Bool) async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let state = try await makeState(in: directory)
+    defer { state.teardown() }
+    state.backgroundStyle = .solidColor(CodableColor(r: 0.2, g: 0.4, b: 0.6))
+    let before = state.createSnapshot()
+    #expect(state.history.entries[state.history.currentIndex].snapshot != before)
+    let tools = dispatcher(state, in: directory)
+    if batched { _ = try await tools.call("begin_batch", arguments: ["label": "trim only"]) }
+    _ = try await tools.call("set_trim", arguments: ["start": 0.25, "end": 1.5, "label": "trim only"])
+    if batched { _ = try await tools.call("end_batch", arguments: [:]) }
+    let after = state.createSnapshot()
+
+    state.undo()
+    #expect(state.createSnapshot() == before)
+    state.redo()
+    #expect(state.createSnapshot() == after)
+  }
+
   @Test func setTrimCreatesOneLabelledUndoStep() async throws {
     let directory = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(directory) }

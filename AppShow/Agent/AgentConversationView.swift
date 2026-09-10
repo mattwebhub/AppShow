@@ -9,11 +9,17 @@ struct AgentConversationView: View {
   let project: AppShowProject?
   let isExporting: Bool
 
-  @State private var prompt = ""
-  @State private var isPreparing = false
+  @State var prompt = ""
+  @State var isPreparing = false
   @State var readiness: [AgentProviderKind: AgentReadiness] = [:]
   @State var isResolving = false
   @State var toolchain = AgentToolchain.standard()
+  @State var signIn = AgentSignIn()
+  @State var consentedProviders: Set<AgentProviderKind> = []
+  @State var showAIConsent = false
+  @State var pendingRecovery = false
+  @State var pendingFresh = false
+  @State var preparationError: String?
   @FocusState private var composerFocused: Bool
 
   var body: some View {
@@ -26,6 +32,22 @@ struct AgentConversationView: View {
     .task {
       await refreshReadiness()
     }
+    .onDisappear { signIn.cancel() }
+    .confirmationDialog(
+      "Share this project with \(transcript.provider.displayName)?",
+      isPresented: $showAIConsent,
+      titleVisibility: .visible
+    ) {
+      Button("Allow and Send") {
+        consentedProviders.insert(transcript.provider)
+        send(recovering: pendingRecovery, fresh: pendingFresh)
+      }
+      Button("Cancel", role: .cancel) {}
+    } message: {
+      Text(
+        "Your messages, project details, and preview images requested by the assistant will be sent to \(transcript.provider == .codex ? "OpenAI" : "Anthropic"). The assistant can edit this project using AppShow tools. You can undo edits and must confirm full exports separately."
+      )
+    }
     .onChange(of: transcript.isRunning) { wasRunning, isRunning in
       if wasRunning && !isRunning {
         confirmations.clear()
@@ -36,7 +58,7 @@ struct AgentConversationView: View {
   private var transcriptView: some View {
     ScrollViewReader { proxy in
       ScrollView {
-        LazyVStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 20) {
           if transcript.messages.isEmpty {
             emptyState
           } else {
@@ -81,6 +103,11 @@ struct AgentConversationView: View {
   private var composer: some View {
     VStack(alignment: .leading, spacing: Layout.compactSpacing) {
       readinessView
+      if let preparationError {
+        Text(preparationError)
+          .font(.system(size: FontSize.xxs))
+          .foregroundStyle(Color.orange)
+      }
       if transcript.recoveryPrompt != nil {
         HStack {
           Button("Retry interrupted reply") { send(recovering: true) }
@@ -130,7 +157,7 @@ struct AgentConversationView: View {
     .padding(12)
   }
 
-  private var canStart: Bool {
+  var canStart: Bool {
     selectedReadiness?.isReady == true
       && project != nil
       && !isExporting
@@ -142,47 +169,4 @@ struct AgentConversationView: View {
     canStart && !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
   }
 
-  private func send(recovering: Bool = false, fresh: Bool = false) {
-    let text = recovering ? transcript.recoveryPrompt ?? "" : prompt.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard
-      canStart,
-      !text.isEmpty,
-      let executable = selectedReadiness?.executableURL,
-      let project
-    else { return }
-    let provider = transcript.provider.makeProvider()
-    let workspace = sessionConfiguration?.workspace.directory ?? AgentProjectWorkspace.directory(for: project.bundleURL)
-    do {
-      try FileManager.default.createDirectory(at: workspace, withIntermediateDirectories: true)
-    } catch {
-      return
-    }
-    isPreparing = true
-    Task {
-      defer { isPreparing = false }
-      let searchPath = await toolchain.searchPath()
-      guard !transcript.isRunning, transcript.provider == provider.id else { return }
-      let home = FileManager.default.homeDirectoryForCurrentUser.path
-      var environment = AgentEnvironment.scrubbed(
-        path: searchPath,
-        home: home,
-        forwarding: provider.environmentKeys
-      )
-      environment.merge(sessionConfiguration?.processEnvironment ?? [:]) { _, configured in configured }
-      let session = AgentSession(
-        provider: provider,
-        executable: executable,
-        workingDirectory: workspace,
-        environment: environment,
-        configuration: sessionConfiguration,
-        resumeIDs: fresh ? [:] : transcript.resumeIDs
-      )
-      if recovering {
-        transcript.retry(using: session)
-      } else {
-        prompt = ""
-        transcript.send(text, using: session)
-      }
-    }
-  }
 }

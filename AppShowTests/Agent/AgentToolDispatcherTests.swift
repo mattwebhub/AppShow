@@ -103,6 +103,25 @@ struct AgentToolDispatcherTests {
     )
   }
 
+  @Test func previewResultCarriesTheRenderedImageThroughMCP() async throws {
+    let dir = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(dir) }
+    let (state, _) = try await makeState(in: dir, webcam: false, cursor: false)
+    defer { state.teardown() }
+    let dispatcher = makeDispatcher(state, in: dir)
+    let result = try await dispatcher.callResult("render_preview_frame", arguments: ["atSeconds": 0, "width": 160])
+    let content = try #require(result.mcpValue["content"]?.arrayValue)
+    let encoded = try #require(content.first { $0["type"] == "image" }?["data"]?.stringValue)
+    let bytes = try #require(Data(base64Encoded: encoded))
+    let path = try #require(result.value["path"]?.stringValue)
+    #expect(bytes == (try Data(contentsOf: URL(fileURLWithPath: path))))
+    #expect(content.last?["mimeType"] == "image/png")
+    #expect(CGImageSourceCreateWithData(bytes as CFData, nil) != nil)
+    #expect(result.mcpValue["structuredContent"]?["width"] == 160)
+    let textOnly = try await dispatcher.callResult("get_project_summary", arguments: [:])
+    #expect(textOnly.mcpValue["content"]?.arrayValue?.count == 1)
+  }
+
   @Test func projectSummaryReportsBundleAndMedia() async throws {
     let dir = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(dir) }

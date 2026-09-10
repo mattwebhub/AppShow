@@ -99,11 +99,16 @@ final class AgentToolDispatcher {
     do {
       let value = try await handler.call(arguments: validated, context: context)
       try Task.checkCancellation()
-      if before != nil {
+      if let before {
         context.editorState.pendingUndoTask?.cancel()
         if mutationBatch == nil {
           let label = Self.mutationLabel(arguments: validated, fallback: name)
-          context.editorState.history.pushSnapshot(context.editorState.createSnapshot(), label: label)
+          let history = context.editorState.history
+          let after = context.editorState.createSnapshot()
+          if history.currentIndex < 0 || history.entries[history.currentIndex].snapshot != after {
+            history.pushSnapshot(before)
+            history.pushSnapshot(after, label: label)
+          }
         }
         context.editorState.lastAgentChange = Self.timelineChange(name: name, arguments: validated)
       }
@@ -118,6 +123,12 @@ final class AgentToolDispatcher {
       logger.error("Agent tool \(name) failed: \(error)")
       throw AgentToolError.failed(error.localizedDescription)
     }
+  }
+
+  func callResult(_ name: String, arguments: JSONValue?) async throws -> AgentToolResult {
+    let value = try await call(name, arguments: arguments)
+    guard let handler = handlers[name] else { throw AgentToolError.unknownTool(name) }
+    return try handler.result(for: value, context: context)
   }
 
   func cancelBatch() {
@@ -135,8 +146,10 @@ final class AgentToolDispatcher {
   private func beginBatch(arguments: JSONValue) throws -> JSONValue {
     guard mutationBatch == nil else { throw AgentToolError.batchAlreadyActive }
     context.editorState.pendingUndoTask?.cancel()
+    let snapshot = context.editorState.createSnapshot()
+    context.editorState.history.pushSnapshot(snapshot)
     mutationBatch = MutationBatch(
-      snapshot: context.editorState.createSnapshot(),
+      snapshot: snapshot,
       historyIndex: context.editorState.history.currentIndex,
       label: Self.mutationLabel(arguments: arguments, fallback: "batch")
     )

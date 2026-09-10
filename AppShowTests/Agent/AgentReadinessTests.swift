@@ -39,6 +39,28 @@ struct AgentReadinessTests {
     #expect(readiness == .notLoggedIn(executable: executable.path, version: "2.1.259"))
   }
 
+  @Test func installedVersionRefreshesWithoutInvokingAuthentication() async throws {
+    let directory = try TestPaths.makeTemporaryDirectory()
+    defer { TestPaths.remove(directory) }
+    let probe = AgentProbe()
+    for version in ["1.2.3", "1.2.4"] {
+      let executable = try writeProvider(
+        in: directory,
+        body: """
+          if [ "$1" = "--version" ]; then
+            echo "codex-cli \(version)"
+            exit 0
+          fi
+          touch "$HOME/auth-was-invoked"
+          exit 1
+          """
+      )
+      let status = await probe.version(executable: executable, environment: environment(for: directory))
+      #expect(status == .available(version))
+    }
+    #expect(!FileManager.default.fileExists(atPath: directory.appendingPathComponent("auth-was-invoked").path))
+  }
+
   @Test func claudeProbeReportsReadyFromAuthJSON() async throws {
     let directory = try TestPaths.makeTemporaryDirectory()
     defer { TestPaths.remove(directory) }

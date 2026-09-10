@@ -9,6 +9,9 @@ make build      # Debug build
 make release    # Release build
 make store-build # Sandboxed store validation build
 make eval-store  # Audit the local store artifact
+make check-agent-updates # Compare bundled provider pins with official stable releases
+make stage-store-agents # Download and verify the pinned universal provider runtimes
+make test-agent-updates # Test runtime staging and update recovery
 make dev        # Build debug and run
 make run        # Build release and run
 make dmg        # Create DMG installer
@@ -198,6 +201,6 @@ Uses `MenuBarExtra(.window)` + MenuBarExtraAccess (1.2.x) for the `isPresented` 
 
 - Bundle ID: `com.mattwebhub.appshow`
 - `LSUIElement = false` (app shows in Dock with icon)
-- Direct-download target uses the existing unsandboxed configuration; `AppShowStore` enables App Sandbox and excludes Sparkle/the CLI helper. Store capture and file-access runtime acceptance remain required.
+- Direct-download target uses the existing unsandboxed configuration with automatically updated AppShow-managed runtimes or newer compatible user-installed CLIs. `AppShowStore` enables App Sandbox, excludes Sparkle, and bundles pinned agent runtimes plus the MCP helper. Store runtime updates ship through AppShow Mac App Store releases (ADR 0021). Store capture, agent and file-access runtime acceptance remain required.
 - Version is managed in `Config.xcconfig` (`MARKETING_VERSION` + `CURRENT_PROJECT_VERSION`)
 - SPM PBXBuildFile entries need `productRef` only (no `fileRef`)

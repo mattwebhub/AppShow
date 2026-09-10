@@ -1,10 +1,12 @@
 import argparse
+import hashlib
 import json
 import plistlib
 import subprocess
 from pathlib import Path
 
 from release_metadata import ROOT, configured_version
+from agent_runtime_versions import read_versions
 
 
 def run(*arguments):
@@ -44,11 +46,35 @@ def evaluate(app, universal):
         'versionAndBuild': info.get('CFBundleShortVersionString') == version and info.get('CFBundleVersion') == build,
         'noUpdateConfiguration': not any(key.startswith('SU') for key in info),
         'noSparkleLinkage': 'Sparkle' not in libraries,
-        'noUpdaterOrCLIHelper': not any('Sparkle' in path or 'appshow-mcp' in path for path in paths),
+        'noUpdater': not any('Sparkle' in path for path in paths),
         'privacyManifest': {'C617.1', '3B52.1'} <= reasons.get('NSPrivacyAccessedAPICategoryFileTimestamp', set()) and '35F9.1' in reasons.get('NSPrivacyAccessedAPICategorySystemBootTime', set()),
         'releaseNotDebuggable': not universal or not entitlements.get('com.apple.security.get-task-allow'),
         'architectures': set(architectures) == {'arm64', 'x86_64'} if universal else bool(architectures),
     }
+    runtime_manifest = app / 'Contents/Resources/AgentRuntimes.json'
+    runtime_checks = []
+    try:
+        receipt = json.loads(runtime_manifest.read_text())
+        runtime_checks.append(receipt.get('versions') == read_versions())
+        runtime_architectures = set(receipt['architectures'])
+        runtime_checks.append(runtime_architectures == set(architectures))
+        expected = ['Contents/Helpers/appshow-mcp']
+        expected += [f'Contents/Helpers/Runtimes/{arch}/{name}' for arch in architectures for name in ('codex', 'codex-code-mode-host', 'claude')]
+        runtime_checks.append(set(receipt['embeddedFiles']) == set(expected))
+        for relative in expected:
+            path = app / relative
+            runtime_checks.append(hashlib.sha256(path.read_bytes()).hexdigest() == receipt['embeddedFiles'][relative])
+            run('codesign', '--verify', '--strict', str(path))
+            if path.name == 'claude':
+                source = receipt['sourceFiles'][path.parent.name + '/claude']
+                runtime_checks.append(hashlib.sha256(path.read_bytes()).hexdigest() == source['sha256'])
+            else:
+                child = plistlib.loads(run('codesign', '-d', '--entitlements', ':-', str(path)))
+                runtime_checks.append(child == {'com.apple.security.app-sandbox': True, 'com.apple.security.inherit': True})
+        runtime_checks.append((app / 'Contents/Resources/AgentRuntimeNotices.txt').is_file())
+        checks['bundledAgentRuntimes'] = all(runtime_checks)
+    except (KeyError, ValueError, OSError, subprocess.SubprocessError):
+        checks['bundledAgentRuntimes'] = False
     try:
         run('codesign', '--verify', '--deep', '--strict', str(app))
         checks['signatureIntegrity'] = True
