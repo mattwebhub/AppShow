@@ -21,6 +21,7 @@ struct TimelineView: View {
   @Bindable var editorState: EditorState
   let systemAudioSamples: [Float]
   let micAudioSamples: [Float]
+  var externalAudioSamples: [UUID: [Float]] = [:]
   var systemAudioProgress: Double?
   var micAudioProgress: Double?
   var micAudioMessage: String?
@@ -73,6 +74,11 @@ struct TimelineView: View {
   @State var spotlightDragRegionId: UUID?
   @State var popoverSpotlightRegionId: UUID?
 
+  @State var externalDragOffset: CGFloat = 0
+  @State var externalDragType: RegionDragType?
+  @State var externalDragTrackId: UUID?
+  @State var popoverExternalTrackId: UUID?
+
   private var showSystemAudioTrack: Bool {
     !editorState.systemAudioMuted
       && (!systemAudioSamples.isEmpty || editorState.hasSystemAudio)
@@ -93,6 +99,7 @@ struct TimelineView: View {
     if editorState.hasWebcam && editorState.webcamEnabled { count += 1 }
     if showSystemAudioTrack { count += 1 }
     if showMicAudioTrack { count += 1 }
+    count += editorState.externalAudioTracks.count
     if editorState.zoomEnabled { count += 1 }
     if showSpotlightTrack { count += 1 }
     return count
@@ -132,6 +139,12 @@ struct TimelineView: View {
 
           if showMicAudioTrack {
             trackSidebar(label: "Mic", icon: "mic")
+              .frame(height: trackHeight)
+              .transition(.trackTransition)
+          }
+
+          ForEach(editorState.externalAudioTracks) { _ in
+            trackSidebar(label: "Audio", icon: "music.note")
               .frame(height: trackHeight)
               .transition(.trackTransition)
           }
@@ -211,6 +224,11 @@ struct TimelineView: View {
                   .transition(.trackTransition)
                 }
 
+                ForEach(editorState.externalAudioTracks) { track in
+                  externalAudioTrackContent(track: track, width: cw)
+                    .transition(.trackTransition)
+                }
+
                 if editorState.zoomEnabled {
                   zoomTrackContent(width: cw, keyframes: editorState.zoomTimeline?.allKeyframes ?? [])
                     .transition(.trackTransition)
@@ -270,6 +288,9 @@ struct TimelineView: View {
     }
     .frame(height: timelineHeight)
     .animation(.easeInOut(duration: 0.2), value: visibleTrackCount)
+    .fileDrop(of: ExternalAudioImporter.contentTypes) { urls in
+      editorState.importExternalAudioFiles(urls)
+    }
     .background(ReframedColors.backgroundCard)
     .padding(.vertical, 8)
   }

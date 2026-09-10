@@ -17,6 +17,14 @@ enum TestPaths {
   }
 }
 
+enum BundledFixtures {
+  static func url(_ name: String, extension ext: String) -> URL? {
+    let bundle = Bundle(for: FixtureAnchor.self)
+    return bundle.url(forResource: name, withExtension: ext, subdirectory: "Fixtures")
+      ?? bundle.url(forResource: name, withExtension: ext)
+  }
+}
+
 enum AudioFixtures {
   enum Container {
     case wav
@@ -76,5 +84,45 @@ enum AudioFixtures {
     }
     try file.write(from: buffer)
     return url
+  }
+
+  static func rmsDecibels(of url: URL, from start: Double, to end: Double) async throws -> Double {
+    let asset = AVURLAsset(url: url)
+    guard let track = try await asset.loadTracks(withMediaType: .audio).first else { return -Double.infinity }
+    let reader = try AVAssetReader(asset: asset)
+    reader.timeRange = CMTimeRange(
+      start: CMTime(seconds: start, preferredTimescale: 600),
+      end: CMTime(seconds: end, preferredTimescale: 600)
+    )
+    let output = AVAssetReaderTrackOutput(
+      track: track,
+      outputSettings: [
+        AVFormatIDKey: kAudioFormatLinearPCM,
+        AVLinearPCMBitDepthKey: 32,
+        AVLinearPCMIsFloatKey: true,
+        AVLinearPCMIsBigEndianKey: false,
+        AVLinearPCMIsNonInterleaved: false,
+      ]
+    )
+    reader.add(output)
+    guard reader.startReading() else { throw reader.error ?? VideoFixtureError.readerFailed("audio") }
+    var sum = 0.0
+    var count = 0
+    while let buffer = output.copyNextSampleBuffer() {
+      guard let block = CMSampleBufferGetDataBuffer(buffer) else { continue }
+      let length = CMBlockBufferGetDataLength(block)
+      let samples = length / MemoryLayout<Float>.size
+      var data = [Float](repeating: 0, count: samples)
+      data.withUnsafeMutableBytes { raw in
+        _ = CMBlockBufferCopyDataBytes(block, atOffset: 0, dataLength: length, destination: raw.baseAddress!)
+      }
+      for value in data {
+        sum += Double(value * value)
+      }
+      count += samples
+    }
+    guard count > 0 else { return -Double.infinity }
+    let rms = (sum / Double(count)).squareRoot()
+    return 20 * log10(max(rms, 1e-9))
   }
 }
