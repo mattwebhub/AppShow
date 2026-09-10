@@ -1,0 +1,8 @@
+{"type":"thread.started","thread_id":"019f-codex-thread"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"Postgres Timeout Investigation"}}
+{"type":"item.completed","item":{"id":"question-1","type":"function_call","name":"request_user_input","arguments":"{\"questions\":[{\"id\":\"project-kind\",\"header\":\"Project\",\"question\":\"What are you building?\",\"options\":[]}]}"}}
+{"type":"item.completed","item":{"id":"item_2","type":"command_execution","command":"ls","aggregated_output":"…","exit_code":0,"status":"completed"}}
+{"type":"turn.completed","error":null,"usage":{"input_tokens":10,"output_tokens":5}}
+{"type":"turn.failed","error":{"message":"Turn failed: rate limited"}}
+{"type":"error","message":"Handled error from server: Connection interrupted"}

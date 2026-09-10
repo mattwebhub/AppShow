@@ -10,7 +10,7 @@ TEST_TARGET = ReframedTests
 TEST_FILTER = $(if $(T),-only-testing:'$(TEST_TARGET)/$(T)',-only-testing:$(TEST_TARGET))
 TEST_OUTPUT_FILTER = ^(◇|✔|✘|Test Suite|\*\* )|Executed|: error:|: warning:|failed
 
-.PHONY: build release run dev test dmg dmg-release format lint clean help install uninstall changelog tag appcast publish
+.PHONY: build release run dev test test-shim test-agent-skills test-scenario dmg dmg-release format lint clean help install uninstall changelog tag appcast publish
 
 all: help
 
@@ -28,6 +28,15 @@ dev: build
 
 test:
 	@set -o pipefail; xcodebuild -project Reframed.xcodeproj -scheme $(SCHEME) -configuration Debug test -derivedDataPath $(BUILD_DIR) -destination '$(DESTINATION)' -parallel-testing-enabled NO $(TEST_FILTER) 2>&1 | grep -E '$(TEST_OUTPUT_FILTER)'
+
+test-shim:
+	@TEST_RUNNER_REFRAMED_RUN_SHIM_TESTS=1 $(MAKE) test T=AgentShimTests
+
+test-agent-skills:
+	@TEST_RUNNER_REFRAMED_RUN_AGENT_SKILL_E2E=1 TEST_RUNNER_REFRAMED_AGENT_CLAUDE_MODEL="$(CLAUDE_MODEL)" $(MAKE) test T=AgentSkillLiveTests
+
+test-scenario:
+	@TEST_RUNNER_REFRAMED_RUN_SCENARIO_TESTS=1 TEST_RUNNER_REFRAMED_RUN_EXPORT_TESTS=1 $(MAKE) test T=PresentationScenarioTests
 
 dmg: release
 	@./scripts/create-dmg.sh
@@ -59,10 +68,10 @@ publish: tag dmg-release appcast
 	@./scripts/publish-release.sh
 
 format:
-	@swift format -i -r Reframed/ $(wildcard ReframedTests)
+	@swift format -i -r Reframed/ Tools/ $(wildcard ReframedTests)
 
 lint:
-	@swift format lint -r -s Reframed/ $(wildcard ReframedTests)
+	@swift format lint -r -s Reframed/ Tools/ $(wildcard ReframedTests)
 
 clean:
 	@rm -rf $(BUILD_DIR) dist
@@ -82,6 +91,9 @@ help:
 	@echo "  run       - Build release and run"
 	@echo "  dev       - Build debug and run"
 	@echo "  test      - Run unit tests (make test T=SuiteName for one suite)"
+	@echo "  test-shim - Run the bundled MCP shim integration test"
+	@echo "  test-agent-skills - Run live provider skill tests (optional CLAUDE_MODEL=name)"
+	@echo "  test-scenario - Replay and export the deterministic presentation scenario"
 	@echo "  format    - Format Swift source files"
 	@echo "  clean     - Clean build artifacts"
 	@echo "  tag       - Create git tag from Config.xcconfig version and generate changelog"

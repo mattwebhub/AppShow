@@ -76,23 +76,20 @@ extension EditorState {
         cachedNoiseReductionIntensity: cachedIntensity
       )
     }
-    var captionSettings: CaptionSettingsData?
-    if !captionSegments.isEmpty {
-      captionSettings = CaptionSettingsData(
-        enabled: captionsEnabled,
-        fontSize: captionFontSize,
-        fontWeight: captionFontWeight,
-        textColor: captionTextColor,
-        backgroundColor: captionBackgroundColor,
-        backgroundOpacity: captionBackgroundOpacity,
-        showBackground: captionShowBackground,
-        position: captionPosition,
-        maxWordsPerLine: captionMaxWordsPerLine,
-        model: captionModel,
-        language: captionLanguage,
-        audioSource: captionAudioSource
-      )
-    }
+    let captionSettings = CaptionSettingsData(
+      enabled: captionsEnabled,
+      fontSize: captionFontSize,
+      fontWeight: captionFontWeight,
+      textColor: captionTextColor,
+      backgroundColor: captionBackgroundColor,
+      backgroundOpacity: captionBackgroundOpacity,
+      showBackground: captionShowBackground,
+      position: captionPosition,
+      maxWordsPerLine: captionMaxWordsPerLine,
+      model: captionModel,
+      language: captionLanguage,
+      audioSource: captionAudioSource
+    )
     return EditorStateData(
       trimStartSeconds: CMTimeGetSeconds(trimStart),
       trimEndSeconds: CMTimeGetSeconds(trimEnd),
@@ -124,7 +121,10 @@ extension EditorState {
       captionSettings: captionSettings,
       captionSegments: captionSegments.isEmpty ? nil : captionSegments,
       spotlightRegions: spotlightRegions.isEmpty ? nil : spotlightRegions,
-      externalAudioTracks: externalAudioTracks.isEmpty ? nil : externalAudioTracks
+      externalAudioTracks: externalAudioTracks.isEmpty ? nil : externalAudioTracks,
+      textOverlays: textOverlays.isEmpty ? nil : textOverlays,
+      imageOverlays: imageOverlays.isEmpty ? nil : imageOverlays,
+      blurRegions: blurRegions.isEmpty ? nil : blurRegions
     )
   }
 
@@ -134,9 +134,12 @@ extension EditorState {
 
     let prev = createSnapshot()
 
-    trimStart = .zero
-    trimEnd = playerController.duration
-    playerController.trimEnd = playerController.duration
+    let sourceDuration = CMTimeGetSeconds(playerController.duration)
+    let restoredStart = max(0, min(sourceDuration, data.trimStartSeconds))
+    let restoredEnd = max(restoredStart, min(sourceDuration, data.trimEndSeconds))
+    trimStart = CMTime(seconds: restoredStart, preferredTimescale: 600)
+    trimEnd = CMTime(seconds: restoredEnd, preferredTimescale: 600)
+    playerController.trimEnd = trimEnd
 
     backgroundStyle = data.backgroundStyle
     backgroundImageFillMode = data.backgroundImageFillMode ?? .fill
@@ -255,6 +258,9 @@ extension EditorState {
     } else {
       spotlightRegions = []
     }
+    textOverlays = data.textOverlays ?? []
+    imageOverlays = availableImageOverlays(data.imageOverlays ?? [])
+    blurRegions = (data.blurRegions ?? []).map { $0.normalized() }
 
     if case .image(let filename) = data.backgroundStyle, let bundleURL = project?.bundleURL {
       let url = bundleURL.appendingPathComponent(filename)
@@ -384,6 +390,9 @@ extension EditorState {
       _ = self.spotlightDimOpacity
       _ = self.spotlightEdgeSoftness
       _ = self.spotlightRegions
+      _ = self.textOverlays
+      _ = self.imageOverlays
+      _ = self.blurRegions
       _ = self.clickSoundEnabled
       _ = self.clickSoundVolume
       _ = self.clickSoundStyle
@@ -432,7 +441,7 @@ extension EditorState {
         self.syncVideoRegionsToPlayer()
         self.playerController.previewMode = self.isPreviewMode
         self.scheduleSave()
-        if !self.isRestoringState {
+        if !self.isRestoringState && !self.agentMutationBatchActive {
           self.scheduleUndoSnapshot()
         }
         self.observeChanges()
@@ -441,6 +450,9 @@ extension EditorState {
   }
 
   func teardown() {
+    agentTranscript.teardown()
+    agentConfirmations.clear()
+    Task { await agentBridgeController.stop() }
     pendingSaveTask?.cancel()
     pendingUndoTask?.cancel()
     micProcessingTask?.cancel()

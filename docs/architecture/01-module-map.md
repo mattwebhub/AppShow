@@ -6,6 +6,23 @@ Reminder: **these folders are not Swift modules.** Everything compiles into the 
 
 ---
 
+## `Agent/`
+
+**Responsibility.** Provider-neutral assistant runtime, one persisted conversation per project, provider discovery/readiness, streamed transcript rendering, and the editor's collapsible chat panel.
+
+| Cluster | Key types | Notes |
+| --- | --- | --- |
+| Provider protocol | `AgentProvider`, `ClaudeCodeProvider`, `CodexProvider`, `AgentEvent` | Keeps each CLI's filesystem sandbox read-only, adds only the scoped AppShow MCP server, and reduces versioned NDJSON into typed events. Unknown events are tolerated. |
+| Process boundary | `AgentProcessRunner`, `AgentSession` | Actors. One fresh child process per turn; cancellation terminates it. `AgentSession` maps process lines to events and accepts saved provider resume ids. The scrubbed environment retains `USER`/`LOGNAME`, which Claude's first-party credential lookup requires. |
+| Discovery | `AgentToolchain`, `AgentProbe`, `AgentReadiness` | Actors resolve executables and run bounded version/authentication probes without invoking a real CLI in tests. |
+| Persistence | `AgentConversationData`, `AgentConversationStore`, `AgentTranscript` | Exactly one `agent/conversation.json` inside each `.frm`; provider resume ids are stored independently. `AgentTranscript` is `@MainActor @Observable`. |
+| UI | `AgentChatPanel`, `AgentConversationView`, `AgentMarkdownView` | Persisted collapse/width, provider picker, explicit clear, streamed Markdown and expandable tool rows. |
+| Tool bridge | `AgentBridgeController`, `AgentBridgeServer`, `AgentRPCSession`, `AgentSessionConfig` | The editor owns an authenticated Unix socket. A signed `appshow-mcp` stdio helper relays MCP JSON-RPC for the selected CLI; session configuration exposes only this per-project server. |
+| Tool surface | `AgentToolCatalog`, `AgentToolDispatcher`, `AgentEditingToolCatalog`, `AgentConfirmations` | Read-only inspection and reversible mutations run on the main actor. Each call validates its schema, creates at most one labeled history entry, rolls back on failure, and returns the compact current timeline. Drafts stay inside the private workspace; external image reads, full exports, and destructive silence passes are confirmation-bound. |
+| Skills | `AgentSkillBundle`, `AgentWorkspace` | Five canonical workflows ship as app resources and are copied into both provider discovery trees for each project. Canonical vendor-neutral guidance preserves the typed-tool, confirmation, and Undo boundaries. |
+
+The portable conversation lives inside the project bundle. Ephemeral runtime state lives in the sibling `.agent/<project-name>/` workspace. `Agent/` depends on `Project`, `State`, and reusable `UI` tokens; only `EditorState` and `EditorView` depend on it.
+
 ## `Reframed/ReframedApp.swift` (29 LOC)
 
 `@main struct ReframedApp: App`. Bootstraps logging (`LogBootstrap.configure()` in `init`), declares the single `MenuBarExtra(.window)` scene, and wires `MenuBarExtraAccess` so `SessionState.statusItemButton` gets the `NSStatusBarButton`. Delegates everything else to `AppDelegate` via `@NSApplicationDelegateAdaptor`.

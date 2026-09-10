@@ -120,3 +120,13 @@ EditorState debounces saves with a 1-second delay. Every change schedules a save
 ## Music tracks (fork)
 
 External audio files can be added from the Audio tab or by dropping them on the timeline. Each becomes an `ExternalAudioTrackData` entry with a bundle-relative file name (`audio-<hash8>.<ext>`), a timeline start, in/out points inside the file, volume, mute, and linear fades, shown as its own "Audio" row under Mic. Preview playback runs through `ExternalAudioPreviewEngine` on an `AVAudioEngine`, resynced on play, seek, and gap skips; export inserts each track into the composition and applies `trackID`-keyed volume ramps (`VideoCompositor+ExternalAudio`). Fades are timeline-based and are clipped by trims and cuts.
+
+## Assistant panel
+
+The editor's left edge contains a collapsible, resizable assistant panel. It supports Claude Code and Codex, discovers their executables through PATH, common install locations, and a login shell, and checks version and authentication before enabling the composer.
+
+Each project owns exactly one conversation at `agent/conversation.json` inside its `.frm` bundle. Messages and provider-specific resume identifiers survive reopening the project. Clear Conversation removes both after confirmation. Switching providers keeps the conversation and uses that provider's own resume identifier.
+
+Each submitted turn launches a fresh provider process, streams Markdown and tool events into the transcript, and exits at completion or cancellation. The process runs in `.agent/<project-name>/` beside the bundle. That sibling directory is ephemeral workspace for sockets, tokens, and generated preview frames; it is not the portable conversation record.
+
+The chat is read-only toward the editor in milestone 04. Project inspection and mutation arrive through the authenticated agent bridge in milestones 05 and 06.

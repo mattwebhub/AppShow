@@ -59,6 +59,7 @@ struct AgentWorkspace: Sendable, Equatable {
     let fm = FileManager.default
     let directory = directory(forBundle: bundleURL)
     let workspace = AgentWorkspace(bundleURL: bundleURL, directory: directory, socketURL: socketURL(forWorkspace: directory), token: token)
+    try AgentSkillBundle.materialize(into: workspace.directory)
     try fm.createDirectory(at: workspace.framesDirectory, withIntermediateDirectories: true)
     try fm.createDirectory(at: workspace.socketURL.deletingLastPathComponent(), withIntermediateDirectories: true)
     let session = AgentWorkspaceSession(
@@ -86,6 +87,7 @@ struct AgentWorkspace: Sendable, Equatable {
 
   func close() {
     try? FileManager.default.removeItem(at: sessionFileURL)
+    try? FileManager.default.removeItem(at: directory.appendingPathComponent(AgentSessionConfig.claudeConfigFileName))
     try? FileManager.default.removeItem(at: socketURL)
   }
 }

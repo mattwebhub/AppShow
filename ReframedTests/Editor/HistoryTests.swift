@@ -151,4 +151,33 @@ struct HistoryTests {
     #expect(snapshot.spotlightRegions == original.spotlightRegions)
     #expect(snapshot.backgroundStyle == original.backgroundStyle)
   }
+
+  @Test func historyEntryLabelSurvivesRoundTripAndIsOptional() throws {
+    let snapshot = ProjectFixtures.editorState(marker: 1)
+    let labeled = HistoryData(
+      entries: [HistoryEntry(snapshot: snapshot, timestamp: Date(timeIntervalSince1970: 1), label: "Agent: tighten")],
+      currentIndex: 0
+    )
+
+    let encoded = try JSONEncoder().encode(labeled)
+    let decoded = try JSONDecoder().decode(HistoryData.self, from: encoded)
+    #expect(decoded.entries.first?.label == "Agent: tighten")
+
+    let legacy = try JSONEncoder().encode(
+      ["snapshot": try JSONValue(encoding: snapshot), "timestamp": JSONValue(1.0)] as [String: JSONValue]
+    )
+    let legacyEntry = try JSONDecoder().decode(HistoryEntry.self, from: legacy)
+    #expect(legacyEntry.label == nil)
+  }
+
+  @Test func pushSnapshotSkipsWhenEqualToCurrentEntry() {
+    let history = History()
+    let snapshot = ProjectFixtures.editorState(marker: 1)
+
+    history.pushSnapshot(snapshot)
+    history.pushSnapshot(snapshot, label: "Agent: no change")
+
+    #expect(history.entries.count == 1)
+    #expect(history.entries.first?.label == nil)
+  }
 }

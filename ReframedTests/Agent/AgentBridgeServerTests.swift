@@ -245,6 +245,40 @@ struct AgentBridgeServerTests {
     await harness.tearDown()
   }
 
+  @Test func controllerStartsAnEditingBridgeAndCleansUpItsSession() async throws {
+    let harness = try await makeHarness()
+    let controller = AgentBridgeController()
+    let helper = harness.dir.appendingPathComponent("appshow-mcp")
+
+    try await controller.start(editorState: harness.state, helperURL: helper)
+
+    let configuration = try #require(controller.configuration)
+    #expect(controller.status == .ready)
+    #expect(configuration.helperURL == helper)
+    #expect(FileManager.default.fileExists(atPath: configuration.workspace.sessionFileURL.path))
+    let client = BridgeTestClient(path: configuration.workspace.socketURL.path)
+    try await client.connect()
+    let initialized = try await client.request(
+      JSONRPCRequest(
+        id: .number(1),
+        method: "initialize",
+        params: ["token": .string(configuration.workspace.token)]
+      )
+    )
+    #expect(initialized.error == nil)
+    let list = try await client.request(JSONRPCRequest(id: .number(2), method: "tools/list", params: nil))
+    let names = Set(list.result?["tools"]?.arrayValue?.compactMap { $0["name"]?.stringValue } ?? [])
+    #expect(names.contains("set_trim"))
+    #expect(names.contains("set_kept_slices"))
+
+    await client.cancel()
+    await controller.stop()
+    #expect(controller.status == .stopped)
+    #expect(FileManager.default.fileExists(atPath: configuration.workspace.sessionFileURL.path) == false)
+    #expect(FileManager.default.fileExists(atPath: configuration.workspace.socketURL.path) == false)
+    await harness.tearDown()
+  }
+
   @Test func requestsBeforeInitializeAreRefused() async throws {
     let harness = try await makeHarness()
     let client = try await client(harness)
@@ -263,7 +297,7 @@ struct AgentBridgeServerTests {
 
     let initialized = try await initialize(client)
     #expect(initialized.error == nil)
-    #expect(initialized.result?["serverInfo"]?["name"] == "reframed")
+    #expect(initialized.result?["serverInfo"]?["name"] == "appshow")
     #expect(initialized.result?["serverInfo"]?["version"]?.stringValue?.isEmpty == false)
     #expect(initialized.result?["protocolVersion"] == .string(AgentToolCatalog.protocolVersion))
     #expect(initialized.result?["capabilities"]?["tools"] != nil)
@@ -299,10 +333,11 @@ struct AgentBridgeServerTests {
     )
     #expect(badArguments.error?.code == -32602)
     #expect(badArguments.error?.data?["code"] == "TOOL_ARGUMENTS_INVALID")
-    let pending = try await client.request(
+    let silences = try await client.request(
       JSONRPCRequest(id: .number(7), method: "tools/call", params: ["name": "get_silences", "arguments": [:]])
     )
-    #expect(pending.error?.code == -32004)
+    #expect(silences.error == nil)
+    #expect(silences.result?["structuredContent"]?["count"] == 0)
     let unknownMethod = try await client.request(JSONRPCRequest(id: .number(8), method: "resources/list", params: nil))
     #expect(unknownMethod.error?.code == -32601)
     #expect(harness.state.history.entries.count == 1)

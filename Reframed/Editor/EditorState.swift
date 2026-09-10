@@ -24,6 +24,11 @@ final class EditorState {
   var exportTask: Task<Void, Never>?
   var exportStatusMessage: String?
   var isPreviewMode = false
+  var agentTranscript: AgentTranscript
+  var agentConfirmations = AgentConfirmations()
+  var agentBridgeController = AgentBridgeController()
+  var agentActivity: AgentActivity?
+  var lastAgentChange: AgentTimelineChange?
 
   var backgroundStyle: BackgroundStyle = .solidColor(CodableColor(r: 0, g: 0, b: 0))
   var backgroundImage: NSImage?
@@ -62,6 +67,9 @@ final class EditorState {
   var spotlightDimOpacity: CGFloat = 0.6
   var spotlightEdgeSoftness: CGFloat = 50
   var spotlightRegions: [SpotlightRegionData] = []
+  var textOverlays: [TextOverlayData] = []
+  var imageOverlays: [ImageOverlayData] = []
+  var blurRegions: [BlurRegionData] = []
 
   var clickSoundEnabled: Bool = false
   var clickSoundVolume: Float = 0.5
@@ -86,6 +94,7 @@ final class EditorState {
 
   var history = History()
   var isRestoringState = false
+  var agentMutationBatchActive = false
   var pendingUndoTask: Task<Void, Never>?
 
   let logger = Logger(label: "eu.jankuri.reframed.editor-state")
@@ -159,6 +168,10 @@ final class EditorState {
     self.result = project.recordingResult
     self.playerController = SyncedPlayerController(result: project.recordingResult)
     self.projectName = project.name
+    self.agentTranscript = AgentTranscript(
+      store: AgentConversationStore(project: project),
+      defaultProvider: ConfigService.shared.agentProvider
+    )
 
     if let saved = project.metadata.editorState {
       self.backgroundStyle = saved.backgroundStyle
@@ -216,6 +229,7 @@ final class EditorState {
     self.result = result
     self.playerController = SyncedPlayerController(result: result)
     self.projectName = result.screenVideoURL.deletingPathExtension().lastPathComponent
+    self.agentTranscript = AgentTranscript(store: nil, defaultProvider: ConfigService.shared.agentProvider)
   }
 
   func setup() async {
@@ -311,6 +325,11 @@ final class EditorState {
         let dur = CMTimeGetSeconds(playerController.duration)
         spotlightRegions = [SpotlightRegionData(startSeconds: 0, endSeconds: dur)]
       }
+      if let savedTextOverlays = saved.textOverlays, !savedTextOverlays.isEmpty {
+        textOverlays = savedTextOverlays
+      }
+      imageOverlays = availableImageOverlays(saved.imageOverlays ?? [])
+      blurRegions = (saved.blurRegions ?? []).map { $0.normalized() }
       if let audioSettings = saved.audioSettings {
         systemAudioVolume = audioSettings.systemAudioVolume
         micAudioVolume = audioSettings.micAudioVolume
@@ -338,5 +357,8 @@ final class EditorState {
     }
 
     startAutoSave()
+    if !LaunchEnvironment.isTestHost, project != nil {
+      try? await agentBridgeController.start(editorState: self)
+    }
   }
 }

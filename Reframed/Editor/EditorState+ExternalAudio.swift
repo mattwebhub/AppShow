@@ -18,7 +18,12 @@ extension EditorState {
     syncExternalAudioToPlayer()
   }
 
-  func importExternalAudio(from sourceURL: URL) async throws {
+  @discardableResult
+  func importExternalAudio(
+    from sourceURL: URL,
+    atTime: Double? = nil,
+    recordsHistory: Bool = true
+  ) async throws -> ExternalAudioTrackData {
     guard let project else {
       throw CaptureError.recordingFailed("Audio files can only be added to a saved project")
     }
@@ -27,13 +32,17 @@ extension EditorState {
       fileName: imported.fileName,
       displayName: imported.displayName,
       sourceDurationSeconds: imported.durationSeconds,
-      timelineStartSeconds: CMTimeGetSeconds(currentTime),
+      timelineStartSeconds: atTime ?? CMTimeGetSeconds(currentTime),
       fileOutSeconds: imported.durationSeconds
     )
-    externalAudioTracks.append(ExternalAudioTrackMath.clamped(track, to: CMTimeGetSeconds(duration)))
+    let added = ExternalAudioTrackMath.clamped(track, to: CMTimeGetSeconds(duration))
+    externalAudioTracks.append(added)
     syncExternalAudioToPlayer()
     scheduleSave()
-    history.pushSnapshot(createSnapshot())
+    if recordsHistory {
+      history.pushSnapshot(createSnapshot())
+    }
+    return added
   }
 
   func importExternalAudioFiles(_ urls: [URL]) {

@@ -25,7 +25,8 @@ struct EditorView: View {
     if editorState.zoomEnabled { h |= 8 }
     if editorState.spotlightEnabled { h |= 16 }
     if editorState.showCutTrack { h |= 32 }
-    h |= editorState.externalAudioTracks.count << 6
+    if editorState.showOverlayTrack { h |= 64 }
+    h |= editorState.externalAudioTracks.count << 7
     return h
   }
 
@@ -45,6 +46,13 @@ struct EditorView: View {
         .padding(.bottom, 2)
 
         HStack(spacing: 8) {
+          AgentChatPanel(
+            transcript: editorState.agentTranscript,
+            confirmations: editorState.agentConfirmations,
+            sessionConfiguration: editorState.agentBridgeController.configuration,
+            project: editorState.project,
+            isExporting: editorState.isExporting
+          )
           mainContent
             .background(ReframedColors.backgroundCard)
             .clipShape(RoundedRectangle(cornerRadius: Radius.xxl))

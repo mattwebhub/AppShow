@@ -24,7 +24,7 @@ Source of the task list: `docs/architecture/07-testability.md` §5 (first fiftee
 - [x] T14. Test 13, caption timing and `mergeShortSegments` with seam S7 (drop `private`). Proof: `ReframedTests/Compositor/CaptionTimingTests.swift`, `ReframedTests/Utilities/TranscriptionServiceTests.swift`.
 - [x] T15. Test 15, `SharedRecordingClock`. Proof: `ReframedTests/Recording/SharedRecordingClockTests.swift`.
 - [x] T16. Seams recorded in `planning/upstream-sync.md`; `docs/architecture/07-testability.md` marked with what landed. Proof: grep.
-- [ ] T17. `VERIFY.md` run, branch pushed, PR opened, URL recorded.
+- [x] T17. `VERIFY.md` run, branch pushed, PR opened, URL recorded.
 
 ## Out of scope
 

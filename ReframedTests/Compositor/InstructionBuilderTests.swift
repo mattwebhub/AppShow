@@ -65,6 +65,22 @@ struct InstructionBuilderTests {
     #expect(size == CGSize(width: 1280, height: 426))
   }
 
+  @Test func maximumWidthCapsWithoutUpscaling() {
+    let capped = VideoCompositor.computeRenderSize(
+      canvasSize: CGSize(width: 1920, height: 1080),
+      resolution: .original,
+      maximumWidth: 640
+    )
+    let alreadySmall = VideoCompositor.computeRenderSize(
+      canvasSize: CGSize(width: 320, height: 180),
+      resolution: .original,
+      maximumWidth: 640
+    )
+
+    #expect(capped == CGSize(width: 640, height: 360))
+    #expect(alreadySmall == CGSize(width: 320, height: 180))
+  }
+
   private func result(
     webcam: Bool = false,
     quality: CaptureQuality = .standard
@@ -275,5 +291,26 @@ struct InstructionBuilderTests {
     config.exportSettings.codec = .proRes4444
 
     #expect(!needsCompositor(config, result: result(quality: .veryHigh)))
+  }
+
+  @Test func textOverlayNeedsCompositor() {
+    var config = config()
+    config.textOverlays = [TextOverlayData(startSeconds: 0, endSeconds: 1)]
+
+    #expect(needsCompositor(config))
+  }
+
+  @Test func imageOverlayNeedsCompositor() {
+    var config = config()
+    config.imageOverlays = [ImageOverlayData(startSeconds: 0, endSeconds: 1, filename: "image.png")]
+
+    #expect(needsCompositor(config))
+  }
+
+  @Test func blurRegionNeedsCompositor() {
+    var config = config()
+    config.blurRegions = [BlurRegionData(startSeconds: 0, endSeconds: 1)]
+
+    #expect(needsCompositor(config))
   }
 }

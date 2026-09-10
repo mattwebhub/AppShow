@@ -64,6 +64,7 @@ struct PropertiesPanel: View {
           cornerRadiusSection
           videoShadowSection
           backgroundSection
+          silencesSection
         case .camera:
           cameraSection
           cameraPositionSection
@@ -87,6 +88,7 @@ struct PropertiesPanel: View {
         case .zoom:
           zoomSection
         case .effects:
+          overlaysSection
           spotlightSection
         case .captions:
           captionsSection

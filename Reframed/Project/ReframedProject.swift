@@ -50,6 +50,10 @@ struct ReframedProject: Sendable {
     bundleURL.appendingPathComponent(fileName)
   }
 
+  var agentDirectory: URL {
+    bundleURL.appendingPathComponent("agent", isDirectory: true)
+  }
+
   var recordingResult: RecordingResult {
     RecordingResult(
       screenVideoURL: screenVideoURL,
