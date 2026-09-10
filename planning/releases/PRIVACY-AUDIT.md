@@ -2,6 +2,18 @@
 
 Date: 2026-09-10. Scope: first-party source and the local Store target with restored provider integrations. This is engineering evidence, not a completed privacy policy or App Store Connect disclosure.
 
+## Submission follow-up
+
+The current public policy is [PRIVACY.md](../../PRIVACY.md), with a Settings → About link in both editions. The policy distinguishes local processing from optional provider requests and model/update downloads. Its contact route is the existing public support page; App Review's private contact details are not copied into the repository.
+
+Source inspection confirms that first-party logs rotate at 5 MiB with three retained older files. WhisperKit's default model repository is `argmaxinc/whisperkit-coreml` on Hugging Face; transcription itself uses the installed local model. Store provider state remains container-scoped, and Claude nonessential traffic is disabled.
+
+The pinned Codex `rust-v0.153.3` source sets `DEFAULT_ANALYTICS_ENABLED` to true in `codex-rs/exec/src/lib.rs`. `core/src/config/otel.rs` defaults metrics to Statsig, and `core/src/otel_init.rs` gates this on the analytics setting. AppShow does not currently override that setting. The privacy policy therefore discloses provider usage and performance metrics; it does not claim that all integrated runtimes are telemetry-free. See the [pinned implementation](https://github.com/openai/codex/blob/rust-v0.153.3/codex-rs/exec/src/lib.rs).
+
+Provider-side retention and model-improvement choices follow the relevant account: [Claude Code data usage](https://code.claude.com/docs/en/data-usage), [OpenAI privacy](https://openai.com/policies/privacy-policy/), and [Hugging Face privacy](https://huggingface.co/privacy). These references do not justify applying unrelated website features, such as payments or advertising, to AppShow's own flows.
+
+App Store Connect data collection must include integrated providers under [Apple's definitions](https://developer.apple.com/app-store/app-privacy-details/). Local-only recordings are not themselves collection. Assistant messages, project text/transcripts and requested previews are transmitted to account-linked provider services; the optional-assistant feature does not justify a blanket “Data Not Collected” answer. Provider identifiers, network-derived information and diagnostics require the corresponding questionnaire details. The questionnaire was started but not completed or published before the owner stopped desktop control.
+
 ## First-party API declarations
 
 The store resource `AppShow/PrivacyInfo.xcprivacy` declares the following observed uses. It is included only in the store target; the direct edition's broader external-assistant behavior needs its own review.

@@ -67,6 +67,7 @@ extension SettingsView {
       HStack(spacing: 16) {
         linkButton("GitHub", icon: "arrow.up.right.square", url: "https://github.com/mattwebhub/AppShow")
         linkButton("Issues", icon: "ladybug", url: "https://github.com/mattwebhub/AppShow/issues")
+        linkButton("Privacy", icon: "hand.raised", url: "https://mattwebhub.github.io/AppShow/privacy/")
         #if !APP_STORE
         linkButton("Releases", icon: "shippingbox", url: "https://github.com/mattwebhub/AppShow/releases")
         #endif

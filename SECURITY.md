@@ -21,14 +21,16 @@ I'll acknowledge your report within 48 hours and work with you on a fix before a
 
 ## Scope
 
-AppShow runs without the App Sandbox (ScreenCaptureKit requires it) and requests several system permissions:
+The Mac App Store edition runs in App Sandbox; the direct-download edition runs without it. Depending on the selected capture features, AppShow requests these system permissions:
 
 - Screen Recording
-- Accessibility (cursor and keystroke capture)
+- Accessibility (direct-download edition only)
 - Microphone (optional)
 - Camera (optional)
 
 Security issues related to how the app handles these permissions, stores user data, or processes recordings are all in scope.
+
+The optional assistants share messages and requested project context with the selected provider. See the [privacy policy](PRIVACY.md) for storage, sharing and deletion details.
 
 ## Disclosure
 

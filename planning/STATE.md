@@ -2,6 +2,14 @@
 
 Last updated: 2026-09-10
 
+## Current submission continuation
+
+The final four screenshots and clean generated reviewer attachment are saved in App Store Connect. The owner's 4+ age rating is verified; copyright and the existing no-third-party-content declaration are now saved. App Review contact details remain private. No build is selected and no review request has been submitted.
+
+The public privacy policy and Settings → About link are prepared in `codex/store-privacy`; formatting, lint, and Direct/Store Debug builds passed without warnings before the GitHub Pages URL update. The policy describes optional AI sharing, provider metrics, local retention and model downloads. The owner requested GitHub Pages hosting and a paste-only URL update. The Pages workflow builds from the single root policy source and deploys only the website files. Final deployment and saved URL verification remain pending. The owner's later screenshot shows “Data is not collected”; that declaration must be reconciled with the provider inventory before review. No new recordings or Figma operations occurred.
+
+The previous development archive passed 818 tests in 100 suites, three sandbox-hosted tests, real Claude/Codex MCP edits and Undo, Codex Stop/Retry, cold reopening/resumption, and a seven-second H.264 export from the generated sample. Its distribution export succeeded; no package was uploaded. A replacement archive is required for the new privacy link. The owner asked to set aside the Claude re-signing interpretation; see [distribution evidence](releases/STORE-DISTRIBUTION-SIGNING.md) for the remaining technical receipt/audit distinction.
+
 Owner identifiers (developer team, App Store Connect record, local checkout paths) are kept out of the repository in the git-ignored `planning/local/OWNER.md`; public docs use `<team id>`, `<app id>`, `<toone-repo>` and "the owner".
 
 ## Position
