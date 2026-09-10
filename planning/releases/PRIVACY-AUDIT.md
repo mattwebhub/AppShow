@@ -1,6 +1,6 @@
 # Store privacy implementation audit
 
-Date: 2026-09-09. Scope: first-party source and the local store validation target. This is engineering evidence, not a completed privacy policy or App Store Connect disclosure.
+Date: 2026-09-10. Scope: first-party source and the local Store target with restored provider integrations. This is engineering evidence, not a completed privacy policy or App Store Connect disclosure.
 
 ## First-party API declarations
 
@@ -17,10 +17,11 @@ The manifest deliberately supplies API reasons only. It does not assert complete
 
 ## Data flow and remaining owner work
 
-- Screen, camera, microphone and system audio become local project media. Imports are copied into project bundles; exports are local files. Projects can include captions and, when originating from the direct edition, saved assistant conversations. A public policy must explain storage, user-controlled sharing/deletion, and what deleting the app does to documents outside the container.
+- Screen, camera, microphone and system audio become local project media. Imports are copied into project bundles; exports are local files. Projects can include captions and saved assistant conversations in both editions. A public policy must explain storage, user-controlled sharing/deletion, and what deleting the app does to documents outside the container.
 - Logs include operational details and paths and remain local in the current first-party implementation. Confirm the final release's retention and support-report handling before describing either publicly. No automatic first-party analytics/crash-upload implementation was identified by this audit; this is not a blanket statement about system services or SDKs.
 - WhisperKit downloads selected models over the network. Downloads inherently expose network/request metadata to the hosting services; review the actual resolved SDK, endpoints, tokenizer/model fetches, caching, licenses and privacy terms. Test explicit consent, size information, cancellation, retry, offline use and Intel limitations with the store app.
-- The external assistant is disabled in the store validation build. If retained in the shipping store edition, re-evaluate authentication, prompts/media/tool transmissions, provider retention and reviewer access. The direct edition still requires that disclosure.
+- The Store assistant is enabled. Before the first send to each provider in a conversation view, AppShow identifies OpenAI or Anthropic and asks permission to send messages, project details and assistant-requested preview images. Typed MCP tools can return project metadata, text/transcripts and image content; project-local conversation history persists in the document. Full exports have a separate confirmation. This is a first-party UI/source check, not a completed inventory of provider-side collection or retention.
+- Store sign-in runs through the bundled provider's own flow. Codex and Claude state stays in dedicated container directories; AppShow does not copy external CLI credentials or configuration. The Store environment disables provider self-updates and Claude nonessential traffic, while the direct runtime updater is excluded at compilation. These controls do not establish that provider network requests contain no telemetry. Review the exact pinned provider packages and their current service terms for App Privacy answers.
 - The resolved dependency tree includes privacy resources from `swift-crypto`; inspect the final archive's combined privacy report and the full inventory, including WhisperKit, swift-transformers, RNNoise, gifski, Logging and MenuBarExtraAccess. A dependency's manifest covers its own declarations, not the whole app.
 - The owner must supply a public privacy-policy URL, support contact, complete App Store Connect answers and confirm the intended service relationships. These have not been published or submitted.
 

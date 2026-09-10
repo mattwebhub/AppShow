@@ -1,49 +1,32 @@
-# App Store design package
+# AppShow presentation assets
 
-Status: design review. Two owner-supplied screenshots from the direct edition now fill the hero and pace layouts; three captures remain pending. The owner explicitly requested review before anything is submitted. No assets, metadata or build have been submitted.
+The owner approved using the updated Figma set in App Store Connect on September 10 and asked to prepare the release. The first frame was removed; use the four-frame set below. All four screenshots are uploaded and processed in App Store Connect app <app id>; their numbered order was verified after reload and in Media Manager. No new recordings are requested.
 
-The five images use the existing brushstroke identity, ink background, restrained accent colors and large system typography. Every image has one feature claim and space for a complete, authentic AppShow Store window. The editable [shot list](shots.json) supplies copy and capture direction; [slide.html](slide.html) controls the layout.
+The editable [Figma presentation](https://www.figma.com/design/5nqdxqb29569Umo2dBg9xT) contains four 2880 × 1800 frames. It uses the existing AppShow icon and Rubik, the font used by Toone's web landing page. Each slide has its own feature view:
 
-## Render and review
-
-```sh
-/usr/bin/python3 -B scripts/render-store-assets.py --capture-edition direct
-open dist/app-store-submission/design/index.html
-```
-
-The renderer finds an installed Playwright Chromium headless shell, or accepts another compatible executable through `--chrome`. The system Google Chrome executable is the fallback; its screenshot process timed out on the preparation machine, so the installed headless shell was used for verification. Rendering uses a temporary profile, embedded local images and no account session.
-
-The renderer makes five opaque RGB PNGs at 2880 × 1800, a local review gallery, a copy of the existing 1024-pixel macOS icon and `asset-evaluation.json`. It verifies PNG dimensions, color format and source/output hashes. Missing captures produce conspicuously labeled layout proofs. These are not submission images. `--require-captures` fails before rendering if any required input is absent.
-
-Native PNG inputs go in ignored `dist/app-store-submission/captures/`, using the names in the shot list. Rendered outputs and private source footage also stay in ignored `dist/`. Do not substitute the inherited Reframed screenshot, generated UI, or a different app's window. The renderer does not crop or retouch the app capture; it places the complete image inside the layout.
-
-The supplied September 9 screenshots at 19:51:29 and 19:54:40 show the real editor, assistant conversation, preview, cuts and speed tracks. They are used unchanged in images 01 and 02. `--capture-edition direct` records that provenance in the report and adds a visible design-review label. Their assistant UI differs from the current Store validation target, so they establish a design direction rather than Store candidate parity. The visible imported music title and demonstration content remain part of the final visible-content/rights review; no audio has been included in these still images.
-
-## Footage prepared locally
-
-The owner suggested the latest Desktop video. `routine-demo-v2.mp4` is 62.05 seconds, HEVC, 3836 × 2476 at 60 fps, with AAC audio. A sampled frame shows a Toone routine demonstration. It is suitable as sample content inside AppShow, subject to visible-content and rights review; it does not itself demonstrate AppShow's interface.
-
-An independent `Routine demo.appshow` project was prepared under `dist/app-store-submission/demo-project/` with a copy of that export as its screen track. It has no assistant history, external audio or original project metadata. This is a presentation project, not an automated test fixture. The original Desktop export and original projects remain unchanged.
-
-## Acceptance evaluation
-
-- [ ] Each native capture comes from the intended Store candidate; record commit, version/build, architecture, macOS version and capture date.
-- [ ] The shown controls and edits really work in that edition. A1/A2/A4/A7/A11 feature decisions and runtime gates remain applicable.
-- [ ] Full-size and thumbnail review confirms readable titles, uncut windows, correct colors and no exposed personal/client material.
-- [ ] Rights to the sample content, icon and visible third-party material are recorded against A8.
-- [ ] All five source captures exist; render with `--require-captures`, inspect every PNG and retain the generated report.
-- [ ] The owner reviews the completed screenshot set and explicitly approves submission. Approval of layout proofs alone does not approve later screenshots.
-
-## Optional 24-second preview storyboard
-
-| Time | Capture from the actual AppShow Store edition |
+| Frame | Feature and native capture |
 | --- | --- |
-| 0–5 s | Open the prepared project and play a short section. Introduce the recording-to-editor workflow. |
-| 5–10 s | Make one visible cut and undo/reapply it. |
-| 10–15 s | Change the background and spacing with the real controls. |
-| 15–20 s | Add or select a zoom region and play through it. |
-| 20–24 s | Open the export sheet and show the supported output choices. |
+| 1 · Record. Tell AI. Show. (`5:2`) | Owner’s hero headline with the real Store conversation, MCP activity and provider controls |
+| 2 · Cut the waiting. (`6:2`) | Selected speed region and pacing controls |
+| 3 · Make it yours. (`7:2`) | Background palette, canvas and framing controls |
+| 4 · Ready to share. (`7:12`) | Owner’s enlarged native export sheet and output choices |
 
-Record fresh AppShow UI footage when screen capture is available. Use only cleared narration/audio. Do not transcode the Desktop demonstration and label it as an AppShow app preview. The storyboard is prepared; a preview video has not been recorded or rendered.
+Keep headlines, copy, icon and image fills editable. Do not replace the app interface with generated UI. Provider labels describe the integration; a provider account is required. Both providers now complete live Debug Store MCP edits; milestone 21 retains exact universal-candidate and recovery acceptance.
 
-Apple's [Mac screenshot specification](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/) includes 2880 × 1800 at 16:10. Its [preview specification](https://developer.apple.com/help/app-store-connect/reference/app-information/app-preview-specifications/) calls for Mac landscape 1920 × 1080, 15–30 seconds, at most 30 fps and 500 MB; H.264 uses the documented profile, bitrate and audio settings. The [app icon](https://developer.apple.com/help/app-store-connect/manage-app-information/add-an-app-icon/) is supplied through the Xcode build. Recheck these requirements at upload time.
+The current upload pack is under ignored `dist/app-store-submission/2026-09-10-owner-approved/`. Its `screenshots/` directory holds fresh native Figma exports; `upload/` holds the four numbered RGB PNGs without alpha. Decoded pixel hashes prove the upload copies are visually identical to the owner’s exports. `screenshot-manifest.json` records order, frame IDs, dimensions and SHA-256 hashes. Use only these four upload files. The older five-frame pack under `2026-09-09-rubik/` is historical.
+
+## Cropped demonstration source
+
+The working project is `dist/app-store-submission/demo-project/Routine demo.appshow`. It was prepared from the owner's 62.05-second Toone routine export, which is sample content inside AppShow rather than a recording of AppShow's interface.
+
+The previous export contained a baked matte. The replacement screen track crops 3836 × 2476 to 3452 × 2228 at x=192, y=124, removing approximately five percent from each edge. The HEVC output retains the source duration and copied audio stream. Project timing and overlays remain editable. The original working media is preserved as `routine-demo-uncropped.mp4` in the asset directory; the Desktop original and original projects remain untouched. `source-crop.json` records the operation.
+
+## Review scope
+
+These are owner-approved listing assets. The hero retains the earlier real Store conversation; pacing, canvas and export stills originate from the Direct build with the cropped source. They do not establish final Store candidate acceptance. Runtime, rights, distribution signing, account and App Review gates remain in the [readiness evaluation](../../planning/releases/APP-STORE-EVAL.md).
+
+Apple's [Mac screenshot specification](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/) includes 2880 × 1800. No preview video is included in this upload pack; the owner will record it later.
+
+The owner removed the former first frame and moved the hero headline into the agent frame. Native Figma inspection and export preserved those edits, the gray hero, the three feature colors and the enlarged export sheet. No Figma content was changed during this upload preparation.
+
+The external project failed to open during the earlier capture pass, then opened successfully in both the Debug Store app and the fresh universal archive on September 10. This successful retest does not explain the earlier failure or close the complete file-access matrix. The corresponding Debug Store chat failures are resolved; final universal-candidate and recovery checks remain open.
