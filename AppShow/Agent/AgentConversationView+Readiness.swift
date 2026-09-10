@@ -5,7 +5,7 @@ extension AgentConversationView {
   @ViewBuilder
   var readinessView: some View {
     if isResolving, selectedReadiness == nil {
-      statusRow(icon: "ellipsis", text: "Checking \(transcript.provider.displayName)…")
+      AgentActivityRow(text: "Checking \(transcript.provider.displayName)…")
     } else {
       switch selectedReadiness {
       case .ready(_, let version):
@@ -92,8 +92,7 @@ extension AgentConversationView {
       .disabled(isResolving || signIn.isRunning)
     }
     .padding(8)
-    .background(AppShowColors.muted)
-    .clipShape(RoundedRectangle(cornerRadius: Radius.md))
+    .background(AppShowColors.muted, in: RoundedRectangle(cornerRadius: Radius.md))
   }
 
   func refreshReadiness() async {

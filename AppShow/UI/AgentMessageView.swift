@@ -5,6 +5,22 @@ struct AgentMessageView: View {
   let message: AgentMessageData
 
   var body: some View {
+    Group {
+      if message.role == .user {
+        content
+          .padding(10)
+          .background(AppShowColors.muted, in: RoundedRectangle(cornerRadius: Radius.lg))
+          .padding(.leading, 24)
+      } else {
+        content
+      }
+    }
+    .font(.system(size: FontSize.xs))
+    .foregroundStyle(AppShowColors.primaryText)
+    .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
+  }
+
+  private var content: some View {
     VStack(alignment: .leading, spacing: 12) {
       ForEach(Array(message.content.enumerated()), id: \.offset) { _, content in
         switch content {
@@ -21,22 +37,20 @@ struct AgentMessageView: View {
         }
       }
       if message.status == .streaming {
-        Text("▋")
-          .foregroundStyle(AppShowColors.secondaryText)
+        if case .text? = message.content.last {
+          Text("▋")
+            .foregroundStyle(AppShowColors.secondaryText)
+        } else {
+          AgentActivityRow(text: message.content.isEmpty ? "Thinking…" : "Working…")
+        }
+      }
+      if message.status == .cancelled {
+        AgentNoticeView(text: "Stopped before the reply finished.", icon: "stop.circle")
       }
       if let reason = message.failureReason {
-        Text(reason)
-          .font(.system(size: FontSize.xxs))
-          .foregroundStyle(Color.red)
+        AgentNoticeView(text: reason, tone: .error)
       }
     }
-    .font(.system(size: FontSize.xs))
-    .foregroundStyle(AppShowColors.primaryText)
-    .padding(message.role == .user ? 10 : 0)
-    .background(message.role == .user ? AppShowColors.muted : Color.clear)
-    .clipShape(RoundedRectangle(cornerRadius: Radius.lg))
-    .padding(.leading, message.role == .user ? 24 : 0)
-    .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
   }
 
 }
@@ -52,17 +66,27 @@ private struct AgentToolCallView: View {
         if hasDetails { expanded.toggle() }
       } label: {
         HStack(spacing: Layout.compactSpacing) {
-          Image(systemName: icon)
-          Text(call.name)
+          statusIndicator
+            .frame(width: 16, height: 16)
+          Text(AgentToolPresentation.displayName(for: call.name))
             .font(.system(size: FontSize.xs, weight: .medium))
-          Spacer()
+            .lineLimit(1)
+          Text(AgentToolPresentation.editorArea(for: call.name))
+            .font(.system(size: FontSize.xxs))
+            .foregroundStyle(AppShowColors.tertiaryText)
+            .lineLimit(1)
+          Spacer(minLength: 0)
           if hasDetails {
-            Image(systemName: expanded ? "chevron.up" : "chevron.down")
+            Image(systemName: "chevron.down")
+              .font(.system(size: FontSize.xxs, weight: .semibold))
               .foregroundStyle(AppShowColors.secondaryText)
+              .rotationEffect(.degrees(expanded ? 180 : 0))
           }
         }
+        .contentShape(Rectangle())
       }
       .buttonStyle(PlainCustomButtonStyle())
+      .help(call.name)
       if expanded {
         if !call.input.isEmpty {
           detail(call.input)
@@ -73,12 +97,27 @@ private struct AgentToolCallView: View {
       }
     }
     .padding(8)
-    .background(AppShowColors.muted)
-    .clipShape(RoundedRectangle(cornerRadius: Radius.md))
+    .background(AppShowColors.muted, in: RoundedRectangle(cornerRadius: Radius.md))
+    .animation(.easeOut(duration: 0.15), value: expanded)
   }
 
   private var hasDetails: Bool {
     !call.input.isEmpty || call.output?.isEmpty == false
+  }
+
+  @ViewBuilder
+  private var statusIndicator: some View {
+    switch call.status {
+    case .executing:
+      ProgressView()
+        .controlSize(.mini)
+    case .completed:
+      Image(systemName: "checkmark.circle")
+        .foregroundStyle(AppShowColors.secondaryText)
+    case .failed:
+      Image(systemName: "exclamationmark.circle")
+        .foregroundStyle(Color.red)
+    }
   }
 
   private func detail(_ text: String) -> some View {
@@ -86,13 +125,5 @@ private struct AgentToolCallView: View {
       .font(.system(size: FontSize.xxs, design: .monospaced))
       .foregroundStyle(AppShowColors.secondaryText)
       .textSelection(.enabled)
-  }
-
-  private var icon: String {
-    switch call.status {
-    case .executing: "hourglass"
-    case .completed: "checkmark.circle"
-    case .failed: "exclamationmark.circle"
-    }
   }
 }
