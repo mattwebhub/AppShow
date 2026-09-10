@@ -36,8 +36,7 @@ struct AgentCodeBlockView: View {
       }
       .padding(8)
     }
-    .background(AppShowColors.fieldBackground)
-    .clipShape(RoundedRectangle(cornerRadius: Radius.md))
+    .background(AppShowColors.fieldBackground, in: RoundedRectangle(cornerRadius: Radius.md))
     .overlay(RoundedRectangle(cornerRadius: Radius.md).strokeBorder(AppShowColors.border, lineWidth: 1))
   }
 }

@@ -397,6 +397,7 @@
 		592000000000000000000001 /* AgentSignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591000000000000000000001 /* AgentSignIn.swift */; };
 		592000000000000000000002 /* AgentConversationView+Sending.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591000000000000000000002 /* AgentConversationView+Sending.swift */; };
 		592000000000000000000003 /* AgentRuntimeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591000000000000000000003 /* AgentRuntimeSettingsView.swift */; };
+		592000000000000000000005 /* AgentNoticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591000000000000000000005 /* AgentNoticeView.swift */; };
 		592000000000000000000004 /* AgentRuntimeUpdateInstructions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591000000000000000000004 /* AgentRuntimeUpdateInstructions.swift */; };
 		594200000000000000000000 /* AgentRuntimeRelease.swift in Sources */ = {isa = PBXBuildFile; fileRef = 594100000000000000000000 /* AgentRuntimeRelease.swift */; };
 		594200000000000000000001 /* AgentRuntimeArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 594100000000000000000001 /* AgentRuntimeArchive.swift */; };
@@ -838,6 +839,7 @@
 		591000000000000000000001 /* AgentSignIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSignIn.swift; sourceTree = "<group>"; };
 		591000000000000000000002 /* AgentConversationView+Sending.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentConversationView+Sending.swift"; sourceTree = "<group>"; };
 		591000000000000000000003 /* AgentRuntimeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRuntimeSettingsView.swift; sourceTree = "<group>"; };
+		591000000000000000000005 /* AgentNoticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentNoticeView.swift; sourceTree = "<group>"; };
 		591000000000000000000004 /* AgentRuntimeUpdateInstructions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRuntimeUpdateInstructions.swift; sourceTree = "<group>"; };
 		594100000000000000000000 /* AgentRuntimeRelease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRuntimeRelease.swift; sourceTree = "<group>"; };
 		594100000000000000000001 /* AgentRuntimeArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRuntimeArchive.swift; sourceTree = "<group>"; };
@@ -1112,6 +1114,7 @@
 				594100000000000000000006 /* AgentAutomaticUpdateControls.swift */,
 				591000000000000000000004 /* AgentRuntimeUpdateInstructions.swift */,
 				591000000000000000000003 /* AgentRuntimeSettingsView.swift */,
+				591000000000000000000005 /* AgentNoticeView.swift */,
 				B70000000000000000000004 /* DevicePopover.swift */,
 				B70000000000000000000005 /* DevicePickerPopover.swift */,
 				B80000000000000000000001 /* MenuBarView.swift */,
@@ -1787,6 +1790,7 @@
 				A1000000000000000000002D /* SettingsView.swift in Sources */,
 				592000000000000000000004 /* AgentRuntimeUpdateInstructions.swift in Sources */,
 				592000000000000000000003 /* AgentRuntimeSettingsView.swift in Sources */,
+				592000000000000000000005 /* AgentNoticeView.swift in Sources */,
 				A1000000000000000000003D /* Constants.swift in Sources */,
 				A20000000000000000000001 /* WebcamCapture.swift in Sources */,
 				A20000000000000000000002 /* WebcamPreviewWindow.swift in Sources */,

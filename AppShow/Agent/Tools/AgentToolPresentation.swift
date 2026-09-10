@@ -1,7 +1,7 @@
 import Foundation
 
-extension AgentToolDefinition {
-  var editorArea: String {
+enum AgentToolPresentation {
+  static func editorArea(for name: String) -> String {
     switch name {
     case "set_trim", "set_kept_slices", "remove_time_range", "get_silences", "remove_silences": "Cuts"
     case "set_camera", "add_camera_region", "update_camera_region", "remove_camera_region": "Webcam"
@@ -19,6 +19,18 @@ extension AgentToolDefinition {
     case "render_preview_frame", "export_draft", "export_video": "Preview and export"
     default: "Project"
     }
+  }
+
+  static func displayName(for name: String) -> String {
+    let words = name.split(separator: "_").map(String.init)
+    guard let first = words.first else { return name }
+    return ([first.capitalized] + words.dropFirst()).joined(separator: " ")
+  }
+}
+
+extension AgentToolDefinition {
+  var editorArea: String {
+    AgentToolPresentation.editorArea(for: name)
   }
 
   var displayTitle: String {

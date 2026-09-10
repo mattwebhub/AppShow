@@ -104,9 +104,7 @@ struct AgentConversationView: View {
     VStack(alignment: .leading, spacing: Layout.compactSpacing) {
       readinessView
       if let preparationError {
-        Text(preparationError)
-          .font(.system(size: FontSize.xxs))
-          .foregroundStyle(Color.orange)
+        AgentNoticeView(text: preparationError, tone: .warning)
       }
       if transcript.recoveryPrompt != nil {
         HStack {
@@ -119,42 +117,61 @@ struct AgentConversationView: View {
         .disabled(!canStart)
       }
       if project == nil {
-        Text("Open a project to start a conversation.")
-          .font(.system(size: FontSize.xxs))
-          .foregroundStyle(AppShowColors.secondaryText)
+        AgentNoticeView(text: "Open a project to start a conversation.")
       }
       if isExporting {
-        Text("Wait for the export to finish before sending a message.")
-          .font(.system(size: FontSize.xxs))
-          .foregroundStyle(AppShowColors.secondaryText)
+        AgentNoticeView(text: "Wait for the export to finish before sending a message.")
       }
-      HStack(alignment: .bottom, spacing: Layout.compactSpacing) {
-        TextField("Message the assistant", text: $prompt, axis: .vertical)
-          .textFieldStyle(.plain)
-          .font(.system(size: FontSize.xs))
-          .foregroundStyle(AppShowColors.primaryText)
-          .lineLimit(2...8)
-          .padding(8)
-          .background(AppShowColors.fieldBackground)
-          .clipShape(RoundedRectangle(cornerRadius: Radius.md))
-          .overlay(RoundedRectangle(cornerRadius: Radius.md).strokeBorder(AppShowColors.border, lineWidth: 1))
-          .focused($composerFocused)
-          .onSubmit { send() }
-          .disabled(transcript.isRunning)
-        if transcript.isRunning {
-          IconButton(systemName: "stop.fill") {
-            transcript.cancel()
-          }
-        } else {
-          Button(action: { send() }) {
-            Image(systemName: "arrow.up")
-          }
-          .buttonStyle(PrimaryButtonStyle(size: .small))
-          .disabled(!canSend)
-        }
-      }
+      composerField
     }
     .padding(12)
+  }
+
+  private var composerField: some View {
+    HStack(alignment: .bottom, spacing: Layout.compactSpacing) {
+      TextField("Message the assistant", text: $prompt, axis: .vertical)
+        .textFieldStyle(.plain)
+        .font(.system(size: FontSize.xs))
+        .foregroundStyle(AppShowColors.primaryText)
+        .lineLimit(2...8)
+        .padding(.vertical, 6)
+        .padding(.leading, 4)
+        .focused($composerFocused)
+        .onSubmit { send() }
+        .disabled(transcript.isRunning)
+      composerAction
+    }
+    .padding(6)
+    .background(AppShowColors.fieldBackground)
+    .clipShape(RoundedRectangle(cornerRadius: Radius.lg))
+    .overlay(
+      RoundedRectangle(cornerRadius: Radius.lg)
+        .strokeBorder(composerFocused ? AppShowColors.ring : AppShowColors.border, lineWidth: 1)
+    )
+    .contentShape(Rectangle())
+    .onTapGesture { composerFocused = true }
+  }
+
+  @ViewBuilder
+  private var composerAction: some View {
+    if transcript.isRunning {
+      Button {
+        transcript.cancel()
+      } label: {
+        Image(systemName: "stop.fill")
+      }
+      .buttonStyle(CircularPrimaryButtonStyle())
+      .help("Stop the assistant")
+    } else {
+      Button {
+        send()
+      } label: {
+        Image(systemName: "arrow.up")
+      }
+      .buttonStyle(CircularPrimaryButtonStyle())
+      .disabled(!canSend)
+      .help("Send message")
+    }
   }
 
   var canStart: Bool {

@@ -27,8 +27,7 @@ struct AgentConfirmationView: View {
       }
     }
     .padding(10)
-    .background(AppShowColors.muted)
-    .clipShape(RoundedRectangle(cornerRadius: Radius.lg))
+    .background(AppShowColors.muted, in: RoundedRectangle(cornerRadius: Radius.lg))
     .overlay(RoundedRectangle(cornerRadius: Radius.lg).strokeBorder(Color.orange.opacity(0.45), lineWidth: 1))
   }
 }

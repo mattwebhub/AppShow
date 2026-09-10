@@ -122,6 +122,26 @@ struct OutlineButtonStyle: ButtonStyle {
   }
 }
 
+struct CircularPrimaryButtonStyle: ButtonStyle {
+  var diameter: CGFloat = 28
+
+  @Environment(\.isEnabled) private var isEnabled
+  @Environment(\.colorScheme) private var colorScheme
+
+  func makeBody(configuration: Configuration) -> some View {
+    let _ = colorScheme
+    let bg = AppShowColors.primary
+    configuration.label
+      .font(.system(size: FontSize.xs, weight: .bold))
+      .foregroundStyle(AppShowColors.primaryForeground)
+      .frame(width: diameter, height: diameter)
+      .background(configuration.isPressed ? bg.opacity(0.75) : bg, in: Circle())
+      .contentShape(Circle())
+      .opacity(isEnabled ? 1.0 : 0.35)
+      .animation(.easeOut(duration: 0.12), value: isEnabled)
+  }
+}
+
 struct PlainCustomButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
