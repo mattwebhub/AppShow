@@ -25,4 +25,5 @@ The feature spikes under `features/` document earlier exploration. Use the curre
 
 - [Store implementation and local verification](../planning/releases/STORE-IMPLEMENTATION.md)
 - [Store privacy audit](../planning/releases/PRIVACY-AUDIT.md)
+- [Privacy policy](../PRIVACY.md) and [website publishing](../site/README.md)
 - [Store dependency evidence](../planning/releases/STORE-DEPENDENCIES.md)

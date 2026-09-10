@@ -1,6 +1,6 @@
-# AppShow privacy policy — unpublished draft
+# AppShow privacy policy — superseded draft
 
-Drafted September 10, 2026 from the Store data-flow inventory. The owner must provide the public contact details and confirm the provider/dependency disclosures before publication. This draft has not been entered as App Store Connect's data-collection answers.
+The current policy is [PRIVACY.md](../../PRIVACY.md), linked from Settings → About. The draft below is retained as historical preparation material; it is not the policy to publish. App Store Connect's data-collection questionnaire remains separate from publishing the policy.
 
 ## Your recordings and projects
 

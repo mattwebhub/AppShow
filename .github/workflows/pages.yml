@@ -1,0 +1,73 @@
+name: Privacy policy website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - PRIVACY.md
+      - site/**
+      - docs/assets/app-icon.png
+      - .github/workflows/pages.yml
+  pull_request:
+    paths:
+      - PRIVACY.md
+      - site/**
+      - docs/assets/app-icon.png
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build privacy website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare policy source and icon
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          policy = Path('PRIVACY.md').read_text()
+          Path('site/privacy.md').write_text('---\nlayout: policy\npermalink: /privacy/\n---\n\n' + policy)
+          shutil.copyfile('docs/assets/app-icon.png', 'site/assets/app-icon.png')
+          PY
+      - uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./site
+          destination: ./_site
+      - name: Check published routes and privacy choices
+        run: |
+          test -s _site/index.html
+          test -s _site/privacy/index.html
+          test -s _site/assets/policy.css
+          test -s _site/assets/app-icon.png
+          grep -q 'id="your-choices-and-deletion"' _site/privacy/index.html
+          grep -q '/AppShow/assets/policy.css' _site/privacy/index.html
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./_site
+
+  deploy:
+    name: Publish privacy website
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
