@@ -80,6 +80,12 @@ Milestone 15 implements right-click microphone removal using the existing persis
 
 Assistant replies are checkpointed during streaming. Early EOF and reopened streaming messages become recoverable failures, unfinished tool rows explain their unknown outcome, and terminal provider events release a hung process. Retry preserves provider resume IDs; Start fresh retains local conversation context while opening a new provider session. Both ask the assistant to inspect current state before continuing. The full suite passes 752 tests in 87 suites, seven gated export tests pass, and six recovery tests pass again against the final build. Format, lint, warning-free build, project/signature validation pass; the updated app was reopened. Pointer interactions and real-provider recovery remain manual in milestone 15's `VERIFY.md`. Changes remain local.
 
+## Public publication (September 10)
+
+Branch `webcam-presentation-and-review` is pushed to `origin` and [PR #11](https://github.com/mattwebhub/AppShow/pull/11) publishes milestones 10–21 plus the assistant panel polish to `main`. The four newest commits split the sandboxed agent runtimes, the store planning docs, the identifier scrub and the panel styling. Merge waits for CI; the open localization PR #17 targets the old `main` and needs a rebase afterwards.
+
+The direct edition's assistant panel now uses one circular send/stop control inside the composer, humanized tool rows with activity and failure states, shared notice rows, and shaped backgrounds instead of clipping. Offscreen renders in both appearances and the layout guard test verified it; the interactive check in the running editor remains manual.
+
 ## Accepted product decisions
 
 - The Store product must retain project chat, MCP editing tools, and integrations with both Codex and Claude Code under App Sandbox. The owner confirmed this on 2026-09-09; the temporary validation exclusion is not an approved shipping fallback (ADR 0020).
