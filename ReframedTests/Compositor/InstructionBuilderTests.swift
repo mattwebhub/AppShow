@@ -260,4 +260,25 @@ struct InstructionBuilderTests {
 
     #expect(!needsCompositor(config, result: result(quality: .veryHigh)))
   }
+
+  @Test func textOverlayNeedsCompositor() {
+    var config = config()
+    config.textOverlays = [TextOverlayData(startSeconds: 0, endSeconds: 1)]
+
+    #expect(needsCompositor(config))
+  }
+
+  @Test func imageOverlayNeedsCompositor() {
+    var config = config()
+    config.imageOverlays = [ImageOverlayData(startSeconds: 0, endSeconds: 1, filename: "image.png")]
+
+    #expect(needsCompositor(config))
+  }
+
+  @Test func blurRegionNeedsCompositor() {
+    var config = config()
+    config.blurRegions = [BlurRegionData(startSeconds: 0, endSeconds: 1)]
+
+    #expect(needsCompositor(config))
+  }
 }

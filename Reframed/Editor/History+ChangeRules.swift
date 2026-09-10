@@ -268,6 +268,24 @@ extension History {
       removed: "Spotlight region removed",
       adjusted: "Spotlight region adjusted"
     ),
+    regions(
+      \.textOverlays,
+      added: "Text overlay added",
+      removed: "Text overlay removed",
+      adjusted: "Text overlay adjusted"
+    ),
+    regions(
+      \.imageOverlays,
+      added: "Image overlay added",
+      removed: "Image overlay removed",
+      adjusted: "Image overlay adjusted"
+    ),
+    regions(
+      \.blurRegions,
+      added: "Blur region added",
+      removed: "Blur region removed",
+      adjusted: "Blur region adjusted"
+    ),
 
     { old, new in
       guard old.captionSettings != new.captionSettings || old.captionSegments != new.captionSegments
