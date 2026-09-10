@@ -22,6 +22,7 @@ The mental model in `AGENTS.md` ("everything is actor-isolated; writers are acto
 | `CaptureToolbarWindow`, `ReframedColors` (enum; reads `NSApp.effectiveAppearance`), `SoundEffect` | `Reframed/UI/CaptureToolbarWindow.swift`, `Colors.swift`; `Reframed/Utilities/SoundEffect.swift` | |
 | `MouseClickMonitor`, `WebcamPreviewWindow`, `RecordingPreviewWindow`, `DevicePreviewWindow`, `MouseClickWindow`, `DeviceDiscovery` | `Reframed/Recording/*.swift` | `DeviceDiscovery` yes |
 | `EditorWindow`, `EditorState`, `SyncedPlayerController`, `History`, `ClickSoundPlayer`, `AudioWaveformGenerator` | `Reframed/Editor/*.swift` | `EditorState`, `SyncedPlayerController`, `History`, `AudioWaveformGenerator` yes |
+| `AgentTranscript`, `AgentChatPanel`, `AgentConversationView` | `Reframed/Agent/*.swift` | `AgentTranscript` yes |
 | `SparkleUpdater`, `UpdateChecker` (enum), `WhisperModelManager` | `Reframed/Utilities/*.swift` | `WhisperModelManager` yes |
 | `FileManager.projectSaveDirectory()`, `defaultSaveDirectory()`, `defaultSaveURL(for:extension:)` (method-level) | `Reframed/Recording/FileManager+Reframed.swift` | because they read `ConfigService` |
 | Static previews: `CursorRenderer.previewImage`, `SystemCursorRenderer.previewImage`; `Track.background/borderColor/regionTextColor` | `Reframed/Editor/CursorRenderer.swift`, `SystemCursorRenderer.swift`; `Reframed/UI/Constants.swift` | |
@@ -34,6 +35,10 @@ SwiftUI `View` structs are implicitly main-actor. All AppKit `NSWindow`/`NSView`
 | --- | --- | --- |
 | `RecordingCoordinator` | `Reframed/Recording/RecordingCoordinator.swift` | The only application-level actor. Its state is the set of optional sources/writers plus `pauseStartTime`, `totalPauseOffset`, pixel dimensions. Its methods mostly *dispatch* to queue-confined objects (`videoWriter?.pause()` → `queue.async`), so the actor is a coordination point, not a data path. Sample buffers never pass through it. |
 | `RNNoiseProgressTracker` (private) | `Reframed/Utilities/RNNoiseProcessor.swift` | Aggregates progress from parallel denoise chunks and forwards to a `@MainActor` closure. |
+| `AgentProcessRunner` | `Reframed/Agent/AgentProcessRunner.swift` | Owns a single child `Process`, incrementally streams stdout, bounds line length, and terminates on cancellation. |
+| `AgentSession` | `Reframed/Agent/AgentSession.swift` | Composes a provider and runner for one turn and converts output lines to `AgentEvent` values. |
+| `AgentToolchain` | `Reframed/Agent/AgentToolchain.swift` | Resolves provider executables from controlled directories and an optional bounded login-shell lookup. |
+| `AgentProbe` | `Reframed/Agent/AgentReadiness.swift` | Runs bounded version and authentication checks and kills a timed-out probe. |
 
 ### 1.3 `@unchecked Sendable` types and how each one actually achieves safety
 
